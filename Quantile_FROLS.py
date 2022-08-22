@@ -193,7 +193,7 @@ class Quantile_FROLS(BaseOptimizer):
             A = np.zeros(
                 (n_features, n_features), dtype=x.dtype
             )  # Used for inversion to original function set (A @ coef = g)
-
+            
             # Orthogonal function libraries
             Q = np.zeros_like(x)  # Global library (built over time)
             Qs = np.zeros_like(x)  # Same, but for each step
