@@ -2,6 +2,17 @@
     "C_Cpp.default.configurationProvider": "go2sh.cmake-integration",
     "files.associations": {
         "dense": "cpp",
-        "geometry": "cpp"
+        "geometry": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "*.ipp": "cpp",
+        "array": "cpp",
+        "bitset": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "regex": "cpp",
+        "valarray": "cpp",
+        "list": "cpp"
     }
 }
