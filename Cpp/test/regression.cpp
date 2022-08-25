@@ -16,7 +16,7 @@ TEST(Regression, single_response_regression)
     Vec y = X.col(1);
 
     double ERR_tolerance = 1e-4;
-    auto result = FROLS::single_response_regression(X, y, ERR_tolerance);
+    auto result = FROLS::Regression::single_response_batch(X, y, ERR_tolerance);
 
 }
 
