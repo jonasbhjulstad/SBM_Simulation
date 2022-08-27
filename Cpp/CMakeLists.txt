@@ -3,6 +3,7 @@ project(Eigen_FROLS)
 find_package(Eigen3 REQUIRED)
 find_package(casadi REQUIRED)
 find_package(SUNDIALS REQUIRED)
+find_package(igraph REQUIRED)
 set(SUNDIALS_LIBS SUNDIALS::cvode SUNDIALS::nvecserial)
 
 file(GLOB casadi_shared_libs "/home/arch/Env/Default/lib/python3.10/site-packages/casadi/lib*.so")

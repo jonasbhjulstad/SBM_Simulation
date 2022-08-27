@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import ndlib.models.epidemics as ep
 import ndlib.models.ModelConfig as mc
+from ndlib.utils import multi_runs
 from aesara import tensor as at
 from bokeh.io import output_notebook, show
 # from ndlib.viz.bokeh.DiffusionTrend import DiffusionTrend
@@ -16,99 +17,101 @@ from ndlib.viz.mpl.TrendComparison import DiffusionTrendComparison
 import pysindy as ps
 from pydmd import DMD
 
+def load_SIR(filename):
+    X = np.loadtxt(filename, delimiter=',')
+    return X.reshape(X.shape[0], 3, int(X.shape[1]/3))
+
+def plot_separate(X, reg_model):
+    x_grouped = [X[:,i,:] for i in range(3)]
+    X_list = [x.T for x in X]
+    fig, ax = plt.subplots(3,2)
+    t = np.linspace(0,1,x_grouped[0].shape[1])
+    sim = reg_model.simulate(x0=X_list[0][0,:], t=np.linspace(0,1, t.shape[0]))
+
+    for ci in np.arange(95, 10, -5):
+        for (i, x) in enumerate(x_grouped):
+            low = np.percentile(x, 50 - ci / 2, axis=0)
+            high = np.percentile(x, 50 + ci / 2, axis=0)
+            ax[i,0].fill_between(t, low, high, color='gray', alpha= np.exp(-.01*ci))
+
+    ax[0,0].set_title("Susceptible")
+    ax[1,0].set_title("Infected")
+    ax[2,0].set_title("Recovered")
+    _ = [x.grid() for x in ax[:,0]]
+    _ = [x.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False) for x in ax[:,0]]
+    _ = [x.tick_params(axis='y', which='both', bottom=False, top=False, labelbottom=False) for x in ax[:,0]]
+    
+    for i in range(N_sim):
+        x0 = X_list[i][0,:]
+        sim = reg_model.simulate(x0=x0, t=np.linspace(0,1, t.shape[0]))
+        ax[0,1].plot(t,sim[:,0], color='k')
+        ax[1,1].plot(t, sim[:,1], color='k')
+        ax[2,1].plot(t, sim[:,2], color='k')
+
+    ax[0,1].set_title("Susceptible")
+    ax[1,1].set_title("Infected")
+    ax[2,1].set_title("Recovered")
+    _ = [x.grid() for x in ax[:,1]]
+    _ = [x.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False) for x in ax[:,1]]
+    _ = [x.tick_params(axis='y', which='both', bottom=False, top=False, labelbottom=False) for x in ax[:,1]]
+    
+def plot_merged(X, reg_model):
+    x_grouped = [X[:,i,:] for i in range(3)]
+    X_list = [x.T for x in X]
+    fig, ax = plt.subplots(3)
+    t = np.linspace(0,1,x_grouped[0].shape[1])
+    sim = reg_model.simulate(x0=X_list[0][0,:], t=np.linspace(0,1, t.shape[0]))
+
+    for ci in np.arange(95, 10, -5):
+        for (i, x) in enumerate(x_grouped):
+            low = np.percentile(x, 50 - ci / 2, axis=0)
+            high = np.percentile(x, 50 + ci / 2, axis=0)
+            ax[i].fill_between(t, low, high, color='gray', alpha= np.exp(-.01*ci))
+
+    ax[0].set_title("Susceptible")
+    ax[1].set_title("Infected")
+    ax[2].set_title("Recovered")
+    _ = [x.grid() for x in ax[:]]
+    _ = [x.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False) for x in ax]
+    _ = [x.tick_params(axis='y', which='both', bottom=False, top=False, labelbottom=False) for x in ax]
+    
+    sim = reg_model.simulate(x0=X_list[0][0,:], t=np.linspace(0,1, t.shape[0]))
+    ax[0].plot(t,sim[:,0], color='k')
+    ax[1].plot(t, sim[:,1], color='k')
+    ax[2].plot(t, sim[:,2], color='k')
+
+    return fig, ax
+
 
 # In[2]:
+if __name__ == '__main__':
+
+    X = load_SIR('Data/SIR_trajectories.csv')
+
+    Nt = X.shape[-1]
+    N_sim = X.shape[0]
 
 
-def get_trajectory_matrix(trend):
-    return np.array([trend[0]['trends']['node_count'][i] for i in range(3)])
+    # In[8]:
 
 
-# In[3]:
+    t = [*list(range(Nt))]*N_sim
+
+    X_list = [x.T for x in X]
+
+    # In[10]:
 
 
-# Network topology
-N_pop = 20
-g = nx.erdos_renyi_graph(N_pop, .3)
-N_sim = 10
-# 2° Model selection
-models = [ep.SIRModel(g) for i in range(N_sim)]
+    from Quantile_STLSQ import Quantile_STLSQ
+    from Quantile_FROLS import Quantile_FROLS
+    # reg_model = ps.SINDy(Quantile_STLSQ(tau=.95, threshold=1e-6, alpha=1e-6))
+    reg_model = ps.SINDy(Quantile_FROLS(tau=.95, verbose=True, max_iter = 3))
 
-# 2° Model Configuration
-cfg = mc.Configuration()
-cfg.add_model_parameter('beta', 0.01)
-cfg.add_model_parameter('gamma', 0.02)
-cfg.add_model_parameter("fraction_infected", 0.1)
-[model.set_initial_status(cfg) for model in models]
-Nt = 200
-trends = []
-X = np.zeros((N_sim, 3, Nt))
-for i, model in enumerate(models):
-    iteration = model.iteration_bunch(Nt)
-    
-    trends.append(model.build_trends(iteration))
-    X[i, :, :] = get_trajectory_matrix(trends[-1])
-# 2° Simulation execution
+    reg_model.fit(X_list, t=np.linspace(0,1,Nt), multiple_trajectories=True)
+    reg_model.print()
 
+    fig, ax = plot_merged(X, reg_model)
 
-
-
-# In[4]:
-
-
-fig, ax = plt.subplots(1)
-N_pops = [50, 40]
-p_Is = [1.0, .3]
-for N, p in zip(N_pops, p_Is):
-    illustration_model = nx.erdos_renyi_graph(N, p)
-    nx.draw(illustration_model, ax=ax,  width=.1, style='dashed', edge_color='k', node_color='w', edgecolors='k')
-    fig.savefig("Erdos_Renyi_Illustration_{pop}_{pER}.svg".format(pop=N, pER=p), format='svg')
-
-
-# In[5]:
-
-
-# In[ ]:
-
-
-x_grouped = [X[:,i,:] for i in range(3)]
-
-# In[ ]:
-
-
-# In[ ]:
-
-
-t = [*list(range(Nt))]*N_sim
-x_grouped[0].shape
-
-
-# In[ ]:
-
-
-X_list = [x for x in X]
-# for i in range(3):
-#     X_2D[i,:] = np.array([X[j,i,:] for j in range(N_sim)]).T.ravel()
-# t = np.hstack([np.repeat(i, N_sim) for i in range(Nt)])
-
-
-# In[ ]:
-
-
-reg_model = ps.SINDy(ps.FROLS)
-
-reg_model.fit(X_list, multiple_trajectories=True)
-
-
-# In[ ]:
-
-
-sim = reg_model.simulate(x0=X_2D[:,Nt], t=np.linspace(0,200, 10000))
-plt.plot(sim)
-
-
-# In[ ]:
-
-
-
+    fig.savefig('Figures/SIR_merged.png', bbox_inches='tight')
+    fig.show()
 

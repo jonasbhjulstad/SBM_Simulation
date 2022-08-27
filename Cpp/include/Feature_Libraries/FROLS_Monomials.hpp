@@ -20,33 +20,28 @@ template <size_t Nx>
 using jacMonomialFn =
     std::function<std::array<double, Nx * Nx>(const std::array<double, Nx>)>;
 
-template <size_t Nx>
-struct MonomialFeature {
-  std::array<size_t, Nx> orders;
-  MonomialFeature(const std::array<size_t, Nx> &orders) : orders(orders) {}
-
-  double operator()(const std::array<double, Nx> &x) {
-    double result = 1;
-    for (size_t i = 0; i < Nx; i++) {
-      result *= std::pow(x[i], orders[i]);
-    }
-    return result;
-  }
+template <size_t Nx, size_t N_control> struct MonomialRegressionData {
+  double theta_x[Nx];
+  double theta_u[N_control];
+  std::array<std::array<size_t, Nx>> monomial_powers;
 };
 
-template <size_t N_features>
-struct IntegratorData
-{
-  double theta_x[N_features];
-  double theta_u[N_control];
-}
-
 template <size_t Nx>
-int polynomial_CVRhsFn(realtype t, N_Vector y, N_Vector ydot, void *param) {
-  double* y_data = NV_DATA_S(y);
-  double* ydot_data = NV_DATA_S(ydot);
+int polynomial_CVRhsFn(realtype t, N_Vector y, N_Vector ydot, void *p_param) {
+  std::array<double, Nx> y_data = NV_DATA_S(y);
+  double *ydot_data = NV_DATA_S(ydot);
   std::array<double, Nx> x;
+  MonomialRegressionData md = *(MonomialRegressionData)p_param;
 
+  for (int k = 0; k < N_features; k++) {
+    for (int i = 0; i < Nx; i++) {
+      auto powers_i = md.monomial_powers[i] double monomial = 1;
+      for (int j = 0; j < Nx; j++) {
+        monomial *= pow(y_data[j], j);
+      }
+      ydot_data[i] += monomial;
+    }
+  }
   return 0;
 }
 
