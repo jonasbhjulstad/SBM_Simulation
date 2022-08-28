@@ -6,6 +6,7 @@
 #include <cvode/cvode_spils.h>
 #include <fstream>
 #include <iostream>
+#include <array>
 #include <nvector/nvector_serial.h>
 #include <sundials/sundials_math.h>
 #include <sundials/sundials_types.h>

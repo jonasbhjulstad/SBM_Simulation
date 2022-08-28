@@ -11,7 +11,7 @@ Mat used_feature_orthogonalize(const Mat &X, const Mat &Q,
   Mat Q_current = Mat::Zero(N_samples, N_features);
   for (int k = 0; k < N_features; k++) {
     if (!used_indices.head(current_feature_idx).cwiseEqual(k).any()) {
-      Q_current.col(k) = vec_orthogonalize(X.col(k), Q_current.leftCols(k));
+      Q_current.col(k) = vec_orthogonalize(X.col(k), Q.leftCols(k));
     }
   }
   return Q_current;
@@ -63,12 +63,16 @@ Regression_Data single_response_batch(const Mat &X, const Vec &y,
 }
 
 std::vector<Regression_Data>
-multiple_response_batch(const Mat &X, const Mat &Y,
+multiple_response_batch(const Mat &Y, const Mat& U,
                         double ERR_tolerance = 1e-1) {
   size_t N_response = Y.cols();
   std::vector<Regression_Data> result(N_response);
-  for (int i = 0; i < N_response; i++) {
-    result[i] = single_response_batch(X, Y.col(i), ERR_tolerance);
+  Mat X(U.rows(), U.cols() + Y.cols());
+  X << U, Y;
+  {
+    for (int i = 0; i < N_response; i++) {
+      result[i] = single_response_batch(X, Y.col(i), ERR_tolerance);
+    }
   }
   return result;
 }
