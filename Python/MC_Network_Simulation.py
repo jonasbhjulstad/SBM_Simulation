@@ -33,7 +33,12 @@ model.set_initial_status(cfg)
 Nt = 200
 X = np.zeros((N_sim, 3, Nt))
 
-trends = multi_runs(model, execution_number=N_sim, iteration_number=Nt, infection_sets=None, nprocesses=6)    
+#Generate infection sets for the different runs
+infection_sets = []
+for i in range(N_sim):
+    infection_sets.append(model.generate_infection_set(cfg))
+
+trends = multi_runs(model, execution_number=N_sim, iteration_number=Nt, infection_sets=infection_sets, nprocesses=6)    
 for i, trend in enumerate(trends):
     X[i, :, :] = get_trajectory_matrix(trend)
 

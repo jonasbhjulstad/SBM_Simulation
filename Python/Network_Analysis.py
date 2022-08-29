@@ -16,6 +16,10 @@ from bokeh.io import output_notebook, show
 from ndlib.viz.mpl.TrendComparison import DiffusionTrendComparison
 import pysindy as ps
 from pydmd import DMD
+from ParameterConfig import DATA_DIR, FIGURE_DIR, ROOT_DIR
+
+
+
 
 def load_SIR(filename):
     X = np.loadtxt(filename, delimiter=',')
@@ -86,7 +90,7 @@ def plot_merged(X, reg_model):
 # In[2]:
 if __name__ == '__main__':
 
-    X = load_SIR('Data/SIR_trajectories.csv')
+    X = load_SIR(DATA_DIR + 'SIR_trajectories_20_0.1.csv')
 
     Nt = X.shape[-1]
     N_sim = X.shape[0]
@@ -105,13 +109,14 @@ if __name__ == '__main__':
     from Quantile_STLSQ import Quantile_STLSQ
     from Quantile_FROLS import Quantile_FROLS
     # reg_model = ps.SINDy(Quantile_STLSQ(tau=.95, threshold=1e-6, alpha=1e-6))
-    reg_model = ps.SINDy(Quantile_FROLS(tau=.95, verbose=True, max_iter = 3))
+    # reg_model = ps.SINDy(Quantile_FROLS(tau=.95, verbose=True, max_iter = 3))
+    reg_model = ps.SINDy(ps.STLSQ(threshold=1e-1))
 
     reg_model.fit(X_list, t=np.linspace(0,1,Nt), multiple_trajectories=True)
     reg_model.print()
 
     fig, ax = plot_merged(X, reg_model)
 
-    fig.savefig('Figures/SIR_merged.png', bbox_inches='tight')
+    fig.savefig(FIGURE_DIR + 'SIR_merged.png', bbox_inches='tight')
     fig.show()
 
