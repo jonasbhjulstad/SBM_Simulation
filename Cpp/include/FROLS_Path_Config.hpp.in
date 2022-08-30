@@ -1,0 +1,7 @@
+#ifndef FROLS_PATH_CONFIG_HPP
+#define FROLS_PATH_CONFIG_HPP
+
+const char* FROLS_ROOT_DIR = "@FROLS_ROOT_DIR@";
+const char* FROLS_INCLUDE_DIR = "@FROLS_INCLUDE_DIR@";
+const char* FROLS_DATA_DIR = "@FROLS_DATA_DIR@";
+#endif
