@@ -1,1 +1,2 @@
 add_subdirectory(Generate)
+add_subdirectory(Plot)

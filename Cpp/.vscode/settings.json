@@ -83,6 +83,22 @@
         "codecvt": "cpp",
         "ranges": "cpp",
         "shared_mutex": "cpp",
-        "span": "cpp"
-    }
+        "span": "cpp",
+        "cassert": "cpp",
+        "csetjmp": "cpp",
+        "barrier": "cpp",
+        "coroutine": "cpp",
+        "cuchar": "cpp",
+        "expected": "cpp",
+        "latch": "cpp",
+        "scoped_allocator": "cpp",
+        "spanstream": "cpp",
+        "stacktrace": "cpp",
+        "syncstream": "cpp",
+        "hash_map": "cpp"
+    },
+    "cmake.showConsoleAutomatically": true,
+    "C_Cpp.intelliSenseEngineFallback": "Disabled",
+	"settings": {"files.exclude": {"data/**"}}
+
 }

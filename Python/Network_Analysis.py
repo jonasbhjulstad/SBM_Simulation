@@ -16,15 +16,15 @@ from bokeh.io import output_notebook, show
 from ndlib.viz.mpl.TrendComparison import DiffusionTrendComparison
 import pysindy as ps
 from pydmd import DMD
-from ParameterConfig import DATA_DIR, FIGURE_DIR, ROOT_DIR, CPP_DATA_DIR
+from ParameterConfig import DATA_DIR, FIGURE_DIR, ROOT_DIR
 import glob
 import pandas as pd
 
-
-
-def load_SIR_trajectories(filename):
-    trajs = glob.glob(CPP_DATA_DIR + "*.csv")
-    dfs = [pd.read_csv(traj) for traj in trajs]
+CPP_Data_Dir = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/data/"
+CPP_Figure_Dir = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/figures/"
+def load_SIR_trajectories():
+    trajs = glob.glob(CPP_Data_Dir + "*60_1.0*.csv")
+    dfs = [pd.read_csv(traj) for traj in trajs[:100] if "Quantile" not in traj]
     N_traj = len(dfs)
     X = [df[['S', 'I', 'R']].to_numpy() for df in dfs]
     U = [df['p_I'].to_numpy() for df in dfs]
@@ -40,8 +40,8 @@ def plot_separate(X, reg_model):
 
     for ci in np.arange(95, 10, -5):
         for (i, x) in enumerate(x_grouped):
-            low = np.percentile(x, 50 - ci / 2, axis=0)
-            high = np.percentile(x, 50 + ci / 2, axis=0)
+            low = np.percentile(x, 50 - ci / 2, axis=2)
+            high = np.percentile(x, 50 + ci / 2, axis=2)
             ax[i,0].fill_between(t, low, high, color='gray', alpha= np.exp(-.01*ci))
 
     ax[0,0].set_title("Susceptible")
@@ -74,8 +74,8 @@ def plot_merged(X, U, reg_model):
 
     for ci in np.arange(95, 10, -5):
         for (i, x) in enumerate(x_grouped):
-            low = np.percentile(x, 50 - ci / 2, axis=0)
-            high = np.percentile(x, 50 + ci / 2, axis=0)
+            low = np.percentile(x, 50 - ci / 2, axis=1)
+            high = np.percentile(x, 50 + ci / 2, axis=1)
             ax[i].fill_between(t, low, high, color='gray', alpha= np.exp(-.01*ci))
 
     ax[0].set_title("Susceptible")
@@ -85,10 +85,16 @@ def plot_merged(X, U, reg_model):
     _ = [x.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False) for x in ax]
     _ = [x.tick_params(axis='y', which='both', bottom=False, top=False, labelbottom=False) for x in ax]
     
-    sim = reg_model.simulate(x0=X_list[0][0,:], t=np.linspace(0,1, t.shape[0]))
-    ax[0].plot(t,sim[:,0], color='k')
-    ax[1].plot(t, sim[:,1], color='k')
-    ax[2].plot(t, sim[:,2], color='k')
+    X0 = X_list[0][:,0]
+    sim = reg_model.simulate(x0=X0, t=np.linspace(0,1, t.shape[0]), u=U)
+
+    ax[0].plot(t[0], X0[0],color='k')
+    ax[1].plot(t[0], X0[1], color='k')
+    ax[2].plot(t[0], X0[2], color='k')
+
+    ax[0].plot(t[1:], sim[:, 0],color='k')
+    ax[1].plot(t[1:], sim[:, 1], color='k')
+    ax[2].plot(t[1:], sim[:, 2], color='k')
 
     return fig, ax
 
@@ -96,7 +102,7 @@ def plot_merged(X, U, reg_model):
 # In[2]:
 if __name__ == '__main__':
 
-    X, U = load_SIR_trajectories('SIR_trajectories_20_0.1.csv')
+    X, U = load_SIR_trajectories()
 
     U_mean = np.mean(U, axis=0)
 
@@ -115,13 +121,13 @@ if __name__ == '__main__':
     # reg_model = ps.SINDy(Quantile_STLSQ(tau=.95, threshold=1e-6, alpha=1e-6))
     # reg_model = ps.SINDy(Quantile_FROLS(tau=.95, verbose=True, max_iter = 3))
     lowPolyLib = ps.PolynomialLibrary(degree=2)
-    reg_model = ps.SINDy(ps.STLSQ(threshold=.5), feature_library=lowPolyLib)
+    reg_model = ps.SINDy(ps.STLSQ(threshold=.5, alpha=10), feature_library=lowPolyLib)
 
     reg_model.fit(X,u=U, t=np.linspace(0,1,Nt), multiple_trajectories=True)
     reg_model.print()
 
     fig, ax = plot_merged(X, U_mean, reg_model)
 
-    fig.savefig(FIGURE_DIR + 'SIR_merged.png', bbox_inches='tight')
+    fig.savefig(CPP_Figure_Dir + 'SIR_merged.png', bbox_inches='tight')
     fig.show()
 
