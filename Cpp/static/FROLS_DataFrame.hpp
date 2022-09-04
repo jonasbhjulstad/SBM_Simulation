@@ -1,7 +1,6 @@
 #ifndef FROLS_DATAFRAME_HPP
 #define FROLS_DATAFRAME_HPP
 #include <bits/stdc++.h>
-
 namespace FROLS {
 class DataFrameStack;
 class DataFrame {
@@ -67,6 +66,8 @@ public:
   }
 
   DataFrame &operator[](size_t frame)  { return dataframes[frame]; }
+
+  DataFrame compute_svd();
 
   const std::vector<double> get_col(size_t frame, const std::string &col_name);
   std::vector<double> get_row(size_t frame, size_t row);

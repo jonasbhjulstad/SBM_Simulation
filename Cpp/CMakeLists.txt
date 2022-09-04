@@ -1,12 +1,12 @@
 set(ENABLE_TESTING OFF)
 cmake_minimum_required(VERSION 3.5)
 project(FROLS)
+set(PYTHON_EXECUTABLE "C:\\Users\\jonas\\anaconda3\\envs\\Network_MPC\\python.exe")
 find_package(Eigen3 REQUIRED)
 find_package(casadi REQUIRED)
 find_package(SUNDIALS REQUIRED)
-find_package(pybind11 REQUIRED)
+find_package(pybind11 CONFIG)
 find_package(OpenMP)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -24,19 +24,33 @@ GIT_TAG release-1.12.1
 FetchContent_MakeAvailable(googletest)
 endif()
 
+find_package(cppitertools QUIET)
+
+if (NOT cppitertools_FOUND)
+
+set(cppitertools_INSTALL_CMAKE_DIR "share/cppitertools/cmake")
+FetchContent_Declare(
+cppitertools_repo
+GIT_REPOSITORY https://github.com/ryanhaining/cppitertools.git
+GIT_TAG master
+)
+
+FetchContent_MakeAvailable(cppitertools_repo)
+find_package(cppitertools REQUIRED HINTS "${cppitertools_repo_BUILD_DIR}")
+endif()
+
 # find_package(sciplot REQUIRED)
 
-
 find_package(igraph REQUIRED)
-  
-set(FROLS_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(FROLS_INCLUDE_DIRS ${FROLS_ROOT_DIR}/include ${FROLS_ROOT_DIR}/static)
-set(FROLS_DATA_DIR ${FROLS_ROOT_DIR}/data)
-configure_file(include/FROLS_Path_Config.hpp.in include/FROLS_Path_Config.hpp)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-add_executable(ex ex.cpp)
-target_link_libraries(ex PRIVATE Eigen3::Eigen casadi)
+set(FROLS_DATA_DIR "${PROJECT_SOURCE_DIR}/data" CACHE INTERNAL "FROLS_DATA_DIR")
+set(FROLS_INCLUDE "${PROJECT_SOURCE_DIR}/include" CACHE INTERNAL "FROLS_INCLUDE")
+set(FROLS_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_SOURCE_DIR}/static" CACHE INTERNAL "FROLS_INCLUDE_DIRS")
+
 add_subdirectory(static)
+set(FROLS_LIBRARIES "FROLS_DataFrame;FROLS_Quantiles;FROLS_Eigen;FROLS_Features" CACHE INTERNAL "FROLS_LIBRARIES")
+
+configure_file("${PROJECT_SOURCE_DIR}/include/FROLS_Path_Config.hpp.in" "${PROJECT_SOURCE_DIR}/include/FROLS_Path_Config.hpp")
+# For Windows: Prevent overriding the parent project's compiler/linker settings
 if (ENABLE_TESTING)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 add_subdirectory(test)

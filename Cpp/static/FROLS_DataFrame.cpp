@@ -131,5 +131,4 @@ void DataFrame::resize(size_t N_rows) {
     }
     return row_data;
   }
-
 }

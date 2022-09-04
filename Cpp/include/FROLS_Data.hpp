@@ -16,6 +16,22 @@ namespace FROLS
         Vec coefficients; //[N_features x N_features] rowwise coefficient matrix
     };
 
+    const std::string regression_data_summary(const Regression_Data& rd)
+    {
+        std::string summary = "Regression_Data Summary:\n";
+        summary += "Best Features:\n";
+        for (const auto& feature : rd.best_features)
+        {
+            summary += "Index: " + std::to_string(feature.index) + "\tERR: " + std::to_string(feature.ERR) + "\tg: " + std::to_string(feature.g) + "\n";
+        }
+        summary += "Coefficients:\n";
+        for (const auto& coeff : rd.coefficients)
+        {
+            summary += std::to_string(coeff) + "\n";
+        }
+        return summary;
+    }
+
 }
 
 #endif

@@ -3,7 +3,7 @@
 constexpr size_t N_configurations = 4;
 int main() {
   using namespace FROLS;
-  size_t N_threads = 4;
+  size_t N_threads = omp_get_max_threads();
   MC_SIR_Params params[N_configurations];
   params[1].N_pop = 20;
   params[2].p_ER = 0.1;
@@ -14,7 +14,9 @@ int main() {
   for (int i = 0; i < N_configurations; i++) {
     #pragma omp parallel
     { MC_SIR_to_file(FROLS_DATA_DIR, params[i]); }
-    compute_SIR_quantiles(params[i].N_sim * N_threads, 20, params[i].N_pop,
+    compute_SIR_quantiles(params[i].N_sim_tot, 20, params[i].N_pop,
                           params[i].p_ER);
   }
+
+  return 0;
 }

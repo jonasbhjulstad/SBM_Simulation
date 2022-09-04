@@ -8,7 +8,13 @@ import glob
 import re
 from multiprocessing.pool import ThreadPool
 from os.path import basename
+import os
 
+cwd = os.path.dirname(os.path.realpath(__file__))
+
+
+DATA_DIR = cwd + '/../../data/'
+FIGURE_DIR = cwd + '/../../figures/'
 
 def quantile_plot(ax, q_dfs):
     median_idx = int(len(q_dfs)/2)
@@ -38,12 +44,11 @@ def filename_sort(filenames):
 if __name__ == '__main__':
    # read and plot all csv in ../data
     # data_path = "C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\data\\"
-    data_path = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/data/"
-    figure_path = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/figures/"
+   
     # find all csv in data_path
     p_I0 = 0.2
 
-    fnames = glob.glob(data_path + "Bernoulli_SIR_MC_Quantiles*.csv")
+    fnames = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_Quantiles*.csv")
     # pd read first line
     fnames_sorted = filename_sort(fnames)
 
@@ -85,6 +90,6 @@ if __name__ == '__main__':
 
         # _ = [x.set_yticklabels([]) for x in ax]
         [fig.add_subplot(x) for x in ax]
-    fig.savefig(figure_path + "Bernoulli_SIR_MC_Quantiles.svg", format='svg')
+    fig.savefig(FIGURE_DIR + "Bernoulli_SIR_MC_Quantiles.svg", format='svg')
     # plot S, I, R, p_I, p_R
     plt.show()

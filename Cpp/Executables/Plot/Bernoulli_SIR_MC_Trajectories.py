@@ -5,19 +5,20 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import glob
 import re
-
+import os
 if __name__ == '__main__':
    # read and plot all csv in ../data
     # data_path = "C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\data\\"
-    data_path = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/data/"
+    cwd = os.path.dirname(os.path.realpath(__file__))
+
+
+    DATA_DIR = cwd + '/../../data/'
+    FIGURE_DIR = cwd + '/../../figures/'
     # find all csv in data_path
-    files = glob.glob(data_path + "Bernoulli_SIR_MC_*.csv")
+    files = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_*.csv")
     #sort q_files according to float in name
     fig, ax = plt.subplots(3)
-    dfs = [pd.read_csv(f, delimiter=",") for f in files[::500]]
-    for i in range(len(dfs)):
-        if (dfs[i]["S"][0] == 0):
-            print(i)
+    dfs = [pd.read_csv(f, delimiter=",") for f in files[::100]]
 
     for df in dfs:
         ax[0].plot(df["t"], df["S"], color='gray', alpha=.2)
