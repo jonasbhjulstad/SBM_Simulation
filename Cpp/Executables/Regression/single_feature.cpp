@@ -26,17 +26,21 @@ int main()
     // Features::PolynomialLibrary lib(N_raw_features, d_min, d_max);
     // Mat X_poly = lib.transform(X_raw);
 
+    using namespace FROLS::Features;
     int a = 0;
-    Mat X_poly = Features::polynomial_feature_transform(X_raw, d_max, 2);
-    // std::vector<std::string> feature_names = Features::polynomial_feature_names(d_min, d_max, N_raw_features);
-    // std::cout << feature_names << std::endl;
-    std::cout << X_poly.topRows(5) << std::endl;
+    Mat X_poly = Polynomial::feature_transform(X_raw, d_max, 5);
 
-    // Mat Y = dataframe_to_matrix(dfs[0], {"S", "I", "R"})(Eigen::seq(1, Eigen::last), Eigen::all);
-
-    // auto rd = Regression::single_response_batch(X, Y.col(0), 1e-1);
+    Polynomial::feature_display(X_poly, d_max, 3);    
     
-    // std::cout << regression_data_summary(rd) << std::endl;
+
+
+    Mat Y = dataframe_to_matrix(dfs[0], {"S", "I", "R"})(Eigen::seq(1, Eigen::last), Eigen::all);
+
+    auto rd = Regression::single_response_regression(X_raw.leftCols(3),  Y.col(0), 1e-1);
+    
+    std::cout << regression_data_summary(rd) << std::endl;
+
+    
 
     return 0;
 

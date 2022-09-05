@@ -8,3 +8,4 @@ pybind11_add_module(Bernoulli_SIR_MC_Binder Binder.cpp)
 target_link_libraries(Bernoulli_SIR_MC_Binder PUBLIC ${DEFAULT_LIBS} OpenMP::OpenMP_CXX ${FROLS_LIBRARIES})
 target_include_directories(Bernoulli_SIR_MC_Binder PUBLIC ${FROLS_INCLUDE_DIRS})
 
+add_compile_options("-fPIC")

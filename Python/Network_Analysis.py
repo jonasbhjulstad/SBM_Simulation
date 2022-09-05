@@ -16,7 +16,7 @@ from bokeh.io import output_notebook, show
 from ndlib.viz.mpl.TrendComparison import DiffusionTrendComparison
 import pysindy as ps
 from pydmd import DMD
-from ParameterConfig import DATA_DIR, FIGURE_DIR, ROOT_DIR
+# from ParameterConfig import DATA_DIR, FIGURE_DIR, ROOT_DIR
 import glob
 import pandas as pd
 

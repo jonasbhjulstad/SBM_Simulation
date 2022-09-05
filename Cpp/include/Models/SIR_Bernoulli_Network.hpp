@@ -30,7 +30,6 @@ template <typename RNG>
 std::vector<SIR_State> generate_SIR_ER_model(igraph_t &G, size_t N_pop,
                                              double p_ER, double p_I0,
                                              RNG &rng) {
-  static_assert(IGRAPH_THREAD_SAFE);
   igraph_erdos_renyi_game_gnp(&G, N_pop, p_ER, false, false);
 
   std::vector<SIR_State> state(N_pop);
@@ -92,7 +91,6 @@ std::vector<std::vector<size_t>>
 run_SIR_simulation(igraph_t &G, const std::vector<SIR_State> x0, size_t Nt,
                    const std::vector<double> &p_I,
                    const std::vector<double> &p_R, RNG &rng) {
-  static_assert(IGRAPH_THREAD_SAFE);
 
   std::vector<std::vector<size_t>> SIR_trajectory(3);
   SIR_trajectory[S].resize(Nt+1);

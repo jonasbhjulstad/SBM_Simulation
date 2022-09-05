@@ -1,7 +1,12 @@
 set(ENABLE_TESTING OFF)
 cmake_minimum_required(VERSION 3.5)
 project(FROLS)
+if(WIN32)
 set(PYTHON_EXECUTABLE "C:\\Users\\jonas\\anaconda3\\envs\\Network_MPC\\python.exe")
+else()
+set(PYTHON_EXECUTABLE "/home/arch/Env/Default/bin/python")
+endif()
+add_compile_options("-Wfatal-errors" "-fPIC")
 find_package(Eigen3 REQUIRED)
 find_package(casadi REQUIRED)
 find_package(SUNDIALS REQUIRED)
@@ -36,7 +41,7 @@ GIT_TAG master
 )
 
 FetchContent_MakeAvailable(cppitertools_repo)
-find_package(cppitertools REQUIRED HINTS "${cppitertools_repo_BUILD_DIR}")
+find_package(cppitertools REQUIRED HINTS "${cppitertools_repo_BINARY_DIR}")
 endif()
 
 # find_package(sciplot REQUIRED)
@@ -49,6 +54,7 @@ set(FROLS_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_SOURCE_DIR}/stat
 add_subdirectory(static)
 set(FROLS_LIBRARIES "FROLS_DataFrame;FROLS_Quantiles;FROLS_Eigen;FROLS_Features" CACHE INTERNAL "FROLS_LIBRARIES")
 
+add_subdirectory(Binders)
 configure_file("${PROJECT_SOURCE_DIR}/include/FROLS_Path_Config.hpp.in" "${PROJECT_SOURCE_DIR}/include/FROLS_Path_Config.hpp")
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 if (ENABLE_TESTING)

@@ -22,7 +22,6 @@ namespace FROLS
   };
 
 
-  static_assert(IGRAPH_THREAD_SAFE);
 
   void MC_SIR_to_file(const std::string fPath, const MC_SIR_Params &p)
   {

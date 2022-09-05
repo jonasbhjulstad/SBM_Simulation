@@ -65,14 +65,14 @@ public:
     return dataframes[frame][col_name]->operator[](row);
   }
 
-  DataFrame &operator[](size_t frame)  { return dataframes[frame]; }
+  DataFrame &operator[](size_t frame) { return dataframes[frame]; }
 
   DataFrame compute_svd();
 
   const std::vector<double> get_col(size_t frame, const std::string &col_name);
   std::vector<double> get_row(size_t frame, size_t row);
 
-  size_t get_N_frames() { return dataframes.size(); }
+  size_t get_N_frames() const { return dataframes.size(); }
 };
 
 } // namespace FROLS

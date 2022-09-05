@@ -2,9 +2,15 @@
 #define FROLS_FEATURE_HPP
 #include "FROLS_Typedefs.hpp"
 #include "FROLS_math.hpp"
-#include "FROLS_Data.hpp"
 namespace FROLS
 {
+
+    struct Feature
+    {
+        double ERR = 0; //Error Reduction Ratio
+        double g; //Feature (Orthogonalized Linear-in-the-parameters form)
+        size_t index; //Index of the feature in the original feature set
+    };
     Feature feature_select(const Mat& X, const Vec& y, const iVec& used_features)
     {
         size_t N_features = X.cols();

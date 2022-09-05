@@ -28,8 +28,15 @@ bool feature_tolerance_check(const std::vector<Feature> &features,
 namespace Regression {
 // Computes feature coefficients for feature batch X with respect to a single
 // response variable y
-Regression_Data single_response_batch(const Mat &X, const Vec &y,
-                                      double ERR_tolerance) {
+struct Regression_Data {
+  std::vector<Feature>
+      best_features; // Best regression-features in ERR-decreasing order
+  Vec coefficients;  //[N_features x N_features] rowwise coefficient matrix
+};
+
+Regression_Data single_response_regression(Eigen::Ref<const Mat> X,
+                                           Eigen::Ref<const Vec> y,
+                                           double ERR_tolerance) {
   size_t N_features = X.cols();
   Mat Q_global = Mat::Zero(X.rows(), N_features);
   Mat Q_current = Q_global;
@@ -63,18 +70,31 @@ Regression_Data single_response_batch(const Mat &X, const Vec &y,
 }
 
 std::vector<Regression_Data>
-multiple_response_batch(const Mat &Y, const Mat& U,
-                        double ERR_tolerance = 1e-1) {
+multiple_response_regression(Eigen::Ref<const Mat> Y, Eigen::Ref<const Mat> X,
+                             double ERR_tolerance = 1e-1) {
   size_t N_response = Y.cols();
   std::vector<Regression_Data> result(N_response);
-  Mat X(U.rows(), U.cols() + Y.cols());
-  X << U, Y;
   {
     for (int i = 0; i < N_response; i++) {
-      result[i] = single_response_batch(X, Y.col(i), ERR_tolerance);
+      result[i] = single_response_regression(X, Y.col(i), ERR_tolerance);
     }
   }
   return result;
+}
+
+const std::string regression_data_summary(const Regression_Data &rd) {
+  std::string summary = "Regression_Data Summary:\n";
+  summary += "Best Features:\n";
+  for (const auto &feature : rd.best_features) {
+    summary += "Index: " + std::to_string(feature.index) +
+               "\tERR: " + std::to_string(feature.ERR) +
+               "\tg: " + std::to_string(feature.g) + "\n";
+  }
+  summary += "Coefficients:\n";
+  for (const auto &coeff : rd.coefficients) {
+    summary += std::to_string(coeff) + "\n";
+  }
+  return summary;
 }
 } // namespace Regression
 } // namespace FROLS

@@ -4,7 +4,7 @@
 
 const char *FROLS_ROOT_DIR = "";
 const char *FROLS_INCLUDE_DIR = "";
-const char *FROLS_DATA_DIR = "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/data";
+const char *FROLS_DATA_DIR = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/data";
 
 inline std::string MC_sim_filename(size_t N_pop, double p_ER, size_t idx)
 {
