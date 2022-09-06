@@ -121,7 +121,9 @@ if __name__ == '__main__':
     # reg_model = ps.SINDy(Quantile_STLSQ(tau=.95, threshold=1e-6, alpha=1e-6))
     # reg_model = ps.SINDy(Quantile_FROLS(tau=.95, verbose=True, max_iter = 3))
     lowPolyLib = ps.PolynomialLibrary(degree=2)
-    reg_model = ps.SINDy(ps.STLSQ(threshold=.5, alpha=10), feature_library=lowPolyLib)
+    # reg_model = ps.SINDy(ps.STLSQ(threshold=.5, alpha=10), feature_library=lowPolyLib)
+    frols = ps.FROLS()
+    reg_model = ps.SINDy(frols, feature_library=lowPolyLib)
 
     reg_model.fit(X,u=U, t=np.linspace(0,1,Nt), multiple_trajectories=True)
     reg_model.print()

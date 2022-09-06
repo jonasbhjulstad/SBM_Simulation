@@ -2,40 +2,33 @@
 
 #ifndef MCMC_GENERATE_SIR_HPP
 #define MCMC_GENERATE_SIR_HPP
+#include <array>
 #include <cvode/cvode.h>
 #include <cvode/cvode_spils.h>
 #include <fstream>
 #include <iostream>
-#include <array>
 #include <nvector/nvector_serial.h>
 #include <sundials/sundials_math.h>
 #include <sundials/sundials_types.h>
 #include <sunlinsol/sunlinsol_spgmr.h>
 
 namespace FROLS::Integrators {
+template <size_t Nx, size_t Nu, size_t Nt>
+using std::array<double, Nx> (*NARX_LTI_ode)(const array<double, Nx> &x,
+                                             const array<double, Nu> &u);
 
-template <size_t Nx> struct Model_Integrator {
-  virtual std::array<realtype, Nx> step(const std::array<realtype, Nx> &) = 0;
-  std::array<double, Nx> x0;
-  Model_Integrator(const std::array<double, Nx> &x0) : x0(x0) {}
-  void write(const std::string &fPath,
-             const std::vector<std::array<realtype, Nx>> &data) {
-    std::ofstream file(fPath);
-    for (const auto &d : data) {
-      file << d.transpose() << std::endl;
-    }
-    file.close();
-  }
+template <size_t Nx, size_t Nu, size_t Nt, NARX_LTI_ode f_ode>
+std::array<std::array<double, Nx>, Nt>
+NARX_LTI_integrate(std::array<double, Nx> &x0,
+                   const std::array<std::array<double, Nu>, Nt> &U) {
+  std::array<std::array<double, Nx>, Nt> x_traj;
 
-  std::vector<std::array<realtype, Nx>> run_trajectory(const size_t Nt) {
-    std::vector<std::array<realtype, Nx>> data(Nt);
-    data[0] = x0;
-    for (size_t i = 1; i < Nt; i++) {
-      data[i] = step(data[i - 1]);
-    }
-    return data;
+  for (int i = 0; i < Nt; i++) 
+  {
+    x_traj[i] = f_ode(x0, U[i]);
   }
-};
+  return x_traj;
+  }
 
 template <size_t Nx, class Derived>
 struct CVODE_Integrator : public Model_Integrator<Nx> {
@@ -51,7 +44,8 @@ struct CVODE_Integrator : public Model_Integrator<Nx> {
   CVODE_Integrator(const std::array<realtype, Nx> &x0, realtype dt,
                    realtype abs_tol = 1e-5, realtype reltol = 1e-5,
                    realtype t0 = 0)
-      : dt(dt), abs_tol(abs_tol), rel_tol(reltol), t_current(t0), Model_Integrator<Nx>(x0) {
+      : dt(dt), abs_tol(abs_tol), rel_tol(reltol),
+        t_current(t0), Model_Integrator<Nx>(x0) {
 
     SUNContext_Create(NULL, &ctx);
     if (check_flag((void *)ctx, "SUNContextCreate", 0))

@@ -1,13 +1,13 @@
 import sys
 BINDER_DIR = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/build/Binders/"
 sys.path.insert(0, BINDER_DIR)
-from FROLS import single_response_regression, feature_names
+from pyFROLS import single_response_regression, feature_names
 import pandas as pd
 from glob import glob
 import numpy as np
 
 def print_regression_data(rd):
-    for best_feature in rd.best_features:
+    for best_feature in rd:
         print("Index:\t{}".format(best_feature.index) + "\tERR:\t{}".format(best_feature.ERR) + "\tg:\t{}".format(best_feature.g))
     return
 
@@ -27,9 +27,9 @@ if __name__ == '__main__':
     print_regression_data(rd)
     feature_names = feature_names(4, 3, 3)
 
-    # for best_feature in rd.best_features:
-    #     print(feature_names[best_feature.index])
+    for best_feature in rd:
+        print(feature_names[best_feature.index])
 
-    [print(r'{}'.format(name)) for name in feature_names]
+    # [print(r'{}'.format(name)) for name in feature_names]
     
     a = 1

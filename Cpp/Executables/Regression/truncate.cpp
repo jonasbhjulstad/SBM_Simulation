@@ -1,4 +1,4 @@
-#include <FROLS.hpp>
+#include <FROLS_Algorithm.hpp>
 #include <FROLS_DataFrame.hpp>
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_Eigen.hpp>

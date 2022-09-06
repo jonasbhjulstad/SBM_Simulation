@@ -12,6 +12,7 @@ find_package(casadi REQUIRED)
 find_package(SUNDIALS REQUIRED)
 find_package(pybind11 CONFIG)
 find_package(OpenMP)
+find_package(nlohmann_json REQUIRED)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -29,20 +30,22 @@ GIT_TAG release-1.12.1
 FetchContent_MakeAvailable(googletest)
 endif()
 
-find_package(cppitertools QUIET)
+# option(cppitertools_INSTALL_CMAKE_DIR "share/cppitertools/cmake")
+# find_package(cppitertools QUIET)
 
-if (NOT cppitertools_FOUND)
 
-set(cppitertools_INSTALL_CMAKE_DIR "share/cppitertools/cmake")
 FetchContent_Declare(
 cppitertools_repo
 GIT_REPOSITORY https://github.com/ryanhaining/cppitertools.git
 GIT_TAG master
+CONFIGURE_COMMAND ""
+BUILD_COMMAND ""
 )
 
 FetchContent_MakeAvailable(cppitertools_repo)
-find_package(cppitertools REQUIRED HINTS "${cppitertools_repo_BINARY_DIR}")
-endif()
+# target_include_directories(cppitertools INTERFACE ${cppitertools_repo_SOURCE_DIR}/)
+# find_package(cppitertools REQUIRED HINTS "${cppitertools_repo_BINARY_DIR}")
+
 
 # find_package(sciplot REQUIRED)
 
@@ -52,7 +55,7 @@ set(FROLS_INCLUDE "${PROJECT_SOURCE_DIR}/include" CACHE INTERNAL "FROLS_INCLUDE"
 set(FROLS_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_SOURCE_DIR}/static" CACHE INTERNAL "FROLS_INCLUDE_DIRS")
 
 add_subdirectory(static)
-set(FROLS_LIBRARIES "FROLS_DataFrame;FROLS_Quantiles;FROLS_Eigen;FROLS_Features" CACHE INTERNAL "FROLS_LIBRARIES")
+set(FROLS_LIBRARIES "FROLS_DataFrame;FROLS_Quantiles;FROLS_Eigen;FROLS_Features;FROLS_Math;FROLS_Algorithm" CACHE INTERNAL "FROLS_LIBRARIES")
 
 add_subdirectory(Binders)
 configure_file("${PROJECT_SOURCE_DIR}/include/FROLS_Path_Config.hpp.in" "${PROJECT_SOURCE_DIR}/include/FROLS_Path_Config.hpp")

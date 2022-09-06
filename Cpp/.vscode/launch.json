@@ -7,15 +7,15 @@
     "configurations": [
         {
             "name": "C++ Launch",
-            "type": "cppvsdbg",
+            "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}\\build\\${relativeFileDirname}\\${fileBasenameNoExtension}.exe",
+            "program": "${workspaceRoot}\\build\\${relativeFileDirname}\\${fileBasenameNoExtension}",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}\\build\\${relativeFileDirname}\\",
             "environment": [],
             "MIMode": "gdb",
-            "miDebuggerPath": "C:\\msys64\\mingw64\\bin\\gdb.exe",
+            "miDebuggerPath": "/usr/bin/gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

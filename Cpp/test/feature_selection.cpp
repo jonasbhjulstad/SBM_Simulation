@@ -1,4 +1,4 @@
-#include <FROLS.hpp>
+#include <FROLS_Algorithm.hpp>
 #include <gtest/gtest.h>
 
 

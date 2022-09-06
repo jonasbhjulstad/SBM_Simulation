@@ -1,4 +1,4 @@
-#include <FROLS.hpp>
+#include <FROLS_Algorithm.hpp>
 #include <FROLS_DataFrame.hpp>
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_Eigen.hpp>
@@ -21,26 +21,35 @@ int main()
     DataFrameStack dfs(df_names);
     Mat X_raw = dataframe_to_matrix(dfs[0], {"S", "I", "R", "p_I"})(Eigen::seq(0, Eigen::last - 1), Eigen::all);
     size_t d_min = 1;
-    size_t d_max = 2;
+    size_t d_max = 1;
     auto N_raw_features = X_raw.cols();
     // Features::PolynomialLibrary lib(N_raw_features, d_min, d_max);
     // Mat X_poly = lib.transform(X_raw);
 
     using namespace FROLS::Features;
     int a = 0;
-    Mat X_poly = Polynomial::feature_transform(X_raw, d_max, 5);
 
-    Polynomial::feature_display(X_poly, d_max, 3);    
     
 
 
     Mat Y = dataframe_to_matrix(dfs[0], {"S", "I", "R"})(Eigen::seq(1, Eigen::last), Eigen::all);
 
-    auto rd = Regression::single_response_regression(X_raw.leftCols(3),  Y.col(0), 1e-1);
-    
-    std::cout << regression_data_summary(rd) << std::endl;
+    size_t N_output_features = 5;
+    Mat X_poly = Polynomial::feature_transform(X_raw, d_max, N_output_features);
+    double ERR_tolerance = 1e-4;
 
+    //generate x with X.rows ones
+    Mat X_quad(X_poly.rows(), 2);
+    X_quad.col(0) = Vec::LinSpaced(X_poly.rows(), 1, X_poly.rows());
+    X_quad.col(1) = X_quad.col(1).array().square();
+    size_t N_input_features = X_quad.cols();
+
+    auto rd = Regression::single_response_regression(X_quad,  X_quad.col(1), ERR_tolerance);
     
+    // Polynomial::feature_display(X_poly, d_max, N_input_features);    
+    std::cout << Regression::regression_data_summary(rd) << std::endl;
+
+    std::cout << Polynomial::model_print(rd, d_max, N_input_features, N_output_features);
 
     return 0;
 

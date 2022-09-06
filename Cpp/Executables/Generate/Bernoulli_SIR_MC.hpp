@@ -3,7 +3,7 @@
 #include <FROLS_DataFrame.hpp>
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_quantiles.hpp>
-#include <FROLS_math.hpp>
+#include <FROLS_Math.hpp>
 #include <Models/SIR_Bernoulli_Network.hpp>
 #include <bits/stdc++.h>
 #include <omp.h>
