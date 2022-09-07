@@ -1,9 +1,10 @@
 #ifndef FROLS_HPP
 #define FROLS_HPP
-#include <FROLS_Math.hpp>
 #include <FROLS_Features.hpp>
+#include <FROLS_Math.hpp>
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 namespace FROLS {
 // Orthogonalizes x with respect to previously selected features in Q
 Mat used_feature_orthogonalize(const Mat &X, const Mat &Q,
@@ -14,7 +15,7 @@ Mat used_feature_orthogonalize(const Mat &X, const Mat &Q,
   Mat Q_current = Mat::Zero(N_samples, N_features);
   for (int k = 0; k < N_features; k++) {
     if (!used_indices.head(current_feature_idx).cwiseEqual(k).any()) {
-      Q_current.col(k) = vec_orthogonalize(X.col(k), Q.leftCols(k));
+      Q_current.col(k) = vec_orthogonalize(X.col(k), Q.leftCols(k+1));
     }
   }
   return Q_current;
@@ -32,23 +33,21 @@ namespace Regression {
 // Computes feature coefficients for feature batch X with respect to a single
 // response variable y
 
-void write_csv(const std::vector<std::vector<Feature>>&rds, const std::string& filename)
-{
-    std::ofstream file(filename);
-    file << "Feature,ERR,g,theta" << std::endl;
-    for (const auto &rd : rds)
-    {
-        for (const auto &feature : rd)
-        {
-            file << feature.index << "," << feature.ERR << "," << feature.g << ","
-                 << feature.coeff << "\n";
-        }
+void write_csv(const std::vector<std::vector<Feature>> &rds,
+               const std::string &filename) {
+  std::ofstream file(filename);
+  file << "Feature,ERR,g,theta" << std::endl;
+  for (const auto &rd : rds) {
+    for (const auto &feature : rd) {
+      file << feature.index << "," << feature.ERR << "," << feature.g << ","
+           << feature.coeff << "\n";
     }
+  }
 }
 
 std::vector<Feature> single_response_regression(Eigen::Ref<const Mat> X,
-                                           Eigen::Ref<const Vec> y,
-                                           double ERR_tolerance) {
+                                                Eigen::Ref<const Vec> y,
+                                                double ERR_tolerance) {
   using namespace FROLS;
   size_t N_features = X.cols();
   Mat Q_global = Mat::Zero(X.rows(), N_features);
@@ -92,8 +91,12 @@ std::vector<Feature> single_response_regression(Eigen::Ref<const Mat> X,
 }
 
 std::vector<std::vector<Feature>>
-multiple_response_regression(Eigen::Ref<const Mat> Y, Eigen::Ref<const Mat> X,
+multiple_response_regression(Eigen::Ref<const Mat> X, Eigen::Ref<const Mat> Y,
                              double ERR_tolerance) {
+  if ((X.rows() != Y.rows())) 
+  {
+    throw std::invalid_argument("X, U and Y must have same number of rows");
+  }
   size_t N_response = Y.cols();
   std::vector<std::vector<Feature>> result(N_response);
   {

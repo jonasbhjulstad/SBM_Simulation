@@ -16,7 +16,7 @@ TEST(FeatureSelection, feature_select)
 
     iVec used_features = iVec::Constant(N_features, -1);
 
-    FROLS::Feature best_feature = FROLS::feature_select(X, y, used_features);    
+    FROLS::Feature best_feature = FROLS::Features::feature_select(X, y, used_features);    
 
 }
 

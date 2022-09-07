@@ -13,22 +13,16 @@
 #include <sunlinsol/sunlinsol_spgmr.h>
 
 namespace FROLS::Integrators {
-template <size_t Nx, size_t Nu, size_t Nt>
-using std::array<double, Nx> (*NARX_LTI_ode)(const array<double, Nx> &x,
-                                             const array<double, Nu> &u);
-
-template <size_t Nx, size_t Nu, size_t Nt, NARX_LTI_ode f_ode>
-std::array<std::array<double, Nx>, Nt>
-NARX_LTI_integrate(std::array<double, Nx> &x0,
-                   const std::array<std::array<double, Nu>, Nt> &U) {
-  std::array<std::array<double, Nx>, Nt> x_traj;
-
-  for (int i = 0; i < Nt; i++) 
+template <size_t Nx, typename Derived>
+struct Model_Integrator
+{
+  void step(const std::array<double, 3> &x)
   {
-    x_traj[i] = f_ode(x0, U[i]);
+    return static_cast<Derived*>(this)->step(x);
   }
-  return x_traj;
-  }
+
+  std::vector<std::array<double, Nx>> run_trajectory(std::array<double, Nx>& x0, std::vector<double)
+}
 
 template <size_t Nx, class Derived>
 struct CVODE_Integrator : public Model_Integrator<Nx> {

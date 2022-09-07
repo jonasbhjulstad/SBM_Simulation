@@ -12,7 +12,7 @@ TEST(SIR_Integrator, integrator_test)
     double N_pop = 1000;
 
     FROLS::Integrators::SIR_Deterministic model(x0, alpha, beta, N_pop, dt);
-    auto result = model.run_trajectory(100);
+    // auto result = model.run_trajectory(100);
 
     //Expect population to remain the same
     for (auto x: result)

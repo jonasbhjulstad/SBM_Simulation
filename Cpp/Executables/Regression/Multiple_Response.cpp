@@ -1,3 +1,4 @@
+#include "FROLS_Polynomial.hpp"
 #include <FROLS_Algorithm.hpp>
 #include <FROLS_DataFrame.hpp>
 #include <FROLS_Path_Config.hpp>
@@ -19,32 +20,33 @@ int main()
     }
 
     DataFrameStack dfs(df_names);
-    Mat X_raw = dataframe_to_matrix(dfs[0], {"S", "I", "R", "p_I"})(Eigen::seq(0, Eigen::last - 1), Eigen::all);
+    Mat X_raw = dataframe_to_matrix(dfs[0], {"S", "I", "R"})(Eigen::seq(0, Eigen::last - 1), Eigen::all);
     Mat Y = dataframe_to_matrix(dfs[0], {"S", "I", "R"})(Eigen::seq(1, Eigen::last), Eigen::all);
-    size_t d_min = 1;
+    Mat U = dataframe_to_matrix(dfs[0], {"p_I"})(Eigen::seq(0, Eigen::last - 1), Eigen::all);
     size_t d_max = 1;
-    auto N_raw_features = X_raw.cols();
-    // Features::PolynomialLibrary lib(N_raw_features, d_min, d_max);
-    // Mat X_poly = lib.transform(X_raw);
-
+    size_t N_output_features = 100;
     using namespace FROLS::Features;
     int a = 0;
-    size_t N_input_features = 3;
-    size_t N_output_features = 100;
     Mat X_poly = Polynomial::feature_transform(X_raw.leftCols(3), d_max, N_output_features);
 
-    // Polynomial::feature_display(X_poly, d_max, N_input_features);    
-    
-
-
-
     double ERR_tolerance = 1e-4;
+    FROLS::Features::Polynomial::Polynomial_Model model(N_output_features, d_max);
 
-    auto rds = Regression::multiple_response_regression(Y,  X_poly, ERR_tolerance);
-    
-    std::cout << Regression::regression_data_summary(rds) << std::endl;
+    model.multiple_response_regression(X_raw, U, Y, ERR_tolerance);
+    // auto rds = (Y,  X_poly, ERR_tolerance);
+    model.print();
+    // std::cout << Regression::regression_data_summary(rds) << std::endl;
 
-    std::cout << Polynomial::model_print(rds, d_max, N_input_features, N_output_features);
+    Vec x0 = X_raw.row(0);
+    double u0 = U(0,0);
+    size_t Nt = 100;
+    Vec u = Vec::Ones(Nt)*u0;
+    //print x0, u
+    std::cout << "x0 = " << x0.transpose() << std::endl;
+    std::cout << "u0 = " << u0 << std::endl;
+    model.feature_summary();
+    model.simulate(x0, u, Nt);
+
 
 
     return 0;

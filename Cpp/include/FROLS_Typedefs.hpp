@@ -2,6 +2,7 @@
 #define EIGEN_FROLS_TYPEDEFS_HPP
 #include <Eigen/Dense>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
 typedef Eigen::Matrix<double, -1, -1> Mat;
@@ -15,14 +16,11 @@ struct Feature {
   double g;       // Feature (Orthogonalized Linear-in-the-parameters form)
   size_t index;   // Index of the feature in the original feature set
   double coeff = 0;
-};
-struct Regression_Model {
-  std::vector<std::vector<Feature>>
-      features; // Best regression-features in ERR-decreasing order
-  size_t N_control_inputs;
-  size_t N_states;
-  Regression_Model(size_t N_states, size_t N_control_inputs)
-      : N_control_inputs(N_control_inputs), N_states(N_states) {}
+  void summary() const {
+    std::cout << "ERR: " << ERR << "\t"
+              << "g: " << g << "\t"
+              << "coeff: " << coeff << "\n";
+  }
 };
 
 } // namespace FROLS

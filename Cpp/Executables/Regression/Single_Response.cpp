@@ -43,13 +43,14 @@ int main()
     X_quad.col(0) = Vec::LinSpaced(X_poly.rows(), 1, X_poly.rows());
     X_quad.col(1) = X_quad.col(1).array().square();
     size_t N_input_features = X_quad.cols();
-
+    size_t Nx = N_input_features;
+    size_t Nu = 0;
     auto rd = Regression::single_response_regression(X_quad,  X_quad.col(1), ERR_tolerance);
     
     // Polynomial::feature_display(X_poly, d_max, N_input_features);    
     std::cout << Regression::regression_data_summary(rd) << std::endl;
 
-    std::cout << Polynomial::model_print(rd, d_max, N_input_features, N_output_features);
+    std::cout << Polynomial::response_print(rd, d_max, Nx, Nu, N_output_features);
 
     return 0;
 

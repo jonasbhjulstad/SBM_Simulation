@@ -8,8 +8,8 @@ double cov_normalize(const Vec &a, const Vec &b) {
 Vec vec_orthogonalize(const Vec &v, const Mat &Q) {
   Vec cov_remainder = v;
   for (int i = 0; i < Q.cols(); i++) {
-    if (Q.col(i).isApproxToConstant(0))
-      continue;
+    // if (Q.col(i).isApproxToConstant(0))
+      // continue;
     cov_remainder -= cov_normalize(Q.col(i), cov_remainder) * Q.col(i);
   }
   return cov_remainder;

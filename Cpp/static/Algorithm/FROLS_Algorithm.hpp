@@ -1,5 +1,6 @@
 #ifndef FROLS_HPP
 #define FROLS_HPP
+#include <FROLS_Polynomial.hpp>
 #include <FROLS_Features.hpp>
 #include <FROLS_Math.hpp>
 #include <FROLS_Typedefs.hpp>
@@ -18,12 +19,13 @@ namespace Regression {
 // response variable y
 
 std::vector<Feature> single_response_regression(Eigen::Ref<const Mat> X,
-                                           Eigen::Ref<const Vec> y,
-                                           double ERR_tolerance);
+                                                Eigen::Ref<const Vec> y,
+                                                double ERR_tolerance);
 
 std::vector<std::vector<Feature>>
-multiple_response_regression(Eigen::Ref<const Mat> Y, Eigen::Ref<const Mat> X,
-                             double ERR_tolerance);
+multiple_response_regression(Eigen::Ref<const Mat> X, Eigen::Ref<const Mat> Y, double ERR_tolerance);
+
+
 
 const std::string regression_data_summary(const std::vector<Feature> &rd);
 

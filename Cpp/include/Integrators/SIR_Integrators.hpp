@@ -5,15 +5,16 @@
 #include <random>
 namespace FROLS::Integrators {
 
-struct SIR_Stochastic : public Model_Integrator<3> {
+struct SIR_Stochastic {
 public:
   static constexpr size_t Nx = 3;
   std::random_device rd;
   std::mt19937 generator;
   double alpha, beta, N_pop, dt;
 
-  SIR_Stochastic(const std::array<double, Nx>& x0, double alpha, double beta, double N_pop, double dt)
-      : alpha(alpha), beta(beta), N_pop(N_pop), dt(dt), Model_Integrator<3>(x0) {}
+  SIR_Stochastic(const std::array<double, Nx> &x0, double alpha, double beta,
+                 double N_pop, double dt)
+      : alpha(alpha), beta(beta), N_pop(N_pop), dt(dt) {}
 
   std::array<double, 3> step(const std::array<double, 3> &x) {
     double p_I = 1 - std::exp(-beta * x[1] / N_pop * dt);
@@ -79,7 +80,8 @@ int SIR_eval_jac(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector fx,
 
 struct SIR_Deterministic : public CVODE_Integrator<3, SIR_Deterministic> {
   double param[3];
-  SIR_Deterministic(const std::array<double, 3>& x0, double alpha, double beta, double N_pop, double dt)
+  SIR_Deterministic(const std::array<double, 3> &x0, double alpha, double beta,
+                    double N_pop, double dt)
       : CVODE_Integrator<3, SIR_Deterministic>(x0, dt) {
     param[0] = alpha;
     param[1] = beta;
