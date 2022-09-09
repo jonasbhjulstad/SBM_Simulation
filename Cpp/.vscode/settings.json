@@ -98,7 +98,9 @@
         "hash_map": "cpp"
     },
     "cmake.showConsoleAutomatically": true,
+    // "C_Cpp.intelliSenseEngine": "Disabled",
     "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "cmake.parallelJobs": 4,
 	"settings": {"files.exclude": {"data/**"}}
 
 }

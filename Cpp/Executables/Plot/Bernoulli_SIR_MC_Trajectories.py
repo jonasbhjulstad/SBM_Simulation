@@ -24,7 +24,7 @@ if __name__ == '__main__':
         
 
     # find all csv in data_path
-    files = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_*.csv")
+    files = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_*60*1.0*.csv")
     #sort q_files according to float in name
     fig, ax = plt.subplots(3)
     dfs = [pd.read_csv(f, delimiter=",") for f in files[:100]]

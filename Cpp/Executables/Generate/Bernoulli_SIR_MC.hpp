@@ -1,11 +1,12 @@
-#ifndef BERNOULLI_SIR_MC_HPP
-#define BERNOULLI_SIR_MC_HPP
-#include <FROLS_DataFrame.hpp>
-#include <FROLS_Path_Config.hpp>
-#include <FROLS_quantiles.hpp>
-#include <FROLS_Math.hpp>
+#ifndef FROLS_BERNOULLI_SIR_MC_HPP
+#define FROLS_BERNOULLI_SIR_MC_HPP
+#include <DataFrame.hpp>
+#include <Path_Config.hpp>
+#include <quantiles.hpp>
+#include <Math.hpp>
 #include <Models/SIR_Bernoulli_Network.hpp>
 #include <bits/stdc++.h>
+#include <igraph_threading.h>
 #include <omp.h>
 namespace FROLS
 {
@@ -32,15 +33,15 @@ namespace FROLS
     auto seed = rd();
     // std::cout << "Thread " << thread_id << " initialized with seed: " << seed
     // << std::endl;
-    std::mt19937 generator(seed);
+    thread_local std::mt19937 generator(seed);
     std::vector<double> p_I(p.Nt), p_R(p.Nt);
     std::fill(p_R.begin(), p_R.end(), p.p_R);
     // Sample alphas and betas from a uniform distribution
     //  std::uniform_real_distribution<double> alpha_dist();
     std::uniform_real_distribution<double> beta_dist(p.p_I_min, p.p_I_max);
-
+    static_assert(IGRAPH_THREAD_SAFE);
     // Run SIR_simulations
-    igraph_t G;
+    thread_local igraph_t G;
     std::vector<size_t> idx(p.Nt + 1);
     std::vector<size_t> t(p.Nt + 1);
     std::generate(t.begin(), t.end(), [n = 0]() mutable
@@ -54,7 +55,12 @@ namespace FROLS
     for (size_t i = 0; i < N_thread_sims; i++)
     {
       double p_I_const = beta_dist(generator);
-      std::fill(p_I.begin(), p_I.end(), p_I_const);
+      // std::fill(p_I.begin(), p_I.end(), p_I_const);
+      //fill p_I with random generated values
+      for (auto& p: p_I)
+      {
+        p = beta_dist(generator);
+      }
       auto traj = run_SIR_simulation(G, state, p.Nt, p_I, p_R, generator);
       df.assign(colnames, traj);
       df.assign("p_I", p_I);

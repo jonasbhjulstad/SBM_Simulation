@@ -1,10 +1,9 @@
-#include <FROLS_Algorithm.hpp>
-#include <FROLS_DataFrame.hpp>
-#include <FROLS_Path_Config.hpp>
+
+#include <DataFrame.hpp>
+#include <Path_Config.hpp>
 #include <FROLS_Eigen.hpp>
-#include <FROLS_Features.hpp>
+#include <Features.hpp>
 #include <iostream>
-#include <itertools.hpp>
 int main()
 {
     size_t N_sims = 10000;

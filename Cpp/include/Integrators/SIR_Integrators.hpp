@@ -1,5 +1,5 @@
-#ifndef SIR_INTEGRATORS_HPP
-#define SIR_INTEGRATORS_HPP
+#ifndef FROLS_SIR_INTEGRATORS_HPP
+#define FROLS_SIR_INTEGRATORS_HPP
 #include <Integrators/Integrator_Models.hpp>
 #include <algorithm>
 #include <random>

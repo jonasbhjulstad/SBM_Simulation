@@ -8,9 +8,7 @@ import os
 import sys
 BINDER_DIR = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/build/Binders/"
 sys.path.insert(0, BINDER_DIR)
-from pyFROLS import *
-import pyFROLS as ps
-
+from pyFROLS import Polynomial_Model, Quantile_Regressor
 # import pyFROLS as pf
 if __name__ == '__main__':
    # read and plot all csv in ../data
@@ -38,24 +36,26 @@ if __name__ == '__main__':
     Nx = X.shape[1]
     Nt = X.shape[0]
     Nu = 0
-    d_max = 1
+    d_max = 2
     N_output_features = 20
-    ERR_tol = 1e-3
-    model = Polynomial_Model(N_output_features, d_max)
-    model.multiple_response_regression(X, U, Y, ERR_tol)
-    model.print()
+    ERR_tol = 1e-4
+    model = Polynomial_Model(Nx, Nu, N_output_features, d_max)
+    MAE_tol = 0.1
+    tau = .95
+    regressor = Quantile_Regressor(tau, MAE_tol)
+    regressor.transform_fit(X, U, Y, model)
     x0 = X[0,:]
     u0 = U[0,:]
-    Nt = 100
-    U = np.ones(Nt)*u0
+    Nt = dfs[0]['t'].to_numpy().shape[0]
+    U_mean = np.mean(U.reshape(Nt-1, -1), axis=1)
     model.feature_summary()
     model.write_csv(DATA_DIR + "/model.csv")
 
-    X_traj = model.simulate(x0, U, Nt)
+    X_traj = model.simulate(x0, U_mean, Nt-1)
 
     for i, letter in enumerate(['S', 'I', 'R']):
         ax[i].plot(X_traj[:,i], color='r')
         [ax[i].plot(df[letter], color='gray', alpha=.2) for df in dfs[:N_dfs]]
-
+    _ = [x.set_ylim(0,60) for x in ax]
     plt.show()
 

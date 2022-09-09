@@ -8,7 +8,7 @@ import numpy as np
 
 def print_regression_data(rd):
     for best_feature in rd:
-        print("Index:\t{}".format(best_feature.index) + "\tERR:\t{}".format(best_feature.ERR) + "\tg:\t{}".format(best_feature.g))
+        print("Index:\t{}".format(best_feature.index) + "\tERR:\t{}".format(best_feature.f_ERR) + "\tg:\t{}".format(best_feature.g))
     return
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 
 
-#ifndef MCMC_GENERATE_SIR_HPP
-#define MCMC_GENERATE_SIR_HPP
+#ifndef FROLS_MCMC_GENERATE_SIR_HPP
+#define FROLS_MCMC_GENERATE_SIR_HPP
 #include <array>
 #include <cvode/cvode.h>
 #include <cvode/cvode_spils.h>

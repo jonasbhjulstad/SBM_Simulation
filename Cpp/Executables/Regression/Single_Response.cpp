@@ -1,10 +1,10 @@
-#include <FROLS_Algorithm.hpp>
-#include <FROLS_DataFrame.hpp>
-#include <FROLS_Path_Config.hpp>
+#include <ERR_Regressor.hpp>
+
+#include <DataFrame.hpp>
+#include <Path_Config.hpp>
 #include <FROLS_Eigen.hpp>
-#include <FROLS_Features.hpp>
+#include <Features.hpp>
 #include <iostream>
-#include <itertools.hpp>
 int main()
 {
     size_t N_sims = 10000;
@@ -35,22 +35,21 @@ int main()
     Mat Y = dataframe_to_matrix(dfs[0], {"S", "I", "R"})(Eigen::seq(1, Eigen::last), Eigen::all);
 
     size_t N_output_features = 5;
-    Mat X_poly = Polynomial::feature_transform(X_raw, d_max, N_output_features);
     double ERR_tolerance = 1e-4;
 
     //generate x with X.rows ones
-    Mat X_quad(X_poly.rows(), 2);
-    X_quad.col(0) = Vec::LinSpaced(X_poly.rows(), 1, X_poly.rows());
+    Mat X_quad(Y.rows(), 2);
+    X_quad.col(0) = Vec::LinSpaced(Y.rows(), 1, Y.rows());
     X_quad.col(1) = X_quad.col(1).array().square();
     size_t N_input_features = X_quad.cols();
     size_t Nx = N_input_features;
     size_t Nu = 0;
-    auto rd = Regression::single_response_regression(X_quad,  X_quad.col(1), ERR_tolerance);
-    
-    // Polynomial::feature_display(X_poly, d_max, N_input_features);    
-    std::cout << Regression::regression_data_summary(rd) << std::endl;
 
-    std::cout << Polynomial::response_print(rd, d_max, Nx, Nu, N_output_features);
+    FROLS::Regression::ERR_Regressor regressor(ERR_tolerance);
+
+    auto rd = regressor.fit(X_quad,  X_quad.col(1));
+
+
 
     return 0;
 

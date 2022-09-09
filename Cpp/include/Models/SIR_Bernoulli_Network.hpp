@@ -1,5 +1,5 @@
-#ifndef SIR_BERNOULLI_NETWORK_HPP
-#define SIR_BERNOULLI_NETWORK_HPP
+#ifndef FROLS_SIR_BERNOULLI_NETWORK_HPP
+#define FROLS_SIR_BERNOULLI_NETWORK_HPP
 
 #include <array>
 #include <igraph/igraph.h>
