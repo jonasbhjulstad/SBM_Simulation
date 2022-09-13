@@ -8,10 +8,10 @@
 
 namespace FROLS
 {
-    Vec dataframe_to_vector(DataFrame& df, const std::string& col_name);
-    Vec dataframe_to_vector(DataFrameStack& dfs, const std::string& col_name);
-    Mat dataframe_to_matrix(DataFrame& df, const std::vector<std::string>& col_names);
-    Mat dataframe_to_matrix(DataFrameStack& dfs, const std::vector<std::string>& col_names);
+    Vec dataframe_to_vector(DataFrame& df, const std::string& col_name, int start_idx = 0, int end_idx = -1);
+    Vec dataframe_to_vector(DataFrameStack& dfs, const std::string& col_name, int start_idx = 0, int end_idx = -1);
+    Mat dataframe_to_matrix(DataFrame& df, const std::vector<std::string>& col_names, int start_row = 0, int end_row = -1);
+    Mat dataframe_to_matrix(DataFrameStack& dfs, const std::vector<std::string>& col_names, int start_row = 0, int end_row = -1);
     Mat dmd_truncate_timeseries(DataFrameStack& dfs, const std::string& col_name, int truncation);
     Vec df_to_vec(const DataFrame& df, const std::string& col_name);
     Vec df_to_vec(const DataFrameStack& dfs, const std::string& col_name);

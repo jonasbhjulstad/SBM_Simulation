@@ -4,34 +4,51 @@
 namespace FROLS
 {
 
-    Vec dataframe_to_vector(DataFrame& df, const std::string& col_name)
+    Vec dataframe_to_vector(DataFrame& df, const std::string& col_name, int start_idx, int end_idx)
     {
-        return Eigen::Map<Eigen::VectorXd>(df[col_name]->data(), df[col_name]->size());
+        auto sequence = Eigen::all;
+        size_t N_rows = df.get_N_rows();
+        if (N_rows <= 0)
+        {
+            throw std::invalid_argument("[DataFrame] Error: Dataframe must contain elements");
+        }
+        if (end_idx < 0)
+        {
+            return Eigen::Map<Eigen::VectorXd>(df[col_name]->data(), N_rows)(Eigen::seq(start_idx, N_rows + end_idx));
+        }
+        else
+        {
+            return Eigen::Map<Eigen::VectorXd>(df[col_name]->data(), N_rows)(Eigen::seq(start_idx, end_idx));
+        }
+
     }
-    Vec dataframe_to_vector(DataFrameStack& dfs, const std::string& col_name)
+    Vec dataframe_to_vector(DataFrameStack& dfs, const std::string& col_name, int start_idx, int end_idx)
     {
         Vec res(dfs.get_N_frames()*dfs[0][col_name]->size());
         for (size_t i = 0; i < dfs.get_N_frames(); i++)
         {
-            res.segment(i*dfs[0][col_name]->size(), dfs[0][col_name]->size()) = dataframe_to_vector(dfs[i], col_name);
+            res.segment(i*dfs[0][col_name]->size(), dfs[0][col_name]->size()) = dataframe_to_vector(dfs[i], col_name, start_idx, end_idx);
         }
         return res;
     }
-    Mat dataframe_to_matrix(DataFrame &df, const std::vector<std::string> &col_names)
+    Mat dataframe_to_matrix(DataFrame &df, const std::vector<std::string> &col_names, int start_idx, int end_idx)
     {
-        Mat res(df[col_names[0]]->size(), col_names.size());
+        size_t N_rows = (end_idx >= 0) ? end_idx - start_idx : df.get_N_rows() + end_idx+1 - start_idx;
+        Mat res(N_rows, col_names.size());
         for (size_t i = 0; i < col_names.size(); i++)
         {
-            res.col(i) = dataframe_to_vector(df, col_names[i]);
+            res.col(i) = dataframe_to_vector(df, col_names[i], start_idx, end_idx);
         }
         return res;
     }
-    Mat dataframe_to_matrix(DataFrameStack &dfs, const std::vector<std::string> &col_names)
+    Mat dataframe_to_matrix(DataFrameStack &dfs, const std::vector<std::string> &col_names, int start_idx, int end_idx)
     {
-        Mat res(dfs.get_N_frames()*dfs[0][col_names[0]]->size(), col_names.size());
+        size_t N_frame_rows = (end_idx >= 0) ? end_idx - start_idx : dfs[0].get_N_rows() + end_idx+1 - start_idx;
+
+        Mat res(dfs.get_N_frames()*N_frame_rows, col_names.size());
         for (size_t i = 0; i < dfs.get_N_frames(); i++)
         {
-            res.block(i*dfs[0][col_names[0]]->size(), 0, dfs[0][col_names[0]]->size(), col_names.size()) = dataframe_to_matrix(dfs[i], col_names);
+            res(Eigen::seqN(i*N_frame_rows, N_frame_rows), Eigen::all) = dataframe_to_matrix(dfs[i], col_names, start_idx, end_idx);
         }
         return res;
     }

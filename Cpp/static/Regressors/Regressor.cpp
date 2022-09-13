@@ -1,7 +1,16 @@
 #include "Regressor.hpp"
-#include <Math.hpp>
+
 namespace FROLS::Regression {
 
+Regressor::Regressor(double tol)
+    : tol(tol),
+      regressor_logger(spdlog::basic_logger_mt(
+          "regressor_logger",
+          (std::string(FROLS_LOG_DIR) + "/regressor_log.txt").c_str(), true)) {
+  regressor_logger->set_level(spdlog::level::debug);
+  regressor_logger->info("{:^15}{:^15}{:^15}{:^15}", "Feature", "g", "theta",
+                       "f_ERR");
+}
 Mat Regressor::used_feature_orthogonalize(const Mat &X, const Mat &Q,
                                           const iVec &used_indices) const {
   size_t N_features = X.cols();
@@ -15,8 +24,7 @@ Mat Regressor::used_feature_orthogonalize(const Mat &X, const Mat &Q,
   return Q_current;
 }
 
-std::vector<Feature> Regressor::single_fit(crMat X,
-                                    crVec y) const {
+std::vector<Feature> Regressor::single_fit(crMat X, crVec y) const {
   size_t N_features = X.cols();
   Mat Q_global = Mat::Zero(X.rows(), N_features);
   Mat Q_current = Q_global;
@@ -25,7 +33,6 @@ std::vector<Feature> Regressor::single_fit(crMat X,
   Vec g = Vec::Zero(N_features);
 
   std::vector<Feature> best_features;
-  best_features.resize(N_features);
   size_t end_idx = N_features;
   // Perform one feature selection iteration for each feature
   for (int j = 0; j < N_features; j++) {
@@ -33,7 +40,7 @@ std::vector<Feature> Regressor::single_fit(crMat X,
     Q_current =
         used_feature_orthogonalize(X, Q_global, feature_indices.head(j + 1));
     // Determine the best feature to add to the feature set
-    best_features[j] = feature_select(Q_current, y, feature_indices);
+    feature_select(Q_current, y, best_features);
     feature_indices[j] = best_features[j].index;
     g[j] = best_features[j].g;
 
@@ -44,7 +51,7 @@ std::vector<Feature> Regressor::single_fit(crMat X,
     A(j, j) = 1;
 
     // If ERR-tolerance is met, return non-orthogonalized parameters
-    if (tolerance_check(Q_global, y, best_features)) {
+    if (tolerance_check(Q_global.leftCols(j + 1), y, best_features)) {
       end_idx = j + 1;
       best_features.resize(end_idx);
       break;
@@ -56,12 +63,15 @@ std::vector<Feature> Regressor::single_fit(crMat X,
   // assign coefficients to features
   for (int i = 0; i < end_idx; i++) {
     best_features[i].theta = coefficients[i];
+    regressor_logger->info("{:^15}{:^15.3f}{:^15.3f}{:^15.3f}", i,
+                         best_features[i].g, best_features[i].theta,
+                         best_features[i].f_ERR);
   }
+
   return best_features;
 }
 
-std::vector<std::vector<Feature>>
-Regressor::fit(crMat& X, crMat& Y) const {
+std::vector<std::vector<Feature>> Regressor::fit(crMat &X, crMat &Y) const {
   if ((X.rows() != Y.rows())) {
     throw std::invalid_argument("X, U and Y must have same number of rows");
   }
@@ -74,13 +84,28 @@ Regressor::fit(crMat& X, crMat& Y) const {
   }
   return result;
 }
-
-void Regressor::transform_fit(crMat& X_raw, crMat& U_raw, crMat& Y, Features::Feature_Model& model) const
+Vec Regressor::predict(crMat &Q, const std::vector<Feature>& features) const
 {
+  Vec y_pred(Q.rows());
+  y_pred.setZero();
+  size_t i = 0;
+  for (const auto& feature: features)
+  {
+    if(feature.f_ERR == -1) {
+        break;
+    }
+    y_pred += Q.col(i)*feature.g;
+    i++;
+  }
+  return y_pred;
+}
+
+void Regressor::transform_fit(crMat &X_raw, crMat &U_raw, crMat &Y,
+                              Features::Feature_Model &model) const {
   Mat XU(X_raw.rows(), X_raw.cols() + U_raw.cols());
   XU << X_raw, U_raw;
   Mat X = model.transform(XU);
   model.features = fit(X, Y);
-} 
+}
 
 } // namespace FROLS::Regression

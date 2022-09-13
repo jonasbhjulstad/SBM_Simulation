@@ -1,6 +1,5 @@
 
 #include <DataFrame.hpp>
-#include <Path_Config.hpp>
 #include <FROLS_Eigen.hpp>
 #include <Features.hpp>
 #include <iostream>

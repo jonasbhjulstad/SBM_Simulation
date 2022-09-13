@@ -15,8 +15,8 @@ struct Polynomial_Model : public Feature_Model{
 
 
   // double transform(crVec &x_raw, size_t target_index) const;
-  Vec transform(crMat &X_raw, size_t target_index) const;
-  Mat transform(crMat &X_raw) const;
+  Vec _transform(crMat &X_raw, size_t target_index) const;
+  Mat _transform(crMat &X_raw) const;
   const std::vector<std::vector<Feature>> get_features() const;
 
   void write_csv(const std::string &) const;

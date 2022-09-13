@@ -15,7 +15,7 @@ typedef const Eigen::Ref<const iVec> ciVecRef;
 namespace FROLS {
 
 struct Feature {
-  double f_ERR = 0; // objective/Error Reduction Ratio
+  double f_ERR = -1; // objective/Error Reduction Ratio
   double g;       // Feature (Orthogonalized Linear-in-the-parameters form)
   size_t index;   // Index of the feature in the original feature set
   double theta = 0;

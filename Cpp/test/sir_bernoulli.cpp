@@ -19,8 +19,10 @@ TEST(SIR_Bernoulli_Network_Test, run_simulation_test)
     std::random_device rd;
     std::mt19937 generator(rd());
 
+    double p_R0 = 0.05;
 
-    auto state = generate_SIR_ER_model(G, N_pop, p_ER, p_I0, generator);
+    generate_SIR_ER_model(G, N_pop, p_ER, generator);
+    auto state = generate_initial_infections(N_pop, p_I0, p_R0, generator);
 
     auto traj = run_SIR_simulation(G, state, N_steps, p_I, p_R, generator);
 

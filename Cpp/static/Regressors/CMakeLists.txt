@@ -1,5 +1,5 @@
 add_library(Regressors STATIC Regressor.hpp Regressor.cpp ERR_Regressor.cpp Quantile_Regressor.cpp ERR_Regressor.hpp Quantile_Regressor.hpp)
-target_link_libraries(Regressors PUBLIC Features Math Common)
+target_link_libraries(Regressors PUBLIC Common Features Math spdlog::spdlog)
 # target_include_directories(Regressors PRIVATE $<TARGET_PROPERTY:Math, INTERFACE_INCLUDE_DIRECTORIES>)
 target_link_libraries(Regressors PRIVATE casadi)
 target_include_directories(Regressors INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>")
