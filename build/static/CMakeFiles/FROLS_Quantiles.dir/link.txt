@@ -1,0 +1,2 @@
+C:\msys64\mingw64\bin\llvm-ar.exe qc libFROLS_Quantiles.a CMakeFiles/FROLS_Quantiles.dir/FROLS_quantiles.cpp.obj
+C:\msys64\mingw64\bin\llvm-ranlib.exe libFROLS_Quantiles.a

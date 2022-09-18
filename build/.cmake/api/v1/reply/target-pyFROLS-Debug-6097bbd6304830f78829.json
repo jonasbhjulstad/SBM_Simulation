@@ -1,0 +1,355 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "Binders/pyFROLS.cp310-win_amd64.pyd"
+		},
+		{
+			"path" : "Binders/pyFROLS.pdb"
+		}
+	],
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"pybind11_add_module",
+			"target_link_libraries",
+			"include",
+			"find_package",
+			"set_property",
+			"add_compile_options",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"C:/msys64/mingw64/share/cmake/pybind11/pybind11Tools.cmake",
+			"Binders/CMakeLists.txt",
+			"C:/msys64/mingw64/share/cmake/pybind11/pybind11Common.cmake",
+			"C:/msys64/mingw64/share/cmake/pybind11/pybind11Config.cmake",
+			"CMakeLists.txt",
+			"C:/msys64/mingw64/share/cmake/Modules/FindOpenMP.cmake",
+			"C:/msys64/mingw64/lib/cmake/igraph/igraph-config.cmake"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 1,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 173,
+				"parent" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 2,
+				"parent" : 0
+			},
+			{
+				"file" : 4
+			},
+			{
+				"command" : 4,
+				"file" : 4,
+				"line" : 13,
+				"parent" : 4
+			},
+			{
+				"file" : 3,
+				"parent" : 5
+			},
+			{
+				"command" : 3,
+				"file" : 3,
+				"line" : 248,
+				"parent" : 6
+			},
+			{
+				"file" : 2,
+				"parent" : 7
+			},
+			{
+				"command" : 3,
+				"file" : 2,
+				"line" : 180,
+				"parent" : 8
+			},
+			{
+				"file" : 0,
+				"parent" : 9
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 133,
+				"parent" : 10
+			},
+			{
+				"command" : 4,
+				"file" : 4,
+				"line" : 55,
+				"parent" : 4
+			},
+			{
+				"file" : 6,
+				"parent" : 12
+			},
+			{
+				"command" : 4,
+				"file" : 6,
+				"line" : 45,
+				"parent" : 13
+			},
+			{
+				"file" : 5,
+				"parent" : 14
+			},
+			{
+				"command" : 5,
+				"file" : 5,
+				"line" : 585,
+				"parent" : 15
+			},
+			{
+				"command" : 6,
+				"file" : 4,
+				"line" : 9,
+				"parent" : 4
+			},
+			{
+				"command" : 7,
+				"file" : 1,
+				"line" : 3,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 175,
+				"parent" : 1
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -fvisibility=hidden"
+				},
+				{
+					"backtrace" : 17,
+					"fragment" : "-Wfatal-errors"
+				},
+				{
+					"backtrace" : 17,
+					"fragment" : "-fPIC"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-fopenmp=libomp"
+				},
+				{
+					"fragment" : "-std=gnu++17"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"define" : "pyFROLS_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 18,
+					"path" : "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/include"
+				},
+				{
+					"backtrace" : 18,
+					"path" : "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/static"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/static/Features"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/static/Algorithm"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "C:/Users/jonas/Documents/Network_Robust_MPC/build/_deps/cppitertools_repo-src"
+				},
+				{
+					"backtrace" : 19,
+					"isSystem" : true,
+					"path" : "C:/Users/jonas/anaconda3/envs/Network_MPC/Include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "C:/msys64/mingw64/include/eigen3"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					19,
+					19,
+					19,
+					3
+				],
+				"standard" : "17"
+			},
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 3,
+			"id" : "FROLS_Math::@9673205551b5378734bd"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "FROLS_DataFrame::@9673205551b5378734bd"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "FROLS_Algorithm::@9241ffc22d4e6cf30d39"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "FROLS_Quantiles::@9673205551b5378734bd"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "FROLS_Eigen::@9673205551b5378734bd"
+		}
+	],
+	"id" : "pyFROLS::@97fb2c742acbbda780b4",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "..\\static\\libFROLS_DataFrame.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "..\\static\\libFROLS_Quantiles.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "..\\static\\libFROLS_Eigen.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "..\\static\\Features\\libFROLS_Features.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "..\\static\\libFROLS_Math.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "..\\static\\Algorithm\\libFROLS_Algorithm.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "..\\static\\Algorithm\\libFROLS_Algorithm.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 11,
+				"fragment" : "C:\\Users\\jonas\\anaconda3\\envs\\Network_MPC\\libs\\python310.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 16,
+				"fragment" : "C:\\msys64\\mingw64\\lib\\libomp.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "..\\static\\Features\\libFROLS_Features.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "..\\static\\libFROLS_Eigen.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "..\\static\\libFROLS_DataFrame.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "..\\static\\libFROLS_Math.a",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "pyFROLS",
+	"nameOnDisk" : "pyFROLS.cp310-win_amd64.pyd",
+	"paths" : 
+	{
+		"build" : "Binders",
+		"source" : "Binders"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "Binders/pyFROLS.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "MODULE_LIBRARY"
+}

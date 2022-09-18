@@ -1,0 +1,3 @@
+C:\msys64\mingw64\bin\cmake.exe -E rm -f CMakeFiles\sir_bernoulli.dir/objects.a
+C:\msys64\mingw64\bin\llvm-ar.exe qc CMakeFiles\sir_bernoulli.dir/objects.a @CMakeFiles\sir_bernoulli.dir\objects1.rsp
+C:\msys64\mingw64\bin\clang++.exe -g -Wl,--whole-archive CMakeFiles\sir_bernoulli.dir/objects.a -Wl,--no-whole-archive -o sir_bernoulli.exe -Wl,--out-implib,libsir_bernoulli.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\sir_bernoulli.dir\linklibs.rsp

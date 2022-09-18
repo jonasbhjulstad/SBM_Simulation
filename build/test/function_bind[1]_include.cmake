@@ -1,0 +1,5 @@
+if(EXISTS "C:/Users/jonas/Documents/Network_Robust_MPC/build/test/function_bind[1]_tests.cmake")
+  include("C:/Users/jonas/Documents/Network_Robust_MPC/build/test/function_bind[1]_tests.cmake")
+else()
+  add_test(function_bind_NOT_BUILT function_bind_NOT_BUILT)
+endif()

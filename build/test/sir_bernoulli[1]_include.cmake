@@ -1,0 +1,5 @@
+if(EXISTS "C:/Users/jonas/Documents/Network_Robust_MPC/build/test/sir_bernoulli[1]_tests.cmake")
+  include("C:/Users/jonas/Documents/Network_Robust_MPC/build/test/sir_bernoulli[1]_tests.cmake")
+else()
+  add_test(sir_bernoulli_NOT_BUILT sir_bernoulli_NOT_BUILT)
+endif()

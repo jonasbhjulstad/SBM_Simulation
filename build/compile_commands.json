@@ -1,0 +1,117 @@
+[
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/_deps/googletest-build/googlemock",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/gmock.dir/includes_CXX.rsp -g -Wall -Wshadow -Wconversion -DGTEST_HAS_PTHREAD=0 -fexceptions -W -Wpointer-arith -Wreturn-type -Wcast-qual -Wwrite-strings -Wswitch -Wunused-parameter -Wcast-align -Wchar-subscripts -Winline -Wredundant-decls -Wfatal-errors -fPIC -std=c++17 -o CMakeFiles\\gmock.dir\\src\\gmock-all.cc.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\build\\_deps\\googletest-src\\googlemock\\src\\gmock-all.cc",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/build/_deps/googletest-src/googlemock/src/gmock-all.cc"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/_deps/googletest-build/googlemock",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/gmock_main.dir/includes_CXX.rsp -g -Wall -Wshadow -Wconversion -DGTEST_HAS_PTHREAD=0 -fexceptions -W -Wpointer-arith -Wreturn-type -Wcast-qual -Wwrite-strings -Wswitch -Wunused-parameter -Wcast-align -Wchar-subscripts -Winline -Wredundant-decls -Wfatal-errors -fPIC -std=c++17 -o CMakeFiles\\gmock_main.dir\\src\\gmock_main.cc.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\build\\_deps\\googletest-src\\googlemock\\src\\gmock_main.cc",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/build/_deps/googletest-src/googlemock/src/gmock_main.cc"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/_deps/googletest-build/googletest",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/gtest.dir/includes_CXX.rsp -g -Wall -Wshadow -Wconversion -DGTEST_HAS_PTHREAD=0 -fexceptions -W -Wpointer-arith -Wreturn-type -Wcast-qual -Wwrite-strings -Wswitch -Wunused-parameter -Wcast-align -Wchar-subscripts -Winline -Wredundant-decls -Wfatal-errors -fPIC -std=c++17 -o CMakeFiles\\gtest.dir\\src\\gtest-all.cc.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\build\\_deps\\googletest-src\\googletest\\src\\gtest-all.cc",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/build/_deps/googletest-src/googletest/src/gtest-all.cc"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/_deps/googletest-build/googletest",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/gtest_main.dir/includes_CXX.rsp -g -Wall -Wshadow -Wconversion -DGTEST_HAS_PTHREAD=0 -fexceptions -W -Wpointer-arith -Wreturn-type -Wcast-qual -Wwrite-strings -Wswitch -Wunused-parameter -Wcast-align -Wchar-subscripts -Winline -Wredundant-decls -Wfatal-errors -fPIC -std=c++17 -o CMakeFiles\\gtest_main.dir\\src\\gtest_main.cc.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\build\\_deps\\googletest-src\\googletest\\src\\gtest_main.cc",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/build/_deps/googletest-src/googletest/src/gtest_main.cc"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/static",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe   -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\FROLS_DataFrame.dir\\FROLS_DataFrame.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\static\\FROLS_DataFrame.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/static/FROLS_DataFrame.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/static",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/FROLS_Math.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\FROLS_Math.dir\\FROLS_Math.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\static\\FROLS_Math.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/static/FROLS_Math.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/static",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/FROLS_Eigen.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\FROLS_Eigen.dir\\FROLS_Eigen.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\static\\FROLS_Eigen.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/static/FROLS_Eigen.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/static",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe   -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\FROLS_Quantiles.dir\\FROLS_quantiles.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\static\\FROLS_quantiles.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/static/FROLS_quantiles.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/static/Algorithm",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/FROLS_Algorithm.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\FROLS_Algorithm.dir\\FROLS_Algorithm.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\static\\Algorithm\\FROLS_Algorithm.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/static/Algorithm/FROLS_Algorithm.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/static/Features",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/FROLS_Features.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\FROLS_Features.dir\\FROLS_Features.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\static\\Features\\FROLS_Features.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/static/Features/FROLS_Features.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/static/Features",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/FROLS_Features.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\FROLS_Features.dir\\FROLS_Polynomial.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\static\\Features\\FROLS_Polynomial.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/static/Features/FROLS_Polynomial.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/Binders",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe -DpyFROLS_EXPORTS @CMakeFiles/pyFROLS.dir/includes_CXX.rsp -g -fvisibility=hidden -Wfatal-errors -fPIC -fopenmp=libomp -std=gnu++17 -o CMakeFiles\\pyFROLS.dir\\pyFROLS.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\Binders\\pyFROLS.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/Binders/pyFROLS.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/test",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/feature_selection.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\feature_selection.dir\\feature_selection.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\test\\feature_selection.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/test/feature_selection.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/test",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/function_bind.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\function_bind.dir\\function_bind.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\test\\function_bind.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/test/function_bind.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/test",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/monomials.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\monomials.dir\\monomials.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\test\\monomials.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/test/monomials.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/test",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/sir_bernoulli.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\sir_bernoulli.dir\\sir_bernoulli.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\test\\sir_bernoulli.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/test/sir_bernoulli.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/test",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/casadi_function.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\casadi_function.dir\\casadi_function.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\test\\casadi_function.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/test/casadi_function.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/test",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/orthogonalize.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\orthogonalize.dir\\orthogonalize.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\test\\orthogonalize.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/test/orthogonalize.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/Executables/Regression",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/Single_Response.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\Single_Response.dir\\Single_Response.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\Executables\\Regression\\Single_Response.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/Executables/Regression/Single_Response.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/Executables/Regression",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/Multiple_Response.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\Multiple_Response.dir\\Multiple_Response.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\Executables\\Regression\\Multiple_Response.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/Executables/Regression/Multiple_Response.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/Executables/Regression",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/truncate.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -std=gnu++17 -o CMakeFiles\\truncate.dir\\truncate.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\Executables\\Regression\\truncate.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/Executables/Regression/truncate.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/Executables/Generate",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe  @CMakeFiles/Bernoulli_SIR_MC.dir/includes_CXX.rsp -g -Wfatal-errors -fPIC -static -fopenmp=libomp -std=gnu++17 -o CMakeFiles\\Bernoulli_SIR_MC.dir\\Bernoulli_SIR_MC.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\Executables\\Generate\\Bernoulli_SIR_MC.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/Executables/Generate/Bernoulli_SIR_MC.cpp"
+},
+{
+  "directory": "C:/Users/jonas/Documents/Network_Robust_MPC/build/Executables/Generate",
+  "command": "C:\\msys64\\mingw64\\bin\\clang++.exe -DBernoulli_SIR_MC_Binder_EXPORTS @CMakeFiles/Bernoulli_SIR_MC_Binder.dir/includes_CXX.rsp -g -fvisibility=hidden -Wfatal-errors -fPIC -fopenmp=libomp -std=gnu++17 -o CMakeFiles\\Bernoulli_SIR_MC_Binder.dir\\Binder.cpp.obj -c C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\Executables\\Generate\\Binder.cpp",
+  "file": "C:/Users/jonas/Documents/Network_Robust_MPC/Cpp/Executables/Generate/Binder.cpp"
+}
+]

@@ -1,0 +1,3 @@
+C:\msys64\mingw64\bin\cmake.exe -E rm -f CMakeFiles\monomials.dir/objects.a
+C:\msys64\mingw64\bin\llvm-ar.exe qc CMakeFiles\monomials.dir/objects.a @CMakeFiles\monomials.dir\objects1.rsp
+C:\msys64\mingw64\bin\clang++.exe -g -Wl,--whole-archive CMakeFiles\monomials.dir/objects.a -Wl,--no-whole-archive -o monomials.exe -Wl,--out-implib,libmonomials.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\monomials.dir\linklibs.rsp

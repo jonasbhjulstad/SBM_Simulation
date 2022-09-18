@@ -1,0 +1,5 @@
+if(EXISTS "C:/Users/jonas/Documents/Network_Robust_MPC/build/test/feature_selection[1]_tests.cmake")
+  include("C:/Users/jonas/Documents/Network_Robust_MPC/build/test/feature_selection[1]_tests.cmake")
+else()
+  add_test(feature_selection_NOT_BUILT feature_selection_NOT_BUILT)
+endif()
