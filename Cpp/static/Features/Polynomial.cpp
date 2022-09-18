@@ -1,19 +1,19 @@
 #include "Polynomial.hpp"
 #include <Eigen/src/Core/Array.h>
-#include <Math.hpp>
+#include <FROLS_Math.hpp>
 #include <iomanip>
 #include <iostream>
 #include <itertools.hpp>
-
+#include <omp.h>
 namespace FROLS::Features {
 
 
-    void Polynomial_Model::feature_summary() const {
+    void Polynomial_Model::feature_summary() {
         std::cout << "y\tFeature\t\tg\t\tTheta\t\tf_ERR\n";
         std::cout << std::fixed << std::setprecision(4);
         for (int i = 0; i < features.size(); i++) {
             for (auto &feature: features[i]) {
-                std::string name = feature_name(feature.index, false);
+                std::string name = feature_name(candidate_feature_idx[feature.index], false);
                 name = (name == "") ? "1" : name;
                 // print features aligned with tabs
                 std::cout << i << "\t" << name << "\t\t" << feature.g << "\t\t"
@@ -22,7 +22,7 @@ namespace FROLS::Features {
         }
     }
 
-    void Polynomial_Model::write_csv(const std::string &filename) const {
+    void Polynomial_Model::write_csv(const std::string &filename) {
         std::ofstream f(filename);
         f << "Response,Feature,Index,g,ERR" << std::endl;
         for (int i = 0; i < features.size(); i++) {
@@ -34,7 +34,7 @@ namespace FROLS::Features {
         }
     }
 
-    const std::vector<std::vector<Feature>> Polynomial_Model::get_features() const {
+    const std::vector<std::vector<Feature>> Polynomial_Model::get_features() {
         if (Nx == -1 || Nu == -1) {
             std::cout << "Model not yet trained" << std::endl;
             return {};
@@ -43,7 +43,7 @@ namespace FROLS::Features {
     }
 
 
-    Vec Polynomial_Model::_transform(crMat &X_raw, size_t target_idx) const {
+    Vec Polynomial_Model::_transform(crMat &X_raw, size_t target_idx, bool& index_failure) {
         // get feature names for polynomial combinations with powers between d_min,
         // d_max of the original features
         size_t N_input_features = X_raw.cols();
@@ -60,25 +60,12 @@ namespace FROLS::Features {
                 feature_idx++;
             }
         }
-        if (feature_idx < target_idx) {
-            std::cout << "[Polynomial_Model] Warning: Target index is not contained in the permutation set\n";
-        }
-        std::cout << "Feature index not found" << std::endl;
+        index_failure = true;
         return Vec::Zero(N_rows);
     }
 
-    Mat Polynomial_Model::_transform(crMat &X_raw) const {
-        size_t N_input_features = X_raw.cols();
-        size_t N_rows = X_raw.rows();
-        Mat X_poly(N_rows, N_output_features);
-        for (int i = 0; i < N_output_features; i++) {
-            X_poly.col(i) = transform(X_raw, i);
-        }
-        return X_poly;
-    }
-
     const std::string Polynomial_Model::feature_name(size_t target_idx,
-                                                     bool indent) const {
+                                                     bool indent) {
 
         std::string feature_name;
         size_t feature_idx = 0;
@@ -87,11 +74,11 @@ namespace FROLS::Features {
         for (auto &&comb: iter::combinations_with_replacement(range(0, d_max + 1),
                                                               N_input_features)) {
             for (auto &&powers: iter::permutations(comb)) {
+
                 if (feature_idx == target_idx) {
                     size_t x_idx = 0;
                     for (auto &&pow: powers) {
 
-                        std::cout << std::endl;
                         std::string x_or_u = x_idx < Nx ? "x" : "u";
                         size_t idx_offset = x_idx < Nx ? 0 : Nx;
                         feature_name +=
@@ -106,15 +93,15 @@ namespace FROLS::Features {
                 feature_idx++;
             }
         }
-        if (feature_idx < target_idx) {
+        if ((feature_idx < target_idx)&& !index_warning_used) {
             std::cout << "[Polynomial_Model] Warning: Target index is not contained in the permutation set\n";
+            index_warning_used = true;
         }
-        std::cout << "Feature index not found" << std::endl;
         return "";
     }
 
     const std::vector<std::string>
-    Polynomial_Model::feature_names() const {
+    Polynomial_Model::feature_names() {
         // get feature names for polynomial combinations with powers between d_min,
         // d_max of the original features
         size_t N_input_features = Nx + Nu;
@@ -137,7 +124,7 @@ namespace FROLS::Features {
         return feature_names;
     }
 
-    const std::string Polynomial_Model::model_equation(size_t idx) const {
+    const std::string Polynomial_Model::model_equation(size_t idx) {
         std::string model;
         const std::vector<Feature> &rd = features[idx];
         for (int i = 0; i < rd.size(); i++) {
@@ -151,7 +138,7 @@ namespace FROLS::Features {
         return model;
     }
 
-    const std::string Polynomial_Model::model_equations() const {
+    const std::string Polynomial_Model::model_equations() {
         std::string model;
         size_t response_idx = 0;
         for (int i = 0; i < features.size(); i++) {

@@ -3,8 +3,8 @@
 
 namespace FROLS::Regression {
 
-    void ERR_Regressor::feature_select(crMat &X, crVec &y,
-                                       std::vector<Feature> &used_features) const {
+    Feature ERR_Regressor::feature_select(crMat &X, crVec &y,
+                                       const std::vector<Feature> &used_features) {
         std::vector<size_t> used_indices(used_features.size());
         std::transform(used_features.begin(), used_features.end(), used_indices.begin(),
                        [](auto feature) { return feature.index; });
@@ -23,17 +23,17 @@ namespace FROLS::Regression {
                 g = cov_normalize(xi, y);
                 ERR = g * g * ((xi.transpose() * xi) / (y.transpose() * y)).value();
                 if (ERR > best_feature.f_ERR) {
+                    size_t idx_offset = std::count_if(used_features.begin(), used_features.end(), [&](const auto& f){return f.index <= i;});
                     best_feature.f_ERR = ERR;
                     best_feature.g = g;
-                    best_feature.index = i;
+                    best_feature.index = i + idx_offset;
                 }
                 ERR_logger->info("{:^15}{:^15}{:^15.3f}", i, g, ERR);
             }
-
         }
         ERR_logger->info("Best feature:{:^15}{:^15.3f}{:^15.3f}", best_feature.index, best_feature.g,
                          best_feature.f_ERR);
-        used_features.push_back(best_feature);
+        return best_feature;
     }
 
     bool ERR_Regressor::tolerance_check(
@@ -43,7 +43,7 @@ namespace FROLS::Regression {
         for (const auto &feature: best_features) {
             ERR_tot += feature.f_ERR;
         }
-        return ERR_tot > tol;
+        return (1-ERR_tot) < tol;
     }
 
 } // namespace FROLS::Regression

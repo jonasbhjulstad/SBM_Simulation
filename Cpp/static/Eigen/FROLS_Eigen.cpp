@@ -43,12 +43,19 @@ namespace FROLS
     }
     Mat dataframe_to_matrix(DataFrameStack &dfs, const std::vector<std::string> &col_names, int start_idx, int end_idx)
     {
-        size_t N_frame_rows = (end_idx >= 0) ? end_idx - start_idx : dfs[0].get_N_rows() + end_idx+1 - start_idx;
-
-        Mat res(dfs.get_N_frames()*N_frame_rows, col_names.size());
+        size_t N_frames = dfs.get_N_frames();
+        std::vector<size_t> N_rows(N_frames);
+        for (int i = 0; i < N_frames; i++)
+        {
+            N_rows[i] = (end_idx >= 0) ? end_idx - start_idx : dfs[i].get_N_rows() + end_idx+1 - start_idx;
+        }
+        size_t res_rows = std::accumulate(N_rows.begin(), N_rows.end(), 0);
+        Mat res(res_rows, col_names.size());
+        size_t offset = 0;
         for (size_t i = 0; i < dfs.get_N_frames(); i++)
         {
-            res(Eigen::seqN(i*N_frame_rows, N_frame_rows), Eigen::all) = dataframe_to_matrix(dfs[i], col_names, start_idx, end_idx);
+            res(Eigen::seqN(offset, N_rows[i]), Eigen::all) = dataframe_to_matrix(dfs[i], col_names, start_idx, end_idx);
+            offset += N_rows[i];
         }
         return res;
     }

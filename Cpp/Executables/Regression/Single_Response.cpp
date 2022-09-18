@@ -43,7 +43,8 @@ int main()
     size_t Nx = N_input_features;
     size_t Nu = 0;
 
-    FROLS::Regression::ERR_Regressor regressor(ERR_tolerance);
+    double theta_tol = 10;
+    FROLS::Regression::ERR_Regressor regressor(ERR_tolerance, theta_tol);
 
     auto rd = regressor.fit(X_quad,  X_quad.col(1));
 

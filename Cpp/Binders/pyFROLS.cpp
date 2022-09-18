@@ -32,7 +32,7 @@ PYBIND11_MODULE(pyFROLS, m) {
 
     py::class_<Polynomial_Model, Feature_Model>(m, "Polynomial_Model")
             .def(py::init<size_t, size_t, size_t, size_t>())
-            .def("transform", static_cast<Mat (Polynomial_Model::*)(crMat &) const>(
+            .def("transform", static_cast<Mat (Polynomial_Model::*)(crMat &)>(
                     &Polynomial_Model::transform))
             .def("get_features", &Polynomial_Model::get_features)
             .def("write_csv", &Polynomial_Model::write_csv)
@@ -48,11 +48,11 @@ PYBIND11_MODULE(pyFROLS, m) {
             .def("fit", &Regressor::fit);
 
     py::class_<Quantile_Regressor, Regressor>(m, "Quantile_Regressor")
-            .def(py::init<double, double>())
+            .def(py::init<double, double, double, const std::string>())
             .def("transform_fit", &Quantile_Regressor::transform_fit)
             .def("fit", &Quantile_Regressor::fit);
     py::class_<ERR_Regressor, Regressor>(m, "ERR_Regressor")
-            .def(py::init<double>())
+            .def(py::init<double, double>())
             .def("transform_fit", &Quantile_Regressor::transform_fit)
             .def("fit", &Quantile_Regressor::fit);
 }

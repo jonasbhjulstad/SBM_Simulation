@@ -8,9 +8,9 @@ namespace FROLS
 const char *FROLS_DATA_DIR = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/data";
 const char *FROLS_LOG_DIR = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/log";
 
-std::string MC_sim_filename(size_t N_pop, double p_ER, size_t idx)
+std::string MC_sim_filename(size_t N_pop, double p_ER, size_t idx, const std::string network_type = "SIR")
 {
-    return FROLS_DATA_DIR + std::string("/Bernoulli_SIR_MC_") +
+    return FROLS_DATA_DIR + std::string("/Bernoulli_" + network_type + "_MC_") +
            std::to_string(idx) + "_" + std::to_string(N_pop) + "_" +
            std::to_string(p_ER) + ".csv";
 }

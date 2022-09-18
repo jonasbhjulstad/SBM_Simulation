@@ -1,0 +1,109 @@
+#ifndef FROLS_SIR_BERNOULLI_NETWORK_HPP
+#define FROLS_SIR_BERNOULLI_NETWORK_HPP
+
+#include "Graph_Generation.hpp"
+#include <FROLS_Math.hpp>
+#include <graph_lite.h>
+#include <random>
+#include <stddef.h>
+#include <utility>
+#include <vector>
+
+namespace Network_Models {
+    enum SIR_State {
+        SIR_S = 0, SIR_I = 1, SIR_R = 2
+    };
+    typedef graph_lite::Graph<int, SIR_State> SIR_Network;
+
+    template<typename RNG>
+    struct SIR_Bernoulli_Network {
+
+        SIR_Bernoulli_Network(size_t N_pop, double p_ER, RNG rng) : rng(rng) {
+            G = generate_erdos_renyi<RNG, SIR_State>(N_pop, p_ER, rng);
+        }
+
+        void generate_initial_infections(double p_I0, double p_R0) {
+            std::bernoulli_distribution d_I(p_I0);
+            std::bernoulli_distribution d_R(p_R0);
+            std::for_each(G.begin(), G.end(), [&](auto &v) {
+                SIR_State state = d_I(rng) ? SIR_I : SIR_S;
+                state = d_R(rng) ? SIR_R : state;
+                G.node_prop(v) = state;
+            });
+        }
+
+        std::vector<size_t> population_count() {
+            std::vector<size_t> count = {0, 0, 0};
+            std::for_each(G.begin(), G.end(), [&](const auto &v) { count[G.node_prop(v)] += 1; });
+            return count;
+        }
+
+// function for infection step
+        void infection_step(double p_I) {
+            std::bernoulli_distribution d_I(p_I);
+            std::for_each(G.begin(), G.end(), [&](auto v0) {
+                if (G.node_prop(v0) == SIR_I) {
+                    auto [nbr_start, nbr_end] = G.neighbors(v0);
+                    std::for_each(nbr_start, nbr_end, [&](auto &nbr_it) {
+                        G.node_prop(nbr_it) =  ((G.node_prop(nbr_it) == SIR_S) && d_I(rng)) ? SIR_I : G.node_prop(nbr_it);
+                    });
+                }
+            });
+        }
+
+        void recovery_step(double p_R) {
+            std::bernoulli_distribution d_R(p_R);
+            std::for_each(G.begin(), G.end(), [&](auto &v) {
+                SIR_State &state = G.node_prop(v);
+                state = ((state == SIR_I) && d_R(rng)) ? SIR_R : state;
+            });
+        }
+
+        std::vector<std::vector<size_t>>
+        simulate(const std::vector<std::pair<double, double>>& p_vec, size_t infection_count_tolerance = 0, size_t Nt_min = 15) {
+
+            std::vector<std::vector<size_t>> trajectory;
+            trajectory.reserve(p_vec.size());
+            trajectory.push_back(population_count());
+            size_t t = 0;
+            for (const auto& p: p_vec)
+            {
+
+                auto &[p_I, p_R] = p;
+                infection_step(p_I);
+                recovery_step(p_R);
+                trajectory.push_back(population_count());
+                if ((trajectory.back()[1] < infection_count_tolerance) && (t > Nt_min))
+                {
+                    break;
+                }
+                t++;
+            }
+            return FROLS::transpose(trajectory);
+        }
+
+        std::vector<std::vector<size_t>> simulate(size_t Nt, double p_I, double p_R) {
+            std::vector<std::pair<double, double>> p_vec(Nt);
+            std::fill(p_vec.begin(), p_vec.end(), std::make_pair(p_I, p_R));
+            return simulate(p_vec);
+        }
+        std::vector<std::vector<size_t>> simulate(const std::vector<double>& p_I, const std::vector<double>& p_R)
+        {
+            return simulate(FROLS::zip(p_I, p_R));
+        }
+
+        void reset()
+        {
+            for (auto& v: G)
+            {
+                G.node_prop(v) = SIR_S;
+            }
+        }
+
+
+    private:
+        SIR_Network G;
+        RNG rng;
+    };
+}
+#endif

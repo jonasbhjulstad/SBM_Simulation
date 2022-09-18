@@ -11,6 +11,8 @@
 #include <sundials/sundials_math.h>
 #include <sundials/sundials_types.h>
 #include <sunlinsol/sunlinsol_spgmr.h>
+#include <vector>
+#include <array>
 
 namespace FROLS::Integrators {
 template <size_t Nx, typename Derived>
@@ -21,11 +23,12 @@ struct Model_Integrator
     return static_cast<Derived*>(this)->step(x);
   }
 
-  std::vector<std::array<double, Nx>> run_trajectory(std::array<double, Nx>& x0, std::vector<double)
-}
+  std::vector<std::array<double, Nx>> run_trajectory(std::array<double, Nx>& x0, std::vector<double);
+};
 
 template <size_t Nx, class Derived>
-struct CVODE_Integrator : public Model_Integrator<Nx> {
+struct CVODE_Integrator :
+        {
   SUNContext ctx;
   void *cvode_mem;
   realtype t_current;
@@ -68,6 +71,8 @@ struct CVODE_Integrator : public Model_Integrator<Nx> {
     }
     return x_next;
   }
+
+  void simulate()
 
   ~CVODE_Integrator() {
     N_VDestroy(x);

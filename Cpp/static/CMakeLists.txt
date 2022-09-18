@@ -1,5 +1,6 @@
 add_subdirectory(DataFrame)
 add_subdirectory(Eigen)
+add_subdirectory(Network)
 add_subdirectory(Math)
 add_subdirectory(Regressors)
 add_subdirectory(Features)

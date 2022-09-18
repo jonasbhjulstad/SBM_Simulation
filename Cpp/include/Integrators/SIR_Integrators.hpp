@@ -90,5 +90,69 @@ struct SIR_Deterministic : public CVODE_Integrator<3, SIR_Deterministic> {
            EXIT_SUCCESS);
   }
 };
+
+double beta_sin(double beta_const, double* p, double t)
+{
+    return std::max({beta_const + p[0]*sin(t*p[1] + p[2]), 0.});
+}
+
+// Jacobian function vector routine.
+    int SIR_sin_eval_jac(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector fx,
+                     void *param, N_Vector tmp) {
+        double *x_data = N_VGetArrayPointer(x);
+        double *Jv_data = N_VGetArrayPointer(Jv);
+        double *v_data = N_VGetArrayPointer(v);
+        double S = x_data[0];
+        double I = x_data[1];
+        double R = x_data[2];
+        double alpha = ((double *)param)[0];
+        double beta_const = ((double *)param)[1];
+        double N_pop = ((double *)param)[2];
+        double beta = beta_sin(beta_const, &(((double*)param)[3]), t);
+        Jv_data[0] = -beta * I / N_pop * v_data[0] - beta * S / N_pop * v_data[1];
+        Jv_data[1] =  beta * I / N_pop * v_data[0] + beta * S / N_pop * v_data[1] -
+                     alpha * v_data[1];
+        Jv_data[2] = alpha * v_data[1];
+
+        return 0;
+    }
+
+    int SIR_sin_eval_jac(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector fx,
+                     void *param, N_Vector tmp) {
+        double *x_data = N_VGetArrayPointer(x);
+        double *Jv_data = N_VGetArrayPointer(Jv);
+        double *v_data = N_VGetArrayPointer(v);
+        double S = x_data[0];
+        double I = x_data[1];
+        double R = x_data[2];
+        double alpha = ((double *)param)[0];
+        double beta_const = ((double *)param)[1];
+        double N_pop = ((double *)param)[2];
+        double beta = beta_sin(beta_const, &(((double*)param)[3]), t);
+
+        Jv_data[0] = -beta * I / N_pop * v_data[0] - beta * S / N_pop * v_data[1];
+        Jv_data[1] = beta * I / N_pop * v_data[0] + beta * S / N_pop * v_data[1] -
+                     alpha * v_data[1];
+        Jv_data[2] = alpha * v_data[1];
+
+        return 0;
+    }
+
+    struct SIR_Sine : public CVODE_Integrator<3, SIR_Deterministic> {
+        double param[6];
+        SIR_Sine(const std::array<double, 3> &x0, double alpha, double beta, double* beta_sin_p,
+                          double N_pop, double dt)
+                : CVODE_Integrator<3, SIR_Sine>(x0, dt) {
+            param[0] = alpha;
+            param[1] = beta;
+            param[2] = N_pop;
+            param[3] = beta_sin_p[0];
+            param[4] = beta_sin_p[1];
+            param[5] = beta_sin_p[2];
+            assert(this->initialize_solver(SIR_sin_eval_f, SIR_sin_eval_jac, (void *)param) ==
+                   EXIT_SUCCESS);
+        }
+    };
+
 } // namespace FROLS::Integrators
 #endif // SIR_INTEGRATORS_HPP
