@@ -1,6 +1,6 @@
 #include "FROLS_Eigen.hpp"
 #include <Eigen/SVD>
-
+#include <algorithm>
 namespace FROLS
 {
 

@@ -7,7 +7,6 @@
 #include <FROLS_Math.hpp>
 #include <SIR_Bernoulli_Network.hpp>
 #include <graph_lite.h>
-#include <bits/stdc++.h>
 #include <omp.h>
 
 namespace FROLS {

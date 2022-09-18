@@ -5,6 +5,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
+#include <cstdint>
+
 typedef Eigen::Matrix<double, -1, -1> Mat;
 typedef Eigen::Vector<double, -1> Vec;
 typedef Eigen::Vector<int, -1> iVec;

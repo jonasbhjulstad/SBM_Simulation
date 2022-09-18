@@ -9,6 +9,6 @@ endfunction()
 
 
 # add_custom_test(SIR_integrator)
-add_custom_test(monomials)
+# add_custom_test(monomials)
 #add_custom_test(sir_bernoulli)
 # add_custom_test(feature_transform)

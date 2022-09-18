@@ -1,8 +1,10 @@
 #ifndef FROLS_DATAFRAME_HPP
 #define FROLS_DATAFRAME_HPP
-
-#include <bits/stdc++.h>
 #include <Typedefs.hpp>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace FROLS {
     class DataFrameStack;

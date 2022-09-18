@@ -1,6 +1,7 @@
 //
 // Created by arch on 9/17/22.
 //
+#include <Typedefs.hpp>
 #include <Integrators/SIR_Integrators.hpp>
 #include <DataFrame.hpp>
 constexpr size_t Nt = 100;
