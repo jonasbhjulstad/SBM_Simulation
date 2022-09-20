@@ -1,39 +1,27 @@
 #include "ERR_Regressor.hpp"
 #include <vector>
+#include <execution>
 
 namespace FROLS::Regression {
 
-    Feature ERR_Regressor::feature_select(crMat &X, crVec &y,
-                                       const std::vector<Feature> &used_features) {
-        std::vector<size_t> used_indices(used_features.size());
-        std::transform(used_features.begin(), used_features.end(), used_indices.begin(),
-                       [](auto feature) { return feature.index; });
-        ERR_logger->info("Feature selection with used indices:\t{}", fmt::join(used_indices, ","));
-        ERR_logger->info("{:^15}{:^15}{:^15}", "Subproblem", "theta", "ERR");
+    std::vector<Feature> ERR_Regressor::candidate_regression(crMat &X, crVec &y,
+                                                             const std::vector<Feature> &used_features) const {
+        std::vector<size_t> candidate_idx = unused_feature_indices(used_features, X.cols());
+        std::vector<Feature> candidates(X.cols() - used_features.size());
+        std::transform(std::execution::par_unseq,candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
+                       [&](const size_t &idx) {
+                           Feature f = single_feature_regression(X.col(idx), y);
+                           f.index = idx;
+                           return f;
+                       });
+        return candidates;
+    }
 
-        size_t N_features = X.cols();
-        double ERR, g;
-        Feature best_feature;
-        for (int i = 0; i < N_features; i++) {
-
-
-            // If the feature is already used, skip it
-            if (std::none_of(used_features.begin(), used_features.end(), [&i](auto f) { return f.index == i; })) {
-                Vec xi = X.col(i);
-                g = cov_normalize(xi, y);
-                ERR = g * g * ((xi.transpose() * xi) / (y.transpose() * y)).value();
-                if (ERR > best_feature.f_ERR) {
-                    size_t idx_offset = std::count_if(used_features.begin(), used_features.end(), [&](const auto& f){return f.index <= i;});
-                    best_feature.f_ERR = ERR;
-                    best_feature.g = g;
-                    best_feature.index = i + idx_offset;
-                }
-                ERR_logger->info("{:^15}{:^15}{:^15.3f}", i, g, ERR);
-            }
-        }
-        ERR_logger->info("Best feature:{:^15}{:^15.3f}{:^15.3f}", best_feature.index, best_feature.g,
-                         best_feature.f_ERR);
-        return best_feature;
+    Feature ERR_Regressor::single_feature_regression(crVec &x, crVec &y) const {
+        Feature f;
+        f.g = cov_normalize(x, y);
+        f.f_ERR = f.g * f.g * ((x.transpose() * x) / (y.transpose() * y)).value();
+        return f;
     }
 
     bool ERR_Regressor::tolerance_check(
@@ -43,7 +31,7 @@ namespace FROLS::Regression {
         for (const auto &feature: best_features) {
             ERR_tot += feature.f_ERR;
         }
-        return (1-ERR_tot) < tol;
+        return (1 - ERR_tot) < tol;
     }
 
 } // namespace FROLS::Regression

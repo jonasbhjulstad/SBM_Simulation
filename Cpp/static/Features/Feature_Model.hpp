@@ -3,8 +3,6 @@
 
 #include <Typedefs.hpp>
 #include <FROLS_Path_Config.hpp>
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/basic_file_sink.h>
 #include <memory>
 
 namespace FROLS::Features {
@@ -42,8 +40,6 @@ namespace FROLS::Features {
         std::vector<size_t> get_candidate_feature_idx(){ return candidate_feature_idx;};
     protected:
         std::vector<size_t> candidate_feature_idx;
-    private:
-        std::shared_ptr<spdlog::logger> feature_logger;
     };
 } // namespace FROLS::Features
 

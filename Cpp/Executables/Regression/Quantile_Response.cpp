@@ -11,20 +11,21 @@ int main(int argc, char** argv) {
     std::string network_type = "SIS";
     std::vector<std::string> colnames = {"S", "I"};
     size_t Nx = 2;
-    if (argc > 1)
+    if (argc == 1)
     {
         Nx = 3;
         network_type = "SIR";
         colnames = {"S", "I", "R"};
     }
-    size_t N_sims = 100; // 10000;
-    size_t N_pop = 60;
+    size_t N_sims = 50; // 10000;
+    size_t N_pop = 80;
     double p_ER = 1.0;
     using namespace FROLS;
     std::vector<std::string> df_names(N_sims);
 
     for (int i = 0; i < N_sims; i++) {
-        df_names[i] = MC_sim_filename(N_pop, p_ER, i, network_type);
+//        df_names[i] = MC_sim_filename(N_pop, p_ER, i, network_type);
+        df_names[i] = std::string(FROLS_DATA_DIR) + std::string("/SIR_Sine_Trajectory_") + std::to_string(i) + ".csv";
     }
 
 
@@ -44,13 +45,14 @@ int main(int argc, char** argv) {
     size_t N_output_features = 16;
     using namespace FROLS::Features;
     size_t Nu = U.cols();
-    std::vector<size_t> ignore_idx = {0,1, 2, 3,4,5,6};
+    std::vector<size_t> ignore_idx = {0,1, 2, 3,4,5,6,7,8};
     double ERR_tolerance = 1e-2;
     FROLS::Features::Polynomial_Model model(Nx, Nu, N_output_features, d_max, ignore_idx);
-    double MAE_tol = 1.;
+    double MAE_tol = 105.;
+    size_t N_terms = 2;
     double tau = .95;
-    double theta_tol = 10;
-    Regression::Quantile_Regressor regressor(tau, MAE_tol, theta_tol);
+    double theta_tol = 1e-2;
+    Regression::Quantile_Regressor regressor(tau, MAE_tol, theta_tol, N_terms);
     regressor.transform_fit(X, U, Y, model);
     // auto rds = (Y,  X_poly, ERR_tolerance);
     // std::cout << Regression::regression_data_summary(rds) << std::endl;
@@ -58,18 +60,21 @@ int main(int argc, char** argv) {
     Vec x0 = X.row(0);
 //    double u0 = U(0, 0);
     double u_max = U.maxCoeff()/2;
-    Vec u = Vec::Ones(Nt_max) * u_max;
-    // print x0, u
+//    Vec u = Vec::Ones(Nt_max) * u_max;
+// print x0, u
     x0(1) = 10;
     model.feature_summary();
-    Mat X_sim = model.simulate(x0, u, Nt_max);
-    auto t = FROLS::range(0, Nt_max);
-    DataFrame qr_traj;
-    qr_traj.assign(colnames, X_sim);
-    qr_traj.assign("p_I", u);
-    qr_traj.assign("t", t);
-
-    qr_traj.write_csv(FROLS_DATA_DIR + std::string("/Quantile_Trajectory_" + network_type + ".csv"), ",");
+    auto t  = *dfs[0]["t"];
+    for (int i = 0; i < N_sims; i++)
+    {
+        Vec u = df_to_vec(dfs[i], "p_I");
+        Mat X_sim = model.simulate(x0, u, Nt_max);
+        DataFrame qr_traj;
+        qr_traj.assign(colnames, X_sim);
+        qr_traj.assign("p_I", u);
+        qr_traj.assign("t", t);
+        qr_traj.write_csv(FROLS_DATA_DIR + std::string("/Quantile_Trajectory_" + network_type +  "_" + std::to_string(i) + ".csv"), ",");
+    }
 
 
     return 0;

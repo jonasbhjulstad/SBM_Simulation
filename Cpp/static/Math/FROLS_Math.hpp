@@ -76,6 +76,7 @@ inline std::vector<std::pair<T, T>> zip(const std::vector<T>& a, const std::vect
         return res;
     }
 
+    std::vector<size_t> filtered_range(const std::vector<size_t>& filter_idx, size_t min, size_t max);
 
 } // namespace FROLS
 

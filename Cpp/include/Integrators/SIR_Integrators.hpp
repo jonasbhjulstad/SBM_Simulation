@@ -122,13 +122,12 @@ namespace FROLS::Integrators
   struct SIR_Models : public CVODE_Integrator<3, Nt, SIR_Models<Nt, Param, param_gen>, SIR_Param>
   {
     Param param;
-    SIR_Models(const std::array<double, 3> &x0, const Param& p, double dt)
-        : CVODE_Integrator<3, Nt, SIR_Models<Nt, Param, param_gen>, SIR_Param>(x0, dt), param(p)
+    SIR_Models(const std::array<double, 3>& x0, const Param& p, double dt,realtype abs_tol = 1e-5, realtype reltol = 1e-5)
+        : CVODE_Integrator<3, Nt, SIR_Models<Nt, Param, param_gen>, SIR_Param>(x0, dt, abs_tol,reltol, 0), param(p)
     {
       int flag = this->initialize_solver(SIR_eval_f<param_gen>, SIR_eval_jac<param_gen>, (void *)&param);
       assert(flag ==
              EXIT_SUCCESS);
-             std::cout << "Solver Initialized: " << flag << std::endl;
     }
   };
 

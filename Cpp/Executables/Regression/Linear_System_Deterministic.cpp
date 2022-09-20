@@ -1,4 +1,3 @@
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 
 #include <DataFrame.hpp>
 #include <FROLS_Eigen.hpp>

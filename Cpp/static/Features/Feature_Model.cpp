@@ -2,18 +2,9 @@
 
 namespace FROLS::Features {
 
-    Feature_Model::Feature_Model(const size_t N_output_features, const std::vector<size_t> ignore_idx) : N_output_features(N_output_features), ignore_idx(ignore_idx),
-                                                                         feature_logger(spdlog::basic_logger_mt(
-                                                                                 "feature_logger",
-                                                                                 (std::string(FROLS_LOG_DIR) +
-                                                                                  "/feature_log.txt").c_str(), true)) {
-        feature_logger->
-                set_level(spdlog::level::debug);
-        feature_logger->info("{:^15}{:^15}", "Feature_Name", "Index");
-    }
-
+    Feature_Model::Feature_Model(const size_t N_output_features, const std::vector<size_t> ignore_idx) : N_output_features(N_output_features), ignore_idx(ignore_idx)
+    {}
     Vec Feature_Model::transform(crMat &X_raw, size_t target_index, bool& index_failure) {
-        feature_logger->info("{:^15}{:^15}", feature_name(target_index, false), target_index);
         return _transform(X_raw, target_index, index_failure);
     }
 
@@ -31,11 +22,8 @@ namespace FROLS::Features {
             if (std::none_of(ignore_idx.begin(), ignore_idx.end(), [&](const auto& ig_idx){return feature_idx == ig_idx;}))
             {
                 X_poly.col(col_iter) = transform(X_raw, feature_idx, index_failure);
-                if (index_failure)
+                if (!index_failure)
                 {
-                    feature_logger->info("Feature Index exceeded at index {:^15}", feature_idx);
-                }
-                else{
                     col_iter++;
                     candidate_feature_idx.push_back(feature_idx);
                 }

@@ -13,7 +13,7 @@ namespace FROLS::Features {
         std::cout << std::fixed << std::setprecision(4);
         for (int i = 0; i < features.size(); i++) {
             for (auto &feature: features[i]) {
-                std::string name = feature_name(candidate_feature_idx[feature.index], false);
+                std::string name = (feature.f_ERR == -1) ? "-" : feature_name(candidate_feature_idx[feature.index], false);
                 name = (name == "") ? "1" : name;
                 // print features aligned with tabs
                 std::cout << i << "\t" << name << "\t\t" << feature.g << "\t\t"

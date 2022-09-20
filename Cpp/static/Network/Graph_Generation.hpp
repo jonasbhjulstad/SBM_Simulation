@@ -7,6 +7,7 @@
 
 #include <graph_lite.h>
 #include <itertools.hpp>
+#include <random>
 
 namespace Network_Models {
     template<typename RNG, typename NodeProp>

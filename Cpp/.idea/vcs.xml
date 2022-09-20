@@ -3,8 +3,15 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/build/_deps/cppitertools_repo-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/build/_deps/googletest-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/build/_deps/googletest-src" vcs="" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/cppitertools_repo-src" vcs="" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/googletest-src" vcs="" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/cppitertools_repo-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/graphlite_repo-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/graphlite_repo-src/lib/dot_parser_cpp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/graphlite_repo-src/lib/dot_parser_cpp/lib/googletest" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/graphlite_repo-src/lib/dot_parser_cpp/lib/lexy" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/graphlite_repo-src/lib/googletest" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-release/_deps/zipiterator_repo-src" vcs="Git" />
   </component>
 </project>

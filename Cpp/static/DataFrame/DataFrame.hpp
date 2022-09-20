@@ -39,6 +39,24 @@ namespace FROLS {
 
         void assign(const std::string &col_name, const std::vector<double> &col_data);
 
+        template <size_t N, typename T>
+        void assign(const std::string &col_name,
+                               const std::array<T, N> &col_data) {
+
+            data[col_name] = std::make_shared<std::vector<double>>(N);
+            for (int i = 0; i < N; i++) {
+                (*data[col_name])[i] = col_data[i];
+            }
+        }
+
+        template <size_t N, size_t N_C, typename T>
+        void assign(const std::vector<std::string> &col_names,
+                    const std::array<std::array<T, N>, N_C> &data_cols) {
+            for (int i = 0; i < N_C; i++)
+            {
+                assign(col_names[i], data_cols[i]);
+            }
+        }
         void assign(const std::string &col_name, size_t row, double value);
 
         void assign(const std::string &col_name, crVec &vec);

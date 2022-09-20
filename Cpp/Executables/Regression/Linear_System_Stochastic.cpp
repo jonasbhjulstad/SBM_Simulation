@@ -32,6 +32,11 @@ int main() {
     size_t Nu = 2;
     Mat b(Nx, Nu);
     b << 1,.2,0,.4,10,0;
+
+    std::cout << "Linear System\n";
+    std::cout << "A:\n" << A << "\n";
+    std::cout << "b:\n" << b << "\n";
+    std::cout << "x0:\n" << x0 << "\n";
     std::random_device rd{};
     std::mt19937 rng{rd()};
     double b_std = 1.;
@@ -68,7 +73,7 @@ int main() {
 
     size_t d_max = 1;
     size_t N_features = 16;
-    double ERR_tol = 0.2;
+    double ERR_tol = 0.1;
     double MAE_tol = 4;
     double tau = .95;
     double theta_tol = 1e-3;

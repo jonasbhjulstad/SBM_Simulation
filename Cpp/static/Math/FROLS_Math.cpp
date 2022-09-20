@@ -54,5 +54,15 @@ namespace FROLS {
         return res;
     }
 
+    std::vector<size_t> filtered_range(const std::vector<size_t> &filter_idx, size_t min, size_t max) {
+        auto full_range = range(min, max);
+        std::vector<size_t> res;
+        std::copy_if(full_range.begin(), full_range.end(), std::back_inserter(res),
+                     [&](const size_t idx) {
+                         return std::none_of(filter_idx.begin(), filter_idx.end(),
+                                             [&](const size_t &f_idx) { return idx == f_idx; });
+                     });
+        return res;
+    }
 
 } // namespace FROLS

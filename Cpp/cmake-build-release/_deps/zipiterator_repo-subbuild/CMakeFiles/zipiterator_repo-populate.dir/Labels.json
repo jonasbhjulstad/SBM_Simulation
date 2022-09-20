@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/zipiterator_repo-subbuild/CMakeFiles/zipiterator_repo-populate"
+		},
+		{
+			"file" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/zipiterator_repo-subbuild/CMakeFiles/zipiterator_repo-populate.rule"
+		},
+		{
+			"file" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/zipiterator_repo-subbuild/CMakeFiles/zipiterator_repo-populate-complete.rule"
+		},
+		{
+			"file" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/zipiterator_repo-subbuild/zipiterator_repo-populate-prefix/src/zipiterator_repo-populate-stamp/zipiterator_repo-populate-build.rule"
+		},
+		{
+			"file" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/zipiterator_repo-subbuild/zipiterator_repo-populate-prefix/src/zipiterator_repo-populate-stamp/zipiterator_repo-populate-configure.rule"
+		},
+		{
+			"file" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/zipiterator_repo-subbuild/zipiterator_repo-populate-prefix/src/zipiterator_repo-populate-stamp/zipiterator_repo-populate-download.rule"
+		},
+		{
+			"file" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/zipiterator_repo-subbuild/zipiterator_repo-populate-prefix/src/zipiterator_repo-populate-stamp/zipiterator_repo-populate-install.rule"
+		},
+		{
+			"file" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/zipiterator_repo-subbuild/zipiterator_repo-populate-prefix/src/zipiterator_repo-populate-stamp/zipiterator_repo-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/zipiterator_repo-subbuild/zipiterator_repo-populate-prefix/src/zipiterator_repo-populate-stamp/zipiterator_repo-populate-patch.rule"
+		},
+		{
+			"file" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/zipiterator_repo-subbuild/zipiterator_repo-populate-prefix/src/zipiterator_repo-populate-stamp/zipiterator_repo-populate-test.rule"
+		},
+		{
+			"file" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/zipiterator_repo-subbuild/zipiterator_repo-populate-prefix/src/zipiterator_repo-populate-stamp/zipiterator_repo-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"zipiterator_repo-populate"
+		],
+		"name" : "zipiterator_repo-populate"
+	}
+}

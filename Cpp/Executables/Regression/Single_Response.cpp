@@ -49,7 +49,6 @@ int main()
     auto rd = regressor.fit(X_quad,  X_quad.col(1));
 
 
-
     return 0;
 
 }

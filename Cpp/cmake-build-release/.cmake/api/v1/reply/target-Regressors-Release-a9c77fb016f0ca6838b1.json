@@ -1,0 +1,226 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "static/Regressors/libRegressors.a"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"target_link_libraries"
+		],
+		"files" : 
+		[
+			"static/Regressors/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 1,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 2,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-O3 -DNDEBUG -fPIC"
+				},
+				{
+					"backtrace" : 2,
+					"fragment" : "-fwrapv"
+				},
+				{
+					"fragment" : "-std=gnu++17"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 2,
+					"define" : "HAVE_CONFIG_H"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "OR_TOOLS_AS_DYNAMIC_LIB"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "USE_BOP"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "USE_CBC"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "USE_CLP"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "USE_GLOP"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "USE_LP_PARSER"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "USE_PDLP"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "USE_SCIP"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 2,
+					"path" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/static/Features"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/static/Eigen"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/static/DataFrame"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-release/_deps/cppitertools_repo-src"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/static/Regressors"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/static/Math"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "/usr/local/include/eigen3"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "/usr/local/include/coin"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					2,
+					2
+				],
+				"standard" : "17"
+			},
+			"sourceIndexes" : 
+			[
+				1,
+				2,
+				3
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"id" : "Features::@668fa06d19dbc11d4cdc"
+		}
+	],
+	"id" : "Regressors::@f1e7241e55aed8935b50",
+	"name" : "Regressors",
+	"nameOnDisk" : "libRegressors.a",
+	"paths" : 
+	{
+		"build" : "static/Regressors",
+		"source" : "static/Regressors"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				0,
+				4,
+				5
+			]
+		},
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				1,
+				2,
+				3
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"path" : "static/Regressors/Regressor.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "static/Regressors/Regressor.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "static/Regressors/ERR_Regressor.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "static/Regressors/Quantile_Regressor.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "static/Regressors/ERR_Regressor.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "static/Regressors/Quantile_Regressor.hpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}
