@@ -4,8 +4,8 @@
 #include <limits>
 #include <execution>
 namespace FROLS::Regression {
-    Quantile_Regressor::Quantile_Regressor(double tau, double tol, double theta_tol, size_t N_terms_max, const std::string solver_type)
-            : tau(tau), Regressor(tol, theta_tol, N_terms_max), solver_type(solver_type){}
+    Quantile_Regressor::Quantile_Regressor(const Quantile_Param& p)
+            : tau(p.tau), Regressor(p), solver_type(p.solver_type){}
 
 
     Feature Quantile_Regressor::single_feature_regression(const Vec &x, const Vec &y) const {
@@ -45,7 +45,7 @@ namespace FROLS::Regression {
                 return Feature{f, theta_sol, 0, 0.};
             } else {
                 std::cout << "[Quantile_Regressor] Warning: Quantile regression failed" << std::endl;
-                std::for_each(LP.g.begin(), LP.g.end(), [&](auto &gi) { gi->Clear(); });
+                std::for_each(std::execution::par_unseq, LP.g.begin(), LP.g.end(), [&](auto &gi) { gi->Clear(); });
                 return Feature{std::numeric_limits<double>::infinity(), 0., 0, 0.};
             }
 
@@ -58,7 +58,7 @@ namespace FROLS::Regression {
 
         std::vector<size_t> candidate_idx = unused_feature_indices(used_features, X.cols());
         std::vector<Feature> candidates(candidate_idx.size());
-        std::transform(candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
+        std::transform(std::execution::par_unseq, candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
                        [=](const size_t &idx) {
                            Feature f = single_feature_regression(X.col(idx), y);
                            f.index = idx;

@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "_deps/graphlite_repo-build/src/graph_lite",
+		"source" : "cmake-build-debug/_deps/graphlite_repo-src/src/graph_lite"
+	}
+}

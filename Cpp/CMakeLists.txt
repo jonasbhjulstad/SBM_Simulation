@@ -8,19 +8,28 @@ set(PYTHON_EXECUTABLE "/home/arch/Env/Default/bin/python")
 endif()
 list(APPEND CMAKE_MODULE_PATH "/home/arch/Downloads/cmake-checks-cache/CMakeChecksCache/")
 find_package(Eigen3 REQUIRED)
-# find_package(casadi REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(ZLIB REQUIRED)
-# find_package(re2 REQUIRED)
-# find_package(Cbc REQUIRED)
 
 find_package(ortools CONFIG REQUIRED)
-# get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-# get_property(importTargetsAfter DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-# list(REMOVE_ITEM importTargetsAfter ${importTargets})
-# message("${importTargetsAfter}")
+ get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
+ get_property(importTargetsAfter DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
+find_package(range-v3 REQUIRED)
+
+ list(REMOVE_ITEM importTargetsAfter ${importTargets})
+ message("${importTargetsAfter}")
 find_package(SUNDIALS REQUIRED)
 find_package(pybind11 CONFIG)
+if(UNIX)
+    set(COMPUTECPP_DIR "/opt/ComputeCpp-CE/")
+endif()
+
+include_directories("${COMPUTECPP_DIR}/include")
+link_directories("${COMPUTECPP_DIR}/lib")
+#find_package(IntelDPCPP REQUIRED HINTS "/opt/intel/oneapi/compiler/2022.1.0/linux/IntelDPCPP")
+#find_package(oneDPL REQUIRED HINTS "/opt/intel/oneapi/dpl/2021.7.0/lib/cmake/oneDPL/")
+#add_compile_definitions(FROLS_DPCPP_FOUND)
+
 # find_package(nlohmann_json REQUIRED)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -41,8 +50,6 @@ GIT_TAG release-1.12.1
 )
 FetchContent_MakeAvailable(googletest)
 endif()
-#target_link_directories(ortools::ortools INTERFACE "/usr/local/lib/")
-
 # option(cppitertools_INSTALL_CMAKE_DIR "share/cppitertools/cmake")
 # find_package(cppitertools QUIET)
 find_package(GTest REQUIRED)
@@ -52,7 +59,10 @@ if(UNIX)
 /")
     find_package(TBB REQUIRED)
 endif()
-
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
+#    set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=*; --export-fixes=out.yml")
+endif()
 FetchContent_Declare(
 cppitertools_repo
 GIT_REPOSITORY https://github.com/ryanhaining/cppitertools.git
@@ -63,17 +73,7 @@ BUILD_COMMAND ""
 
 FetchContent_MakeAvailable(cppitertools_repo)
 
-FetchContent_Declare(zipiterator_repo
-        GIT_REPOSITORY https://github.com/CommitThis/zip-iterator.git
-        GIT_TAG master
-)
-
-FetchContent_MakeAvailable(zipiterator_repo)
-add_library(zipiterator INTERFACE)
-target_include_directories(zipiterator INTERFACE ${zipiterator_repo_SOURCE_DIR}/)
-# target_include_directories(cppitertools INTERFACE ${cppitertools_repo_SOURCE_DIR}/)
-# find_package(cppitertools REQUIRED HINTS "${cppitertools_repo_BINARY_DIR}")
-set(COMMON_LIBRARIES "Common;zipiterator;FROLS_Math;DataFrame;FROLS_Eigen;cppitertools;graphlite")
+set(COMMON_LIBRARIES "Common;FROLS_Math;DataFrame;FROLS_Eigen;cppitertools;graphlite")
 
 set(GRAPH_LITE_SUPPORT_DOT OFF)
 FetchContent_Declare(graphlite_repo

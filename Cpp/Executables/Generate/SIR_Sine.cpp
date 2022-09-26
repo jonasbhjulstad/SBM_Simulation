@@ -8,7 +8,6 @@
 #include <execution>
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_Math.hpp>
-#include <zip_two.hpp>
 #include <Typedefs.hpp>
 
 constexpr size_t
@@ -31,6 +30,7 @@ sineparam_gen(size_t
             alpha = 1. / 9;
     p.
             beta = R0 * p.alpha;
+    std::cout << p.beta << std::endl;
     p.
             N_pop = 1000;
     std::uniform_real_distribution<double> d_u((2 * M_PI) / 100, (2 * M_PI) / 1000);

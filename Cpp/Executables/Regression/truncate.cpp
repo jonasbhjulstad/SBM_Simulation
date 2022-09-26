@@ -13,7 +13,7 @@ int main()
 
     for (int i = 0; i < N_sims; i++)
     {
-        df_names[i] = MC_sim_filename(N_pop, p_ER, i);
+        df_names[i] = MC_filename(N_pop, p_ER, i);
     }
 
     DataFrameStack dfs(df_names);

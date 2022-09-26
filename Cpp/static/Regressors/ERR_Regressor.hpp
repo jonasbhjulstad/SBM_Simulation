@@ -5,7 +5,7 @@
 
 namespace FROLS::Regression {
     struct ERR_Regressor : public Regressor {
-        ERR_Regressor(double tol, double theta_tol, size_t N_terms_max = std::numeric_limits<size_t>::infinity()) : Regressor(tol, theta_tol, N_terms_max){}
+        ERR_Regressor(const Regressor_Param& p) : Regressor(p){}
 
     private:
         std::vector<Feature> candidate_regression(crMat &X, crVec &y,
@@ -14,9 +14,9 @@ namespace FROLS::Regression {
         bool tolerance_check(crMat &Q, crVec &y,
                              const std::vector<Feature> &best_features) const;
 
-        Feature single_feature_regression(crVec &x, crVec &y) const;
+        Feature single_feature_regression(const Vec &x, const Vec &y) const;
 
-
+        static bool best_feature_measure(const Feature&, const Feature&);
     };
 } // namespace FROLS::Regression
 

@@ -1,5 +1,6 @@
 #ifndef FROLS_DATAFRAME_HPP
 #define FROLS_DATAFRAME_HPP
+
 #include <Typedefs.hpp>
 #include <map>
 #include <memory>
@@ -20,7 +21,7 @@ namespace FROLS {
 
         DataFrame(size_t N_rows) : N_rows(N_rows) {}
 
-        DataFrame(const std::string &filename, const std::string delimiter = ", ") { read_csv(filename, delimiter); }
+        DataFrame(const std::string &filename, const std::string delimiter = ",") { read_csv(filename, delimiter); }
 
         DataFrame(size_t N_rows, const std::vector<std::string> &col_names)
                 : N_rows(N_rows) {
@@ -39,9 +40,9 @@ namespace FROLS {
 
         void assign(const std::string &col_name, const std::vector<double> &col_data);
 
-        template <size_t N, typename T>
+        template<size_t N, typename T>
         void assign(const std::string &col_name,
-                               const std::array<T, N> &col_data) {
+                    const std::array<T, N> &col_data) {
 
             data[col_name] = std::make_shared<std::vector<double>>(N);
             for (int i = 0; i < N; i++) {
@@ -49,14 +50,14 @@ namespace FROLS {
             }
         }
 
-        template <size_t N, size_t N_C, typename T>
+        template<size_t N, size_t N_C, typename T>
         void assign(const std::vector<std::string> &col_names,
                     const std::array<std::array<T, N>, N_C> &data_cols) {
-            for (int i = 0; i < N_C; i++)
-            {
+            for (int i = 0; i < N_C; i++) {
                 assign(col_names[i], data_cols[i]);
             }
         }
+
         void assign(const std::string &col_name, size_t row, double value);
 
         void assign(const std::string &col_name, crVec &vec);
@@ -76,20 +77,22 @@ namespace FROLS {
                       const std::string &delimiter);
 
         void write_csv(const std::string &filename,
-                       const std::string &delimiter);
+                       const std::string &delimiter,
+                       const double termination_tol = -std::numeric_limits<double>::infinity());
 
         size_t get_N_rows() const { return N_rows; }
 
         void resize(size_t N_rows);
+
         void resize();
     };
 
     class DataFrameStack {
-        std::vector<DataFrame> dataframes;
 
         friend class DataFrame;
 
     public:
+        std::vector<DataFrame> dataframes;
         DataFrameStack(const std::vector<std::string> &filenames) {
             dataframes.reserve(filenames.size());
             for (size_t i = 0; i < filenames.size(); i++) {
@@ -101,9 +104,16 @@ namespace FROLS {
             this->dataframes = dataframes;
         }
 
+        DataFrameStack(size_t N_frames)
+        {
+            dataframes.resize(N_frames);
+        }
+
         double get_elem(size_t frame, const std::string &col_name, size_t row) {
             return dataframes[frame][col_name]->operator[](row);
         }
+
+
 
         DataFrame &operator[](size_t frame) { return dataframes[frame]; }
 
@@ -114,6 +124,8 @@ namespace FROLS {
         std::vector<double> get_row(size_t frame, size_t row);
 
         size_t get_N_frames() const { return dataframes.size(); }
+
+        std::vector<size_t> get_N_rows();
     };
 
 } // namespace FROLS

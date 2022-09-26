@@ -4,73 +4,70 @@
 #include <FROLS_Eigen.hpp>
 #include <Features.hpp>
 #include <ERR_Regressor.hpp>
-#include <iostream>
 #include <algorithm>
+#include <FROLS_Path_Config.hpp>
+#include <Regression_Algorithm.hpp>
 
-int main(int argc, char** argv) {
-    std::string network_type = "SIS";
-    std::vector<std::string> colnames = {"S", "I"};
-    size_t Nx = 2;
+std::string err_simulation_filename(size_t N_pop, double p_ER, size_t iter, std::string network_type) {
+    std::stringstream ss;
+    ss << FROLS::FROLS_DATA_DIR << "/ERR_Simulation_" << network_type << "_" << N_pop << "_" << p_ER << "_" << iter
+       << ".csv";
+    return ss.str();
+}
 
-    if (argc == 1)
-    {
-        Nx = 3;
-        network_type = "SIR";
-        colnames = {"S", "I", "R"};
-    }
-    size_t N_sims = 10000; // 10000;
-    size_t N_pop = 80;
+std::string SIR_Sine_filename(size_t N_pop, double p_ER, size_t iter, std::string network_type) {
+    std::stringstream ss;
+    ss << FROLS::FROLS_DATA_DIR << "/SIR_Sine_Trajectory_Discrete_" << iter
+       << ".csv";
+    return ss.str();
+}
+
+std::string SIR_diff_filename(size_t N_pop, double p_ER, size_t iter, std::string network_type) {
+    std::stringstream ss;
+    ss << FROLS::FROLS_DATA_DIR << "/Bernoulli_SIR_Delta_MC_" << N_pop << "_" << p_ER << "_" << iter
+       << ".csv";
+    return ss.str();
+}
+
+
+
+int main(int argc, char **argv) {
+    const size_t Nx = 3;
+    const std::string network_type = "SIR";
+    const std::vector<std::string> colnames = {"S", "I", "R"};
+    size_t N_sims = 1000; // 10000;
+    size_t N_pop = 100;
     double p_ER = 1.0;
     using namespace FROLS;
-    std::vector<std::string> df_names(N_sims);
-
-    for (int i = 0; i < N_sims; i++) {
-//        df_names[i] = MC_sim_filename(N_pop, p_ER, i, network_type);
-        df_names[i] = std::string(FROLS_DATA_DIR) + std::string("/SIR_Sine_Trajectory_") + std::to_string(i) + ".csv";
-    }
-
-    size_t Nt_max = 25;
-    DataFrameStack dfs(df_names);
-    Mat X = dataframe_to_matrix(dfs, colnames,
-                                0, Nt_max-1);
-    Mat Y = dataframe_to_matrix(dfs, colnames, 1, Nt_max);
-    Mat U = dataframe_to_matrix(dfs, {"p_I"}, 0,  Nt_max-1);
-//    size_t Nt_max = 0;
-//
-//    for (int i = 0;i < N_sims; i++)
-//    {
-//        Nt_max = std::max({Nt_max, (size_t) dataframe_to_vector(dfs[i], "t").rows()});
-//    }
-
+    using namespace std::placeholders;
     size_t d_max = 1;
     size_t N_output_features = 16;
-    using namespace FROLS::Features;
-    size_t Nu = U.cols();
-    std::vector<size_t> ignore_idx = {0, 1,2, 3,4, 5, 6,7,8};//{0, 1, 2, 3,4};
-    double ERR_tolerance = 1e-1;
-    FROLS::Features::Polynomial_Model model(Nx, Nu, N_output_features, d_max, ignore_idx);
-    double theta_tol = 1e-6;
-    size_t N_terms_max = 2;
-    Regression::ERR_Regressor regressor(ERR_tolerance, theta_tol, N_terms_max);
-    regressor.transform_fit(X, U, Y, model);
+    size_t Nu = 1;
+    auto Sine_fname_f = std::bind(SIR_Sine_filename, N_pop, p_ER, _1, network_type);
+    auto diff_fname_f = std::bind(SIR_diff_filename, N_pop, p_ER, _1, network_type);
 
-//    double u_max = U.maxCoeff()/2;
-    Vec x0 = X.row(0);
-//    Vec u = Vec::Ones(Nt_max) * u_max;
-    model.feature_summary();
-    Vec t = df_to_vec(dfs[0], "t").head(Nt_max);
-    for (int i = 0; i < N_sims; i++)
-    {
-        x0 = dataframe_to_matrix(dfs[i], colnames).row(0);
-        Vec u = df_to_vec(dfs[i], "p_I").topRows(Nt_max-1);
-        Mat X_sim = model.simulate(x0, u, Nt_max-1);
-        DataFrame er_traj;
-        er_traj.assign(colnames, X_sim);
-        er_traj.assign("p_I", u);
-        er_traj.assign("t", t);
-        er_traj.write_csv(FROLS_DATA_DIR + std::string("/ERR_Trajectory_" + network_type +  "_" + std::to_string(i) + ".csv"), ",");
-    }
+    auto MC_fname_f = std::bind(MC_filename, N_pop, p_ER, _1, network_type);
+    auto outfile_f = std::bind(err_simulation_filename, N_pop, p_ER, _1, network_type);
+    std::vector<size_t> ignore_idx = {};//{0, 1, 2, 3, 4, 5, 6, 7, 8};//{0, 1, 2, 3,4};
+    std::vector<std::vector<Feature>> preselected_features(3);
+    preselected_features[0].push_back(Feature{-1, 0., 4,1.});
+    preselected_features[1].push_back(Feature{-1, 0., 3,1.});
+    preselected_features[2].push_back(Feature{-1, 0., 2,1.});
+    FROLS::Features::Polynomial_Model model(Nx, Nu, N_output_features, d_max, ignore_idx, preselected_features);
+    FROLS::Regression::Regressor_Param reg_param;
+    reg_param.tol = 1e-3;
+    reg_param.theta_tol = 1e-10;
+    reg_param.N_terms_max = 2;
+    FROLS::Regression::ERR_Regressor regressor(reg_param);
+
+    Regression::from_file_regression(MC_fname_f, {"S", "I", "R"}, {"p_I"}, N_sims, regressor, model, outfile_f);
+    auto fnames = model.feature_names();
+    std::for_each(fnames.begin(), fnames.end(), [n = 0](auto &name)mutable {
+        std::cout << n << ": " << name << std::endl;
+        n++;
+    });
 
 
     return 0;
 }
+

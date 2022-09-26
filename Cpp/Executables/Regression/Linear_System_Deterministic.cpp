@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 
+using namespace FROLS;
 Vec linsys_step(const Mat &A, const Mat &b, const Vec &x, const Vec &u) {
     return A * x + b * u;
 }

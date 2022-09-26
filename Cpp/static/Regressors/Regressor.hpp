@@ -9,11 +9,17 @@
 
 
 namespace FROLS::Regression {
+    struct Regressor_Param {
+        double tol = 1e-2;
+        double theta_tol = 1e-2;
+        size_t N_terms_max = 4;
+    };
+
     struct Regressor {
         const double tol, theta_tol;
-        const size_t regressor_id;
         const size_t N_terms_max;
-        Regressor(double tol, double theta_tol, size_t N_terms_max = std::numeric_limits<size_t>::infinity());
+
+        Regressor(const Regressor_Param &);
 
         std::vector<std::vector<Feature>> fit(crMat &X, crMat &Y);
 
@@ -27,19 +33,23 @@ namespace FROLS::Regression {
         std::vector<size_t> unused_feature_indices(const std::vector<Feature> &features, size_t N_features) const;
 
     private:
-        void theta_solve(crMat &A, crVec &g, std::vector<Feature> &features) const;
+        void theta_solve(crMat &A, crVec &g, std::vector<Feature> &features, size_t N_preselect_features) const;
 
-            std::vector<Feature> single_fit(const Mat &X, const Vec &y) const;
-            Mat used_feature_orthogonalize(const Mat &X, const Mat &Q,
-                                           const std::vector<Feature> &used_features) const;
-            virtual std::vector<Feature> candidate_regression(crMat &X, crVec &y,
-                                                              const std::vector<Feature> &used_features) const = 0;
-            virtual bool
-            tolerance_check(crMat &Q, crVec &y,
-                            const std::vector<Feature> &best_features) const = 0;
-            Feature best_feature_select(crMat &X, crVec &y, const std::vector<Feature> &used_features) const;
-            static int regressor_count;
-        };
-    } // namespace FROLS::Regression
+        std::vector<Feature> single_fit(const Mat &X, const Vec &y, std::vector<Feature> best_features = {}) const;
+
+        virtual std::vector<Feature> candidate_regression(crMat &X, crVec &y,
+                                                          const std::vector<Feature> &used_features) const = 0;
+
+        virtual bool
+        tolerance_check(crMat &Q, crVec &y,
+                        const std::vector<Feature> &best_features) const = 0;
+
+        static bool best_feature_measure(const Feature &, const Feature &);
+
+        Feature best_feature_select(crMat &X, crVec &y, const std::vector<Feature> &used_features) const;
+
+        static int regressor_count;
+    };
+} // namespace FROLS::Regression
 
 #endif

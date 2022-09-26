@@ -3,7 +3,6 @@
 
 #include "Regressor.hpp"
 #include <ortools/base/commandlineflags.h>
-//#include <ortools/base/init_google.h>
 #include <ortools/base/logging.h>
 #include <ortools/linear_solver/linear_solver.h>
 #include <ortools/linear_solver/linear_solver.pb.h>
@@ -11,6 +10,11 @@
 #include <memory>
 
 namespace FROLS::Regression {
+    struct Quantile_Param : public Regressor_Param
+    {
+        double tau = .95;
+        const std::string solver_type ="GLOP";
+    };
     struct Quantile_LP
     {
         const double tau;
@@ -36,11 +40,11 @@ namespace FROLS::Regression {
             solver->MakeNumVarArray(N_rows, 0.0, infinity, "u_pos", &u_pos);
             solver->MakeNumVarArray(N_rows, 0.0, infinity, "u_neg", &u_neg);
             objective = solver->MutableObjective();
-            objective->SetMinimization();
+            objective->SetMaximization();
             std::for_each(u_pos.begin(), u_pos.end(),
-                          [=](auto u) { objective->SetCoefficient(u, tau / N_rows); });
+                          [=](auto u) { objective->SetCoefficient(u, -tau / N_rows); });
             std::for_each(u_neg.begin(), u_neg.end(),
-                          [=](auto u) { objective->SetCoefficient(u, (1 - tau) / N_rows); });
+                          [=](auto u) { objective->SetCoefficient(u, -(1 - tau) / N_rows); });
             g.resize(N_rows);
             std::for_each(g.begin(), g.end(), [&](auto &gi) { gi = solver->MakeRowConstraint(); });
         }
@@ -62,8 +66,7 @@ namespace FROLS::Regression {
         const double tau;
         const std::string solver_type;
 
-
-        Quantile_Regressor(double tau, double tol, double theta_tol, size_t N_terms_max = std::numeric_limits<size_t>::infinity(), const std::string solver_type = "GLOP");
+        Quantile_Regressor(const Quantile_Param& p);
 
     private:
         Feature single_feature_regression(const Vec &x, const Vec &y) const;

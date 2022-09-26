@@ -1,5 +1,5 @@
-add_library(Regressors STATIC Regressor.hpp Regressor.cpp ERR_Regressor.cpp Quantile_Regressor.cpp ERR_Regressor.hpp Quantile_Regressor.hpp)
-target_link_libraries(Regressors PUBLIC Common Features FROLS_Math ortools::ortools)
+add_library(Regressors STATIC Regressor.hpp Regressor.cpp ERR_Regressor.cpp Quantile_Regressor.cpp ERR_Regressor.hpp Quantile_Regressor.hpp Regression_Algorithm.cpp)
+target_link_libraries(Regressors PUBLIC Common Features FROLS_Math Eigen3::Eigen ortools::ortools)
 # target_include_directories(Regressors PRIVATE $<TARGET_PROPERTY:Math, INTERFACE_INCLUDE_DIRECTORIES>)
 target_link_libraries(Regressors PUBLIC absl::flags TBB::tbb)
 target_include_directories(Regressors INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>")

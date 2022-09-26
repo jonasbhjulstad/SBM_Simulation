@@ -8,8 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
-#include <omp.h>
-
+using namespace FROLS;
 template<typename RNG>
 Vec linsys_step(const Mat &A, const Mat &b, const Vec &x, const Vec &u, double b_std, RNG &rng) {
     std::normal_distribution<> d_b{0, b_std};
@@ -28,10 +27,10 @@ int main() {
     x0 << 10, 100, -100;
 
     Mat A(Nx, Nx);
-    A << .4, 0., 0, 0., .5, 0, 0., 0, .1;
+    A << .9, 0., 0, 0., .8, 0, 0., 0, .5;
     size_t Nu = 2;
     Mat b(Nx, Nu);
-    b << 1,.2,0,.4,10,0;
+    b << 10,20,0,.4,10,0;
 
     std::cout << "Linear System\n";
     std::cout << "A:\n" << A << "\n";
@@ -39,7 +38,7 @@ int main() {
     std::cout << "x0:\n" << x0 << "\n";
     std::random_device rd{};
     std::mt19937 rng{rd()};
-    double b_std = 1.;
+    double b_std = 0.;
     size_t Nt = 100;
     Mat u(Nt, Nu);
     size_t N_sims = 100;
@@ -55,7 +54,6 @@ int main() {
     Mat Y(Nt * N_sims, Nx);
     Mat X(Nt * N_sims, Nx);
     Mat U(N_sims * Nt, Nu);
-#pragma omp parallel for
     for (int j = 0; j < N_sims; j++) {
         Mat traj(Nt + 1, Nx);
         traj.row(0) = x0;
@@ -73,15 +71,20 @@ int main() {
 
     size_t d_max = 1;
     size_t N_features = 16;
-    double ERR_tol = 0.1;
-    double MAE_tol = 4;
-    double tau = .95;
-    double theta_tol = 1e-3;
-    std::vector<size_t> ignore_idx = {0};
-
+    std::vector<size_t> ignore_idx = {};
+    using namespace FROLS::Regression;
     Polynomial_Model model(Nx, Nu, N_features, d_max, ignore_idx);
-    ERR_Regressor er(ERR_tol, theta_tol);
-    Quantile_Regressor qr(tau, MAE_tol, theta_tol);
+    Regressor_Param er_param;
+    er_param.tol = 1e-1;
+    er_param.N_terms_max = 2;
+    er_param.theta_tol = 1e-3;
+    Quantile_Param qr_param;
+    qr_param.tol = .1;
+    qr_param.theta_tol = 1e-3;
+    qr_param.N_terms_max = 2;
+
+    ERR_Regressor er(er_param);
+    Quantile_Regressor qr(qr_param);
 
 
     er.transform_fit(X, U, Y, model);

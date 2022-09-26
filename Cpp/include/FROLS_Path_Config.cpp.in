@@ -1,25 +1,29 @@
 #ifndef FROLS_PATH_CONFIG_HPP
 #define FROLS_PATH_CONFIG_HPP
+
 #include <string>
-namespace FROLS
-{
+#include <sstream>
+
+namespace FROLS {
 // const char *FROLS_ROOT_DIR = "@PROJECT_ROOT_DIR@";
 // const char *FROLS_INCLUDE_DIR = "@FROLS_INCLUDE_DIR@";
-const char *FROLS_DATA_DIR = "@FROLS_DATA_DIR@";
-const char *FROLS_LOG_DIR = "@FROLS_LOG_DIR@";
+    const char *FROLS_DATA_DIR = "@FROLS_DATA_DIR@";
+    const char *FROLS_LOG_DIR = "@FROLS_LOG_DIR@";
 
-std::string MC_sim_filename(size_t N_pop, double p_ER, size_t idx, const std::string network_type = "SIR")
-{
-    return FROLS_DATA_DIR + std::string("/Bernoulli_" + network_type + "_MC_") +
-           std::to_string(idx) + "_" + std::to_string(N_pop) + "_" +
-           std::to_string(p_ER) + ".csv";
-}
 
-std::string quantile_filename(size_t N_pop, double p_ER, double tau)
-{
-    return FROLS_DATA_DIR + std::string("/Bernoulli_SIR_MC_Quantiles_") +
-           std::to_string(N_pop) + "_" + std::to_string(p_ER) + "_" +
-           std::to_string(tau) + ".csv";
-}
-}
+    std::string MC_filename(size_t N_pop, double p_ER, size_t iter, std::string network_type) {
+        std::stringstream ss;
+        ss << FROLS_DATA_DIR << "/Bernoulli_" << network_type << "_MC_" << N_pop << "_" << p_ER << "_" << iter
+           << ".csv";
+        return ss.str();
+    }
+    std::string quantile_filename(size_t N_pop, double p_ER, size_t iter, std::string network_type) {
+        std::stringstream ss;
+        ss << FROLS_DATA_DIR << "/Quantile_Bernoulli_" << network_type << "_MC_" << N_pop << "_" << p_ER << "_" << iter
+           << ".csv";
+        return ss.str();
+    }
+
+
+} //FROLS
 #endif

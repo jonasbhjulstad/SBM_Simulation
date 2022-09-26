@@ -68,7 +68,7 @@ namespace FROLS {
             df.assign("p_I", p_I_vec);
             df.assign("p_S", p_S_vec);
             df.assign("t", FROLS::range(0, Nt));
-            df.write_csv(MC_sim_filename(p.N_pop, p.p_ER, p.iter_offset + i, std::string("SIS")),
+            df.write_csv(MC_filename(p.N_pop, p.p_ER, p.iter_offset + i, "SIS"),
                          ",");
         }
 
@@ -80,7 +80,7 @@ namespace FROLS {
         std::vector<std::string> filenames(N_simulations);
         {
             for (int i = 0; i < N_simulations; i++) {
-                filenames[i] = MC_sim_filename(N_pop, p_ER, i, "SIS");
+                filenames[i] = MC_filename(N_pop, p_ER, i, "SIS");
             }
             using namespace FROLS;
             DataFrameStack dfs(filenames);

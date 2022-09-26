@@ -2,6 +2,7 @@
 #define FROLS_SIR_BERNOULLI_NETWORK_HPP
 
 #include "Graph_Generation.hpp"
+#include "Network.hpp"
 #include <FROLS_Math.hpp>
 #include <graph_lite.h>
 #include <random>
@@ -16,14 +17,22 @@ namespace Network_Models {
     };
     typedef graph_lite::Graph<int, SIR_State> SIR_Network;
 
-    template<typename RNG>
-    struct SIR_Bernoulli_Network {
-
-        SIR_Bernoulli_Network(size_t N_pop, double p_ER, RNG rng) : rng(rng) {
+    struct SIR_Param
+    {
+        double p_I; double p_R;
+        size_t Nt_min;
+        size_t N_I_min;
+    };
+    template<typename RNG, size_t Nt>
+    struct SIR_Bernoulli_Network : public Network<SIR_Param, 3, Nt>{
+        const double p_I0;
+        const double p_R0;
+        const size_t t = 0;
+        SIR_Bernoulli_Network(size_t N_pop, double p_ER, double p_I0, double p_R0, RNG rng) : rng(rng), p_I0(p_I0), p_R0(p_R0) {
             G = generate_erdos_renyi<RNG, SIR_State>(N_pop, p_ER, rng);
         }
 
-        void generate_initial_infections(double p_I0, double p_R0) {
+        void initialize() {
             std::bernoulli_distribution d_I(p_I0);
             std::bernoulli_distribution d_R(p_R0);
             std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](auto &v) {
@@ -33,8 +42,8 @@ namespace Network_Models {
             });
         }
 
-        std::vector<size_t> population_count() {
-            std::vector<size_t> count = {0, 0, 0};
+        std::array<size_t, 3> population_count() {
+            std::array<size_t, 3> count = {0, 0, 0};
             std::for_each(G.begin(), G.end(), [&](const auto &v) { count[G.node_prop(v)] += 1; });
             return count;
         }
@@ -60,47 +69,22 @@ namespace Network_Models {
             });
         }
 
-        std::vector<std::vector<size_t>>
-        simulate(const std::vector<std::pair<double, double>>& p_vec, size_t infection_count_tolerance = 0, size_t Nt_min = 15) {
-
-            std::vector<std::vector<size_t>> trajectory;
-            trajectory.reserve(p_vec.size());
-            trajectory.push_back(population_count());
-            size_t t = 0;
-            for (const auto& p: p_vec)
-            {
-
-                auto &[p_I, p_R] = p;
-                infection_step(p_I);
-                recovery_step(p_R);
-                trajectory.push_back(population_count());
-                if ((trajectory.back()[1] < infection_count_tolerance) && (t > Nt_min))
-                {
-                    break;
-                }
-                t++;
-            }
-            return FROLS::transpose(trajectory);
-        }
-
-        std::vector<std::vector<size_t>> simulate(size_t Nt, double p_I, double p_R) {
-            std::vector<std::pair<double, double>> p_vec(Nt);
-            std::fill(p_vec.begin(), p_vec.end(), std::make_pair(p_I, p_R));
-            return simulate(p_vec);
-        }
-        std::vector<std::vector<size_t>> simulate(const std::vector<double>& p_I, const std::vector<double>& p_R)
+        bool terminate(const SIR_Param& p, const std::array<size_t, 3>& x)
         {
-            return simulate(FROLS::zip(p_I, p_R));
+            bool early_termination = ((t > p.Nt_min) && x[1] < p.N_I_min);
+            return early_termination || (t >= Nt);
+        }
+
+        void advance(const SIR_Param& p)
+        {
+            infection_step(p.p_I);
+            recovery_step(p.p_R);
         }
 
         void reset()
         {
-            for (auto& v: G)
-            {
-                G.node_prop(v) = SIR_S;
-            }
+            std::for_each(G.begin(), G.end(), [&](auto& v){G.node_prop(v) = SIR_S;});
         }
-
 
     private:
         SIR_Network G;

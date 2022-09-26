@@ -1,5 +1,5 @@
 
-#include <Polynomial.hpp>
+#include <Polynomial_Discrete.hpp>
 #include <Regressor.hpp>
 #include <Quantile_Regressor.hpp>
 #include <ERR_Regressor.hpp>

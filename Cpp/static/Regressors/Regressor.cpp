@@ -5,79 +5,73 @@
 
 namespace FROLS::Regression {
 
-    Regressor::Regressor(double tol, double theta_tol, size_t N_terms_max)
-            : tol(tol), theta_tol(theta_tol), N_terms_max(N_terms_max), regressor_id(regressor_count) {}
+    Regressor::Regressor(const Regressor_Param &p)
+            : tol(p.tol), theta_tol(p.theta_tol), N_terms_max(p.N_terms_max) {}
 
-    Mat Regressor::used_feature_orthogonalize(const Mat &X, const Mat &Q,
-                                              const std::vector<Feature> &used_features) const {
-        size_t N_features = X.cols();
-        size_t N_samples = X.rows();
-        Mat Q_current = Mat::Zero(X.rows(), X.cols());
-        for (int k = 0; k < N_features; k++) {
-            if (std::none_of(used_features.begin(), used_features.end(),
-                             [&](const auto &feature) { return feature.index == k; })) {
-                Q_current.col(k) = vec_orthogonalize(X.col(k), Q.leftCols(used_features.size()));
-            }
-        }
-        return Q_current;
-    }
 
-    std::vector<Feature> Regressor::single_fit(const Mat &X, const Vec &y) const {
+    std::vector<Feature> Regressor::single_fit(const Mat &X, const Vec &y, std::vector<Feature> best_features) const {
         size_t N_features = X.cols();
         Mat Q_global = Mat::Zero(X.rows(), N_features);
         Mat Q_current = Q_global;
         Mat A = Mat::Zero(N_features, N_features);
         Vec g = Vec::Zero(N_features);
 
-        std::vector<Feature> best_features;
         size_t end_idx = N_features;
+        size_t N_preselect_features = best_features.size();
+        for (int i = 0; i < N_preselect_features; i++) {
+            Q_global.col(i) = X.col(best_features[i].index) * best_features[i].theta;
+        }
+
         // Perform one feature selection iteration for each feature
-        for (int j = 0; j < N_features; j++) {
+        for (int j = N_preselect_features; j < N_features; j++) {
+
             // Compute remaining variance by orthogonalizing the current feature
             Q_current =
                     used_feature_orthogonalize(X, Q_global, best_features);
             // Determine the best feature to add to the feature set
             Feature f = best_feature_select(Q_current, y, best_features);
 
-            if ((f.f_ERR == -1) || (j == N_terms_max)) {
-                end_idx = j;
+            if ((f.f_ERR == -std::numeric_limits<double>::infinity()) || (j >= (N_terms_max + N_preselect_features))) {
+                end_idx = j-1;
                 break;
             }
             best_features.push_back(f);
+            Q_global.col(j) = Q_current.col(best_features[j].index);
 
-            //std::cout << "Feature " << best_features.back().index << std::endl;
+
             g[j] = best_features[j].g;
 
-            Q_global.col(j) = Q_current.col(best_features[j].index);
-            for (int m = 0; m < j; m++) {
-                A(m, j) = cov_normalize(Q_global.col(m), X.col(best_features[j].index));
+            for (int m = N_preselect_features; m < j; m++) {
+                A(m - N_preselect_features, j - N_preselect_features) = cov_normalize(Q_global.col(m), X.col(best_features[j].index));
             }
-            A(j, j) = 1;
+            A(j - N_preselect_features, j - N_preselect_features) = 1;
 
             // If ERR-tolerance is met, return non-orthogonalized parameters
             if (tolerance_check(Q_global.leftCols(j + 1), y, best_features)) {
-                end_idx = j+1;
+                end_idx = j;
                 break;
             }
 
 
             Q_current.setZero();
         }
-        theta_solve(A.topLeftCorner(end_idx, end_idx), g.head(end_idx), best_features);
+        theta_solve(A.topLeftCorner(end_idx, end_idx), g.head(end_idx), best_features, N_preselect_features);
 
         return best_features;
     }
 
-    void Regressor::theta_solve(crMat &A, crVec &g, std::vector<Feature> &features) const {
+    void Regressor::theta_solve(crMat &A, crVec &g, std::vector<Feature> &features, size_t N_preselect_features) const {
         Vec coefficients =
                 A.inverse() * g;
         //Lectures on network systems
         // assign coefficients to features
+        std::cout << A << std::endl;
+        std::cout << g << std::endl;
         for (
                 int i = 0;
                 i < coefficients.rows();
                 i++) {
-            features[i].
+            features[i + N_preselect_features].
                     theta = coefficients[i];
         }
     }
@@ -86,7 +80,9 @@ namespace FROLS::Regression {
         const std::vector<Feature> candidates = candidate_regression(X, y, used_features);
         std::vector<Feature> thresholded_candidates;
         std::copy_if(candidates.begin(), candidates.end(), std::back_inserter(thresholded_candidates),
-                     [&](const auto &f) { return abs(f.g) > theta_tol; });
+                     [&](const auto &f) {
+                         return ((abs(f.g) > theta_tol) && (f.f_ERR != -std::numeric_limits<double>::infinity()));
+                     });
         static bool warn_msg = true;
 
         Feature res;
@@ -101,7 +97,7 @@ namespace FROLS::Regression {
                 break;
             default:
                 res = *std::max_element(thresholded_candidates.begin(), thresholded_candidates.end(),
-                                        [](const Feature &f0, const Feature &f1) { return f0.f_ERR < f1.f_ERR; });
+                                        best_feature_measure);
                 break;
         }
 
@@ -116,11 +112,8 @@ namespace FROLS::Regression {
         size_t N_response = Y.cols();
         std::vector<std::vector<Feature>> result(N_response);
         auto cols = Y.colwise();
-        std::transform(std::execution::par_unseq,cols.begin(), cols.end(), result.begin(),
+        std::transform(std::execution::par_unseq, cols.begin(), cols.end(), result.begin(),
                        [=](const auto &yi) { return this->single_fit(X, yi); });
-//        for (int i = 0; i < N_response; i++) {
-//            result[i] = single_fit(X, Y.col(i));
-//        }
         return result;
     }
 
@@ -138,19 +131,37 @@ namespace FROLS::Regression {
         return y_pred;
     }
 
+    struct Fit_Data {
+        std::vector<Feature> preselect_features;
+        Vec y;
+    };
+
     void Regressor::transform_fit(crMat &X_raw, crMat &U_raw, crMat &Y,
                                   Features::Feature_Model &model) {
         Mat XU(X_raw.rows(), X_raw.cols() + U_raw.cols());
         XU << X_raw, U_raw;
-        Mat X = model.transform(XU);
-        model.features = fit(X, Y);
+        std::vector<Fit_Data> data(Y.cols());
+        for (int i = 0; i < Y.cols(); i++) {
+            data[i] = Fit_Data{model.preselected_features[i], Y.col(i)};
+        }
+        model.features.resize(Y.cols());
+        std::transform(data.begin(), data.end(), model.features.begin(), [&](const auto &d) {
+            Mat X = model.transform(XU, d.preselect_features);
+            return single_fit(X, d.y, d.preselect_features);
+        });
+
     }
+
 
     std::vector<size_t>
     Regressor::unused_feature_indices(const std::vector<Feature> &features, size_t N_features) const {
         std::vector<size_t> used_idx(features.size());
         std::transform(features.begin(), features.end(), used_idx.begin(), [&](auto &f) { return f.index; });
         return filtered_range(used_idx, 0, N_features);
+    }
+
+    bool Regressor::best_feature_measure(const Feature &f0, const Feature &f1) {
+        return f0.f_ERR < f1.f_ERR;
     }
 
     int Regressor::regressor_count = 0;

@@ -17,7 +17,7 @@ namespace FROLS::Regression {
         return candidates;
     }
 
-    Feature ERR_Regressor::single_feature_regression(crVec &x, crVec &y) const {
+    Feature ERR_Regressor::single_feature_regression(const Vec &x, const Vec &y) const {
         Feature f;
         f.g = cov_normalize(x, y);
         f.f_ERR = f.g * f.g * ((x.transpose() * x) / (y.transpose() * y)).value();
@@ -33,5 +33,11 @@ namespace FROLS::Regression {
         }
         return (1 - ERR_tot) < tol;
     }
+    bool ERR_Regressor::best_feature_measure(const Feature& f0, const Feature& f1)
+    {
+        return (1 - f0.f_ERR) < (1 - f1.f_ERR);
+    }
+
+
 
 } // namespace FROLS::Regression

@@ -1,6 +1,6 @@
 #include <Typedefs.hpp>
 
-#include <Polynomial.hpp>
+#include <Polynomial_Discrete.hpp>
 #include <gtest/gtest.h>
 
 TEST(Feature_Transform, single_feature) {

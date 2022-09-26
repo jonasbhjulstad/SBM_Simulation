@@ -1,0 +1,15 @@
+# This is a generated file and its contents are an internal implementation detail.
+# The download step will be re-executed if anything in this file changes.
+# No other meaning or use of this file is supported.
+
+method=git
+command=/home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake;-P;/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-debug/_deps/graphlite_repo-subbuild/graphlite_repo-populate-prefix/tmp/graphlite_repo-populate-gitclone.cmake
+source_dir=/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-debug/_deps/graphlite_repo-src
+work_dir=/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-debug/_deps
+repository=https://github.com/haasdo95/graphlite.git
+remote=origin
+init_submodules=TRUE
+recurse_submodules=--recursive
+submodules=
+CMP0097=NEW
+

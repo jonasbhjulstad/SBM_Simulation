@@ -1,0 +1,6 @@
+/home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/arch/Downloads/clion-2022.2.1/bin/ninja/linux/ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G Ninja -S /home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp -B /home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-debug
+
+-- Found pybind11: /usr/include (found version "2.10.0")
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-debug

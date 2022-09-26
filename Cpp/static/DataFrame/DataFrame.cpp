@@ -34,6 +34,10 @@ namespace FROLS {
     }
 
     void DataFrame::assign(const std::string &col_name, size_t row, double value) {
+        if (data[col_name]->size() < row+1)
+        {
+            data[col_name]->resize(row+1);
+        }
         data[col_name]->operator[](row) = value;
     }
 
@@ -77,6 +81,7 @@ namespace FROLS {
             data.insert({col_name, ptr});
         }
         size_t row = 0;
+        N_rows = 0;
         while (std::getline(file, line)) {
             std::stringstream ss(line);
             std::string value;
@@ -100,7 +105,9 @@ namespace FROLS {
     }
 
     void DataFrame::write_csv(const std::string &filename,
-                              const std::string &delimiter) {
+                              const std::string &delimiter,
+                              const double termination_tol) {
+
         resize();
         std::ofstream file(filename);
         size_t N_cols = data.size();
@@ -114,15 +121,15 @@ namespace FROLS {
         }
         file << "\n";
         for (size_t i = 0; i < N_rows; i++) {
-            iter = 0;
-            for (auto &col: data) {
-                iter++;
-                file << col.second->operator[](i);
-                if (iter < N_cols) {
-                    file << delimiter;
-                }
+            std::vector<double> coldata(data.size());
+            std::transform(data.begin(), data.end(), coldata.begin(),
+                           [&i](auto &col) { return col.second->operator[](i); });
+            if (std::all_of(coldata.begin(), coldata.end(), [&](auto &cd) { return cd < termination_tol; })) {
+                break;
             }
-            file << "\n";
+            std::for_each(coldata.begin(), coldata.end(), [&, n = 1](auto &d) mutable { file << d;
+                file << ((n != coldata.size()) ? "," : "\n");
+            n++;});
         }
     }
 
@@ -135,11 +142,9 @@ namespace FROLS {
         this->N_rows = N_rows;
     }
 
-    void DataFrame::resize()
-    {
+    void DataFrame::resize() {
         size_t rows = 0;
-        for (const auto& col: data)
-        {
+        for (const auto &col: data) {
             rows = std::max({rows, col.second->size()});
         }
         N_rows = rows;
@@ -157,5 +162,11 @@ namespace FROLS {
             row_data.push_back(col.second->operator[](row));
         }
         return row_data;
+    }
+
+    std::vector<size_t> DataFrameStack::get_N_rows() {
+        std::vector<size_t> N_rows(dataframes.size());
+        std::generate(N_rows.begin(), N_rows.end(), [&,n = 0]() mutable { return dataframes[n].get_N_rows(); });
+        return N_rows;
     }
 }

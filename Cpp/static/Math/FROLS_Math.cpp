@@ -65,4 +65,18 @@ namespace FROLS {
         return res;
     }
 
+    Mat used_feature_orthogonalize(const Mat &X, const Mat &Q,
+                                   const std::vector<Feature> &used_features) {
+        size_t N_features = X.cols();
+        Mat Q_current = Mat::Zero(X.rows(), X.cols());
+        for (int k = 0; k < N_features; k++) {
+            if (std::none_of(used_features.begin(), used_features.end(),
+                             [&](const auto &feature) { return feature.index == k; })) {
+                Q_current.col(k) = vec_orthogonalize(X.col(k), Q.leftCols(used_features.size()));
+            }
+        }
+        return Q_current;
+    }
+
+
 } // namespace FROLS

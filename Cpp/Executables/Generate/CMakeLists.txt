@@ -9,3 +9,6 @@ target_link_libraries(Bernoulli_SIS_MC PUBLIC ${COMMON_LIBRARIES} TBB::tbb DataF
 
 add_executable(SIR_Sine SIR_Sine.cpp)
 target_link_libraries(SIR_Sine PUBLIC ${COMMON_LIBRARIES} DataFrame Common FROLS_Math ${SUNDIALS_LIBS} TBB::tbb)
+
+add_executable(SIR_Sine_Discrete SIR_Sine_Discrete.cpp)
+target_link_libraries(SIR_Sine_Discrete PUBLIC ${COMMON_LIBRARIES} DataFrame Common FROLS_Math ${SUNDIALS_LIBS} TBB::tbb)

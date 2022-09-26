@@ -18,7 +18,7 @@
 namespace FROLS::Integrators {
     template<size_t Nx, size_t Nt, typename Derived, typename Param>
     struct Model_Integrator {
-        Model_Integrator(double t0): t_current(t0){}
+        Model_Integrator(double t0 = 0.): t_current(t0){}
         typedef std::array<double, Nx> State;
         typedef std::array<std::array<double, Nt + 1>, Nx> Trajectory;
         double t_current;
