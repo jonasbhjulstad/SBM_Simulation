@@ -33,7 +33,8 @@ if __name__ == '__main__':
     er_files = glob.glob(DATA_DIR + "ERR_Simulation_" + network_type + "*.csv")
     # sort q_files according to float in name
     fig, ax = plt.subplots(len(statenames) + 1)
-    dfs = [pd.read_csv(f, delimiter=",") for f in files[:500]]
+    N_files = 100
+    dfs = [pd.read_csv(f, delimiter=",") for f in files[:N_files]]
 
     qr_dfs = [pd.read_csv(qrf) for qrf in qr_files]
     er_dfs = [pd.read_csv(erf) for erf in er_files]
@@ -49,8 +50,8 @@ if __name__ == '__main__':
     fig1, ax1 = plt.subplots(4)
     for (qr, er) in zip(qr_dfs, er_dfs):
         for i, name in enumerate(statenames):
-            ax1[i].plot(qr["t"], qr[name], color='k', alpha=.3)
-            ax1[i].plot(er["t"], er[name], color='r', alpha=.3)
+            ax1[i].plot(qr["t"][:-1], qr[name][:-1], color='k', alpha=.3)
+            ax1[i].plot(er["t"][:-1], er[name][:-1], color='r', alpha=.3)
         ax1[-1].plot(qr["t"][:-1], qr["p_I"][:-1], color='k', alpha=.8)
         ax1[-1].plot(er["t"][:-1], er["p_I"][:-1], color='r', alpha=.8)
         _ = [x.set_ylim(0, N_pop) for x in ax1[:-1]]

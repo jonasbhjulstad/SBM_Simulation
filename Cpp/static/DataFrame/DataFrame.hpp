@@ -36,6 +36,8 @@ namespace FROLS {
             return data.at(col_name);
         }
 
+        const std::vector<std::vector<double>> operator[](const std::vector<std::string>& col_names) const;
+
         void assign(const std::string &col_name, const std::vector<size_t> &col_data);
 
         void assign(const std::string &col_name, const std::vector<double> &col_data);

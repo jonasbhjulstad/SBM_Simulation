@@ -39,7 +39,7 @@ namespace FROLS::Features {
 
         const size_t N_output_features;
         std::vector<size_t> ignore_idx;
-        const std::vector<std::vector<Feature>> preselected_features;
+        std::vector<std::vector<Feature>> preselected_features;
         std::vector<std::vector<Feature>> features;
 
         std::vector<size_t> get_candidate_feature_idx() { return candidate_feature_idx; }

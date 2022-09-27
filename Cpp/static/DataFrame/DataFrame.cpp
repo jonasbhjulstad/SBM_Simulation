@@ -40,7 +40,15 @@ namespace FROLS {
         }
         data[col_name]->operator[](row) = value;
     }
-
+    const std::vector<std::vector<double>> DataFrame::operator[](const std::vector<std::string>& col_names) const
+    {
+        std::vector<std::vector<double>> res(col_names.size());
+        std::transform(col_names.begin(), col_names.end(), res.begin(), [&](const std::string& name)
+        {
+            return *this->operator[](name);
+        });
+        return res;
+    }
     void DataFrame::assign(const std::vector<std::string> &col_names,
                            const std::vector<std::vector<size_t>> &col_data) {
         for (size_t i = 0; i < col_names.size(); i++) {

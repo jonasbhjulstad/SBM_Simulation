@@ -27,20 +27,15 @@ namespace FROLS::Regression
 
         regressor.transform_fit(X, U, Y, feature_model);
         feature_model.feature_summary();
-
-        Vec t = df_to_vec(dfs[0], "t");
-        size_t offset = 0;
         for (int i = 0; i < N_sims; i++) {
-            DataFrame df(MC_fname_f(i));
-            Vec u = df_to_vec(df, "p_I");
-            Vec x0 = X.row(offset);
-            Mat X_sim = feature_model.simulate(x0, u, N_rows[i] - 1);
-            offset += N_rows[i]-1;
-            DataFrame er_traj;
-            er_traj.assign(colnames_x, X_sim);
-            er_traj.assign(colnames_u, u);
-            er_traj.assign("t", t);
-            er_traj.write_csv(outsim_f(i), ",");
+            Mat u = vecs_to_mat(dfs[i][colnames_u])(Eigen::seq(0, Eigen::last - 1), Eigen::all);
+            Vec x0 = vecs_to_mat(dfs[i][colnames_x]).row(0);
+            Mat X_sim = feature_model.simulate(x0, u, u.rows());
+            FROLS::DataFrame df;
+            df.assign({colnames_u}, u);
+            df.assign("t", FROLS::range(0, u.rows()));
+            df.assign(colnames_x, X_sim);
+            df.write_csv(outsim_f(i), ",");
         }
 
     }

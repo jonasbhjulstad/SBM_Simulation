@@ -27,7 +27,7 @@ sineparam_gen(size_t
     FROLS::Integrators::SIR_Sine_Param p;
     double R0 = 2.0;
     p.
-            alpha = 1. / 9;
+            alpha = 1./9;
     p.
             beta = R0 * p.alpha;
     std::cout << p.beta << std::endl;

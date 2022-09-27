@@ -33,9 +33,12 @@ namespace FROLS::Regression {
         std::vector<size_t> unused_feature_indices(const std::vector<Feature> &features, size_t N_features) const;
 
     private:
-        void theta_solve(crMat &A, crVec &g, std::vector<Feature> &features, size_t N_preselect_features) const;
+        void theta_solve(crMat &A, crVec &g, std::vector<Feature> &featureso) const;
 
-        std::vector<Feature> single_fit(const Mat &X, const Vec &y, std::vector<Feature> best_features = {}) const;
+        std::vector<Feature> single_fit(const Mat& X, const Vec& y) const;
+
+        std::vector<Feature> single_fit(const Mat &X, const Vec &y, std::vector<Feature> preselect_features) const;
+
 
         virtual std::vector<Feature> candidate_regression(crMat &X, crVec &y,
                                                           const std::vector<Feature> &used_features) const = 0;

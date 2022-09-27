@@ -25,11 +25,13 @@ sineparam_gen(size_t
               seed) {
     std::mt19937 rng(seed);
     FROLS::Integrators::SIR_Sine_Param p;
+    double R0 = 2;
     p.
-            alpha = .1;
+            alpha = .11;
+    p.N_pop = 1000;
+
     p.
-            beta = 5e-5;
-    std::cout << p.beta << std::endl;
+            beta = R0*p.alpha/p.N_pop;
     std::uniform_real_distribution<double> d_u((2 * M_PI) / 100, (2 * M_PI) / 1000);
     p.
             omega = d_u(rng);
@@ -40,7 +42,6 @@ sineparam_gen(size_t
     std::uniform_real_distribution<double> d_amp(p.beta / 5, p.beta / 1);
     p.
             amplitude = d_amp(rng);
-    p.N_pop = 20000;
     return
             p;
 }

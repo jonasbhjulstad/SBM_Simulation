@@ -11,13 +11,13 @@
 
 namespace FROLS {
     struct MC_SIR_Params {
-        size_t N_pop = 100;
+        size_t N_pop = 500;
         double p_ER = 1.0;
         double p_I0 = 0.2;
-        double p_R0 = 0.1;
-        double p_I_max = .05;
+        double p_R0 = 0.0;
+        double p_I_max = .001;
         double p_I_min = .0;
-        size_t N_sim = 500;
+        size_t N_sim = 100;
         size_t Nt_min = 15;
         double p_R = 0.01;
         size_t seed;
@@ -29,7 +29,7 @@ namespace FROLS {
     template<typename RNG, size_t Nt>
     std::array<Network_Models::SIR_Param, Nt> generate_interaction_probabilities(const MC_SIR_Params &p, RNG &rng) {
         std::array<Network_Models::SIR_Param, Nt> param_vec;
-        double omega_bounds[] = {(2 * M_PI) / 100, (2 * M_PI) / 1000};
+        double omega_bounds[] = {(2 * M_PI) / 10, (2 * M_PI) / 100};
         std::uniform_real_distribution<double> d_omega(omega_bounds[0], omega_bounds[1]);
         std::uniform_real_distribution<double> d_offset(0, 2 * M_PI);
         double offset = d_offset(rng);

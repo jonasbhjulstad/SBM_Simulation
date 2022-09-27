@@ -14,9 +14,8 @@ namespace FROLS::Features {
 
         Polynomial_Model(size_t Nx, size_t Nu, size_t N_output_features, size_t d_max,
                          const std::vector<size_t> ignore_idx = std::vector<size_t>(),
-                                 const std::vector<std::vector<Feature>> preselected_features = std::vector<std::vector<Feature>>())
+                                 std::vector<std::vector<Feature>> preselected_features = std::vector<std::vector<Feature>>())
                 : d_max(d_max), Nx(Nx), Nu(Nu), Feature_Model(N_output_features, ignore_idx, preselected_features) {}
-
 
         // double transform(crVec &x_raw, size_t target_index) ;
         Vec _transform(crMat &X_raw, size_t target_index, bool& index_failure);

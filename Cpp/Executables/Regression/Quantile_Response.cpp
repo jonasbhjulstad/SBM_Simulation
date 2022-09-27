@@ -20,18 +20,24 @@ int main(int argc, char **argv) {
     const size_t Nx = 3;
     const std::string network_type = "SIR";
     const std::vector<std::string> colnames = {"S", "I", "R"};
-    size_t N_sims = 500; // 10000;
-    size_t N_pop = 80;
+    size_t N_sims = 350; // 10000;
+    size_t N_pop = 500;
     double p_ER = 1.0;
     using namespace FROLS;
     using namespace std::placeholders;
     size_t d_max = 1;
     size_t N_output_features = 16;
     size_t Nu = 1;
+    std::vector<std::vector<Feature>> preselected_features(4);
+    preselected_features[0].push_back(Feature{-1, 0., 4,1.});
+    preselected_features[1].push_back(Feature{-1, 0., 3,1.});
+//    preselected_features[1].push_back(Feature{-1, 0., 3, -.1});
+    preselected_features[2].push_back(Feature{-1, 0., 2,1.});
+
     auto MC_fname_f = std::bind(MC_filename, N_pop, p_ER, _1, network_type);
     auto outfile_f = std::bind(quantile_simulation_filename, N_pop, p_ER, _1, network_type);
     std::vector<size_t> ignore_idx = {};//{0, 1, 2, 3, 4, 5, 6, 7, 8};//{0, 1, 2, 3,4};
-    FROLS::Features::Polynomial_Model model(Nx, Nu, N_output_features, d_max, ignore_idx);
+    FROLS::Features::Polynomial_Model model(Nx, Nu, N_output_features, d_max, ignore_idx, preselected_features);
     double theta_tol = 1e-6;
     size_t N_terms_max = 2;
     double MAE_tol = 1e-3;

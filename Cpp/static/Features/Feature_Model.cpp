@@ -29,7 +29,7 @@ namespace FROLS::Features {
                                            [&](const auto &ig_idx) { return feature_idx == ig_idx; });
             bool is_preselected = std::any_of(preselected_features.begin(), preselected_features.end(),
                                               [&](const auto &ps_feature) { return feature_idx == ps_feature.index; });
-            if (not_ignored || is_preselected) {
+            if (not_ignored) {
 
                 X_poly.col(col_iter) = transform(X_raw, feature_idx, index_failure);
                 if (!index_failure) {
@@ -64,15 +64,6 @@ namespace FROLS::Features {
                     break;
                 }
             }
-            for (int j = 0; j < preselected_features[i].size(); j++) {
-                x_next(i) +=
-                        preselected_features[i][j].theta *
-                        _transform(X, preselected_features[i][j].index, index_failure).value();
-                if (index_failure) {
-                    break;
-                }
-            }
-
         }
 
         return x_next;
@@ -80,9 +71,10 @@ namespace FROLS::Features {
 
     Mat Feature_Model::simulate(crVec &x0, crMat &U, size_t Nt) {
         Mat X(Nt + 1, x0.rows());
+        X.setZero();
         X.row(0) = x0;
         for (int i = 0; i < Nt; i++) {
-            X.row(i + 1) += step(X.row(i), U.row(i));
+            X.row(i + 1) = step(X.row(i), U.row(i));
         }
         return X;
     }

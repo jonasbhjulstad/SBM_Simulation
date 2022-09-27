@@ -29,18 +29,18 @@ if __name__ == '__main__':
 
     # find all csv in data_path
     files = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_" + str(N_pop) + "_1_*.csv")
-
+    # files = glob.glob(DATA_DIR + "SIR_Sine_Trajectory_Discrete_*.csv")
     # sort q_files according to float in name
-    
+    N_files = 200
     fig, ax = plt.subplots(len(statenames) + 1)
-    dfs = [pd.read_csv(f, delimiter=",") for f in files[:500]]
+    dfs = [pd.read_csv(f, delimiter=",") for f in files[:N_files]]
 
     x0_vec = [df.iloc[0][["S", "I", "R"]].to_numpy() for df in dfs]
 
     qr_files = glob.glob(DATA_DIR + "Quantile_Simulation_" + network_type + "*.csv")
     er_files = glob.glob(DATA_DIR + "ERR_Simulation_" + network_type + "*.csv")
-    qr_dfs = [pd.read_csv(qrf) for qrf in qr_files]
-    er_dfs = [pd.read_csv(erf) for erf in er_files]
+    qr_dfs = [pd.read_csv(qrf) for qrf in qr_files[:N_files]]
+    er_dfs = [pd.read_csv(erf) for erf in er_files[:N_files]]
     I = np.zeros_like(dfs[0]["S"].to_numpy())
     for j, (df, er_df) in enumerate(zip(dfs, er_dfs)):
         X = df[statenames].to_numpy()
@@ -51,6 +51,7 @@ if __name__ == '__main__':
         ax[-1].plot(er_df["t"][:-1], er_df["p_I"][:-1], color='r', alpha=.2)
         ax[-1].plot(df["t"][:-1], df["p_I"][:-1], color='gray', alpha=.2)
 
+    N_pop = np.sum(dfs[0][["S","I"]].to_numpy()[0,:])
     [x.set_ylim(0, N_pop) for x in ax[:-1]]
     [x.set_ylabel(lb) for x, lb in zip(ax, ["S", "I", "R", "beta"])]
 
