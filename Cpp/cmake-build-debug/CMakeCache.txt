@@ -15,10 +15,10 @@
 ########################
 
 //Path to a program.
-CMAKE_ADDR2LINE:FILEPATH=/usr/bin/llvm-addr2line
+CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
 
 //Path to a program.
-CMAKE_AR:FILEPATH=/usr/bin/llvm-ar
+CMAKE_AR:FILEPATH=/usr/bin/ar
 
 //Choose the type of build, options are: None Debug Release RelWithDebInfo
 // MinSizeRel ...
@@ -28,13 +28,7 @@ CMAKE_BUILD_TYPE:STRING=Debug
 CMAKE_CHECKS_CACHE_FILE:FILEPATH=/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-debug/cmake_checks_cache.txt
 
 //No help, variable specified on the command line.
-CMAKE_CXX_COMPILER:UNINITIALIZED=clang++
-
-//LLVM archiver
-CMAKE_CXX_COMPILER_AR:FILEPATH=/usr/bin/llvm-ar
-
-//Generate index for LLVM archive
-CMAKE_CXX_COMPILER_RANLIB:FILEPATH=/usr/bin/llvm-ranlib
+CMAKE_CXX_COMPILER:UNINITIALIZED=icpx
 
 //Flags used by the CXX compiler during all build types.
 CMAKE_CXX_FLAGS:STRING=
@@ -52,13 +46,7 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //No help, variable specified on the command line.
-CMAKE_C_COMPILER:UNINITIALIZED=clang
-
-//LLVM archiver
-CMAKE_C_COMPILER_AR:FILEPATH=/usr/bin/llvm-ar
-
-//Generate index for LLVM archive
-CMAKE_C_COMPILER_RANLIB:FILEPATH=/usr/bin/llvm-ranlib
+CMAKE_C_COMPILER:UNINITIALIZED=icx
 
 //Flags used by the C compiler during all build types.
 CMAKE_C_FLAGS:STRING=
@@ -76,7 +64,7 @@ CMAKE_C_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 CMAKE_C_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //Path to a program.
-CMAKE_DLLTOOL:FILEPATH=/usr/bin/llvm-dlltool
+CMAKE_DLLTOOL:FILEPATH=CMAKE_DLLTOOL-NOTFOUND
 
 //Flags used by the linker during all build types.
 CMAKE_EXE_LINKER_FLAGS:STRING=
@@ -100,7 +88,7 @@ CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=
 CMAKE_INSTALL_PREFIX:PATH=/usr/local
 
 //Path to a program.
-CMAKE_LINKER:FILEPATH=/usr/bin/ld.lld
+CMAKE_LINKER:FILEPATH=/usr/bin/ld
 
 //No help, variable specified on the command line.
 CMAKE_MAKE_PROGRAM:UNINITIALIZED=/home/arch/Downloads/clion-2022.2.1/bin/ninja/linux/ninja
@@ -126,13 +114,13 @@ CMAKE_MODULE_LINKER_FLAGS_RELEASE:STRING=
 CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
 //Path to a program.
-CMAKE_NM:FILEPATH=/usr/bin/llvm-nm
+CMAKE_NM:FILEPATH=/usr/bin/nm
 
 //Path to a program.
-CMAKE_OBJCOPY:FILEPATH=/usr/bin/llvm-objcopy
+CMAKE_OBJCOPY:FILEPATH=/usr/bin/objcopy
 
 //Path to a program.
-CMAKE_OBJDUMP:FILEPATH=/usr/bin/llvm-objdump
+CMAKE_OBJDUMP:FILEPATH=/usr/bin/objdump
 
 //Value Computed by CMake
 CMAKE_PROJECT_DESCRIPTION:STATIC=
@@ -159,10 +147,10 @@ CMAKE_PROJECT_VERSION_PATCH:STATIC=
 CMAKE_PROJECT_VERSION_TWEAK:STATIC=
 
 //Path to a program.
-CMAKE_RANLIB:FILEPATH=/usr/bin/llvm-ranlib
+CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
 
 //Path to a program.
-CMAKE_READELF:FILEPATH=/usr/bin/llvm-readelf
+CMAKE_READELF:FILEPATH=/usr/bin/readelf
 
 //Flags used by the linker during the creation of shared libraries
 // during all build types.
@@ -212,7 +200,7 @@ CMAKE_STATIC_LINKER_FLAGS_RELEASE:STRING=
 CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
 //Path to a program.
-CMAKE_STRIP:FILEPATH=/usr/bin/llvm-strip
+CMAKE_STRIP:FILEPATH=/usr/bin/strip
 
 //If this value is on, makefiles will be generated without the
 // .SILENT directive, and all commands will be echoed to the console
@@ -292,9 +280,6 @@ GTest_DIR:PATH=/usr/lib64/cmake/GTest
 //The directory containing a CMake configuration file for IntelDPCPP.
 IntelDPCPP_DIR:PATH=/opt/intel/oneapi/compiler/2022.1.0/linux/IntelDPCPP
 
-//The directory containing a CMake configuration file for MKL.
-MKL_DIR:PATH=MKL_DIR-NOTFOUND
-
 //The directory containing a CMake configuration file for Osi.
 Osi_DIR:PATH=/usr/local/lib/cmake/Osi
 
@@ -326,7 +311,7 @@ Protobuf_LITE_LIBRARY_DEBUG:FILEPATH=/usr/local/lib/libprotobuf-lite.a
 Protobuf_LITE_LIBRARY_RELEASE:FILEPATH=/usr/local/lib/libprotobuf-lite.a
 
 //The Google Protocol Buffers Compiler
-Protobuf_PROTOC_EXECUTABLE:FILEPATH=/usr/local/bin/protoc
+Protobuf_PROTOC_EXECUTABLE:FILEPATH=/opt/intel/oneapi/intelpython/latest/bin/protoc
 
 //Path to a library.
 Protobuf_PROTOC_LIBRARY_DEBUG:FILEPATH=/usr/local/lib/libprotoc.a
@@ -335,7 +320,7 @@ Protobuf_PROTOC_LIBRARY_DEBUG:FILEPATH=/usr/local/lib/libprotoc.a
 Protobuf_PROTOC_LIBRARY_RELEASE:FILEPATH=/usr/local/lib/libprotoc.a
 
 //Dependencies for the target
-Regressors_LIB_DEPENDS:STATIC=general;Common;general;Features;general;FROLS_Math;general;ortools::ortools;general;absl::flags;general;TBB::tbb;
+Regressors_LIB_DEPENDS:STATIC=general;Common;general;Features;general;FROLS_Math;general;ortools::ortools;general;absl::flags;general;TBB::tbb;general;fmt;
 
 //The directory containing a CMake configuration file for SCIP.
 SCIP_DIR:PATH=/usr/local/lib/cmake/scip
@@ -344,21 +329,24 @@ SCIP_DIR:PATH=/usr/local/lib/cmake/scip
 SUNDIALS_DIR:PATH=/usr/lib64/cmake/sundials
 
 //SYCL flags for the compiler
-SYCL_FLAGS:STRING='-fsycl '
+SYCL_FLAGS:STRING='--dpcpp -fsycl '
 
 //Path to a file.
-SYCL_INCLUDE_DIR:FILEPATH=/usr/include
+SYCL_INCLUDE_DIR:FILEPATH=/opt/intel/oneapi/compiler/2022.1.0/linux/include
 
 //SYCL Language version
 SYCL_LANGUAGE_VERSION:STRING=202001
 
 //Path to a file.
-SYCL_LIBRARY_DIR:FILEPATH=/usr/lib
+SYCL_LIBRARY_DIR:FILEPATH=/opt/intel/oneapi/compiler/2022.1.0/linux/lib
 
-SYCL_PACKAGE_DIR:STRING=/usr
+SYCL_PACKAGE_DIR:STRING=/opt/intel/oneapi/compiler/2022.1.0/linux
 
 //The directory containing a CMake configuration file for TBB.
-TBB_DIR:PATH=/usr/lib64/cmake/TBB
+TBB_DIR:PATH=/opt/intel/oneapi/tbb/2021.6.0/lib/cmake/tbb
+
+//Path to a program.
+XIAR:FILEPATH=/opt/intel/oneapi/compiler/2022.1.0/linux/bin/intel64/xiar
 
 //Path to a file.
 ZLIB_INCLUDE_DIR:PATH=/usr/local/include
@@ -386,6 +374,9 @@ cppitertools_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
 cppitertools_SOURCE_DIR:STATIC=/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-debug/_deps/cppitertools_repo-src
+
+//The directory containing a CMake configuration file for fmt.
+fmt_DIR:PATH=/usr/lib64/cmake/fmt
 
 //Value Computed by CMake
 graphlite_BINARY_DIR:STATIC=/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/cmake-build-debug/_deps/graphlite_repo-build
@@ -436,10 +427,6 @@ CMAKE_CPACK_COMMAND:INTERNAL=/home/arch/Downloads/clion-2022.2.1/bin/cmake/linux
 CMAKE_CTEST_COMMAND:INTERNAL=/home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/ctest
 //ADVANCED property for variable: CMAKE_CXX_COMPILER
 CMAKE_CXX_COMPILER-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_CXX_COMPILER_AR
-CMAKE_CXX_COMPILER_AR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_CXX_COMPILER_RANLIB
-CMAKE_CXX_COMPILER_RANLIB-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_FLAGS
 CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_FLAGS_DEBUG
@@ -452,10 +439,6 @@ CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_COMPILER
 CMAKE_C_COMPILER-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_C_COMPILER_AR
-CMAKE_C_COMPILER_AR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_C_COMPILER_RANLIB
-CMAKE_C_COMPILER_RANLIB-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_FLAGS
 CMAKE_C_FLAGS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_FLAGS_DEBUG
@@ -568,7 +551,7 @@ FIND_PACKAGE_MESSAGE_DETAILS_Clp:INTERNAL=[/usr/local/lib/cmake/Clp/ClpConfig.cm
 //Details about finding GTest
 FIND_PACKAGE_MESSAGE_DETAILS_GTest:INTERNAL=[/usr/lib64/cmake/GTest/GTestConfig.cmake][c ][v1.12.1()]
 //Details about finding IntelDPCPP
-FIND_PACKAGE_MESSAGE_DETAILS_IntelDPCPP:INTERNAL=[/usr/include][/usr/lib][-fsycl ][v202001()]
+FIND_PACKAGE_MESSAGE_DETAILS_IntelDPCPP:INTERNAL=[/opt/intel/oneapi/compiler/2022.1.0/linux/include][/opt/intel/oneapi/compiler/2022.1.0/linux/lib][--dpcpp -fsycl ][v202001()]
 //Details about finding PYTHON
 FIND_PACKAGE_MESSAGE_DETAILS_PYTHON:INTERNAL=/home/arch/Env/Default/bin/python3.10.7
 //Details about finding Protobuf
@@ -593,10 +576,8 @@ FROLS_INCLUDE_DIRS:INTERNAL=/home/arch/Documents/Bernoulli_Network_Optimal_Contr
 FROLS_LOG_DIR:INTERNAL=/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/log
 //ADVANCED property for variable: GIT_EXECUTABLE
 GIT_EXECUTABLE-ADVANCED:INTERNAL=1
-//Test HAS_FLTO
-HAS_FLTO:INTERNAL=1
-//Test HAS_FLTO_THIN
-HAS_FLTO_THIN:INTERNAL=1
+//Test HAS_INTEL_IPO
+HAS_INTEL_IPO:INTERNAL=
 //ADVANCED property for variable: PKG_CONFIG_ARGN
 PKG_CONFIG_ARGN-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PKG_CONFIG_EXECUTABLE
@@ -628,6 +609,8 @@ Protobuf_PROTOC_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Protobuf_PROTOC_LIBRARY_RELEASE
 Protobuf_PROTOC_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 Python_ADDITIONAL_VERSIONS:INTERNAL=3.11;3.10;3.9;3.8;3.7;3.6
+//ADVANCED property for variable: XIAR
+XIAR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: ZLIB_INCLUDE_DIR
 ZLIB_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: ZLIB_LIBRARY_DEBUG

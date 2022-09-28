@@ -36,8 +36,8 @@ if __name__ == '__main__':
     N_files = 100
     dfs = [pd.read_csv(f, delimiter=",") for f in files[:N_files]]
 
-    qr_dfs = [pd.read_csv(qrf) for qrf in qr_files]
-    er_dfs = [pd.read_csv(erf) for erf in er_files]
+    qr_dfs = [pd.read_csv(qrf) for qrf in qr_files[:N_files]]
+    er_dfs = [pd.read_csv(erf) for erf in er_files[:N_files]]
 
     for j, df in enumerate(dfs):
         for i, name in enumerate(statenames):

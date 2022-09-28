@@ -1,11 +1,12 @@
 #include "Quantile_Regressor.hpp"
 
+#include <FROLS_Execution.hpp>
 #include <filesystem>
 #include <limits>
-#include <execution>
+
 namespace FROLS::Regression {
-    Quantile_Regressor::Quantile_Regressor(const Quantile_Param& p)
-            : tau(p.tau), Regressor(p), solver_type(p.solver_type){}
+    Quantile_Regressor::Quantile_Regressor(const Quantile_Param &p)
+            : tau(p.tau), Regressor(p), solver_type(p.solver_type) {}
 
 
     Feature Quantile_Regressor::single_feature_regression(const Vec &x, const Vec &y) const {
@@ -42,23 +43,23 @@ namespace FROLS::Regression {
                 }
                 double theta_sol = LP.theta_pos->solution_value() - LP.theta_neg->solution_value();
                 std::for_each(LP.g.begin(), LP.g.end(), [&](auto &gi) { gi->Clear(); });
-                return Feature{f, theta_sol, 0, 0.};
+                return Feature{f, theta_sol, 0, 0., FEATURE_REGRESSION};
             } else {
                 std::cout << "[Quantile_Regressor] Warning: Quantile regression failed" << std::endl;
-                std::for_each(std::execution::par_unseq, LP.g.begin(), LP.g.end(), [&](auto &gi) { gi->Clear(); });
-                return Feature{std::numeric_limits<double>::infinity(), 0., 0, 0.};
+                std::for_each(LP.g.begin(), LP.g.end(), [](auto &gi) { gi->Clear(); });
+                return Feature{};
             }
 
 
         }
     }
 
-    std::vector<Feature> Quantile_Regressor::candidate_regression(crMat &X, crVec &y, const std::vector<Feature>& used_features) const {
+    std::vector<Feature>
+    Quantile_Regressor::candidate_regression(crMat &X, crVec &y, const std::vector<Feature> &used_features) const {
         const Vec y_diff = y - predict(X, used_features);
-
         std::vector<size_t> candidate_idx = unused_feature_indices(used_features, X.cols());
         std::vector<Feature> candidates(candidate_idx.size());
-        std::transform(std::execution::par_unseq, candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
+        std::transform(candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
                        [=](const size_t &idx) {
                            Feature f = single_feature_regression(X.col(idx), y);
                            f.index = idx;

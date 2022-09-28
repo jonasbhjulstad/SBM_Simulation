@@ -21,6 +21,7 @@ namespace FROLS::Regression {
         Feature f;
         f.g = cov_normalize(x, y);
         f.f_ERR = f.g * f.g * ((x.transpose() * x) / (y.transpose() * y)).value();
+        f.tag = FEATURE_REGRESSION;
         return f;
     }
 

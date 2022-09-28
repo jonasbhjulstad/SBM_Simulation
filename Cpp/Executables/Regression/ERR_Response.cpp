@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     const size_t Nx = 3;
     const std::string network_type = "SIR";
     const std::vector<std::string> colnames = {"S", "I", "R"};
-    size_t N_sims = 350; // 10000;
+    size_t N_sims = 7000; // 10000;
     size_t N_pop = 500;
     double p_ER = 1.0;
     using namespace FROLS;
@@ -48,15 +48,17 @@ int main(int argc, char **argv) {
 
     auto MC_fname_f = std::bind(MC_filename, N_pop, p_ER, _1, network_type);
     auto outfile_f = std::bind(err_simulation_filename, N_pop, p_ER, _1, network_type);
-    std::vector<size_t> ignore_idx = {0, 1, 2, 3, 4, 5, 6, 7, 8,9,10};//{0, 1, 2, 3,4};
     std::vector<std::vector<Feature>> preselected_features(4);
-    preselected_features[0].push_back(Feature{-1, 0., 4,1.});
-    preselected_features[1].push_back(Feature{-1, 0., 3,1.});
-//    preselected_features[1].push_back(Feature{-1, 0., 3, -.1});
-    preselected_features[2].push_back(Feature{-1, 0., 2,1.});
-    FROLS::Features::Polynomial_Model model(Nx, Nu, N_output_features, d_max, ignore_idx, preselected_features);
+    FROLS::Features::Polynomial_Model model(Nx, Nu, N_output_features, d_max);
+    model.preselect("x0", 1.0, 0, FEATURE_PRESELECTED_IGNORE);
+    model.preselect("x1", 1.0, 1, FEATURE_PRESELECTED_IGNORE);
+    model.preselect("x2", 1.0, 2, FEATURE_PRESELECTED_IGNORE);
+    std::vector<size_t> ignore_idx = {6, 8, 9, 13};
+    std::for_each(ignore_idx.begin(), ignore_idx.end(), [&](auto& ig_idx){
+        model.ignore(ig_idx);
+    });
     FROLS::Regression::Regressor_Param reg_param;
-    reg_param.tol = 1e-6;
+    reg_param.tol = 1e-1;
     reg_param.theta_tol = 1e-10;
     reg_param.N_terms_max = 4;
     FROLS::Regression::ERR_Regressor regressor(reg_param);

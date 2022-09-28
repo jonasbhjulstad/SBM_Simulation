@@ -3,3 +3,5 @@ data/**
 figures/**
 log/**
 cmake-build-release/**
+cmake-build-debug/**
+cmake-build-relwithdebinfo/**

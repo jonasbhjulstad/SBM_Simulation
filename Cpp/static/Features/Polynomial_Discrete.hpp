@@ -12,10 +12,8 @@ namespace FROLS::Features {
         const size_t Nx;
         const size_t Nu;
 
-        Polynomial_Model(size_t Nx, size_t Nu, size_t N_output_features, size_t d_max,
-                         const std::vector<size_t> ignore_idx = std::vector<size_t>(),
-                                 std::vector<std::vector<Feature>> preselected_features = std::vector<std::vector<Feature>>())
-                : d_max(d_max), Nx(Nx), Nu(Nu), Feature_Model(N_output_features, ignore_idx, preselected_features) {}
+        Polynomial_Model(size_t Nx, size_t Nu, size_t N_output_features, size_t d_max)
+                : d_max(d_max), Nx(Nx), Nu(Nu), Feature_Model(N_output_features) {}
 
         // double transform(crVec &x_raw, size_t target_index) ;
         Vec _transform(crMat &X_raw, size_t target_index, bool& index_failure);
@@ -35,6 +33,7 @@ namespace FROLS::Features {
 
         const std::string model_equations();
 
+        size_t get_feature_index(const std::string&);
 
     private:
         bool index_warning_used = false;

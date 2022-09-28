@@ -71,9 +71,8 @@ int main() {
 
     size_t d_max = 1;
     size_t N_features = 16;
-    std::vector<size_t> ignore_idx = {};
     using namespace FROLS::Regression;
-    Polynomial_Model model(Nx, Nu, N_features, d_max, ignore_idx);
+    Polynomial_Model model(Nx, Nu, N_features, d_max);
     Regressor_Param er_param;
     er_param.tol = 1e-1;
     er_param.N_terms_max = 2;

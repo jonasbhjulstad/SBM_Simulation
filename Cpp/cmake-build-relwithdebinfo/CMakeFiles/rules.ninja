@@ -25,7 +25,7 @@ rule CUSTOM_COMMAND
 rule CXX_COMPILER__Common_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -33,7 +33,7 @@ rule CXX_COMPILER__Common_RelWithDebInfo
 # Rule for linking CXX static library.
 
 rule CXX_STATIC_LIBRARY_LINKER__Common_RelWithDebInfo
-  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/llvm-ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/llvm-ranlib $TARGET_FILE && $POST_BUILD
+  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
   description = Linking CXX static library $TARGET_FILE
   restat = $RESTAT
 
@@ -44,7 +44,7 @@ rule CXX_STATIC_LIBRARY_LINKER__Common_RelWithDebInfo
 rule CXX_COMPILER__DataFrame_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -52,7 +52,7 @@ rule CXX_COMPILER__DataFrame_RelWithDebInfo
 # Rule for linking CXX static library.
 
 rule CXX_STATIC_LIBRARY_LINKER__DataFrame_RelWithDebInfo
-  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/llvm-ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/llvm-ranlib $TARGET_FILE && $POST_BUILD
+  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
   description = Linking CXX static library $TARGET_FILE
   restat = $RESTAT
 
@@ -63,7 +63,7 @@ rule CXX_STATIC_LIBRARY_LINKER__DataFrame_RelWithDebInfo
 rule CXX_COMPILER__FROLS_Eigen_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -71,7 +71,7 @@ rule CXX_COMPILER__FROLS_Eigen_RelWithDebInfo
 # Rule for linking CXX static library.
 
 rule CXX_STATIC_LIBRARY_LINKER__FROLS_Eigen_RelWithDebInfo
-  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/llvm-ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/llvm-ranlib $TARGET_FILE && $POST_BUILD
+  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
   description = Linking CXX static library $TARGET_FILE
   restat = $RESTAT
 
@@ -82,7 +82,7 @@ rule CXX_STATIC_LIBRARY_LINKER__FROLS_Eigen_RelWithDebInfo
 rule CXX_COMPILER__FROLS_Math_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -90,7 +90,7 @@ rule CXX_COMPILER__FROLS_Math_RelWithDebInfo
 # Rule for linking CXX static library.
 
 rule CXX_STATIC_LIBRARY_LINKER__FROLS_Math_RelWithDebInfo
-  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/llvm-ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/llvm-ranlib $TARGET_FILE && $POST_BUILD
+  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
   description = Linking CXX static library $TARGET_FILE
   restat = $RESTAT
 
@@ -101,7 +101,7 @@ rule CXX_STATIC_LIBRARY_LINKER__FROLS_Math_RelWithDebInfo
 rule CXX_COMPILER__Regressors_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -109,7 +109,7 @@ rule CXX_COMPILER__Regressors_RelWithDebInfo
 # Rule for linking CXX static library.
 
 rule CXX_STATIC_LIBRARY_LINKER__Regressors_RelWithDebInfo
-  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/llvm-ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/llvm-ranlib $TARGET_FILE && $POST_BUILD
+  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
   description = Linking CXX static library $TARGET_FILE
   restat = $RESTAT
 
@@ -120,7 +120,7 @@ rule CXX_STATIC_LIBRARY_LINKER__Regressors_RelWithDebInfo
 rule CXX_COMPILER__Features_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -128,7 +128,7 @@ rule CXX_COMPILER__Features_RelWithDebInfo
 # Rule for linking CXX static library.
 
 rule CXX_STATIC_LIBRARY_LINKER__Features_RelWithDebInfo
-  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/llvm-ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/llvm-ranlib $TARGET_FILE && $POST_BUILD
+  command = $PRE_LINK && /home/arch/Downloads/clion-2022.2.1/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
   description = Linking CXX static library $TARGET_FILE
   restat = $RESTAT
 
@@ -139,7 +139,7 @@ rule CXX_STATIC_LIBRARY_LINKER__Features_RelWithDebInfo
 rule CXX_COMPILER__ERR_Response_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -147,7 +147,7 @@ rule CXX_COMPILER__ERR_Response_RelWithDebInfo
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__ERR_Response_RelWithDebInfo
-  command = $PRE_LINK && /usr/bin/clang++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  command = $PRE_LINK && /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $FLAGS  --dpcpp -fsycl  $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -158,7 +158,7 @@ rule CXX_EXECUTABLE_LINKER__ERR_Response_RelWithDebInfo
 rule CXX_COMPILER__Quantile_Response_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -166,7 +166,7 @@ rule CXX_COMPILER__Quantile_Response_RelWithDebInfo
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__Quantile_Response_RelWithDebInfo
-  command = $PRE_LINK && /usr/bin/clang++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  command = $PRE_LINK && /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $FLAGS  --dpcpp -fsycl  $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -177,7 +177,7 @@ rule CXX_EXECUTABLE_LINKER__Quantile_Response_RelWithDebInfo
 rule CXX_COMPILER__Linear_System_Stochastic_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -185,7 +185,7 @@ rule CXX_COMPILER__Linear_System_Stochastic_RelWithDebInfo
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__Linear_System_Stochastic_RelWithDebInfo
-  command = $PRE_LINK && /usr/bin/clang++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  command = $PRE_LINK && /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $FLAGS  --dpcpp -fsycl  $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -196,7 +196,7 @@ rule CXX_EXECUTABLE_LINKER__Linear_System_Stochastic_RelWithDebInfo
 rule CXX_COMPILER__Bernoulli_SIR_MC_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -204,7 +204,7 @@ rule CXX_COMPILER__Bernoulli_SIR_MC_RelWithDebInfo
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__Bernoulli_SIR_MC_RelWithDebInfo
-  command = $PRE_LINK && /usr/bin/clang++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  command = $PRE_LINK && /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $FLAGS  --dpcpp -fsycl  $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -215,7 +215,7 @@ rule CXX_EXECUTABLE_LINKER__Bernoulli_SIR_MC_RelWithDebInfo
 rule CXX_COMPILER__Bernoulli_SIS_MC_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -223,7 +223,7 @@ rule CXX_COMPILER__Bernoulli_SIS_MC_RelWithDebInfo
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__Bernoulli_SIS_MC_RelWithDebInfo
-  command = $PRE_LINK && /usr/bin/clang++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  command = $PRE_LINK && /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $FLAGS  --dpcpp -fsycl  $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -234,7 +234,7 @@ rule CXX_EXECUTABLE_LINKER__Bernoulli_SIS_MC_RelWithDebInfo
 rule CXX_COMPILER__SIR_Sine_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -242,7 +242,7 @@ rule CXX_COMPILER__SIR_Sine_RelWithDebInfo
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__SIR_Sine_RelWithDebInfo
-  command = $PRE_LINK && /usr/bin/clang++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  command = $PRE_LINK && /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $FLAGS  --dpcpp -fsycl  $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -253,7 +253,7 @@ rule CXX_EXECUTABLE_LINKER__SIR_Sine_RelWithDebInfo
 rule CXX_COMPILER__SIR_Sine_Discrete_RelWithDebInfo
   depfile = $DEP_FILE
   deps = gcc
-  command = /usr/bin/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -261,7 +261,7 @@ rule CXX_COMPILER__SIR_Sine_Discrete_RelWithDebInfo
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__SIR_Sine_Discrete_RelWithDebInfo
-  command = $PRE_LINK && /usr/bin/clang++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  command = $PRE_LINK && /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx $FLAGS  --dpcpp -fsycl  $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 

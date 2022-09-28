@@ -2,6 +2,7 @@
 #include <omp.h>
 #include <algorithm>
 #include <execution>
+#include <fmt/format.h>
 
 namespace FROLS::Regression {
 
@@ -21,14 +22,14 @@ namespace FROLS::Regression {
 
         // Perform one feature selection iteration for each feature
         for (int j = 0; j < N_features; j++) {
-
+            fmt::print("Feature {} of {}\n", j+1, N_features);
             // Compute remaining variance by orthogonalizing the current feature
             Q_current =
                     used_feature_orthogonalize(X, Q_global, best_features);
             // Determine the best feature to add to the feature set
             Feature f = best_feature_select(Q_current, y, best_features);
 
-            if ((f.f_ERR == -std::numeric_limits<double>::infinity()) || (j >= (N_terms_max))) {
+            if ((f.tag == FEATURE_INVALID) || (j >= (N_terms_max))) {
                 end_idx = j;
                 break;
             }
@@ -58,22 +59,14 @@ namespace FROLS::Regression {
     }
 
     std::vector<Feature>
-    Regressor::single_fit(const Mat &X, const Vec &y, const std::vector<Feature> preselect_features) const {
-//        Mat X_preselect_orth = X;
-//        for (int i = 0; i < preselect_features.size(); i++) {
-//            for (int j = 0; j < X.cols(); j++) {
-//                X_preselect_orth.col(j) = vec_orthogonalize(X_preselect_orth.col(j),
-//                                                            X.col(preselect_features[i].index) *
-//                                                            preselect_features[i].theta);
-//            }
-//        }
+    Regressor::single_fit(const Mat &X, const Vec &y, std::vector<Feature> preselect_features) const {
 
+        std::for_each(preselect_features.begin(), preselect_features.end(), [](auto& f){f.tag = FEATURE_PRESELECTED;});
         Vec y_diff = y;
         std::for_each(preselect_features.begin(), preselect_features.end(), [&](const auto& f){
             y_diff -= X.col(f.index)*f.theta;
         });
         Mat X_unused = X;
-        std::for_each(preselect_features.begin(), preselect_features.end(), [&](const auto& f){X_unused.col(f.index).setZero();});
 
         std::vector<Feature> result;
         result.insert(result.begin(), preselect_features.begin(), preselect_features.end());
@@ -169,7 +162,7 @@ namespace FROLS::Regression {
             data[i] = Fit_Data{model.preselected_features[i], Y.col(i)};
         }
         model.features.resize(Y.cols());
-        std::transform(std::execution::par_unseq, data.begin(), data.end(), model.features.begin(), [&](const auto &d) {
+        std::transform(data.begin(), data.end(), model.features.begin(), [&](const auto d) {
             Mat X = model.transform(XU, d.preselect_features);
             return single_fit(X, d.y, d.preselect_features);
         });

@@ -8,8 +8,7 @@
 namespace FROLS::Features {
     struct Feature_Model {
 
-        Feature_Model(const size_t N_output_features, const std::vector<size_t> ignore_idx = std::vector<size_t>(),
-                      const std::vector<std::vector<Feature>> preselected_features = std::vector<std::vector<Feature>>());
+        Feature_Model(const size_t N_output_features);
 
         Vec step(crVec &x, crVec &u);
 
@@ -36,6 +35,11 @@ namespace FROLS::Features {
         virtual const std::string model_equation(size_t idx) = 0;
 
         virtual const std::string model_equations() = 0;
+        virtual size_t get_feature_index(const std::string&) = 0;
+        void ignore(const std::string&);
+        void ignore(size_t);
+        void preselect(const std::string&, double, size_t, Feature_Tag);
+        void preselect(size_t, double, size_t, Feature_Tag);
 
         const size_t N_output_features;
         std::vector<size_t> ignore_idx;

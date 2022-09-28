@@ -3,7 +3,6 @@
 #include <quantiles.hpp>
 #include <FROLS_Path_Config.hpp>
 #include <functional>
-#include <FROLS_Thread.hpp>
 constexpr size_t N_configurations = 4;
 constexpr size_t Nt = 20;
 

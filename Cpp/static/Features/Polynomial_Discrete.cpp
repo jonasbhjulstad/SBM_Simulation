@@ -5,19 +5,22 @@
 #include <iostream>
 #include <itertools.hpp>
 #include <omp.h>
+#include <fmt/format.h>
+
 namespace FROLS::Features {
 
-
     void Polynomial_Model::feature_summary() {
-        std::cout << "y\tFeature\t\tg\t\tTheta\t\tf_ERR\n";
-        std::cout << std::fixed << std::setprecision(4);
+        fmt::print("{:^15}{:^15}{:^15}{:^15}{:^15}{:^15}\n", "y", "Feature", "g", "Theta", "f_ERR", "Tag");
         for (int i = 0; i < features.size(); i++) {
-            for (auto &feature: features[i]) {
-                std::string name = (feature.f_ERR == -1) ? "-" : feature_name(candidate_feature_idx[feature.index], false);
+            for (const auto &feature: features[i]) {
+                size_t absolute_idx = (feature.tag == FEATURE_PRESELECTED) ? feature.index : candidate_feature_idx[feature.index];
+                std::string name = feature_name(absolute_idx, false);
+
                 name = (name == "") ? "1" : name;
+
                 // print features aligned with tabs
-                std::cout << i << "\t" << name << "\t\t" << feature.g << "\t\t"
-                          << feature.theta << "\t\t" << feature.f_ERR << std::endl;
+                fmt::print("{:^15}{:^15}{:^15.3f}{:^15.3f}{:^15.3f}{:^15}\n", i, name, feature.g, feature.theta,
+                           feature.f_ERR, feature_tag_map.at(feature.tag));
             }
         }
     }
@@ -43,7 +46,7 @@ namespace FROLS::Features {
     }
 
 
-    Vec Polynomial_Model::_transform(crMat &X_raw, size_t target_idx, bool& index_failure) {
+    Vec Polynomial_Model::_transform(crMat &X_raw, size_t target_idx, bool &index_failure) {
         // get feature names for polynomial combinations with powers between d_min,
         // d_max of the original features
         size_t N_input_features = X_raw.cols();
@@ -93,7 +96,7 @@ namespace FROLS::Features {
                 feature_idx++;
             }
         }
-        if ((feature_idx < target_idx)&& !index_warning_used) {
+        if ((feature_idx < target_idx) && !index_warning_used) {
             std::cout << "[Polynomial_Model] Warning: Target index is not contained in the permutation set\n";
             index_warning_used = true;
         }
@@ -147,4 +150,22 @@ namespace FROLS::Features {
         }
         return model;
     }
+
+    size_t Polynomial_Model::get_feature_index(const std::string& name)
+    {
+        size_t index = 0;
+        std::string trial_name = ".";
+        while ((trial_name != name))
+        {
+            trial_name = feature_name(index, false);
+            if (trial_name == "")
+            {
+                fmt::print("[Polynomial Model] Warning: Unable to find index of feature {}", name);
+                break;
+            }
+            index++;
+        }
+        return index-1;
+    }
+
 } // namespace FROLS::Features::Polynomial

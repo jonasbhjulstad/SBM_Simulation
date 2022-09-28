@@ -9,17 +9,18 @@
 #include <SIR_Bernoulli_Network.hpp>
 #include <graph_lite.h>
 
+
 namespace FROLS {
     struct MC_SIR_Params {
         size_t N_pop = 500;
         double p_ER = 1.0;
         double p_I0 = 0.2;
         double p_R0 = 0.0;
-        double p_I_max = .001;
+        double p_I_max = .005;
         double p_I_min = .0;
-        size_t N_sim = 100;
+        size_t N_sim = 2000;
         size_t Nt_min = 15;
-        double p_R = 0.01;
+        double p_R = 0.1;
         size_t seed;
         size_t N_I_min = N_pop / 15;
         size_t iter_offset = 0;

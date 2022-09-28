@@ -101,7 +101,6 @@ namespace FROLS {
 
     Mat used_feature_orthogonalize(const Mat &X, const Mat &Q,
                                    const std::vector<Feature> &used_features);
-
 } // namespace FROLS
 
 #endif
