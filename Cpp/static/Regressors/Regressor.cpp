@@ -97,7 +97,7 @@ namespace FROLS::Regression {
         std::vector<Feature> thresholded_candidates;
         std::copy_if(candidates.begin(), candidates.end(), std::back_inserter(thresholded_candidates),
                      [&](const auto &f) {
-                         return ((abs(f.g) > theta_tol) && (f.f_ERR != -std::numeric_limits<double>::infinity()));
+                         return abs(f.g) > theta_tol;
                      });
         static bool warn_msg = true;
 

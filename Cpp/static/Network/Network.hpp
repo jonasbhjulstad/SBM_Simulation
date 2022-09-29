@@ -11,13 +11,25 @@
 
 namespace Network_Models {
 
-    template <typename Param, size_t Nx, size_t Nt>
+    template <typename Param, size_t Nx, size_t Nt, class Derived>
     struct Network
     {
-        virtual std::array<size_t, Nx> population_count() = 0;
-        virtual void advance(const Param&) = 0;
-        virtual void reset() = 0;
-        virtual bool terminate(const Param& p, const std::array<size_t, Nx>& x) = 0;
+        std::array<size_t, Nx> population_count()
+        {
+            return static_cast<Derived*>(this)->population_count();
+        }
+        void advance(const Param& p)
+        {
+            static_cast<Derived*>(this)->advance(p);
+        }
+        void reset()
+        {
+            static_cast<Derived*>(this)->reset();
+        }
+        bool terminate(const Param& p, const std::array<size_t, Nx>& x)
+        {
+            return static_cast<Derived*>(this)->terminate(p, x);
+        }
         
         std::array<std::array<size_t, Nt+1>, Nx>
         simulate(const std::array<Param, Nt>& p_vec, size_t infection_count_tolerance = 0, size_t Nt_min = 15) {

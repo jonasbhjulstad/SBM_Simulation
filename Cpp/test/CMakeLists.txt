@@ -7,7 +7,8 @@ target_link_libraries(${source_file} PUBLIC Eigen3::Eigen ${SUNDIALS_LIBS} ${LIB
 gtest_discover_tests(${source_file})
 endfunction()
 
-
+add_custom_test(Graph_Iterators)
+target_include_directories(Graph_Iterators PUBLIC "../static/Graph/")
 # add_custom_test(SIR_integrator)
 # add_custom_test(monomials)
 #add_custom_test(sir_bernoulli)

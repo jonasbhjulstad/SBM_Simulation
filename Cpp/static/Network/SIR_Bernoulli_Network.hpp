@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <utility>
 #include <vector>
-#include <FROLS_Execution.hpp>
+#include <execution>
 
 namespace Network_Models {
     enum SIR_State {
@@ -24,7 +24,7 @@ namespace Network_Models {
         size_t N_I_min;
     };
     template<typename RNG, size_t Nt>
-    struct SIR_Bernoulli_Network : public Network<SIR_Param, 3, Nt>{
+    struct SIR_Bernoulli_Network : public Network<SIR_Param, 3, Nt, SIR_Bernoulli_Network<RNG, Nt>>{
         const double p_I0;
         const double p_R0;
         const size_t t = 0;
@@ -35,7 +35,7 @@ namespace Network_Models {
         void initialize() {
             std::bernoulli_distribution d_I(p_I0);
             std::bernoulli_distribution d_R(p_R0);
-            std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](auto &v) {
+            std::for_each(G.begin(), G.end(), [&](auto &v) {
                 SIR_State state = d_I(rng) ? SIR_I : SIR_S;
                 state = d_R(rng) ? SIR_R : state;
                 G.node_prop(v) = state;
@@ -51,10 +51,10 @@ namespace Network_Models {
 // function for infection step
         void infection_step(double p_I) {
             std::bernoulli_distribution d_I(p_I);
-            std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](auto v0) {
+            std::for_each(G.begin(), G.end(), [&](auto v0) {
                 if (G.node_prop(v0) == SIR_I) {
                     auto [nbr_start, nbr_end] = G.neighbors(v0);
-                    std::for_each(std::execution::par_unseq, nbr_start, nbr_end, [&](auto &nbr_it) {
+                    std::for_each(nbr_start, nbr_end, [&](auto &nbr_it) {
                         G.node_prop(nbr_it) =  ((G.node_prop(nbr_it) == SIR_S) && d_I(rng)) ? SIR_I : G.node_prop(nbr_it);
                     });
                 }
@@ -83,7 +83,7 @@ namespace Network_Models {
 
         void reset()
         {
-            std::for_each(G.begin(), G.end(), [&](auto& v){G.node_prop(v) = SIR_S;});
+            std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](auto& v){G.node_prop(v) = SIR_S;});
         }
 
     private:

@@ -1,7 +1,7 @@
 #include "FROLS_Math.hpp"
 
 namespace FROLS {
-    inline double cov_normalize(const Vec &a, const Vec &b) {
+    double cov_normalize(const Vec &a, const Vec &b) {
         return ((a.transpose() * a).isZero()) ? 0 : (a.transpose() * b).value() / (a.transpose() * a);
     }
 

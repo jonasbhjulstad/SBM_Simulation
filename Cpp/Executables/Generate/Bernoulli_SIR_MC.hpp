@@ -12,13 +12,13 @@
 
 namespace FROLS {
     struct MC_SIR_Params {
-        size_t N_pop = 500;
+        size_t N_pop = 20;
         double p_ER = 1.0;
         double p_I0 = 0.2;
         double p_R0 = 0.0;
         double p_I_max = .005;
         double p_I_min = .0;
-        size_t N_sim = 2000;
+        size_t N_sim = 200;
         size_t Nt_min = 15;
         double p_R = 0.1;
         size_t seed;
@@ -46,6 +46,26 @@ namespace FROLS {
         });
         return param_vec;
     }
+        template <size_t Nt>
+        struct MC_SIR_SimData
+        {
+            std::array<std::array<size_t, Nt+1>, 3> traj;
+            std::array<Network_Models::SIR_Param, Nt> p_vec;
+        };
+        template <size_t Nt>
+        MC_SIR_SimData<Nt> MC_SIR_simulation(const MC_SIR_Params &p, size_t seed)
+        {
+                MC_SIR_SimData<Nt> data;
+                std::mt19937 generator(seed);
+                Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt> G(p.N_pop, p.p_ER, p.p_I0, p.p_R0, generator);
+                G.reset();
+                while (G.population_count()[1] == 0) {
+                    G.initialize();
+                }
+                data.p_vec = generate_interaction_probabilities<decltype(generator), Nt>(p, generator);
+                data.traj = G.simulate(data.p_vec);
+                return data;
+        }
 
     template <size_t Nt>
     void MC_SIR_to_file(const MC_SIR_Params &p, size_t thread_id) {

@@ -99,6 +99,15 @@ namespace FROLS {
         return res;
     }
 
+    template <typename T>
+    std::vector<std::pair<size_t, T>> enumerate(const std::vector<T>& data)
+    {
+        std::vector<std::pair<size_t, T>> enumerated_data(data.size());
+        std::transform(data.begin(), data.end(), enumerated_data.begin(), [&, n= 0]
+                (const auto& d)mutable {return std::make_pair(n++, d);});
+        return enumerated_data;
+    }
+
     Mat used_feature_orthogonalize(const Mat &X, const Mat &Q,
                                    const std::vector<Feature> &used_features);
 } // namespace FROLS

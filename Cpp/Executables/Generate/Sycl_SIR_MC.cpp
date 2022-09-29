@@ -3,6 +3,7 @@
 #include <quantiles.hpp>
 #include <FROLS_Path_Config.hpp>
 #include <functional>
+#include <CL/sycl.hpp>
 template <size_t Nt>
 void traj_to_file(const FROLS::MC_SIR_Params& p, const FROLS::MC_SIR_SimData<Nt>& d, size_t iter)
 {
@@ -36,7 +37,23 @@ int main() {
     std::vector<size_t> seeds(p.N_sim);
     std::generate(seeds.begin(), seeds.end(), [&](){return rd();});
     auto enum_seeds = FROLS::enumerate(seeds);
+
+    sycl::queue q(sycl::default_selector{});
+    sycl::buffer<size_t, 1> seed_buffer{seeds.data(), sycl::range<1>(seeds.size())};
+
     std::cout << "Running MC-SIR simulations..." << std::endl;
+    q.submit([&](sycl::handler& h)
+    {
+        auto seed = seed_buffer.template get_access<sycl::access_mode::read>(h);
+        h.parallel_for<class nstream>(sycl::range<1>{p.N_sim}, [=](sycl::id<1> it)
+        {
+            const int i = it[0];
+            auto simdata = MC_SIR_simulation<Nt>(p, seed[i]);
+            traj_to_file(p, simdata, i);
+
+        });
+    });
+
     std::for_each(std::execution::par_unseq, enum_seeds.begin(), enum_seeds.end(), [&](auto& es){
         size_t iter = es.first;
         size_t seed = es.second;

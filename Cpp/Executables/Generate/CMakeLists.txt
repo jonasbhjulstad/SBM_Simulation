@@ -1,8 +1,12 @@
 add_executable(Bernoulli_SIR_MC Bernoulli_SIR_MC.cpp)
-target_link_libraries(Bernoulli_SIR_MC PUBLIC ${COMMON_LIBRARIES} TBB::tbb DataFrame Common FROLS_Math graphlite FROLS_Graph)
+target_link_libraries(Bernoulli_SIR_MC PUBLIC ${COMMON_LIBRARIES} TBB::tbb DataFrame Common FROLS_Math graphlite FROLS_Network)
+
+#add_executable(Sycl_SIR_MC Sycl_SIR_MC.cpp)
+#target_link_libraries(Sycl_SIR_MC PUBLIC ${COMMON_LIBRARIES} TBB::tbb DataFrame Common FROLS_Math graphlite FROLS_Graph)
+#
 
 add_executable(Bernoulli_SIS_MC Bernoulli_SIS_MC.cpp)
-target_link_libraries(Bernoulli_SIS_MC PUBLIC ${COMMON_LIBRARIES} TBB::tbb DataFrame Common FROLS_Math graphlite FROLS_Graph)
+target_link_libraries(Bernoulli_SIS_MC PUBLIC ${COMMON_LIBRARIES} TBB::tbb DataFrame Common FROLS_Math graphlite FROLS_Network)
 
 # pybind11_add_module(Bernoulli_SIR_MC_Binder Binder.cpp)
 # target_link_libraries(Bernoulli_SIR_MC_Binder PUBLIC ${COMMON_LIBRARIES} OpenMP::OpenMP_CXX DataFrame Common FROLS_Math graphlite FROLS_Graph)

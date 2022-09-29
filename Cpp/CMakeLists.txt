@@ -21,33 +21,28 @@ list(REMOVE_ITEM importTargetsAfter ${importTargets})
 message("${importTargetsAfter}")
 find_package(SUNDIALS REQUIRED)
 find_package(pybind11 CONFIG)
-if (UNIX)
-    set(COMPUTECPP_DIR "/opt/ComputeCpp-CE/")
-endif ()
-
-include_directories("${COMPUTECPP_DIR}/include")
-link_directories("${COMPUTECPP_DIR}/lib")
 
 set(FROLS_USE_DPCPP ON)
 if (${FROLS_USE_DPCPP})
-    get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-    get_property(importTargetsAfter DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
+#    get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
+#    get_property(importTargetsAfter DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
     find_package(IntelDPCPP REQUIRED HINTS "/opt/intel/oneapi/compiler/2022.1.0/linux/IntelDPCPP")
 
     find_package(oneDPL REQUIRED HINTS "/opt/intel/oneapi/dpl/2021.7.0/lib/cmake/oneDPL/")
-    list(REMOVE_ITEM importTargetsAfter ${importTargets})
-    message(WARNING "${importTargetsAfter}")
+#    list(REMOVE_ITEM importTargetsAfter ${importTargets})
+#    message(WARNING "${importTargetsAfter}")
 #    set(CMAKE_CXX_COMPILER /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx)
 #    set(CMAKE_C_COMPILER /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icx)
     add_compile_definitions(FROLS_USE_DPCPP)
     add_compile_definitions(__DEVICE_SPIR64__)
     add_compile_options("-fsycl")
+#    add_compile_options("-cc1;-fnative-half-type;-fallow-half-arguments-and-returns")
 endif ()
 
 # find_package(nlohmann_json REQUIRED)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #if(UNIX)
 #cmake_policy(SET CMP0069 NEW)
@@ -84,7 +79,6 @@ FetchContent_Declare(
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
 )
-
 FetchContent_MakeAvailable(cppitertools_repo)
 
 set(COMMON_LIBRARIES "Common;FROLS_Math;DataFrame;FROLS_Eigen;cppitertools;graphlite")
