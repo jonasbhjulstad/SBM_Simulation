@@ -127,7 +127,7 @@ namespace FROLS::Graph {
     struct GraphContainer {
         GraphContainer(const std::array<V, NV> &vertices, const std::array<E, NE> &edges) : _vertices(vertices),
                                                                                             _edges(edges),
-                                                                                            edges(edges.data()) {
+                                                                                            m_data(_vertices.data()){
 
         }
 
@@ -171,7 +171,37 @@ namespace FROLS::Graph {
             return it.getPtr() - _vertices.begin();
         }
 
-    private:
+        const V &get_vertex(iterator it) {
+            return get_vertex(get_vertex_index(it));
+        }
+
+        const V &get_vertex(size_t idx) {
+            return _vertices[idx];
+        }
+
+        void assign_vertex(const V &v_data, size_t idx) {
+            _vertices[idx] = v_data;
+        }
+
+
+        iterator get_edge_iterator(size_t index) {
+            return iterator(&(_vertices.data() + index));
+        }
+
+        size_t get_edge_index(iterator it) {
+            return it.getPtr() - _vertices.begin();
+        }
+
+        const V &get_edge(iterator it) {
+            return get_edge(get_edge_index(it));
+        }
+
+        const V &get_edge(size_t idx) {
+            return _vertices[idx];
+        }
+
+
+    protected:
 
 
         V *m_data;
@@ -182,17 +212,24 @@ namespace FROLS::Graph {
     template<typename V, typename E, size_t NV, size_t NE>
     struct Graph : public GraphContainer<V, E, NV, NE> {
     public:
+        Graph(const std::array<V, NV> &vertices, const std::array<E, NE> &edges) : Base(vertices, edges) {}
         using Base = GraphContainer<V, E, NV, NE>;
         using iterator = typename Base::iterator;
         using Base::_vertices;
+
+
         std::views::_Filter get_neighbors(iterator iv) {
-            auto is_in_edge = [&iv](const E &edge) {
-                return (get_vertex_index(iv) == edge.to) || (get_vertex_index(iv) == edge.from);
+            auto is_in_edge = [&](const E &edge) {
+                return (this->get_vertex_index(iv) == edge.to) || (this->get_vertex_index(iv) == edge.from);
             };
-            return _vertices | std::views::filter(is_in_edge) | std::views::transform([&](const V& vertex){return iterator(vertex);});
+            return std::views::all(_vertices) | std::ranges::views::filter(is_in_edge) |
+                   std::views::transform([&](const V &vertex) { return iterator(vertex); });
         }
 
     };
+
+    template<typename V, typename E, size_t NV, size_t NE>
+    Graph(const std::array<V, NV> &vertices, const std::array<E, NE> &edges) -> Graph<V, E, NV, NE>;
 
 
 } // FROLS::Graph

@@ -103,7 +103,7 @@ namespace FROLS {
     std::vector<std::pair<size_t, T>> enumerate(const std::vector<T>& data)
     {
         std::vector<std::pair<size_t, T>> enumerated_data(data.size());
-        std::transform(data.begin(), data.end(), enumerated_data.begin(), [&, n= 0]
+        std::transform(data.begin(), data.end(), enumerated_data.begin(), [&, n= -1]
                 (const auto& d)mutable {return std::make_pair(n++, d);});
         return enumerated_data;
     }

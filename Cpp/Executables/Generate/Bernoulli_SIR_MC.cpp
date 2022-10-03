@@ -7,10 +7,11 @@ template <size_t Nt>
 void traj_to_file(const FROLS::MC_SIR_Params& p, const FROLS::MC_SIR_SimData<Nt>& d, size_t iter)
 {
     FROLS::DataFrame df;
-    std::array<double, Nt> p_Is;
-    std::array<double, Nt> p_Rs;
+    std::array<double, Nt+1> p_Is;
+    std::array<double, Nt+1> p_Rs;
     std::fill(p_Rs.begin(), p_Rs.end(), p.p_R);
     std::transform(d.p_vec.begin(), d.p_vec.end(), p_Is.begin(), [](const auto& pv){return pv.p_I;});
+    p_Is.back() = 0.;
     df.assign("S", d.traj[0]);
     df.assign("I", d.traj[1]);
     df.assign("R", d.traj[2]);
@@ -29,7 +30,7 @@ int main() {
 //    params[3].p_ER = 0.1;
 //    params[3].N_pop = 20;
     MC_SIR_Params p;
-    p.N_pop = 20;
+    p.N_pop = 1000;
     p.p_ER = 1.0;
 
     std::random_device rd{};
@@ -37,11 +38,19 @@ int main() {
     std::generate(seeds.begin(), seeds.end(), [&](){return rd();});
     auto enum_seeds = FROLS::enumerate(seeds);
     std::cout << "Running MC-SIR simulations..." << std::endl;
+    std::mutex mx;
+    size_t MC_iter = 0;
     std::for_each(std::execution::par_unseq, enum_seeds.begin(), enum_seeds.end(), [&](auto& es){
         size_t iter = es.first;
         size_t seed = es.second;
         auto simdata = MC_SIR_simulation<Nt>(p, seed);
         traj_to_file(p, simdata, iter);
+        std::lock_guard<std::mutex> lg(mx);
+        MC_iter++;
+        if (!(MC_iter % (p.N_sim / 10)))
+        {
+            std::cout << "Simulation " << MC_iter << " of " << p.N_sim << std::endl;
+        }
     });
 
     using namespace std::placeholders;

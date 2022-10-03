@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
     const size_t Nx = 3;
     const std::string network_type = "SIR";
     const std::vector<std::string> colnames = {"S", "I", "R"};
-    size_t N_sims = 7000; // 10000;
-    size_t N_pop = 500;
+    size_t N_sims = 995; // 10000;
+    size_t N_pop = 1000;
     double p_ER = 1.0;
     using namespace FROLS;
     using namespace std::placeholders;
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
     model.preselect("x0", 1.0, 0, FEATURE_PRESELECTED_IGNORE);
     model.preselect("x1", 1.0, 1, FEATURE_PRESELECTED_IGNORE);
     model.preselect("x2", 1.0, 2, FEATURE_PRESELECTED_IGNORE);
-    std::vector<size_t> ignore_idx = {6, 8, 9, 13};
+    std::vector<size_t> ignore_idx = {};//;{6, 8, 9, 13};
     std::for_each(ignore_idx.begin(), ignore_idx.end(), [&](auto& ig_idx){
         model.ignore(ig_idx);
     });

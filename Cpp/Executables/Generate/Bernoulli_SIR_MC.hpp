@@ -12,13 +12,13 @@
 
 namespace FROLS {
     struct MC_SIR_Params {
-        size_t N_pop = 20;
+        size_t N_pop = 1000;
         double p_ER = 1.0;
         double p_I0 = 0.2;
         double p_R0 = 0.0;
-        double p_I_max = .005;
+        double p_I_max = .0008;
         double p_I_min = .0;
-        size_t N_sim = 200;
+        size_t N_sim = 1000;
         size_t Nt_min = 15;
         double p_R = 0.1;
         size_t seed;
@@ -55,6 +55,7 @@ namespace FROLS {
         template <size_t Nt>
         MC_SIR_SimData<Nt> MC_SIR_simulation(const MC_SIR_Params &p, size_t seed)
         {
+
                 MC_SIR_SimData<Nt> data;
                 std::mt19937 generator(seed);
                 Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt> G(p.N_pop, p.p_ER, p.p_I0, p.p_R0, generator);

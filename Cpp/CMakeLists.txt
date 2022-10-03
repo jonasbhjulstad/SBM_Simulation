@@ -1,4 +1,4 @@
-set(ENABLE_TESTING OFF)
+set(ENABLE_TESTING ON)
 cmake_minimum_required(VERSION 3.5)
 project(FROLS)
 if (WIN32)

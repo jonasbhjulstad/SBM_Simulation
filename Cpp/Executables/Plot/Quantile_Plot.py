@@ -19,7 +19,7 @@ if __name__ == '__main__':
     else:
         network_type = "SIR"
         statenames = ["S", "I", "R"]
-    N_pop = 500
+    N_pop = 1000
         # read and plot all csv in ../data
         # data_path = "C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\data\\"
     cwd = os.path.dirname(os.path.realpath(__file__))
@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     qr_dfs = [pd.read_csv(qrf) for qrf in qr_files[:N_files]]
     er_dfs = [pd.read_csv(erf) for erf in er_files[:N_files]]
-
+    
     for j, df in enumerate(dfs):
         for i, name in enumerate(statenames):
             ax[i].plot(df["t"], df[name], color='gray', alpha=.2)
@@ -47,6 +47,7 @@ if __name__ == '__main__':
         if (np.any(df["t"] > 101)):
             a = 1
 
+    er_dfs = qr_dfs
     fig1, ax1 = plt.subplots(4)
     for (qr, er) in zip(qr_dfs, er_dfs):
         for i, name in enumerate(statenames):

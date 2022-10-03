@@ -24,10 +24,10 @@ if __name__ == '__main__':
         
 
     # find all csv in data_path
-    files = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_500_1_*.csv")
+    files = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_1000_1_*.csv")
     #sort q_files according to float in name
     fig, ax = plt.subplots(4)
-    dfs = [pd.read_csv(f, delimiter=",") for f in files[:2000]]
+    dfs = [pd.read_csv(f, delimiter=",") for f in files]
 
     I = np.zeros_like(dfs[0]["S"].to_numpy())
     for df in dfs:
