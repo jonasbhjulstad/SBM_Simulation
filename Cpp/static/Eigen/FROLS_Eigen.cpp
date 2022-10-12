@@ -53,6 +53,7 @@ namespace FROLS {
         return res;
     }
 
+
     Vec df_to_vec(const DataFrame &df, const std::string &col_name) {
         return Eigen::Map<Eigen::VectorXd>(df[col_name]->data(), df[col_name]->size());
     }

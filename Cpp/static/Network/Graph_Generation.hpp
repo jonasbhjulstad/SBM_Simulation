@@ -10,24 +10,23 @@
 #include <random>
 
 namespace Network_Models {
-    template<typename RNG, typename NodeProp>
-    void random_connect(graph_lite::Graph<int, NodeProp> &G, double p_ER, RNG &rng) {
+    template<typename Graph, typename RNG>
+    void random_connect(Graph &G, double p_ER, RNG &rng) {
         std::bernoulli_distribution d_ER(p_ER);
-        for (auto &&nodes: iter::combinations(G, 2)) {
+        for (auto &&v_idx: iter::combinations(FROLS::range(0, Graph::MAX_VERTICES), 2)) {
             if (d_ER(rng))
-                G.add_edge(nodes[0], nodes[1]);
+                G.add_edge(v_idx[0], v_idx[1]);
         }
     }
 
-    template<typename RNG, typename NodeProp>
-    graph_lite::Graph<int, NodeProp> generate_erdos_renyi(size_t N_pop,
-                                                          double p_ER,
-                                                          RNG &rng) {
-        using namespace graph_lite;
-        Graph<int, NodeProp> G;
-        NodeProp prop;
+    template<typename Graph, typename RNG>
+    Graph generate_erdos_renyi(size_t N_pop,
+                               double p_ER,
+                               const typename Graph::Vertex_Prop_t& node_prop,
+                               RNG &rng) {
+        Graph G;
         for (int i = 0; i < N_pop; i++) {
-            G.add_node_with_prop(i, prop);
+            G.add_vertex(i, node_prop);
         }
         random_connect(G, p_ER, rng);
         return G;

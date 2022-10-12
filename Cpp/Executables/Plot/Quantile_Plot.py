@@ -11,7 +11,7 @@ import sys
 # sys.path.insert(0, BINDER_DIR)
 # from pyFROLS import *
 
-if __name__ == '__main__':
+if __name__ == '__main__':  
     arglist = str(sys.argv)
     if (len(sys.argv) > 1):
         network_type = "SIS"
@@ -47,9 +47,9 @@ if __name__ == '__main__':
         if (np.any(df["t"] > 101)):
             a = 1
 
-    er_dfs = qr_dfs
+    # er_dfs = qr_dfs
     fig1, ax1 = plt.subplots(4)
-    for (qr, er) in zip(qr_dfs, er_dfs):
+    for (qr, er) in zip(er_dfs, er_dfs):
         for i, name in enumerate(statenames):
             ax1[i].plot(qr["t"][:-1], qr[name][:-1], color='k', alpha=.3)
             ax1[i].plot(er["t"][:-1], er[name][:-1], color='r', alpha=.3)

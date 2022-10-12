@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
     const size_t Nx = 3;
     const std::string network_type = "SIR";
     const std::vector<std::string> colnames = {"S", "I", "R"};
-    size_t N_sims = 995; // 10000;
-    size_t N_pop = 1000;
+    size_t N_sims = 500; // 10000;
+    size_t N_pop = 3000;
     double p_ER = 1.0;
     using namespace FROLS;
     using namespace std::placeholders;

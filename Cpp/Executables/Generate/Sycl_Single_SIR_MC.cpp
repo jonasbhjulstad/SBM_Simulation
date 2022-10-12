@@ -3,6 +3,7 @@
 #include <quantiles.hpp>
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_Graph.hpp>
+#include <oneapi/dpl/random>
 #include <functional>
 #include <CL/sycl.hpp>
 
@@ -43,9 +44,19 @@ int main() {
     std::random_device rd{};
     std::vector<size_t> seeds(p.N_sim);
     std::generate(seeds.begin(), seeds.end(), [&]() { return rd(); });
-    auto enum_seeds = FROLS::enumerate(seeds);
     std::mt19937_64 rng(rd());
     auto G = generate_erdos_renyi<SIR_Graph<NV, NE>, decltype(rng)>(p.N_pop, p.p_ER, SIR_S, rng);
+
+    oneapi::dpl::ranlux48 generator(seed);
+    Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(G_structure, p.p_I0, p.p_R0,
+                                                                             generator);
+    MC_SIR_SimData<Nt> data;
+    G.reset();
+    while (G.population_count()[1] == 0) {
+        G.initialize();
+    }
+
+    data.p_vec = generate_interaction_probabilities<decltype(generator), Nt>(p, generator);
 
     //list available sycl devices
     auto devices = cl::sycl::device::get_devices();
