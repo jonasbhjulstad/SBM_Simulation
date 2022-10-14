@@ -6,11 +6,11 @@
 #include <functional>
 #include <CL/sycl.hpp>
 
-template<size_t Nt>
-void traj_to_file(const FROLS::MC_SIR_Params &p, const FROLS::MC_SIR_SimData<Nt> &d, size_t iter) {
+template<size_t Nt, typename dType = float>
+void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<Nt> &d, size_t iter) {
     FROLS::DataFrame df;
-    std::array<double, Nt> p_Is;
-    std::array<double, Nt> p_Rs;
+    std::array<float, Nt> p_Is;
+    std::array<float, Nt> p_Rs;
     std::fill(p_Rs.begin(), p_Rs.end(), p.p_R);
     std::transform(d.p_vec.begin(), d.p_vec.end(), p_Is.begin(), [](const auto &pv) { return pv.p_I; });
     df.assign("S", d.traj[0]);
@@ -24,7 +24,7 @@ void traj_to_file(const FROLS::MC_SIR_Params &p, const FROLS::MC_SIR_SimData<Nt>
 }
 
 constexpr size_t N_pop = 20;
-constexpr double p_ER = 1.0;
+constexpr float p_ER = 1.0;
 constexpr size_t Nt = 20;
 constexpr size_t NV = N_pop;
 constexpr size_t NE = NV * NV;
@@ -36,7 +36,7 @@ int main() {
 //    params[2].p_ER = 0.1;
 //    params[3].p_ER = 0.1;
 //    params[3].N_pop = 20;
-    MC_SIR_Params p;
+    MC_SIR_Params<>p;
     p.N_pop = 20;
     p.p_ER = 1.0;
 
@@ -56,7 +56,7 @@ int main() {
     sycl::buffer<size_t, 1> seed_buffer{seeds.data(), sycl::range<1>(seeds.size())};
     std::vector<MC_SIR_SimData<Nt>> sim_data(p.N_sim);
     sycl::buffer<MC_SIR_SimData<Nt>, 1> sim_buffer{sim_data.data(), sycl::range<1>(sim_data.size())};
-    sycl::buffer<MC_SIR_Params, 1> param_buffer{&p, sycl::range<1>(1)};
+    sycl::buffer<MC_SIR_Params<>, 1> param_buffer{&p, sycl::range<1>(1)};
     sycl::buffer<SIR_Graph<NV, NE>, 1> graph_buffer{&G, sycl::range<1>(1)};
     std::cout << "Running MC-SIR simulations..." << std::endl;
     q.submit([&](sycl::handler &h) {
@@ -73,14 +73,16 @@ int main() {
     });
 
     std::for_each(sim_data.begin(), sim_data.end(), [&, n=0](auto &sim) mutable{
-        traj_to_file(p, sim, n++);
+        traj_to_file<Nt>(p, sim, n++);
     });
+
+
 
     using namespace std::placeholders;
     const std::vector<std::string> colnames = {"S", "I", "R"};
     auto MC_fname_f = std::bind(MC_filename, p.N_pop, p.p_ER, _1, "SIR");
     auto q_fname_f = std::bind(quantile_filename, p.N_pop, p.p_ER, _1, "SIR");
-    quantiles_to_file(p.N_sim, colnames, MC_fname_f, q_fname_f);
+    // quantiles_to_file(p.N_sim, colnames, MC_fname_f, q_fname_f);
 
     return 0;
 }

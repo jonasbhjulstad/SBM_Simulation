@@ -10,8 +10,8 @@
 #include <random>
 
 namespace Network_Models {
-    template<typename Graph, typename RNG>
-    void random_connect(Graph &G, double p_ER, RNG &rng) {
+    template<typename Graph, typename RNG, typename dType=float>
+    void random_connect(Graph &G, dType p_ER, RNG &rng) {
         std::bernoulli_distribution d_ER(p_ER);
         for (auto &&v_idx: iter::combinations(FROLS::range(0, Graph::MAX_VERTICES), 2)) {
             if (d_ER(rng))
@@ -19,9 +19,9 @@ namespace Network_Models {
         }
     }
 
-    template<typename Graph, typename RNG>
+    template<typename Graph, typename RNG, typename dType=float>
     Graph generate_erdos_renyi(size_t N_pop,
-                               double p_ER,
+                               dType p_ER,
                                const typename Graph::Vertex_Prop_t& node_prop,
                                RNG &rng) {
         Graph G;

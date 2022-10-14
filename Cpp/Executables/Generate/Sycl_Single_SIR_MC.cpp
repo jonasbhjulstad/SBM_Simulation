@@ -8,7 +8,7 @@
 #include <CL/sycl.hpp>
 
 template<size_t Nt>
-void traj_to_file(const FROLS::MC_SIR_Params &p, const FROLS::MC_SIR_SimData<Nt> &d, size_t iter) {
+void traj_to_file(const FROLS::MC_SIR_Params<>&p, const FROLS::MC_SIR_SimData<Nt> &d, size_t iter) {
     FROLS::DataFrame df;
     std::array<double, Nt> p_Is;
     std::array<double, Nt> p_Rs;
@@ -37,7 +37,7 @@ int main() {
 //    params[2].p_ER = 0.1;
 //    params[3].p_ER = 0.1;
 //    params[3].N_pop = 20;
-    MC_SIR_Params p;
+    MC_SIR_Params<>p;
     p.N_pop = 20;
     p.p_ER = 1.0;
 

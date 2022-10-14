@@ -21,90 +21,94 @@ namespace Network_Models {
     struct SIR_Edge {
     };
 
-    struct SIR_Param {
-        double p_I;
-        double p_R;
+    template <typename dType=float>
+    struct SIR_Param{
+        dType p_I;
+        dType p_R;
         size_t Nt_min;
         size_t N_I_min;
     };
-    template<size_t NV, size_t NE>
+    template<size_t NV, size_t NE, typename dType=float>
     using SIR_Graph = FROLS::Graph::Graph<SIR_State, SIR_Edge, NV, NE>;
 
-    template<typename RNG, size_t Nt, size_t NV, size_t NE>
-    struct SIR_Bernoulli_Network : public Network<SIR_Param, 3, Nt, SIR_Bernoulli_Network<RNG, Nt, NV, NE>> {
+    template<typename RNG, size_t Nt, size_t NV, size_t NE, typename dType=float>
+    struct SIR_Bernoulli_Network : public Network<SIR_Param<>, 3, Nt, SIR_Bernoulli_Network<RNG, Nt, NV, NE>> {
         using Vertex_t = typename SIR_Graph<NV, NE>::Vertex_t;
         using Edge_t = typename SIR_Graph<NV, NE>::Edge_t;
         using Edge_Prop_t = typename SIR_Graph<NV, NE>::Edge_Prop_t;
         using Vertex_Prop_t = typename SIR_Graph<NV, NE>::Vertex_Prop_t;
-        const double p_I0;
-        const double p_R0;
+        const dType p_I0;
+        const dType p_R0;
         const size_t t = 0;
 
-        SIR_Bernoulli_Network(const SIR_Graph<NV, NE> &G, double p_I0, double p_R0, RNG rng) : G(G), rng(rng),
+        SIR_Bernoulli_Network(const SIR_Graph<NV, NE> &G, dType p_I0, dType p_R0, RNG rng) : G(G), rng(rng),
                                                                                                p_I0(p_I0), p_R0(p_R0) {}
 
         void initialize() {
 #ifdef FROLS_USE_DPCPP
-            using oneapi::dpl::bernoulli_distribution;
+            using oneapi::dpl::uniform_real_distribution;
 #else
-            using std::bernoulli_distribution;
+            using std::uniform_real_distribution;
 #endif
-            bernoulli_distribution d_I(p_I0);
-            bernoulli_distribution d_R(p_R0);
+            uniform_real_distribution<dType> d_I;
+            uniform_real_distribution<dType> d_R;
             for(auto& v: G)
             {
-                SIR_State state = d_I(rng) ? SIR_I : SIR_S;
-                state = d_R(rng) ? SIR_R : state;
+                SIR_State state = d_I(rng) < p_I0 ? SIR_I : SIR_S;
+                state = d_R(rng) < p_R0 ? SIR_R : state;
                 v.data = state;
             }
         }
 
         std::array<size_t, 3> population_count() {
             std::array<size_t, 3> count = {0, 0, 0};
-            for (const auto& v: G)
-            {
+            std::for_each(G.begin(), G.end(), [&count](const Vertex_t &v) {
                 count[v.data]++;
-            }
+            });
             return count;
         }
 
 // function for infection step
-        void infection_step(double p_I) {
+        void infection_step(dType p_I) {
 
 #ifdef FROLS_USE_DPCPP
-            using oneapi::dpl::bernoulli_distribution;
+            using oneapi::dpl::uniform_real_distribution;
 #else
-            using std::bernoulli_distribution;
+            using std::uniform_real_distribution;
 #endif
-            bernoulli_distribution d_I(p_I);
+            uniform_real_distribution<dType> d_I;
 
+            //print distance between G.begin() and G.end/()
+            std::cout << std::distance(G.begin(), G.end()) << std::endl;
             std::for_each(G.begin(), G.end(), [&](auto v0) {
                 if (v0.data == SIR_I) {
                     for (const auto &v: G.neighbors(v0.id)) {
-                        G.assign(v.id, ((v.data == SIR_S) && d_I(rng)) ? SIR_I : v.data);
+                        G.assign(v.id, ((v.data == SIR_S) && (d_I(rng) < p_I)) ? SIR_I : v.data);
                     };
                 }
             });
         }
 
-        void recovery_step(double p_R) {
+        void recovery_step(dType p_R) {
 #ifdef FROLS_USE_DPCPP
-            using oneapi::dpl::bernoulli_distribution;
+            using oneapi::dpl::uniform_real_distribution;
 #else
-            using std::bernoulli_distribution;
+            using std::uniform_real_distribution;
 #endif
-            bernoulli_distribution d_R(p_R);
-            for (const auto &v: G) {
-                G.assign(v.id, ((v.data == SIR_I) && d_R(rng)) ? SIR_R : v.data);
-            }
+            uniform_real_distribution<dType> d_R;
+            std::for_each(G.begin(), G.end(), [&](const auto& v)
+            {
+                bool recover_trigger = (v.data == SIR_I) && d_R(rng) < p_R;
+                G.assign(v.id, (recover_trigger) ? SIR_R : v.data);
+            });
         }
 
-        bool terminate(const SIR_Param &p, const std::array<size_t, 3> &x) {
+        bool terminate(const SIR_Param<>&p, const std::array<size_t, 3> &x) {
             bool early_termination = ((t > p.Nt_min) && x[1] < p.N_I_min);
             return early_termination || (t >= Nt);
         }
 
-        void advance(const SIR_Param &p) {
+        void advance(const SIR_Param<>&p) {
             infection_step(p.p_I);
             recovery_step(p.p_R);
         }

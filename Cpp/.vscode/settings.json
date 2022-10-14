@@ -1,5 +1,18 @@
 {
-    "C_Cpp.default.configurationProvider": "go2sh.cmake-integration",
+        "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+        "cmake.configureOnOpen": true,
+        "cmake.debugConfig": 
+        {
+            "stopAtEntry": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/intel/oneapi/debugger/latest/gdb/intel64/bin/gdb-oneapi",
+            "logging": {
+                "trace": true,
+                "engineLogging": true,
+                "traceResponse": true
+            }
+        },
+    
     "files.associations": {
         "dense": "cpp",
         "geometry": "cpp",

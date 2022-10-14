@@ -330,6 +330,8 @@ namespace FROLS::Graph {
             const std::array<V, NV> &vertices,
             const std::array<E, NE> &edges) -> Graph<V, E, NV, NE>;
 
+    
+
 
 } // FROLS::Graph
 

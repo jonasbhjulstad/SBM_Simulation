@@ -2,7 +2,7 @@
     "configurations": [
         {
             "compileCommands": "${workspaceFolder}/build/compile_commands.json",
-            "configurationProvider": "go2sh.cmake-integration",
+            "configurationProvider": "ms-vscode.cmake-tools",
             "includePath": [
                 "${workspaceFolder}/include",
                 "${workspaceFolder}/static"
