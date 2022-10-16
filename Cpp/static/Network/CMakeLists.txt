@@ -1,3 +1,3 @@
 add_library(FROLS_Network INTERFACE Graph_Generation.hpp SIR_Bernoulli_Network.hpp)
 target_include_directories(FROLS_Network INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(FROLS_Network INTERFACE graphlite FROLS_Math cppitertools FROLS_Graph)
+target_link_libraries(FROLS_Network INTERFACE graphlite FROLS_Math cppitertools FROLS_Graph ${ONEAPI_LIBS})

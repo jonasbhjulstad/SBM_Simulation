@@ -3,7 +3,7 @@
 #include <quantiles.hpp>
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_Graph.hpp>
-#include <oneapi/dpl/random>
+#include <FROLS_Random.hpp>
 #include <functional>
 #include <CL/sycl.hpp>
 
@@ -33,10 +33,6 @@ constexpr size_t NE = NV * NV;
 int main() {
     using namespace FROLS;
     using namespace Network_Models;
-//    params[1].N_pop = 20;
-//    params[2].p_ER = 0.1;
-//    params[3].p_ER = 0.1;
-//    params[3].N_pop = 20;
     MC_SIR_Params<>p;
     p.N_pop = 20;
     p.p_ER = 1.0;
@@ -45,9 +41,9 @@ int main() {
     std::vector<size_t> seeds(p.N_sim);
     std::generate(seeds.begin(), seeds.end(), [&]() { return rd(); });
     std::mt19937_64 rng(rd());
-    auto G = generate_erdos_renyi<SIR_Graph<NV, NE>, decltype(rng)>(p.N_pop, p.p_ER, SIR_S, rng);
+    auto G_structure = generate_erdos_renyi<SIR_Graph<NV, NE>, decltype(rng)>(p.N_pop, p.p_ER, SIR_S, rng);
 
-    oneapi::dpl::ranlux48 generator(seed);
+    oneapi::dpl::ranlux48 generator(seeds[0]);
     Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(G_structure, p.p_I0, p.p_R0,
                                                                              generator);
     MC_SIR_SimData<Nt> data;
@@ -67,8 +63,8 @@ int main() {
     sycl::buffer<size_t, 1> seed_buffer{seeds.data(), sycl::range<1>(seeds.size())};
     std::vector<MC_SIR_SimData<Nt>> sim_data(p.N_sim);
     sycl::buffer<MC_SIR_SimData<Nt>, 1> sim_buffer{sim_data.data(), sycl::range<1>(sim_data.size())};
-    sycl::buffer<MC_SIR_Params, 1> param_buffer{&p, sycl::range<1>(1)};
-    sycl::buffer<SIR_Graph<NV, NE>, 1> graph_buffer{&G, sycl::range<1>(1)};
+    sycl::buffer<MC_SIR_Params<>, 1> param_buffer{&p, sycl::range<1>(1)};
+    sycl::buffer<SIR_Graph<NV, NE>, 1> graph_buffer{&G_structure, sycl::range<1>(1)};
     std::cout << "Running MC-SIR simulations..." << std::endl;
     q.submit([&](sycl::handler &h) {
         auto seed = seed_buffer.template get_access<sycl::access_mode::read>(h);

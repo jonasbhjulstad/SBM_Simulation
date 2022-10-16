@@ -5,13 +5,12 @@
 #include "Network.hpp"
 #include <FROLS_Math.hpp>
 #include <FROLS_Graph.hpp>
+#include <FROLS_Random.hpp>
 #include <graph_lite.h>
-#include <random>
 #include <stddef.h>
-#include <oneapi/dpl/random>
 #include <utility>
 #include <vector>
-#include <execution>
+#include <FROLS_Execution.hpp>
 #include <ranges>
 
 namespace Network_Models {
@@ -45,13 +44,9 @@ namespace Network_Models {
                                                                                                p_I0(p_I0), p_R0(p_R0) {}
 
         void initialize() {
-#ifdef FROLS_USE_INTEL_SYCL
-            using oneapi::dpl::uniform_real_distribution;
-#else
-            using std::uniform_real_distribution;
-#endif
-            uniform_real_distribution<dType> d_I;
-            uniform_real_distribution<dType> d_R;
+
+            FROLS::random::uniform_real_distribution<dType> d_I;
+            FROLS::random::uniform_real_distribution<dType> d_R;
             for(auto& v: G)
             {
                 SIR_State state = d_I(rng) < p_I0 ? SIR_I : SIR_S;
@@ -71,15 +66,10 @@ namespace Network_Models {
 // function for infection step
         void infection_step(dType p_I) {
 
-#ifdef FROLS_USE_INTEL_SYCL
-            using oneapi::dpl::uniform_real_distribution;
-#else
-            using std::uniform_real_distribution;
-#endif
-            uniform_real_distribution<dType> d_I;
+            FROLS::random::uniform_real_distribution<dType> d_I;
 
             //print distance between G.begin() and G.end/()
-            std::cout << std::distance(G.begin(), G.end()) << std::endl;
+            // std::cout << std::distance(G.begin(), G.end()) << std::endl;
             std::for_each(G.begin(), G.end(), [&](auto v0) {
                 if (v0.data == SIR_I) {
                     for (const auto &v: G.neighbors(v0.id)) {
@@ -90,12 +80,8 @@ namespace Network_Models {
         }
 
         void recovery_step(dType p_R) {
-#ifdef FROLS_USE_INTEL_SYCL
-            using oneapi::dpl::uniform_real_distribution;
-#else
-            using std::uniform_real_distribution;
-#endif
-            uniform_real_distribution<dType> d_R;
+
+            FROLS::random::uniform_real_distribution<dType> d_R;
             std::for_each(G.begin(), G.end(), [&](const auto& v)
             {
                 bool recover_trigger = (v.data == SIR_I) && d_R(rng) < p_R;

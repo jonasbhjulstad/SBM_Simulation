@@ -3,9 +3,9 @@
 #include <quantiles.hpp>
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_Graph.hpp>
+#include <FROLS_Execution.hpp>
 #include <functional>
 // #include <oneapi/dpl/algorithm>
-#include <oneapi/dpl/execution>
 template <size_t Nt, typename dType=float>
 void traj_to_file(const FROLS::MC_SIR_Params<>& p, const FROLS::MC_SIR_SimData<Nt>& d, size_t iter)
 {
@@ -45,7 +45,7 @@ int main() {
     std::random_device rd{};
     std::vector<size_t> seeds(p.N_sim);
     std::generate(seeds.begin(), seeds.end(), [&](){return rd();});
-    auto enum_seeds = FROLS::enumerate(seeds);
+    auto enum_seeds = enumerate(seeds);
     std::cout << "Running MC-SIR simulations..." << std::endl;
     std::mutex mx;
     size_t MC_iter = 0;

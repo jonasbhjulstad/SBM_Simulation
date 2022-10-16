@@ -1,7 +1,7 @@
 
 function(add_regression source_file)
 add_executable(${source_file} "${source_file}.cpp")
-target_link_libraries(${source_file} PUBLIC Common Eigen3::Eigen TBB::tbb Regressors FROLS_Math Features DataFrame FROLS_Eigen graphlite)
+target_link_libraries(${source_file} PUBLIC Common Eigen3::Eigen ${ONEAPI_LIBS} Regressors FROLS_Math Features DataFrame FROLS_Eigen graphlite)
 endfunction()
 if (${ortools_FOUND})
 add_regression(Quantile_Response)

@@ -1,7 +1,5 @@
 #include "Regressor.hpp"
-#include <omp.h>
-#include <algorithm>
-#include <execution>
+#include <FROLS_Execution.hpp>
 #include <fmt/format.h>
 
 namespace FROLS::Regression {
@@ -128,7 +126,7 @@ namespace FROLS::Regression {
         size_t N_response = Y.cols();
         std::vector<std::vector<Feature>> result(N_response);
         auto cols = Y.colwise();
-        std::transform(std::execution::par_unseq, cols.begin(), cols.end(), result.begin(),
+        std::transform(FROLS::execution::par_unseq, cols.begin(), cols.end(), result.begin(),
                        [=](const auto &yi) { return this->single_fit(X, yi); });
         return result;
     }

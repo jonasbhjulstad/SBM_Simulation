@@ -23,9 +23,10 @@ list(REMOVE_ITEM importTargetsAfter ${importTargets})
 message("${importTargetsAfter}")
 find_package(SUNDIALS REQUIRED)
 find_package(pybind11 CONFIG)
-
-set(FROLS_USE_INTEL_SYCL OFF)
-set(FROLS_USE_HIPSYCL ON)
+set(FROLS_USE_INTEL_SYCL ON)
+set(FROLS_USE_HIPSYCL OFF)
+find_package(TBB)
+set(ONEAPI_LIBS TBB::tbb)
 
 if(${FROLS_USE_INTEL_SYCL})
     # get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
@@ -34,7 +35,10 @@ if(${FROLS_USE_INTEL_SYCL})
     set(TBB_DIR "/opt/intel/oneapi/tbb/latest/lib/cmake/tbb
 /")
     find_package(TBB REQUIRED)
+    
     find_package(oneDPL REQUIRED HINTS "/opt/intel/oneapi/dpl/2021.7.0/lib/cmake/oneDPL/")
+
+    set(ONEAPI_LIBS oneDPL TBB::tbb)
 
     # list(REMOVE_ITEM importTargetsAfter ${importTargets})
     # message(WARNING "${importTargetsAfter}")
@@ -43,6 +47,9 @@ if(${FROLS_USE_INTEL_SYCL})
     add_compile_definitions(FROLS_USE_INTEL_SYCL)
     add_compile_definitions(__DEVICE_SPIR64__)
     add_compile_options("-fsycl")
+    add_compile_definitions(FROLS_USE_SYCL)
+    set(FROLS_USE_SYCL ON)
+
 elseif(${FROLS_USE_HIPSYCL})
 set(CMAKE_C_COMPILER_WORKS ON)
 set(CMAKE_CXX_COMPILER_WORKS ON)
@@ -70,10 +77,13 @@ set(CMAKE_CXX_COMPILER_WORKS ON)
     endif()
 
     add_compile_definitions(FROLS_USE_HIPSYCL)
+    add_compile_definitions(FROLS_USE_SYCL)
+    set(FROLS_USE_SYCL ON)
 
     # add_compile_definitions(__HIPSYCL_ENABLE_SYCL_TARGET__)
     add_compile_options("-fsycl")
-endif()
+
+    endif()
 
 # find_package(nlohmann_json REQUIRED)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

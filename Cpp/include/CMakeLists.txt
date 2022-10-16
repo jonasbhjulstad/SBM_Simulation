@@ -1,6 +1,3 @@
 add_library(Common STATIC FROLS_Path_Config.cpp FROLS_Execution.hpp)
 target_include_directories(Common INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>")
 target_link_libraries(Common INTERFACE Eigen3::Eigen)
-if (FROLS_USE_INTEL_SYCL)
-    target_link_libraries(Common INTERFACE oneDPL TBB::tbb)
-endif ()

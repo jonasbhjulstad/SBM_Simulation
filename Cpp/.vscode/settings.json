@@ -114,6 +114,10 @@
     // "C_Cpp.intelliSenseEngine": "Disabled",
     "C_Cpp.intelliSenseEngineFallback": "Disabled",
     "cmake.parallelJobs": 4,
-	"settings": {"files.exclude": {"data/**"}}
+    //exclude data and build folders from search
+    "search.exclude": {
+        "**/data": true,
+        "**/build": true
+    },
 
 }

@@ -4,7 +4,6 @@
 #include <iomanip>
 #include <iostream>
 #include <itertools.hpp>
-#include <omp.h>
 namespace FROLS::Features {
 
 

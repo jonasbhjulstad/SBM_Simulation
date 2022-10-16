@@ -2,11 +2,11 @@
 #define FROLS_BERNOULLI_SIR_MC_HPP
 
 #include <FROLS_Path_Config.hpp>
+#include <FROLS_Random.hpp>
 #include <quantiles.hpp>
 #include <FROLS_Math.hpp>
 #include <FROLS_Eigen.hpp>
 #include <SIR_Bernoulli_Network.hpp>
-#include "Bernoulli_SIR_File.hpp"
 #include <graph_lite.h>
 
 
@@ -29,18 +29,14 @@ namespace FROLS {
         size_t iter_offset = 0;
         dType csv_termination_tol = 0.f;
     };
+#include "Bernoulli_SIR_File.hpp"
 
     template<typename RNG, size_t Nt,typename dType=float>
     std::array<Network_Models::SIR_Param<>, Nt> generate_interaction_probabilities(const MC_SIR_Params<> &p, RNG &rng) {
         std::array<Network_Models::SIR_Param<>, Nt> param_vec;
         dType omega_bounds[] = {(2.f * M_PIf) / 5.f, (2.f * M_PIf) / 100.f};
-#ifdef FROLS_USE_INTEL_SYCL
-        using oneapi::dpl::uniform_real_distribution;
-#else
-        using std::uniform_real_distribution;
-#endif
-        uniform_real_distribution<dType> d_omega(omega_bounds[0], omega_bounds[1]);
-        uniform_real_distribution<dType> d_offset(0.f, 2.f * M_PIf);
+        random::uniform_real_distribution<dType> d_omega(omega_bounds[0], omega_bounds[1]);
+        random::uniform_real_distribution<dType> d_offset(0.f, 2.f * M_PIf);
         dType offset = d_offset(rng);
         dType R0_mean = (p.R0_max - p.R0_min) / 2.f + p.R0_min;
         dType R0_std = R0_mean - p.R0_min;
@@ -49,7 +45,7 @@ namespace FROLS {
         std::for_each(param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable {
             dType R0 = R0_mean + R0_std * std::sin(omega * t + offset);
 //            p_SIR.p_I = 1 - exp(-R0*p.alpha/p.N_pop);
-            p_SIR.p_I = R0 / p.N_pop;
+            p_SIR.p_I = R0 / p.N_pop *10;
             p_SIR.p_R = 1 - std::exp(-p.alpha);
             t++;
         });
@@ -65,11 +61,8 @@ namespace FROLS {
     template<size_t Nt, size_t NV, size_t NE>
     MC_SIR_SimData<Nt>
     MC_SIR_simulation(const Network_Models::SIR_Graph<NV, NE> &G_structure, const MC_SIR_Params<>&p, size_t seed) {
-#ifdef FROLS_USE_INTEL_SYCL
-        oneapi::dpl::ranlux48 generator(seed);
-#else
-        std::mt19937 generator(seed);
-#endif
+
+        random::default_rng generator(seed);
         Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(G_structure, p.p_I0, p.p_R0,
                                                                                  generator);
         MC_SIR_SimData<Nt> data;

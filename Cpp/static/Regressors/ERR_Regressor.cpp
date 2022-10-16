@@ -1,6 +1,6 @@
 #include "ERR_Regressor.hpp"
 #include <vector>
-#include <execution>
+#include <FROLS_Execution.hpp>
 
 namespace FROLS::Regression {
 
@@ -8,7 +8,7 @@ namespace FROLS::Regression {
                                                              const std::vector<Feature> &used_features) const {
         std::vector<size_t> candidate_idx = unused_feature_indices(used_features, X.cols());
         std::vector<Feature> candidates(X.cols() - used_features.size());
-        std::transform(std::execution::par_unseq,candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
+        std::transform(FROLS::execution::par_unseq,candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
                        [&](const size_t &idx) {
                            Feature f = single_feature_regression(X.col(idx), y);
                            f.index = idx;

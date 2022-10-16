@@ -9,8 +9,8 @@ namespace FROLS
 
         static std::thread::id thread_0 = std::this_thread::get_id();
 
-        FROLS::DataFrame df;
-        FROLS::DataFrame delta_df;
+        DataFrame df;
+        DataFrame delta_df;
         std::vector<std::string> colnames = {"S", "I", "R"};
 
         std::mt19937 generator(p.seed);
@@ -41,7 +41,7 @@ namespace FROLS
             df.assign("R", traj[2]);
             df.assign("p_I", p_Is);
             df.assign("p_R", p_Rs);
-            df.assign("t", FROLS::range(0, Nt + 1));
+            df.assign("t", range(0, Nt + 1));
             df.write_csv(MC_filename(p.N_pop, p.p_ER, i + p.iter_offset, "SIR"),
                          ",", p.csv_termination_tol);
 
@@ -50,7 +50,7 @@ namespace FROLS
             delta_df.assign("R", diff<Nt + 1, size_t, int>(traj[2]));
             delta_df.assign("p_I", p_Is);
             delta_df.assign("p_R", p_Rs);
-            delta_df.assign("t", FROLS::range(0, Nt));
+            delta_df.assign("t", range(0, Nt));
             delta_df.write_csv(MC_filename(p.N_pop, p.p_ER, i + p.iter_offset, "SIR_Delta"),
                                ",", p.csv_termination_tol);
         }
@@ -78,7 +78,7 @@ namespace FROLS
             }
             auto p_vec = generate_interaction_probabilities<decltype(generator), Nt>(p, generator);
             auto traj = G.simulate(p_vec, p.N_I_min, p.Nt_min);
-            auto [p_I_vec, p_R_vec] = FROLS::unzip(p_vec);
+            auto [p_I_vec, p_R_vec] = unzip(p_vec);
             std::array<dType, Nt> p_Is;
             std::transform(p_vec.begin(), p_vec.end(), p_Is.begin(), [](const auto &pv)
                            { return pv.p_I; });
