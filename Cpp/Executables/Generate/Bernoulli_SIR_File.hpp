@@ -1,6 +1,6 @@
 #ifndef BERNOULLI_SIR_FILE_HPP
 #define BERNOULLI_SIR_FILE_HPP
-#ifndef FROLS_USE_DPCPP
+#ifndef FROLS_USE_INTEL_SYCL
 namespace FROLS
 {
     template <size_t Nt, size_t NV, size_t NE, typename dType = float>

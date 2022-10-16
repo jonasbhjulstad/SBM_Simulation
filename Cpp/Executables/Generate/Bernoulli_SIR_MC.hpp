@@ -34,7 +34,7 @@ namespace FROLS {
     std::array<Network_Models::SIR_Param<>, Nt> generate_interaction_probabilities(const MC_SIR_Params<> &p, RNG &rng) {
         std::array<Network_Models::SIR_Param<>, Nt> param_vec;
         dType omega_bounds[] = {(2.f * M_PIf) / 5.f, (2.f * M_PIf) / 100.f};
-#ifdef FROLS_USE_DPCPP
+#ifdef FROLS_USE_INTEL_SYCL
         using oneapi::dpl::uniform_real_distribution;
 #else
         using std::uniform_real_distribution;
@@ -65,7 +65,7 @@ namespace FROLS {
     template<size_t Nt, size_t NV, size_t NE>
     MC_SIR_SimData<Nt>
     MC_SIR_simulation(const Network_Models::SIR_Graph<NV, NE> &G_structure, const MC_SIR_Params<>&p, size_t seed) {
-#ifdef FROLS_USE_DPCPP
+#ifdef FROLS_USE_INTEL_SYCL
         oneapi::dpl::ranlux48 generator(seed);
 #else
         std::mt19937 generator(seed);

@@ -45,7 +45,7 @@ namespace Network_Models {
                                                                                                p_I0(p_I0), p_R0(p_R0) {}
 
         void initialize() {
-#ifdef FROLS_USE_DPCPP
+#ifdef FROLS_USE_INTEL_SYCL
             using oneapi::dpl::uniform_real_distribution;
 #else
             using std::uniform_real_distribution;
@@ -71,7 +71,7 @@ namespace Network_Models {
 // function for infection step
         void infection_step(dType p_I) {
 
-#ifdef FROLS_USE_DPCPP
+#ifdef FROLS_USE_INTEL_SYCL
             using oneapi::dpl::uniform_real_distribution;
 #else
             using std::uniform_real_distribution;
@@ -90,7 +90,7 @@ namespace Network_Models {
         }
 
         void recovery_step(dType p_R) {
-#ifdef FROLS_USE_DPCPP
+#ifdef FROLS_USE_INTEL_SYCL
             using oneapi::dpl::uniform_real_distribution;
 #else
             using std::uniform_real_distribution;
