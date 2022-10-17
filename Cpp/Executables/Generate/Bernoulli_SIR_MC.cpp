@@ -25,11 +25,11 @@ void traj_to_file(const FROLS::MC_SIR_Params<>& p, const FROLS::MC_SIR_SimData<N
     df.write_csv(FROLS::MC_filename(p.N_pop, p.p_ER, iter, "SIR"),
                  ",", p.csv_termination_tol);
 }
-constexpr size_t N_pop = 20;
+constexpr size_t N_pop = 2000;
 constexpr float p_ER = 1.0;
 constexpr size_t Nt = 20;
 constexpr size_t NV = N_pop;
-constexpr size_t NE = NV*NV;
+constexpr size_t NE = NV*10;
 int main() {
     using namespace FROLS;
     using namespace Network_Models;

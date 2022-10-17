@@ -13,9 +13,18 @@ namespace Network_Models {
     template<typename Graph, typename RNG, typename dType=float>
     void random_connect(Graph &G, dType p_ER, RNG &rng) {
         std::bernoulli_distribution d_ER(p_ER);
+        size_t N_edges = 0;
         for (auto &&v_idx: iter::combinations(FROLS::range(0, Graph::MAX_VERTICES), 2)) {
             if (d_ER(rng))
+            {
                 G.add_edge(v_idx[0], v_idx[1]);
+                N_edges++;
+                if (N_edges == Graph::MAX_EDGES)
+                {
+                    std::cout << "Warning: max edges reached" << std::endl;
+                    return;
+                }
+            }
         }
     }
 

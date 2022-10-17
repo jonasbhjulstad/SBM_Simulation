@@ -73,7 +73,10 @@ namespace Network_Models {
             std::for_each(G.begin(), G.end(), [&](auto v0) {
                 if (v0.data == SIR_I) {
                     for (const auto &v: G.neighbors(v0.id)) {
-                        G.assign(v.id, ((v.data == SIR_S) && (d_I(rng) < p_I)) ? SIR_I : v.data);
+                        bool trigger = d_I(rng) < p_I;
+                        if (v.data == SIR_S && trigger) {
+                        }
+                        G.assign(v.id, ((v.data == SIR_S) && (trigger)) ? SIR_I : v.data);
                     };
                 }
             });

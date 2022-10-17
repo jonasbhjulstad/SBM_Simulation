@@ -15,7 +15,7 @@ namespace FROLS {
     struct MC_SIR_Params{
         size_t N_pop = 100;
         dType p_ER = 1.0f;
-        dType p_I0 = 0.2f;
+        dType p_I0 = 0.01f;
         dType p_R0 = 0.0f;
         dType R0_max = 1.6f;
         dType R0_min = 0.0f;
@@ -45,7 +45,7 @@ namespace FROLS {
         std::for_each(param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable {
             dType R0 = R0_mean + R0_std * std::sin(omega * t + offset);
 //            p_SIR.p_I = 1 - exp(-R0*p.alpha/p.N_pop);
-            p_SIR.p_I = R0 / p.N_pop *10;
+            p_SIR.p_I = R0 / p.N_pop;
             p_SIR.p_R = 1 - std::exp(-p.alpha);
             t++;
         });

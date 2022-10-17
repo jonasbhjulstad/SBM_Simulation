@@ -14,6 +14,10 @@ function(add_custom_test source_file)
     target_compile_options(${source_file} PRIVATE "-Wfatal-errors")
 endfunction()
 
+# add_custom_executable(neighbor_test)
+# #link frols_network
+# target_link_libraries(neighbor_test PUBLIC FROLS_Graph FROLS_Network)
+# target_include_directories(neighbor_test PUBLIC "../Executables/Generate/")
 
 add_custom_test(Graph_Iterators)
 target_include_directories(Graph_Iterators PUBLIC "../static/Graph/")

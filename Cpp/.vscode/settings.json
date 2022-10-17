@@ -1,17 +1,6 @@
 {
         "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
         "cmake.configureOnOpen": true,
-        "cmake.debugConfig": 
-        {
-            "stopAtEntry": false,
-            "MIMode": "gdb",
-            "miDebuggerPath": "/opt/intel/oneapi/debugger/latest/gdb/intel64/bin/gdb-oneapi",
-            "logging": {
-                "trace": true,
-                "engineLogging": true,
-                "traceResponse": true
-            }
-        },
     
     "files.associations": {
         "dense": "cpp",
@@ -108,7 +97,8 @@
         "spanstream": "cpp",
         "stacktrace": "cpp",
         "syncstream": "cpp",
-        "hash_map": "cpp"
+        "hash_map": "cpp",
+        "*.inc": "cpp"
     },
     "cmake.showConsoleAutomatically": true,
     // "C_Cpp.intelliSenseEngine": "Disabled",
