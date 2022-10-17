@@ -10,7 +10,7 @@
 #include <random>
 using namespace FROLS;
 template<typename RNG>
-Vec linsys_step(const Mat &A, const Mat &b, const Vec &x, const Vec &u, double b_std, RNG &rng) {
+Vec linsys_step(const Mat &A, const Mat &b, const Vec &x, const Vec &u, float b_std, RNG &rng) {
     std::normal_distribution<> d_b{0, b_std};
     Mat b_stochastic = b.array() + d_b(rng);
     return A * x + (b + b_stochastic) * u;
@@ -38,12 +38,12 @@ int main() {
     std::cout << "x0:\n" << x0 << "\n";
     std::random_device rd{};
     std::mt19937 rng{rd()};
-    double b_std = 0.;
+    float b_std = 0.;
     uint16_t Nt = 100;
     Mat u(Nt, Nu);
     uint16_t N_sims = 100;
-    double omega = 10;
-    std::vector<double> t(Nt+1);
+    float omega = 10;
+    std::vector<float> t(Nt+1);
     std::generate(t.begin(), t.end(), [&](){static uint16_t i = 0;
         return i++;});
     u.col(0) = Vec::LinSpaced(Nt, 0, M_PI_2 + .1);

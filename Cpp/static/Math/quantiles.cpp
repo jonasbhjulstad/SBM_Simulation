@@ -4,10 +4,10 @@
 #include <FROLS_Execution.hpp>
 #include <thread>
 namespace FROLS {
-    double quantile(std::vector<double> list, double tau) {
-        typename std::vector<double>::iterator b = list.begin();
-        typename std::vector<double>::iterator e = list.end();
-        typename std::vector<double>::iterator quant = list.begin();
+    float quantile(std::vector<float> list, float tau) {
+        typename std::vector<float>::iterator b = list.begin();
+        typename std::vector<float>::iterator e = list.end();
+        typename std::vector<float>::iterator quant = list.begin();
         const uint16_t pos = tau * std::distance(b, e);
         std::advance(quant, pos);
 
@@ -15,15 +15,15 @@ namespace FROLS {
         return *quant;
     }
 
-    std::vector<double> dataframe_quantiles(DataFrameStack &dfs,
-                                            std::string col_name, double tau) {
+    std::vector<float> dataframe_quantiles(DataFrameStack &dfs,
+                                            std::string col_name, float tau) {
         uint16_t N_rows = 0;
         for (int i = 0; i < dfs.get_N_frames(); i++) {
             N_rows = std::max({N_rows, (uint16_t) dfs[i].get_N_rows()});
         }
         uint16_t N_frames = dfs.get_N_frames();
-        std::vector<double> result(N_rows);
-        std::vector<double> xk;
+        std::vector<float> result(N_rows);
+        std::vector<float> xk;
         xk.reserve(N_rows);
         for (int i = 0; i < N_rows; i++) {
             for (int j = 0; j < N_frames; j++) {
@@ -50,10 +50,10 @@ namespace FROLS {
             using namespace FROLS;
             DataFrameStack dfs(filenames);
             uint16_t N_rows = dfs[0].get_N_rows();
-            std::vector<double> t = (*dfs[0]["t"]);
-            std::vector<double> xk(N_simulations);
+            std::vector<float> t = (*dfs[0]["t"]);
+            std::vector<float> xk(N_simulations);
 
-            std::vector<double> quantiles = FROLS::arange(0.05, 0.95, 0.05);
+            std::vector<float> quantiles = FROLS::arange(0.05, 0.95, 0.05);
 
             std::vector<std::vector<uint16_t>> q_trajectories(quantiles.size());
             for (auto &traj: q_trajectories) {

@@ -8,7 +8,7 @@
 #include <FROLS_Path_Config.hpp>
 #include <Regression_Algorithm.hpp>
 
-std::string quantile_simulation_filename(uint16_t N_pop, double p_ER, uint16_t iter, std::string network_type) {
+std::string quantile_simulation_filename(uint16_t N_pop, float p_ER, uint16_t iter, std::string network_type) {
     std::stringstream ss;
     ss << FROLS::FROLS_DATA_DIR << "/Quantile_Simulation_" << network_type << "_" <<  N_pop << "_" << p_ER << "_" << iter
        << ".csv";
@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     const std::vector<std::string> colnames = {"S", "I", "R"};
     uint16_t N_sims = 2000; // 10000;
     uint16_t N_pop = 1000;
-    double p_ER = 1.0;
+    float p_ER = 1.0;
     using namespace FROLS;
     using namespace std::placeholders;
     uint16_t d_max = 1;
@@ -35,9 +35,9 @@ int main(int argc, char **argv) {
     model.preselect("x1", 1.0, 1, FEATURE_PRESELECTED_IGNORE);
     model.preselect("x2", 1.0, 2, FEATURE_PRESELECTED_IGNORE);
     model.ignore(0);
-    double theta_tol = 1e-6;
+    float theta_tol = 1e-6;
     uint16_t N_terms_max = 2;
-    double MAE_tol = 1e-1;
+    float MAE_tol = 1e-1;
     FROLS::Regression::Quantile_Param reg_param;
     reg_param.N_terms_max = 2;
     reg_param.tol = MAE_tol;

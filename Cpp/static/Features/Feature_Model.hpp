@@ -38,8 +38,8 @@ namespace FROLS::Features {
         virtual uint16_t get_feature_index(const std::string&) = 0;
         void ignore(const std::string&);
         void ignore(uint16_t);
-        void preselect(const std::string&, double, uint16_t, Feature_Tag);
-        void preselect(uint16_t, double, uint16_t, Feature_Tag);
+        void preselect(const std::string&, float, uint16_t, Feature_Tag);
+        void preselect(uint16_t, float, uint16_t, Feature_Tag);
 
         const uint16_t N_output_features;
         std::vector<uint16_t> ignore_idx;

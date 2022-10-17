@@ -29,7 +29,7 @@ int main() {
     uint16_t Nt = 100;
     Mat u(Nt, 1);
     uint16_t N_sims = 100;
-    double omega = 4;
+    float omega = 4;
     u.col(0).setLinSpaced(Nt, 0, Nt * omega / (2 * M_PI));
     u = u.array().sin();
     Mat Y(Nt * N_sims, Nx);
@@ -51,10 +51,10 @@ int main() {
 
     uint16_t d_max = 1;
     uint16_t N_features = 16;
-    double ERR_tol = 1e-5;
-    double MAE_tol = 1;
-    double tau = .95;
-    double theta_tol = 10;
+    float ERR_tol = 1e-5;
+    float MAE_tol = 1;
+    float tau = .95;
+    float theta_tol = 10;
     Polynomial_Model model(Nx, Nu, N_features, d_max);
     ERR_Regressor er(ERR_tol, theta_tol);
     Quantile_Regressor qr(tau, MAE_tol, theta_tol);

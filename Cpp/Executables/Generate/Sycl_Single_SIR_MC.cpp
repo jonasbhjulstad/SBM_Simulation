@@ -10,8 +10,8 @@
 template<uint16_t Nt>
 void traj_to_file(const FROLS::MC_SIR_Params<>&p, const FROLS::MC_SIR_SimData<Nt> &d, uint16_t iter) {
     FROLS::DataFrame df;
-    std::array<double, Nt> p_Is;
-    std::array<double, Nt> p_Rs;
+    std::array<float, Nt> p_Is;
+    std::array<float, Nt> p_Rs;
     std::fill(p_Rs.begin(), p_Rs.end(), p.p_R);
     std::transform(d.p_vec.begin(), d.p_vec.end(), p_Is.begin(), [](const auto &pv) { return pv.p_I; });
     df.assign("S", d.traj[0]);
@@ -25,7 +25,7 @@ void traj_to_file(const FROLS::MC_SIR_Params<>&p, const FROLS::MC_SIR_SimData<Nt
 }
 
 constexpr uint16_t N_pop = 20;
-constexpr double p_ER = 1.0;
+constexpr float p_ER = 1.0;
 constexpr uint16_t Nt = 20;
 constexpr uint16_t NV = N_pop;
 constexpr uint16_t NE = NV * NV;
@@ -43,8 +43,8 @@ int main() {
     std::mt19937_64 rng(rd());
 
     FROLS::random::default_rng generator(seeds[0]);
-    Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(G_structure, p.p_I0, p.p_R0,
-                                                                             generator);
+    // Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(G_structure, p.p_I0, p.p_R0,
+                                                                            //  generator);
     MC_SIR_SimData<Nt> data;
     G.reset();
     while (G.population_count()[1] == 0) {

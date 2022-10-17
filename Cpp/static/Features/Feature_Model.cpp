@@ -86,7 +86,7 @@ namespace FROLS::Features {
     void Feature_Model::ignore(const std::string &feature_name) {
         ignore(get_feature_index(feature_name));
     }
-    void Feature_Model::preselect(uint16_t feature_index, double theta, uint16_t response_index, Feature_Tag tag)
+    void Feature_Model::preselect(uint16_t feature_index, float theta, uint16_t response_index, Feature_Tag tag)
     {
         if (response_index >= preselected_features.size())
         {
@@ -98,13 +98,13 @@ namespace FROLS::Features {
         f.index = feature_index;
         preselected_features[response_index].push_back(f);
     }
-    double f_ERR = -std::numeric_limits<double>::infinity(); // objective/Error Reduction Ratio
-    double g;       // Feature (Orthogonalized Linear-in-the-parameters form)
+    float f_ERR = -std::numeric_limits<float>::infinity(); // objective/Error Reduction Ratio
+    float g;       // Feature (Orthogonalized Linear-in-the-parameters form)
     uint16_t index;   // Index of the feature in the original feature set
-    double theta = 0;
+    float theta = 0;
     Feature_Tag tag = FEATURE_INVALID;
 
-    void Feature_Model::preselect(const std::string& feature_name, double theta, uint16_t response_index, Feature_Tag tag)
+    void Feature_Model::preselect(const std::string& feature_name, float theta, uint16_t response_index, Feature_Tag tag)
     {
         preselect(get_feature_index(feature_name), theta, response_index, tag);
     }

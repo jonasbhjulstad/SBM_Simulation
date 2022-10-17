@@ -4,15 +4,15 @@
 #include <Typedefs.hpp>
 
 namespace FROLS {
-    double cov_normalize(const Vec &a, const Vec &b);
+    float cov_normalize(const Vec &a, const Vec &b);
 
     uint16_t n_choose_k(uint16_t n, uint16_t k);
 
     Vec vec_orthogonalize(const Vec &v, const Mat &Q);
 
-    std::vector<double> linspace(double min, double max, int N);
+    std::vector<float> linspace(float min, float max, int N);
 
-    std::vector<double> arange(double min, double max, double step);
+    std::vector<float> arange(float min, float max, float step);
 
     std::vector<uint16_t> range(uint16_t start, uint16_t end);
 
@@ -27,8 +27,8 @@ namespace FROLS {
     }
 
     template<typename T>
-    inline double monomial_power(const Vec &x, const T &powers) {
-        double result = 1;
+    inline float monomial_power(const Vec &x, const T &powers) {
+        float result = 1;
         for (int i = 0; i < powers.size(); i++) {
             result *= pow(x(i), powers[i]);
         }
@@ -67,7 +67,7 @@ namespace FROLS {
         return res;
     }
 
-    template<typename T, uint16_t N0, uint16_t N1>
+    template<typename T, std::size_t N0, std::size_t N1>
     inline std::array<std::array<T, N1>, N0> transpose(const std::array<std::array<T, N0>, N1> &vec) {
         std::array<std::array<T, N1>, N0> res;
         for (int i = 0; i < N1; i++) {

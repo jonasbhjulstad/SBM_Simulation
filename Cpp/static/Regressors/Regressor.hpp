@@ -10,13 +10,13 @@
 
 namespace FROLS::Regression {
     struct Regressor_Param {
-        double tol = 1e-2;
-        double theta_tol = 1e-2;
+        float tol = 1e-2;
+        float theta_tol = 1e-2;
         uint16_t N_terms_max = 4;
     };
 
     struct Regressor {
-        const double tol, theta_tol;
+        const float tol, theta_tol;
         const uint16_t N_terms_max;
 
         Regressor(const Regressor_Param &);

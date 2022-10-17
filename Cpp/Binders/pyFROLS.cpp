@@ -43,16 +43,16 @@ PYBIND11_MODULE(pyFROLS, m) {
             .def("model_equations", &Polynomial_Model::model_equations);
 
     py::class_<Regressor>(m, "Regressor")
-            //   .def(py::init<double>())
+            //   .def(py::init<float>())
             .def("transform_fit", &Regressor::transform_fit)
             .def("fit", &Regressor::fit);
 
     py::class_<Quantile_Regressor, Regressor>(m, "Quantile_Regressor")
-            .def(py::init<double, double, double, const std::string>())
+            .def(py::init<float, float, float, const std::string>())
             .def("transform_fit", &Quantile_Regressor::transform_fit)
             .def("fit", &Quantile_Regressor::fit);
     py::class_<ERR_Regressor, Regressor>(m, "ERR_Regressor")
-            .def(py::init<double, double>())
+            .def(py::init<float, float>())
             .def("transform_fit", &Quantile_Regressor::transform_fit)
             .def("fit", &Quantile_Regressor::fit);
 }

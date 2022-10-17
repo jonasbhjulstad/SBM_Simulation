@@ -4,6 +4,8 @@
 #define FROLS_MCMC_GENERATE_SIR_HPP
 
 #include <array>
+#define SUNDIALS_SINGLE_PRECISION
+
 #include <cvode/cvode.h>
 #include <cvode/cvode_spils.h>
 #include <fstream>
@@ -18,18 +20,18 @@
 namespace FROLS::Integrators {
     template<uint16_t Nx, uint16_t Nt, typename Derived, typename Param>
     struct Model_Integrator {
-        Model_Integrator(double t0 = 0.): t_current(t0){}
-        typedef std::array<double, Nx> State;
-        typedef std::array<std::array<double, Nt + 1>, Nx> Trajectory;
-        double t_current;
+        Model_Integrator(float t0 = 0.): t_current(t0){}
+        typedef std::array<float, Nx> State;
+        typedef std::array<std::array<float, Nt + 1>, Nx> Trajectory;
+        float t_current;
 
         State step(const State &x) {
             return static_cast<Derived *>(this)->step(x);
         }
 
-        std::pair<Trajectory, std::array<double, Nt+1>> simulate(const std::array<double, 3>& x0) {
-            std::array<std::array<double, Nt + 1>, Nx> trajectory;
-            std::array<double, Nt+1> t;
+        std::pair<Trajectory, std::array<float, Nt+1>> simulate(const std::array<float, 3>& x0) {
+            std::array<std::array<float, Nt + 1>, Nx> trajectory;
+            std::array<float, Nt+1> t;
             t[0] = t_current;
             auto x = x0;
             for (int j = 0; j < Nx; j++)
@@ -56,17 +58,16 @@ namespace FROLS::Integrators {
         using Trajectory = typename Base::Trajectory;
         SUNContext ctx;
         void *cvode_mem;
-        realtype dt = 0;
-        realtype abs_tol;
-        realtype rel_tol;
-        realtype& t_current = Base::t_current;
+        float dt = 0;
+        float abs_tol;
+        float rel_tol;
+        float& t_current = Base::t_current;
         SUNMatrix jac_mat;
         N_Vector x;
         SUNLinearSolver solver;
-
-        CVODE_Integrator(const std::array<double, Nx>& x0,realtype dt,
-                         realtype abs_tol = 1e-5, realtype reltol = 1e-5,
-                         realtype t0 = 0)
+        CVODE_Integrator(const std::array<float, Nx>& x0,float dt,
+                         float abs_tol = 1e-5, float reltol = 1e-5,
+                         float t0 = 0)
                 : dt(dt), abs_tol(abs_tol), rel_tol(reltol),
                   Model_Integrator<Nx, Nt, CVODE_Integrator<Nx, Nt, Derived, Param>, Param>(t0){
 
@@ -81,7 +82,7 @@ namespace FROLS::Integrators {
             jac_mat = SUNMatNewEmpty(ctx);
             cvode_mem = CVodeCreate(CV_BDF, ctx);
         }
-        State step(const std::array<double, Nx> x_current) {
+        State step(const std::array<float, Nx> x_current) {
 //            N_Vector x = N_VNew_Serial(Nx, ctx);
             for (int i = 0; i < Nx; i++)
             {
@@ -89,7 +90,7 @@ namespace FROLS::Integrators {
             }
             int flag = CVode(cvode_mem, t_current + dt, x, &t_current, CV_NORMAL);
             // copy x to Vec
-            std::array<double, Nx> x_next;
+            std::array<float, Nx> x_next;
             for (int i = 0; i < Nx; i++) {
                 x_next[i] = NV_Ith_S(x, i);
                 if (check_flag(&flag, "CVode", 1))

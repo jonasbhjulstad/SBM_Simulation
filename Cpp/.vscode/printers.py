@@ -281,11 +281,11 @@ class EigenQuaternionPrinter:
 
 def cast_eigen_block_to_matrix(val):
 	# Get the type of the variable (and convert to a string)
-	# Example: 'const Eigen::Block<Eigen::Block<Eigen::Matrix<double, -1, -1, 0, -1, -1>, -1, -1, false> const, -1, -1, false>'
+	# Example: 'const Eigen::Block<Eigen::Block<Eigen::Matrix<float, -1, -1, 0, -1, -1>, -1, -1, false> const, -1, -1, false>'
 	val_type = str(val.type)
 
 	# Extract the Eigen::Matrix type from the Block:
-	# From the previous example: Eigen::Matrix<double, -1, -1, 0, -1, -1>
+	# From the previous example: Eigen::Matrix<float, -1, -1, 0, -1, -1>
 	begin = val_type.find('Eigen::Matrix<')
 	end = val_type.find('>', begin) + 1
 

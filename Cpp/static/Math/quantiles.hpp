@@ -8,10 +8,10 @@
 #include <functional>
 namespace FROLS
 {
-double quantile(std::vector<double> list, double tau = .95);
+float quantile(std::vector<float> list, float tau = .95);
 
-std::vector<double> dataframe_quantiles(FROLS::DataFrameStack &dfs,
-                                       std::string col_name, double tau = .95);
+std::vector<float> dataframe_quantiles(FROLS::DataFrameStack &dfs,
+                                       std::string col_name, float tau = .95);
 void quantiles_to_file(uint16_t N_simulations, const std::vector<std::string>& colnames, std::function<std::string(uint16_t)> MC_fname_f, std::function<std::string(uint16_t)> q_fname_f);
 
 }

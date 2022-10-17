@@ -1,7 +1,7 @@
 #include "FROLS_Math.hpp"
 
 namespace FROLS {
-    double cov_normalize(const Vec &a, const Vec &b) {
+    float cov_normalize(const Vec &a, const Vec &b) {
         return ((a.transpose() * a).isZero()) ? 0 : (a.transpose() * b).value() / (a.transpose() * a);
     }
 
@@ -28,17 +28,17 @@ namespace FROLS {
         return cov_remainder;
     }
 
-    std::vector<double> linspace(double min, double max, int N) {
-        std::vector<double> res(N);
+    std::vector<float> linspace(float min, float max, int N) {
+        std::vector<float> res(N);
         for (int i = 0; i < N; i++) {
             res[i] = min + (max - min) * i / (N - 1);
         }
         return res;
     }
 
-    std::vector<double> arange(double min, double max, double step) {
-        double s = min;
-        std::vector<double> res;
+    std::vector<float> arange(float min, float max, float step) {
+        float s = min;
+        std::vector<float> res;
         while (s <= max) {
             res.push_back(s);
             s += step;

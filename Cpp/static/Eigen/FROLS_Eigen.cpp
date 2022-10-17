@@ -11,9 +11,9 @@ namespace FROLS {
             throw std::invalid_argument("[DataFrame] Error: Dataframe must contain elements");
         }
         if (end_idx < 0) {
-            return Eigen::Map<Eigen::VectorXd>(df[col_name]->data(), N_rows)(Eigen::seq(start_idx, N_rows + end_idx));
+            return Eigen::Map<Eigen::VectorXf>(df[col_name]->data(), N_rows)(Eigen::seq(start_idx, N_rows + end_idx));
         } else {
-            return Eigen::Map<Eigen::VectorXd>(df[col_name]->data(), N_rows)(Eigen::seq(start_idx, end_idx));
+            return Eigen::Map<Eigen::VectorXf>(df[col_name]->data(), N_rows)(Eigen::seq(start_idx, end_idx));
         }
 
     }
@@ -55,7 +55,7 @@ namespace FROLS {
 
 
     Vec df_to_vec(const DataFrame &df, const std::string &col_name) {
-        return Eigen::Map<Eigen::VectorXd>(df[col_name]->data(), df[col_name]->size());
+        return Eigen::Map<Eigen::VectorXf>(df[col_name]->data(), df[col_name]->size());
     }
 
     Vec df_to_vec(DataFrameStack &dfs, const std::string &col_name) {
@@ -67,7 +67,7 @@ namespace FROLS {
         return res;
     }
 
-    Mat dmd_truncate(const Mat &Xk, const Mat &Xk_1, double threshold) {
+    Mat dmd_truncate(const Mat &Xk, const Mat &Xk_1, float threshold) {
         Eigen::JacobiSVD<Mat> svd(Xk, Eigen::ComputeThinU | Eigen::ComputeThinV);
         // svd.setThreshold(threshold);
         Mat U = svd.matrixU();
@@ -76,7 +76,7 @@ namespace FROLS {
         return svd.matrixU().transpose() * (Xk_1 * svd.matrixV() * (sigma.asDiagonal().inverse()));
     }
 
-    Mat dmd_truncate(DataFrameStack &dfs, const std::vector<std::string> &col_names, double threshold) {
+    Mat dmd_truncate(DataFrameStack &dfs, const std::vector<std::string> &col_names, float threshold) {
         uint16_t Nt = dfs[0].get_N_rows();
         uint16_t N_frames = dfs.get_N_frames();
         uint16_t N_features = col_names.size();
@@ -96,7 +96,7 @@ namespace FROLS {
     }
 
     template<>
-    Mat vecs_to_mat<double>(const std::vector<std::vector<double>>&);
+    Mat vecs_to_mat<float>(const std::vector<std::vector<float>>&);
     template<>
     Mat vecs_to_mat<uint16_t>(const std::vector<std::vector<uint16_t>>&);
 

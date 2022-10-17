@@ -7,7 +7,7 @@
 int main() {
   uint16_t N_sims = 100; // 10000;
   uint16_t N_pop = 60;
-  double p_ER = 1.0;
+  float p_ER = 1.0;
   using namespace FROLS;
   std::vector<std::string> df_names(N_sims);
 
@@ -30,13 +30,13 @@ int main() {
   uint16_t Nu = U.cols();
 
   FROLS::Features::Polynomial_Model model(Nx, Nu, N_output_features, d_max);
-  double ERR_tol = 1e-1;
-  double theta_tol = 10;
+  float ERR_tol = 1e-1;
+  float theta_tol = 10;
   Regression::ERR_Regressor regressor(ERR_tol, theta_tol);
   regressor.transform_fit(X, U, Y, model);
 
   Vec x0 = X.row(0);
-  double u0 = U(0, 0);
+  float u0 = U(0, 0);
   uint16_t Nt = 30;
   Vec u = Vec::Ones(Nt) * u0;
   // print x0, u

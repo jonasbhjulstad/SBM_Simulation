@@ -8,21 +8,21 @@
 #include <FROLS_Path_Config.hpp>
 #include <Regression_Algorithm.hpp>
 
-std::string err_simulation_filename(uint16_t N_pop, double p_ER, uint16_t iter, std::string network_type) {
+std::string err_simulation_filename(uint16_t N_pop, float p_ER, uint16_t iter, std::string network_type) {
     std::stringstream ss;
     ss << FROLS::FROLS_DATA_DIR << "/ERR_Simulation_" << network_type << "_" << N_pop << "_" << p_ER << "_" << iter
        << ".csv";
     return ss.str();
 }
 
-std::string SIR_Sine_filename(uint16_t N_pop, double p_ER, uint16_t iter, std::string network_type) {
+std::string SIR_Sine_filename(uint16_t N_pop, float p_ER, uint16_t iter, std::string network_type) {
     std::stringstream ss;
     ss << FROLS::FROLS_DATA_DIR << "/SIR_Sine_Trajectory_Discrete_" << iter
        << ".csv";
     return ss.str();
 }
 
-std::string SIR_diff_filename(uint16_t N_pop, double p_ER, uint16_t iter, std::string network_type) {
+std::string SIR_diff_filename(uint16_t N_pop, float p_ER, uint16_t iter, std::string network_type) {
     std::stringstream ss;
     ss << FROLS::FROLS_DATA_DIR << "/Bernoulli_SIR_Delta_MC_" << N_pop << "_" << p_ER << "_" << iter
        << ".csv";
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     const std::vector<std::string> colnames = {"S", "I", "R"};
     uint16_t N_sims = 500; // 10000;
     uint16_t N_pop = 3000;
-    double p_ER = 1.0;
+    float p_ER = 1.0;
     using namespace FROLS;
     using namespace std::placeholders;
     uint16_t d_max = 1;

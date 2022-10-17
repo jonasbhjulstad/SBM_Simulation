@@ -28,7 +28,7 @@ namespace FROLS::Regression {
     bool ERR_Regressor::tolerance_check(
             crMat &Q, crVec &y,
             const std::vector<Feature> &best_features) const {
-        double ERR_tot = 0;
+        float ERR_tot = 0;
         for (const auto &feature: best_features) {
             ERR_tot += feature.f_ERR;
         }

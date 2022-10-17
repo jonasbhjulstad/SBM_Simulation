@@ -12,14 +12,14 @@
 namespace FROLS::Regression {
     struct Quantile_Param : public Regressor_Param
     {
-        double tau = .95;
+        float tau = .95;
         const std::string solver_type ="GLOP";
     };
     struct Quantile_LP
     {
-        const double tau;
+        const float tau;
         const std::string solver_type;
-        Quantile_LP(double tau, const std::string& solver_type) : tau(tau), solver_type(solver_type){}
+        Quantile_LP(float tau, const std::string& solver_type) : tau(tau), solver_type(solver_type){}
         void construct(uint16_t N_rows)
         {
             using namespace operations_research;
@@ -32,7 +32,7 @@ namespace FROLS::Regression {
                 throw std::runtime_error("Supports for solver " + solver_type + " not linked in.");
             }
             solver = std::make_unique<MPSolver>("Quantile_Solver", problem_type);
-            const double infinity = solver->infinity();
+            const float infinity = solver->infinity();
 
             theta_neg = solver->MakeNumVar(0.0, infinity, "theta_neg");
             theta_pos = solver->MakeNumVar(0.0, infinity, "theta_pos");
@@ -63,7 +63,7 @@ namespace FROLS::Regression {
     };
 
     struct Quantile_Regressor : public Regressor {
-        const double tau;
+        const float tau;
         const std::string solver_type;
 
         Quantile_Regressor(const Quantile_Param& p);

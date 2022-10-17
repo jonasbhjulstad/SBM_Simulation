@@ -30,18 +30,18 @@ namespace FROLS::Regression {
 
             const bool solver_status = LP.solver->Solve() == MPSolver::OPTIMAL;
             Feature candidate;
-            candidate.f_ERR = std::numeric_limits<double>::infinity();
+            candidate.f_ERR = std::numeric_limits<float>::infinity();
 
             if (solver_status) {
-                double f = LP.objective->Value();
+                float f = LP.objective->Value();
 
-                std::vector<double> u_neg_sol(N_rows);
-                std::vector<double> u_pos_sol(N_rows);
+                std::vector<float> u_neg_sol(N_rows);
+                std::vector<float> u_pos_sol(N_rows);
                 for (int i = 0; i < N_rows; i++) {
                     u_neg_sol[i] = LP.u_neg[i]->solution_value();
                     u_pos_sol[i] = LP.u_pos[i]->solution_value();
                 }
-                double theta_sol = LP.theta_pos->solution_value() - LP.theta_neg->solution_value();
+                float theta_sol = LP.theta_pos->solution_value() - LP.theta_neg->solution_value();
                 std::for_each(LP.g.begin(), LP.g.end(), [&](auto &gi) { gi->Clear(); });
                 return Feature{f, theta_sol, 0, 0., FEATURE_REGRESSION};
             } else {
@@ -78,7 +78,7 @@ namespace FROLS::Regression {
         Vec y_pred = predict(X, best_features);
         Vec diff = y - y_pred;
         uint16_t N_samples = y.rows();
-        double err = (diff.array() > 0).select(tau * diff, -(1 - tau) * diff).sum() / N_samples;
+        float err = (diff.array() > 0).select(tau * diff, -(1 - tau) * diff).sum() / N_samples;
         return err < tol;
     }
 

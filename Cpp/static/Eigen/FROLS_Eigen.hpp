@@ -24,9 +24,9 @@ namespace FROLS {
 
     Vec df_to_vec(const DataFrameStack &dfs, const std::string &col_name);
 
-    Mat dmd_truncate(const Mat &X, double threshold);
+    Mat dmd_truncate(const Mat &X, float threshold);
 
-    Mat dmd_truncate(DataFrameStack &dfs, const std::vector<std::string> &col_names, double threshold);
+    Mat dmd_truncate(DataFrameStack &dfs, const std::vector<std::string> &col_names, float threshold);
 
 
     template <typename T>
@@ -36,7 +36,7 @@ namespace FROLS {
         Mat res(N_rows, vectors.size());
         for (int i = 0; i < res.cols(); i++) {
             for (int j = 0; j < vectors[i].size(); j++) {
-                res.col(i)(j) = (double) vectors[i][j];
+                res.col(i)(j) = (float) vectors[i][j];
             }
         }
         return res;

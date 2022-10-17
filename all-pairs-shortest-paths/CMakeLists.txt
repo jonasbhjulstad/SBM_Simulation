@@ -11,7 +11,7 @@ if (NOT CMAKE_BUILD_TYPE)
         STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel"
         FORCE)
 endif()
-set(HIPSYCL_TARGETS "cuda;")
+set(HIPSYCL_TARGETS "cuda:sm_60")
 find_package(hipSYCL)
 add_compile_options("-fsycl")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++17")
