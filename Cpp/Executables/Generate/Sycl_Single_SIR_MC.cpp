@@ -5,10 +5,10 @@
 #include <FROLS_Graph.hpp>
 #include <FROLS_Random.hpp>
 #include <functional>
-#include <CL/sycl.hpp>
+#include <FROLS_sycl.hpp>
 
-template<size_t Nt>
-void traj_to_file(const FROLS::MC_SIR_Params<>&p, const FROLS::MC_SIR_SimData<Nt> &d, size_t iter) {
+template<uint16_t Nt>
+void traj_to_file(const FROLS::MC_SIR_Params<>&p, const FROLS::MC_SIR_SimData<Nt> &d, uint16_t iter) {
     FROLS::DataFrame df;
     std::array<double, Nt> p_Is;
     std::array<double, Nt> p_Rs;
@@ -24,11 +24,11 @@ void traj_to_file(const FROLS::MC_SIR_Params<>&p, const FROLS::MC_SIR_SimData<Nt
                  ",", p.csv_termination_tol);
 }
 
-constexpr size_t N_pop = 20;
+constexpr uint16_t N_pop = 20;
 constexpr double p_ER = 1.0;
-constexpr size_t Nt = 20;
-constexpr size_t NV = N_pop;
-constexpr size_t NE = NV * NV;
+constexpr uint16_t Nt = 20;
+constexpr uint16_t NV = N_pop;
+constexpr uint16_t NE = NV * NV;
 
 int main() {
     using namespace FROLS;
@@ -38,11 +38,11 @@ int main() {
     p.p_ER = 1.0;
 
     std::random_device rd{};
-    std::vector<size_t> seeds(p.N_sim);
+    std::vector<uint16_t> seeds(p.N_sim);
     std::generate(seeds.begin(), seeds.end(), [&]() { return rd(); });
     std::mt19937_64 rng(rd());
 
-    oneapi::dpl::ranlux48 generator(seeds[0]);
+    FROLS::random::default_rng generator(seeds[0]);
     Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(G_structure, p.p_I0, p.p_R0,
                                                                              generator);
     MC_SIR_SimData<Nt> data;
@@ -54,12 +54,12 @@ int main() {
     data.p_vec = generate_interaction_probabilities<decltype(generator), Nt>(p, generator);
 
     //list available sycl devices
-    auto devices = cl::sycl::device::get_devices();
+    auto devices = sycl::device::get_devices();
     for (auto &dev: devices) {
-        std::cout << dev.get_info<cl::sycl::info::device::name>() << std::endl;
+        std::cout << dev.get_info<sycl::info::device::name>() << std::endl;
     }
     sycl::queue q(sycl::default_selector{});
-    sycl::buffer<size_t, 1> seed_buffer{seeds.data(), sycl::range<1>(seeds.size())};
+    sycl::buffer<uint16_t, 1> seed_buffer{seeds.data(), sycl::range<1>(seeds.size())};
     std::vector<MC_SIR_SimData<Nt>> sim_data(p.N_sim);
     sycl::buffer<MC_SIR_SimData<Nt>, 1> sim_buffer{sim_data.data(), sycl::range<1>(sim_data.size())};
     sycl::buffer<MC_SIR_Params<>, 1> param_buffer{&p, sycl::range<1>(1)};
@@ -70,11 +70,11 @@ int main() {
         auto params = sycl::accessor{param_buffer, h, sycl::read_only};
         auto G_structure = generate_erdos_renyi<SIR_Graph<NV, NE>, decltype(rng)>(p.N_pop, p.p_ER, SIR_S, rng);
 
-        h.parallel_for<class nstream>(sycl::range<1>{p.N_sim}, [=](sycl::id<1> it) {
-            const int i = it[0];
-            sim[i] = MC_SIR_simulation<Nt>(graph[0], params[0], seed[i]);
+        // h.parallel_for<class nstream>(sycl::range<1>{p.N_sim}, [=](sycl::id<1> it) {
+        //     const int i = it[0];
+        //     sim[i] = MC_SIR_simulation<Nt>(graph[0], params[0], seed[i]);
 
-        });
+        // });
 
     });
 

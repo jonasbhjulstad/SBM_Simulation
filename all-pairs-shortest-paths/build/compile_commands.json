@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/all-pairs-shortest-paths/build",
+  "command": "/usr/bin/clang++  -O3 -std=c++17 -g -fsycl -o CMakeFiles/apsp.dir/src/apsp.cpp.o -c /home/man/Documents/Bernoulli_MC/all-pairs-shortest-paths/src/apsp.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/all-pairs-shortest-paths/src/apsp.cpp"
+}
+]

@@ -9,14 +9,14 @@ namespace FROLS::Regression {
 
 
     std::vector<Feature> Regressor::single_fit(const Mat &X, const Vec &y) const {
-        size_t N_features = X.cols();
+        uint16_t N_features = X.cols();
         Mat Q_global = Mat::Zero(X.rows(), N_features);
         Mat Q_current = Q_global;
         Mat A = Mat::Zero(N_features, N_features);
         Vec g = Vec::Zero(N_features);
         std::vector<Feature> best_features;
         best_features.reserve(N_terms_max);
-        size_t end_idx = N_features;
+        uint16_t end_idx = N_features;
 
         // Perform one feature selection iteration for each feature
         for (int j = 0; j < N_features; j++) {
@@ -123,7 +123,7 @@ namespace FROLS::Regression {
         if ((X.rows() != Y.rows())) {
             throw std::invalid_argument("X, U and Y must have same number of rows");
         }
-        size_t N_response = Y.cols();
+        uint16_t N_response = Y.cols();
         std::vector<std::vector<Feature>> result(N_response);
         auto cols = Y.colwise();
         std::transform(FROLS::execution::par_unseq, cols.begin(), cols.end(), result.begin(),
@@ -134,7 +134,7 @@ namespace FROLS::Regression {
     Vec Regressor::predict(crMat &Q, const std::vector<Feature> &features) const {
         Vec y_pred(Q.rows());
         y_pred.setZero();
-        size_t i = 0;
+        uint16_t i = 0;
         for (const auto &feature: features) {
             if (feature.f_ERR == -1) {
                 break;
@@ -168,9 +168,9 @@ namespace FROLS::Regression {
     }
 
 
-    std::vector<size_t>
-    Regressor::unused_feature_indices(const std::vector<Feature> &features, size_t N_features) const {
-        std::vector<size_t> used_idx(features.size());
+    std::vector<uint16_t>
+    Regressor::unused_feature_indices(const std::vector<Feature> &features, uint16_t N_features) const {
+        std::vector<uint16_t> used_idx(features.size());
         std::transform(features.begin(), features.end(), used_idx.begin(), [&](auto &f) { return f.index; });
         return filtered_range(used_idx, 0, N_features);
     }

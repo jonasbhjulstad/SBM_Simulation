@@ -11,13 +11,13 @@ namespace FROLS {
     const char *FROLS_LOG_DIR = "/home/man/Documents/Bernoulli_MC/Cpp/log";
 
 
-    std::string MC_filename(size_t N_pop, double p_ER, size_t iter, std::string network_type) {
+    std::string MC_filename(uint16_t N_pop, double p_ER, uint16_t iter, std::string network_type) {
         std::stringstream ss;
         ss << FROLS_DATA_DIR << "/Bernoulli_" << network_type << "_MC_" << N_pop << "_" << p_ER << "_" << iter
            << ".csv";
         return ss.str();
     }
-    std::string quantile_filename(size_t N_pop, double p_ER, size_t iter, std::string network_type) {
+    std::string quantile_filename(uint16_t N_pop, double p_ER, uint16_t iter, std::string network_type) {
         std::stringstream ss;
         ss << FROLS_DATA_DIR << "/Quantile_Bernoulli_" << network_type << "_MC_" << N_pop << "_" << p_ER << "_" << iter
            << ".csv";

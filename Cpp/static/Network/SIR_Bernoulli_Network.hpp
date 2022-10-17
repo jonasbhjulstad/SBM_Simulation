@@ -24,13 +24,13 @@ namespace Network_Models {
     struct SIR_Param{
         dType p_I;
         dType p_R;
-        size_t Nt_min;
-        size_t N_I_min;
+        uint16_t Nt_min;
+        uint16_t N_I_min;
     };
-    template<size_t NV, size_t NE, typename dType=float>
+    template<uint16_t NV, uint16_t NE, typename dType=float>
     using SIR_Graph = FROLS::Graph::Graph<SIR_State, SIR_Edge, NV, NE>;
 
-    template<typename RNG, size_t Nt, size_t NV, size_t NE, typename dType=float>
+    template<typename RNG, uint16_t Nt, uint16_t NV, uint16_t NE, typename dType=float>
     struct SIR_Bernoulli_Network : public Network<SIR_Param<>, 3, Nt, SIR_Bernoulli_Network<RNG, Nt, NV, NE>> {
         using Vertex_t = typename SIR_Graph<NV, NE>::Vertex_t;
         using Edge_t = typename SIR_Graph<NV, NE>::Edge_t;
@@ -38,7 +38,7 @@ namespace Network_Models {
         using Vertex_Prop_t = typename SIR_Graph<NV, NE>::Vertex_Prop_t;
         const dType p_I0;
         const dType p_R0;
-        const size_t t = 0;
+        const uint16_t t = 0;
 
         SIR_Bernoulli_Network(const SIR_Graph<NV, NE> &G, dType p_I0, dType p_R0, RNG rng) : G(G), rng(rng),
                                                                                                p_I0(p_I0), p_R0(p_R0) {}
@@ -55,8 +55,8 @@ namespace Network_Models {
             }
         }
 
-        std::array<size_t, 3> population_count() {
-            std::array<size_t, 3> count = {0, 0, 0};
+        std::array<uint16_t, 3> population_count() {
+            std::array<uint16_t, 3> count = {0, 0, 0};
             std::for_each(G.begin(), G.end(), [&count](const Vertex_t &v) {
                 count[v.data]++;
             });
@@ -92,7 +92,7 @@ namespace Network_Models {
             });
         }
 
-        bool terminate(const SIR_Param<>&p, const std::array<size_t, 3> &x) {
+        bool terminate(const SIR_Param<>&p, const std::array<uint16_t, 3> &x) {
             bool early_termination = ((t > p.Nt_min) && x[1] < p.N_I_min);
             return early_termination || (t >= Nt);
         }

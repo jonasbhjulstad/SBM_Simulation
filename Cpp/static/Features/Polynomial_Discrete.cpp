@@ -12,7 +12,7 @@ namespace FROLS::Features {
         fmt::print("{:^15}{:^15}{:^15}{:^15}{:^15}{:^15}\n", "y", "Feature", "g", "Theta", "f_ERR", "Tag");
         for (int i = 0; i < features.size(); i++) {
             for (const auto &feature: features[i]) {
-                size_t absolute_idx = (feature.tag == FEATURE_PRESELECTED) ? feature.index : candidate_feature_idx[feature.index];
+                uint16_t absolute_idx = (feature.tag == FEATURE_PRESELECTED) ? feature.index : candidate_feature_idx[feature.index];
                 std::string name = feature_name(absolute_idx, false);
 
                 name = (name == "") ? "1" : name;
@@ -37,7 +37,7 @@ namespace FROLS::Features {
     }
 
     const std::vector<std::vector<Feature>> Polynomial_Model::get_features() {
-        if (Nx == -1 || Nu == -1) {
+        if (Nx == std::numeric_limits<uint16_t>::max() || Nu == std::numeric_limits<uint16_t>::max()) {
             std::cout << "Model not yet trained" << std::endl;
             return {};
         }
@@ -45,12 +45,12 @@ namespace FROLS::Features {
     }
 
 
-    Vec Polynomial_Model::_transform(crMat &X_raw, size_t target_idx, bool &index_failure) {
+    Vec Polynomial_Model::_transform(crMat &X_raw, uint16_t target_idx, bool &index_failure) {
         // get feature names for polynomial combinations with powers between d_min,
         // d_max of the original features
-        size_t N_input_features = X_raw.cols();
-        size_t N_rows = X_raw.rows();
-        size_t feature_idx = 0;
+        uint16_t N_input_features = X_raw.cols();
+        uint16_t N_rows = X_raw.rows();
+        uint16_t feature_idx = 0;
         // for (int d = 1; d < d_max; d++) {
         for (auto &&comb: iter::combinations_with_replacement(range(0, d_max + 1),
                                                               N_input_features)) {
@@ -66,23 +66,23 @@ namespace FROLS::Features {
         return Vec::Zero(N_rows);
     }
 
-    const std::string Polynomial_Model::feature_name(size_t target_idx,
+    const std::string Polynomial_Model::feature_name(uint16_t target_idx,
                                                      bool indent) {
 
         std::string feature_name;
-        size_t feature_idx = 0;
-        size_t N_input_features = Nx + Nu;
+        uint16_t feature_idx = 0;
+        uint16_t N_input_features = Nx + Nu;
         // for (int d = 1; d < d_max; d++) {
         for (auto &&comb: iter::combinations_with_replacement(range(0, d_max + 1),
                                                               N_input_features)) {
             for (auto &&powers: iter::permutations(comb)) {
 
                 if (feature_idx == target_idx) {
-                    size_t x_idx = 0;
+                    uint16_t x_idx = 0;
                     for (auto &&pow: powers) {
 
                         std::string x_or_u = x_idx < Nx ? "x" : "u";
-                        size_t idx_offset = x_idx < Nx ? 0 : Nx;
+                        uint16_t idx_offset = x_idx < Nx ? 0 : Nx;
                         feature_name +=
                                 (pow > 0) ? x_or_u + std::to_string(x_idx - idx_offset) : "";
                         feature_name += (pow > 1) ? "^" + std::to_string(powers[x_idx]) : "";
@@ -106,13 +106,13 @@ namespace FROLS::Features {
     Polynomial_Model::feature_names() {
         // get feature names for polynomial combinations with powers between d_min,
         // d_max of the original features
-        size_t N_input_features = Nx + Nu;
+        uint16_t N_input_features = Nx + Nu;
         std::vector<std::string> feature_names;
         for (auto &&comb: iter::combinations_with_replacement(range(0, d_max + 1),
                                                               N_input_features)) {
             for (auto &&powers: iter::permutations(comb)) {
                 std::string feature_name = "";
-                size_t x_idx = 0;
+                uint16_t x_idx = 0;
                 for (auto &&pow: powers) {
                     feature_name += (pow > 0) ? "x" + std::to_string(x_idx) : "";
                     feature_name += (pow > 1) ? "^" + std::to_string(powers[x_idx]) : "";
@@ -126,7 +126,7 @@ namespace FROLS::Features {
         return feature_names;
     }
 
-    const std::string Polynomial_Model::model_equation(size_t idx) {
+    const std::string Polynomial_Model::model_equation(uint16_t idx) {
         std::string model;
         const std::vector<Feature> &rd = features[idx];
         for (int i = 0; i < rd.size(); i++) {
@@ -142,7 +142,7 @@ namespace FROLS::Features {
 
     const std::string Polynomial_Model::model_equations() {
         std::string model;
-        size_t response_idx = 0;
+        uint16_t response_idx = 0;
         for (int i = 0; i < features.size(); i++) {
             model += "y" + std::to_string(i) + "=\t";
             model += model_equation(i);
@@ -150,9 +150,9 @@ namespace FROLS::Features {
         return model;
     }
 
-    size_t Polynomial_Model::get_feature_index(const std::string& name)
+    uint16_t Polynomial_Model::get_feature_index(const std::string& name)
     {
-        size_t index = 0;
+        uint16_t index = 0;
         std::string trial_name = ".";
         while ((trial_name != name))
         {

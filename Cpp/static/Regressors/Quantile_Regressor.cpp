@@ -14,7 +14,7 @@ namespace FROLS::Regression {
 
 
             using namespace operations_research;
-            size_t N_rows = x.rows();
+            uint16_t N_rows = x.rows();
             Quantile_LP LP(tau, solver_type);
             LP.construct(N_rows);
 
@@ -57,10 +57,10 @@ namespace FROLS::Regression {
     std::vector<Feature>
     Quantile_Regressor::candidate_regression(crMat &X, crVec &y, const std::vector<Feature> &used_features) const {
         const Vec y_diff = y - predict(X, used_features);
-        std::vector<size_t> candidate_idx = unused_feature_indices(used_features, X.cols());
+        std::vector<uint16_t> candidate_idx = unused_feature_indices(used_features, X.cols());
         std::vector<Feature> candidates(candidate_idx.size());
         std::transform(candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
-                       [=](const size_t &idx) {
+                       [=](const uint16_t &idx) {
                            Feature f = single_feature_regression(X.col(idx), y);
                            f.index = idx;
                            return f;
@@ -77,7 +77,7 @@ namespace FROLS::Regression {
             crMat &X, crVec &y, const std::vector<Feature> &best_features) const {
         Vec y_pred = predict(X, best_features);
         Vec diff = y - y_pred;
-        size_t N_samples = y.rows();
+        uint16_t N_samples = y.rows();
         double err = (diff.array() > 0).select(tau * diff, -(1 - tau) * diff).sum() / N_samples;
         return err < tol;
     }

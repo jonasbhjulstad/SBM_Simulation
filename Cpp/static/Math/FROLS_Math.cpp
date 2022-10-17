@@ -5,7 +5,7 @@ namespace FROLS {
         return ((a.transpose() * a).isZero()) ? 0 : (a.transpose() * b).value() / (a.transpose() * a);
     }
 
-    size_t n_choose_k(size_t n, size_t k) {
+    uint16_t n_choose_k(uint16_t n, uint16_t k) {
         if (k > n) return 0;
         if (k * 2 > n) k = n - k;
         if (k == 0) return 1;
@@ -46,28 +46,28 @@ namespace FROLS {
         return res;
     }
 
-    std::vector<size_t> range(size_t start, size_t end) {
-        std::vector<size_t> res(end - start);
-        for (size_t i = start; i < end; i++) {
+    std::vector<uint16_t> range(uint16_t start, uint16_t end) {
+        std::vector<uint16_t> res(end - start);
+        for (uint16_t i = start; i < end; i++) {
             res[i - start] = i;
         }
         return res;
     }
 
-    std::vector<size_t> filtered_range(const std::vector<size_t> &filter_idx, size_t min, size_t max) {
+    std::vector<uint16_t> filtered_range(const std::vector<uint16_t> &filter_idx, uint16_t min, uint16_t max) {
         auto full_range = range(min, max);
-        std::vector<size_t> res;
+        std::vector<uint16_t> res;
         std::copy_if(full_range.begin(), full_range.end(), std::back_inserter(res),
-                     [&](const size_t idx) {
+                     [&](const uint16_t idx) {
                          return std::none_of(filter_idx.begin(), filter_idx.end(),
-                                             [&](const size_t &f_idx) { return idx == f_idx; });
+                                             [&](const uint16_t &f_idx) { return idx == f_idx; });
                      });
         return res;
     }
 
     Mat used_feature_orthogonalize(const Mat &X, const Mat &Q,
                                    const std::vector<Feature> &used_features) {
-        size_t N_features = X.cols();
+        uint16_t N_features = X.cols();
         Mat Q_current = Mat::Zero(X.rows(), X.cols());
         for (int k = 0; k < N_features; k++) {
             if (std::none_of(used_features.begin(), used_features.end(),

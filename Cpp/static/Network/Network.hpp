@@ -11,10 +11,10 @@
 
 namespace Network_Models {
 
-    template <typename Param, size_t Nx, size_t Nt, class Derived>
+    template <typename Param, uint16_t Nx, uint16_t Nt, class Derived>
     struct Network
     {
-        std::array<size_t, Nx> population_count()
+        std::array<uint16_t, Nx> population_count()
         {
             return static_cast<Derived*>(this)->population_count();
         }
@@ -26,16 +26,16 @@ namespace Network_Models {
         {
             static_cast<Derived*>(this)->reset();
         }
-        bool terminate(const Param& p, const std::array<size_t, Nx>& x)
+        bool terminate(const Param& p, const std::array<uint16_t, Nx>& x)
         {
             return static_cast<Derived*>(this)->terminate(p, x);
         }
         
-        std::array<std::array<size_t, Nt+1>, Nx>
-        simulate(const std::array<Param, Nt>& p_vec, size_t infection_count_tolerance = 0, size_t Nt_min = 15) {
+        std::array<std::array<uint16_t, Nt+1>, Nx>
+        simulate(const std::array<Param, Nt>& p_vec, uint16_t infection_count_tolerance = 0, uint16_t Nt_min = 15) {
 
-            std::array<std::array<size_t, Nx>,Nt+1> trajectory;
-            size_t t = 0;
+            std::array<std::array<uint16_t, Nx>,Nt+1> trajectory;
+            uint16_t t = 0;
             trajectory[0] = population_count();
             for (int i = 0; i < Nt; i++)
             {

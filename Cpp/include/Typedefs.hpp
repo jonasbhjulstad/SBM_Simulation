@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <limits>
 #include <map>
+#include <stdint.h>
 namespace FROLS {
 
 typedef Eigen::Matrix<double, -1, -1> Mat;
@@ -24,7 +25,7 @@ const std::map<Feature_Tag, std::string> feature_tag_map = {{FEATURE_INVALID, "I
 struct Feature {
   double f_ERR = -std::numeric_limits<double>::infinity(); // objective/Error Reduction Ratio
   double g;       // Feature (Orthogonalized Linear-in-the-parameters form)
-  size_t index;   // Index of the feature in the original feature set
+  uint16_t index;   // Index of the feature in the original feature set
   double theta = 0;
   Feature_Tag tag = FEATURE_INVALID;
 };

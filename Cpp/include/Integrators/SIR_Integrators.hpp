@@ -12,7 +12,7 @@ namespace FROLS::Integrators
     struct SIR_Stochastic
     {
     public:
-        static constexpr size_t Nx = 3;
+        static constexpr uint16_t Nx = 3;
         std::random_device rd;
         std::mt19937 generator;
         double alpha, beta, N_pop, dt;
@@ -117,7 +117,7 @@ namespace FROLS::Integrators
         return p;
     }
 
-    template <size_t Nt, typename Param, SIR_Param<>(param_gen)(void *p, double t)>
+    template <uint16_t Nt, typename Param, SIR_Param<>(param_gen)(void *p, double t)>
     struct SIR_Models : public CVODE_Integrator<3, Nt, SIR_Models<Nt, Param, param_gen>, SIR_Param<>>
     {
         Param param;
@@ -133,18 +133,18 @@ namespace FROLS::Integrators
         }
     };
 
-    template <size_t Nt>
+    template <uint16_t Nt>
     using SIR_Continous = SIR_Models<Nt, SIR_Param<>, SIR_param_gen>;
-    template <size_t Nt>
+    template <uint16_t Nt>
     using SIR_Sine = SIR_Models<Nt, SIR_Sine_Param, SIR_sine_param_gen>;
 
-    template <size_t Nt>
+    template <uint16_t Nt>
     struct SIR_Discrete : public Model_Integrator<3, Nt, SIR_Discrete<Nt>, SIR_Sine_Param>
     {
         using Base = Model_Integrator<3, Nt, SIR_Discrete<Nt>, SIR_Sine_Param>;
-        static constexpr size_t Nx = 3;
+        static constexpr uint16_t Nx = 3;
         const SIR_Sine_Param p;
-        size_t iter = 0;
+        uint16_t iter = 0;
         using Base::t_current;
         SIR_Discrete(const SIR_Sine_Param &p) : p(p) {}
 

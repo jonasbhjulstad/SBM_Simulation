@@ -7,10 +7,10 @@
 
 TEST(SIR_Bernoulli_Network_Test, run_simulation_test)
 {
-    size_t N_pop = 100;
+    uint16_t N_pop = 100;
     double p_ER = .4;
     double p_I0 = .1;
-    size_t N_steps = 100;
+    uint16_t N_steps = 100;
 
     std::random_device rd;
     std::mt19937 generator(rd());
@@ -19,13 +19,13 @@ TEST(SIR_Bernoulli_Network_Test, run_simulation_test)
 
     Network_Models::SIR_Bernoulli_Network G(N_pop, p_ER, generator);
     G.generate_initial_infections(p_I0, p_R0);
-    size_t Nt = 100;
+    uint16_t Nt = 100;
     double p_R = 0.01;
     double p_I = 0.1;
     auto traj = G.simulate(Nt, p_I, p_R);
 
     std::ofstream outfile("test_traj.txt");
-    for (size_t i = 0; i < traj.size(); i++) {
+    for (uint16_t i = 0; i < traj.size(); i++) {
         for (auto val: traj[i]) {
             outfile << val << ",";
         }

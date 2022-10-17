@@ -6,8 +6,8 @@
 #include <FROLS_Execution.hpp>
 #include <functional>
 // #include <oneapi/dpl/algorithm>
-template <size_t Nt, typename dType=float>
-void traj_to_file(const FROLS::MC_SIR_Params<>& p, const FROLS::MC_SIR_SimData<Nt>& d, size_t iter)
+template <uint16_t Nt, typename dType=float>
+void traj_to_file(const FROLS::MC_SIR_Params<>& p, const FROLS::MC_SIR_SimData<Nt>& d, uint16_t iter)
 {
     //print iter
     FROLS::DataFrame df;
@@ -25,11 +25,11 @@ void traj_to_file(const FROLS::MC_SIR_Params<>& p, const FROLS::MC_SIR_SimData<N
     df.write_csv(FROLS::MC_filename(p.N_pop, p.p_ER, iter, "SIR"),
                  ",", p.csv_termination_tol);
 }
-constexpr size_t N_pop = 2000;
+constexpr uint16_t N_pop = 2000;
 constexpr float p_ER = 1.0;
-constexpr size_t Nt = 20;
-constexpr size_t NV = N_pop;
-constexpr size_t NE = NV*10;
+constexpr uint16_t Nt = 20;
+constexpr uint16_t NV = N_pop;
+constexpr uint16_t NE = NV*10;
 int main() {
     using namespace FROLS;
     using namespace Network_Models;
@@ -43,11 +43,11 @@ int main() {
     p.p_ER = p_ER;
 
     std::random_device rd{};
-    std::vector<size_t> seeds(p.N_sim);
+    std::vector<uint16_t> seeds(p.N_sim);
     std::generate(seeds.begin(), seeds.end(), [&](){return rd();});
     auto enum_seeds = enumerate(seeds);
     std::cout << "Running MC-SIR simulations..." << std::endl;
-    size_t MC_iter = 0;
+    uint16_t MC_iter = 0;
     std::mt19937_64 rng(rd());
 
     typedef Network_Models::SIR_Bernoulli_Network<decltype(rng), Nt, N_pop, NE> SIR_Bernoulli_Network;
@@ -56,8 +56,8 @@ int main() {
     auto G = generate_erdos_renyi<SIR_Graph<NV, NE>, decltype(rng)>(p.N_pop, p.p_ER, SIR_S, rng);
     std::vector<MC_SIR_SimData<Nt>> simdatas(p.N_sim);
     std::transform(enum_seeds.begin(), enum_seeds.end(), simdatas.begin(), [=](auto& es){
-        size_t iter = es.first;
-        size_t seed = es.second;
+        uint16_t iter = es.first;
+        uint16_t seed = es.second;
         return MC_SIR_simulation<Nt, NV, NE>(G, p, seed);
 //        traj_to_file(p, simdata, iter);
 //        std::lock_guard<std::mutex> lg(mx);

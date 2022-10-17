@@ -31,7 +31,7 @@ PYBIND11_MODULE(pyFROLS, m) {
             .def("simulate", &Feature_Model::simulate);
 
     py::class_<Polynomial_Model, Feature_Model>(m, "Polynomial_Model")
-            .def(py::init<size_t, size_t, size_t, size_t>())
+            .def(py::init<uint16_t, uint16_t, uint16_t, uint16_t>())
             .def("transform", static_cast<Mat (Polynomial_Model::*)(crMat &)>(
                     &Polynomial_Model::transform))
             .def("get_features", &Polynomial_Model::get_features)

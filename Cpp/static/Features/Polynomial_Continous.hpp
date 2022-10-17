@@ -8,17 +8,17 @@
 namespace FROLS::Features {
 
     struct Polynomial_Model : public Feature_Model {
-        const size_t d_max;
-        const size_t Nx;
-        const size_t Nu;
+        const uint16_t d_max;
+        const uint16_t Nx;
+        const uint16_t Nu;
 
-        Polynomial_Model(size_t Nx, size_t Nu, size_t N_output_features, size_t d_max,
-                         const std::vector<size_t> ignore_idx = std::vector<size_t>())
+        Polynomial_Model(uint16_t Nx, uint16_t Nu, uint16_t N_output_features, uint16_t d_max,
+                         const std::vector<uint16_t> ignore_idx = std::vector<uint16_t>())
                 : d_max(d_max), Nx(Nx), Nu(Nu), Feature_Model(N_output_features, ignore_idx) {}
 
 
-        // double transform(crVec &x_raw, size_t target_index) ;
-        Vec _transform(crMat &X_raw, size_t target_index, bool& index_failure);
+        // double transform(crVec &x_raw, uint16_t target_index) ;
+        Vec _transform(crMat &X_raw, uint16_t target_index, bool& index_failure);
 
 
         const std::vector<std::vector<Feature>> get_features();
@@ -27,11 +27,11 @@ namespace FROLS::Features {
 
         void feature_summary();
 
-        const std::string feature_name(size_t target_index, bool indent = true);
+        const std::string feature_name(uint16_t target_index, bool indent = true);
 
         const std::vector<std::string> feature_names();
 
-        const std::string model_equation(size_t idx);
+        const std::string model_equation(uint16_t idx);
 
         const std::string model_equations();
 

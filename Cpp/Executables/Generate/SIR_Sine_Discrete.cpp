@@ -10,10 +10,10 @@
 #include <FROLS_Math.hpp>
 #include <Typedefs.hpp>
 
-constexpr size_t
+constexpr uint16_t
         Nt = 100;
 
-std::string SIR_Sine_Discrete_filename(size_t
+std::string SIR_Sine_Discrete_filename(uint16_t
                               sim_iter) {
     return FROLS::FROLS_DATA_DIR + std::string("/SIR_Sine_Trajectory_Discrete_") +
            std::to_string(sim_iter)
@@ -21,7 +21,7 @@ std::string SIR_Sine_Discrete_filename(size_t
 }
 
 FROLS::Integrators::SIR_Sine_Param
-sineparam_gen(size_t
+sineparam_gen(uint16_t
               seed) {
     std::mt19937 rng(seed);
     FROLS::Integrators::SIR_Sine_Param p;
@@ -53,13 +53,13 @@ int main() {
     using Trajectory = SIR_Sine<Nt>::Trajectory;
     double dt = 2.0;
 
-    size_t N_sim = 10000;
-    std::vector<size_t> seeds(N_sim);
+    uint16_t N_sim = 10000;
+    std::vector<uint16_t> seeds(N_sim);
     std::random_device rd;
     std::generate(seeds.begin(), seeds.end(), [&rd]() { return rd(); });
     std::vector<std::string> colnames = {"S", "I", "R"};
     typedef std::vector<std::vector<double>> vec_Trajectory;
-    std::for_each(seeds.begin(), seeds.end(), [&](const size_t seed) {
+    std::for_each(seeds.begin(), seeds.end(), [&](const uint16_t seed) {
         static int iter = 0;
         SIR_Sine_Param p = sineparam_gen(seed);
         const std::array<double, 3> x0 = {p.N_pop*9./10, p.N_pop/10, 0};
@@ -78,7 +78,7 @@ int main() {
     });
     std::vector<std::string> fnames(N_sim);
     auto range = FROLS::range(0, N_sim);
-    std::transform(range.begin(), range.end(), fnames.begin(), [&](const size_t &i) {
+    std::transform(range.begin(), range.end(), fnames.begin(), [&](const uint16_t &i) {
         return SIR_Sine_Discrete_filename(i);
     });
 

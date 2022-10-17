@@ -4,10 +4,10 @@
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_Graph.hpp>
 #include <functional>
-#include <CL/sycl.hpp>
+#include <FROLS_sycl.hpp>
 
-template<size_t Nt, typename dType = float>
-void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<Nt> &d, size_t iter) {
+template<uint16_t Nt, typename dType = float>
+void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<Nt> &d, uint16_t iter) {
     FROLS::DataFrame df;
     std::array<float, Nt> p_Is;
     std::array<float, Nt> p_Rs;
@@ -23,11 +23,11 @@ void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<N
                  ",", p.csv_termination_tol);
 }
 
-constexpr size_t N_pop = 20;
+constexpr uint16_t N_pop = 20;
 constexpr float p_ER = 1.0;
-constexpr size_t Nt = 20;
-constexpr size_t NV = N_pop;
-constexpr size_t NE = NV * NV;
+constexpr uint16_t Nt = 20;
+constexpr uint16_t NV = N_pop;
+constexpr uint16_t NE = NV * NV;
 
 int main() {
     using namespace FROLS;
@@ -41,7 +41,7 @@ int main() {
     p.p_ER = 1.0;
 
     std::random_device rd{};
-    std::vector<size_t> seeds(p.N_sim);
+    std::vector<uint16_t> seeds(p.N_sim);
     std::generate(seeds.begin(), seeds.end(), [&]() { return rd(); });
     auto enum_seeds = FROLS::enumerate(seeds);
     std::mt19937_64 rng(rd());
@@ -53,7 +53,7 @@ int main() {
         std::cout << dev.get_info<cl::sycl::info::device::name>() << std::endl;
     }
     sycl::queue q(sycl::default_selector{});
-    sycl::buffer<size_t, 1> seed_buffer{seeds.data(), sycl::range<1>(seeds.size())};
+    sycl::buffer<uint16_t, 1> seed_buffer{seeds.data(), sycl::range<1>(seeds.size())};
     std::vector<MC_SIR_SimData<Nt>> sim_data(p.N_sim);
     sycl::buffer<MC_SIR_SimData<Nt>, 1> sim_buffer{sim_data.data(), sycl::range<1>(sim_data.size())};
     sycl::buffer<MC_SIR_Params<>, 1> param_buffer{&p, sycl::range<1>(1)};

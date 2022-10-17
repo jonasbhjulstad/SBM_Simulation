@@ -11,7 +11,7 @@
 namespace FROLS {
     template<typename dType=float>
     struct MC_SIR_Params{
-        size_t N_pop = 100;
+        uint16_t N_pop = 100;
         dType p_ER = 1.0f;
         dType p_I0 = 0.01f;
         dType p_R0 = 0.0f;
@@ -19,38 +19,19 @@ namespace FROLS {
         dType R0_min = 0.0f;
         dType alpha = 0.1f;
         dType p_I = 0.f;
-        size_t N_sim = 10;
-        size_t Nt_min = 15;
+        uint16_t N_sim = 10;
+        uint16_t Nt_min = 15;
         dType p_R = 0.8f;
-        size_t seed;
-        size_t N_I_min = N_pop / 15;
-        size_t iter_offset = 0;
+        uint16_t seed;
+        uint16_t N_I_min = N_pop / 15;
+        uint16_t iter_offset = 0;
         dType csv_termination_tol = 0.f;
     };
 }
 #include "Bernoulli_SIR_File.hpp"
 
 namespace FROLS {
-    template<typename dType=float>
-    struct MC_SIR_Params{
-        size_t N_pop = 100;
-        dType p_ER = 1.0f;
-        dType p_I0 = 0.01f;
-        dType p_R0 = 0.0f;
-        dType R0_max = 1.6f;
-        dType R0_min = 0.0f;
-        dType alpha = 0.1f;
-        dType p_I = 0.f;
-        size_t N_sim = 10;
-        size_t Nt_min = 15;
-        dType p_R = 0.8f;
-        size_t seed;
-        size_t N_I_min = N_pop / 15;
-        size_t iter_offset = 0;
-        dType csv_termination_tol = 0.f;
-    };
-
-    template<typename RNG, size_t Nt,typename dType=float>
+    template<typename RNG, uint16_t Nt,typename dType=float>
     std::array<Network_Models::SIR_Param<>, Nt> generate_interaction_probabilities(const MC_SIR_Params<> &p, RNG &rng) {
         std::array<Network_Models::SIR_Param<>, Nt> param_vec;
         dType omega_bounds[] = {(2.f * M_PIf) / 5.f, (2.f * M_PIf) / 100.f};
@@ -71,15 +52,15 @@ namespace FROLS {
         return param_vec;
     }
 
-    template<size_t Nt>
+    template<uint16_t Nt>
     struct MC_SIR_SimData {
-        std::array<std::array<size_t, Nt + 1>, 3> traj;
+        std::array<std::array<uint16_t, Nt + 1>, 3> traj;
         std::array<Network_Models::SIR_Param<>, Nt> p_vec;
     };
 
-    template<size_t Nt, size_t NV, size_t NE>
+    template<uint16_t Nt, uint16_t NV, uint16_t NE>
     MC_SIR_SimData<Nt>
-    MC_SIR_simulation(const Network_Models::SIR_Graph<NV, NE> &G_structure, const MC_SIR_Params<>&p, size_t seed) {
+    MC_SIR_simulation(const Network_Models::SIR_Graph<NV, NE> &G_structure, const MC_SIR_Params<>&p, uint16_t seed) {
 
         random::default_rng generator(seed);
         Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(G_structure, p.p_I0, p.p_R0,

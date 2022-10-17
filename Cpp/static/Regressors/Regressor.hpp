@@ -12,12 +12,12 @@ namespace FROLS::Regression {
     struct Regressor_Param {
         double tol = 1e-2;
         double theta_tol = 1e-2;
-        size_t N_terms_max = 4;
+        uint16_t N_terms_max = 4;
     };
 
     struct Regressor {
         const double tol, theta_tol;
-        const size_t N_terms_max;
+        const uint16_t N_terms_max;
 
         Regressor(const Regressor_Param &);
 
@@ -30,7 +30,7 @@ namespace FROLS::Regression {
     protected:
         Vec predict(crMat &X, const std::vector<Feature> &features) const;
 
-        std::vector<size_t> unused_feature_indices(const std::vector<Feature> &features, size_t N_features) const;
+        std::vector<uint16_t> unused_feature_indices(const std::vector<Feature> &features, uint16_t N_features) const;
 
     private:
         void theta_solve(crMat &A, crVec &g, std::vector<Feature> &featureso) const;

@@ -5,15 +5,15 @@
 #include "Regression_Algorithm.hpp"
 namespace FROLS::Regression
 {
-    void from_file_regression(std::function<std::string(size_t)> MC_fname_f, const std::vector<std::string> &colnames_x,
-                              const std::vector<std::string> &colnames_u, size_t N_sims,
+    void from_file_regression(std::function<std::string(uint16_t)> MC_fname_f, const std::vector<std::string> &colnames_x,
+                              const std::vector<std::string> &colnames_u, uint16_t N_sims,
                               FROLS::Regression::Regressor &regressor, FROLS::Features::Feature_Model  &feature_model,
-                              std::function<std::string(size_t)> outsim_f) {
+                              std::function<std::string(uint16_t)> outsim_f) {
         std::vector<std::string> df_names(N_sims);
         std::generate(df_names.begin(), df_names.end(), [&, n = 0]()mutable {
             n++;return MC_fname_f(n);});
-        size_t Nt_max = 0;
-        size_t Nx = colnames_x.size();
+        uint16_t Nt_max = 0;
+        uint16_t Nx = colnames_x.size();
         using namespace FROLS;
         DataFrameStack dfs(df_names);
         Mat X = dataframe_to_matrix(dfs, colnames_x,
@@ -21,7 +21,7 @@ namespace FROLS::Regression
         Mat Y = dataframe_to_matrix(dfs, colnames_x, 1, -1);
         Mat U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
 
-        std::vector<size_t> N_rows = dfs.get_N_rows();
+        std::vector<uint16_t> N_rows = dfs.get_N_rows();
 
         using namespace FROLS::Features;
 

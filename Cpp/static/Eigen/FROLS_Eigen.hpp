@@ -31,7 +31,7 @@ namespace FROLS {
 
     template <typename T>
     Mat vecs_to_mat(const std::vector<std::vector<T>> &vectors) {
-        size_t N_rows = std::max_element(vectors.begin(), vectors.end(),
+        uint16_t N_rows = std::max_element(vectors.begin(), vectors.end(),
                                          [](auto &vec0, auto &vec1) { return vec0.size() > vec1.size(); })->size();
         Mat res(N_rows, vectors.size());
         for (int i = 0; i < res.cols(); i++) {

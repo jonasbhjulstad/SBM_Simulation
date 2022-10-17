@@ -8,18 +8,18 @@
 namespace FROLS::Features {
     struct Feature_Model {
 
-        Feature_Model(const size_t N_output_features);
+        Feature_Model(const uint16_t N_output_features);
 
         Vec step(crVec &x, crVec &u);
 
-        Mat simulate(crVec &x0, crMat &U, size_t Nt);
+        Mat simulate(crVec &x0, crMat &U, uint16_t Nt);
 
-        Vec transform(crMat &X_raw, size_t target_index, bool &index_failure);
+        Vec transform(crMat &X_raw, uint16_t target_index, bool &index_failure);
 
         Mat transform(crMat &X_raw, const std::vector<Feature> preselected_features = {});
 
 
-        virtual Vec _transform(crMat &X_raw, size_t target_index, bool &index_failure) = 0;
+        virtual Vec _transform(crMat &X_raw, uint16_t target_index, bool &index_failure) = 0;
 
         virtual const std::vector<std::vector<Feature>> get_features() = 0;
 
@@ -27,32 +27,32 @@ namespace FROLS::Features {
 
         virtual void feature_summary() = 0;
 
-        virtual const std::string feature_name(size_t target_index,
+        virtual const std::string feature_name(uint16_t target_index,
                                                bool indent = true) = 0;
 
         virtual const std::vector<std::string> feature_names() = 0;
 
-        virtual const std::string model_equation(size_t idx) = 0;
+        virtual const std::string model_equation(uint16_t idx) = 0;
 
         virtual const std::string model_equations() = 0;
-        virtual size_t get_feature_index(const std::string&) = 0;
+        virtual uint16_t get_feature_index(const std::string&) = 0;
         void ignore(const std::string&);
-        void ignore(size_t);
-        void preselect(const std::string&, double, size_t, Feature_Tag);
-        void preselect(size_t, double, size_t, Feature_Tag);
+        void ignore(uint16_t);
+        void preselect(const std::string&, double, uint16_t, Feature_Tag);
+        void preselect(uint16_t, double, uint16_t, Feature_Tag);
 
-        const size_t N_output_features;
-        std::vector<size_t> ignore_idx;
+        const uint16_t N_output_features;
+        std::vector<uint16_t> ignore_idx;
         std::vector<std::vector<Feature>> preselected_features;
         std::vector<std::vector<Feature>> features;
 
-        std::vector<size_t> get_candidate_feature_idx() { return candidate_feature_idx; }
+        std::vector<uint16_t> get_candidate_feature_idx() { return candidate_feature_idx; }
 
-        std::vector<size_t> get_preselect_feature_idx() { return preselect_feature_idx; }
+        std::vector<uint16_t> get_preselect_feature_idx() { return preselect_feature_idx; }
 
     protected:
-        std::vector<size_t> preselect_feature_idx;
-        std::vector<size_t> candidate_feature_idx;
+        std::vector<uint16_t> preselect_feature_idx;
+        std::vector<uint16_t> candidate_feature_idx;
     };
 } // namespace FROLS::Features
 

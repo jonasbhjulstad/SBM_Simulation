@@ -20,7 +20,7 @@ namespace FROLS::Regression {
         const double tau;
         const std::string solver_type;
         Quantile_LP(double tau, const std::string& solver_type) : tau(tau), solver_type(solver_type){}
-        void construct(size_t N_rows)
+        void construct(uint16_t N_rows)
         {
             using namespace operations_research;
             MPSolver::OptimizationProblemType problem_type;
@@ -75,9 +75,9 @@ namespace FROLS::Regression {
 
         bool tolerance_check(crMat &Q, crVec &y, const std::vector<Feature> &best_features) const;
 
-        size_t feature_selection_idx = 0;
+        uint16_t feature_selection_idx = 0;
 
-        Quantile_LP construct_solver(size_t N_rows) const;
+        Quantile_LP construct_solver(uint16_t N_rows) const;
 
 
     };

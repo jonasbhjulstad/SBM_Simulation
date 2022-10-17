@@ -17,8 +17,7 @@ if(${FROLS_USE_HIPSYCL})
     # Use add_definitions for now for older cmake versions
     cmake_policy(SET CMP0005 NEW)
     add_definitions(-DHIPSYCL_DEBUG_LEVEL=${HIPSYCL_DEBUG_LEVEL})
-    add_compile_options(--hipsycl-targets='cuda')
-
+    
     set(FROLS_USE_SYCL ON)
 
     # add_compile_definitions(__HIPSYCL_ENABLE_SYCL_TARGET__)

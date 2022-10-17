@@ -16,7 +16,7 @@
 #include <array>
 
 namespace FROLS::Integrators {
-    template<size_t Nx, size_t Nt, typename Derived, typename Param>
+    template<uint16_t Nx, uint16_t Nt, typename Derived, typename Param>
     struct Model_Integrator {
         Model_Integrator(double t0 = 0.): t_current(t0){}
         typedef std::array<double, Nx> State;
@@ -49,7 +49,7 @@ namespace FROLS::Integrators {
         }
     };
 
-    template<size_t Nx, size_t Nt, class Derived, typename Param>
+    template<uint16_t Nx, uint16_t Nt, class Derived, typename Param>
     struct CVODE_Integrator : public Model_Integrator<Nx, Nt, CVODE_Integrator<Nx, Nt, Derived, Param>, Param> {
         using Base = Model_Integrator<Nx, Nt, CVODE_Integrator<Nx, Nt, Derived, Param>, Param>;
         using State = typename Base::State;
