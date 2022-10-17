@@ -41,7 +41,6 @@ int main() {
     std::vector<size_t> seeds(p.N_sim);
     std::generate(seeds.begin(), seeds.end(), [&]() { return rd(); });
     std::mt19937_64 rng(rd());
-    auto G_structure = generate_erdos_renyi<SIR_Graph<NV, NE>, decltype(rng)>(p.N_pop, p.p_ER, SIR_S, rng);
 
     oneapi::dpl::ranlux48 generator(seeds[0]);
     Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(G_structure, p.p_I0, p.p_R0,
@@ -64,13 +63,13 @@ int main() {
     std::vector<MC_SIR_SimData<Nt>> sim_data(p.N_sim);
     sycl::buffer<MC_SIR_SimData<Nt>, 1> sim_buffer{sim_data.data(), sycl::range<1>(sim_data.size())};
     sycl::buffer<MC_SIR_Params<>, 1> param_buffer{&p, sycl::range<1>(1)};
-    sycl::buffer<SIR_Graph<NV, NE>, 1> graph_buffer{&G_structure, sycl::range<1>(1)};
     std::cout << "Running MC-SIR simulations..." << std::endl;
     q.submit([&](sycl::handler &h) {
         auto seed = seed_buffer.template get_access<sycl::access_mode::read>(h);
         auto sim = sycl::accessor{sim_buffer, h, sycl::write_only};
         auto params = sycl::accessor{param_buffer, h, sycl::read_only};
-        auto graph = sycl::accessor{graph_buffer, h, sycl::read_only};
+        auto G_structure = generate_erdos_renyi<SIR_Graph<NV, NE>, decltype(rng)>(p.N_pop, p.p_ER, SIR_S, rng);
+
         h.parallel_for<class nstream>(sycl::range<1>{p.N_sim}, [=](sycl::id<1> it) {
             const int i = it[0];
             sim[i] = MC_SIR_simulation<Nt>(graph[0], params[0], seed[i]);

@@ -47,7 +47,6 @@ int main() {
     std::generate(seeds.begin(), seeds.end(), [&](){return rd();});
     auto enum_seeds = enumerate(seeds);
     std::cout << "Running MC-SIR simulations..." << std::endl;
-    std::mutex mx;
     size_t MC_iter = 0;
     std::mt19937_64 rng(rd());
 
