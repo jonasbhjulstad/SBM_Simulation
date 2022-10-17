@@ -21,8 +21,8 @@ endfunction()
 add_custom_executable(sycl_info)
 
 
-add_custom_test(Graph_Iterators)
-target_include_directories(Graph_Iterators PUBLIC "../static/Graph/")
+# add_custom_test(Graph_Iterators)
+# target_include_directories(Graph_Iterators PUBLIC "../static/Graph/")
 # add_custom_test(SIR_integrator)
 # add_custom_test(monomials)
 #add_custom_test(sir_bernoulli)

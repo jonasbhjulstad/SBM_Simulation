@@ -8,7 +8,27 @@
 #include <FROLS_Eigen.hpp>
 #include <SIR_Bernoulli_Network.hpp>
 #include <graph_lite.h>
-
+namespace FROLS {
+    template<typename dType=float>
+    struct MC_SIR_Params{
+        size_t N_pop = 100;
+        dType p_ER = 1.0f;
+        dType p_I0 = 0.01f;
+        dType p_R0 = 0.0f;
+        dType R0_max = 1.6f;
+        dType R0_min = 0.0f;
+        dType alpha = 0.1f;
+        dType p_I = 0.f;
+        size_t N_sim = 10;
+        size_t Nt_min = 15;
+        dType p_R = 0.8f;
+        size_t seed;
+        size_t N_I_min = N_pop / 15;
+        size_t iter_offset = 0;
+        dType csv_termination_tol = 0.f;
+    };
+}
+#include "Bernoulli_SIR_File.hpp"
 
 namespace FROLS {
     template<typename dType=float>
@@ -29,7 +49,6 @@ namespace FROLS {
         size_t iter_offset = 0;
         dType csv_termination_tol = 0.f;
     };
-#include "Bernoulli_SIR_File.hpp"
 
     template<typename RNG, size_t Nt,typename dType=float>
     std::array<Network_Models::SIR_Param<>, Nt> generate_interaction_probabilities(const MC_SIR_Params<> &p, RNG &rng) {

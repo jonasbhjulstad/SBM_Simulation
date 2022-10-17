@@ -2,6 +2,7 @@
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_Math.hpp>
 #include <FROLS_Execution.hpp>
+#include <thread>
 namespace FROLS {
     double quantile(std::vector<double> list, double tau) {
         typename std::vector<double>::iterator b = list.begin();

@@ -6,6 +6,7 @@
 #define FROLS_FROLS_GRAPH_HPP
 
 #include <stddef.h>
+#include <stdint.h>
 #include <cassert>
 #include <array>
 #include <algorithm>

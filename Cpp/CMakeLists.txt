@@ -1,7 +1,11 @@
 set(ENABLE_TESTING ON)
 cmake_minimum_required(VERSION 3.5)
 project(FROLS)
-
+set(CMAKE_C_COMPILER_WORKS ON)
+set(CMAKE_CXX_COMPILER_WORKS ON)
+SET(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_C_COMPILER_FORCED ON)
 if(WIN32)
     set(PYTHON_EXECUTABLE "C:\\Users\\jonas\\anaconda3\\envs\\Network_MPC\\python.exe")
 else()
@@ -19,73 +23,24 @@ get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TAR
 get_property(importTargetsAfter DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
 find_package(range-v3 REQUIRED)
 
+set(SPIR_FORMAT __DEVICE_SPIR64__)
 list(REMOVE_ITEM importTargetsAfter ${importTargets})
 message("${importTargetsAfter}")
 find_package(SUNDIALS REQUIRED)
 find_package(pybind11 CONFIG)
-set(FROLS_USE_INTEL ON)
-set(FROLS_USE_INTEL_SYCL ON)
-set(FROLS_USE_HIPSYCL OFF)
+set(FROLS_USE_INTEL OFF)
+set(FROLS_USE_INTEL_SYCL OFF)
+set(FROLS_USE_HIPSYCL ON)
 set(HIPSYCL_TARGETS "cuda")
 if(${FROLS_USE_INTEL})
 find_package(TBB REQUIRED)
 set(ONEAPI_LIBS TBB::tbb)
 endif()
-if(${FROLS_USE_INTEL_SYCL})
-    # get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-    # get_property(importTargetsAfter DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-    find_package(IntelDPCPP REQUIRED HINTS "/opt/intel/oneapi/compiler/latest/linux/IntelDPCPP")
-    set(TBB_DIR "/opt/intel/oneapi/tbb/latest/lib/cmake/tbb
-/")
-    find_package(TBB REQUIRED)
-    
-    find_package(oneDPL REQUIRED HINTS "/opt/intel/oneapi/dpl/2021.7.0/lib/cmake/oneDPL/")
 
-    set(ONEAPI_LIBS oneDPL TBB::tbb)
+include(cmake/HIP_Sycl_config.cmake)
+include(cmake/Intel_Sycl_config.cmake)
+include(cmake/Sycl_executable.cmake)
 
-    # list(REMOVE_ITEM importTargetsAfter ${importTargets})
-    # message(WARNING "${importTargetsAfter}")
-    # set(CMAKE_CXX_COMPILER /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icpx)
-    # set(CMAKE_C_COMPILER /opt/intel/oneapi/compiler/2022.1.0/linux/bin/icx)
-    add_compile_definitions(FROLS_USE_INTEL_SYCL)
-    add_compile_definitions(__DEVICE_SPIR64__)
-    add_compile_options("-fsycl")
-    add_compile_definitions(FROLS_USE_SYCL)
-    set(FROLS_USE_SYCL ON)
-elseif(${FROLS_USE_HIPSYCL})
-set(CMAKE_C_COMPILER_WORKS ON)
-set(CMAKE_CXX_COMPILER_WORKS ON)
-    find_package(HIPSYCL REQUIRED)
-
-    if(NOT HIPSYCL_DEBUG_LEVEL)
-        if(CMAKE_BUILD_TYPE MATCHES "Debug")
-            set(HIPSYCL_DEBUG_LEVEL 3 CACHE INTEGER
-                "Choose the debug level, options are: 0 (no debug), 1 (print errors), 2 (also print warnings), 3 (also print general information)"
-                FORCE)
-        else()
-            set(HIPSYCL_DEBUG_LEVEL 2 CACHE INTEGER
-                "Choose the debug level, options are: 0 (no debug), 1 (print errors), 2 (also print warnings), 3 (also print general information)"
-                FORCE)
-        endif()
-    endif()
-
-    # add_compile_definitions(HIPSYCL_DEBUG_LEVEL="${HIPSYCL_DEBUG_LEVEL}")
-    # Use add_definitions for now for older cmake versions
-    cmake_policy(SET CMP0005 NEW)
-    add_definitions(-DHIPSYCL_DEBUG_LEVEL=${HIPSYCL_DEBUG_LEVEL})
-
-    if(WIN32)
-        add_definitions(-D_USE_MATH_DEFINES)
-    endif()
-
-    add_compile_definitions(FROLS_USE_HIPSYCL)
-    add_compile_definitions(FROLS_USE_SYCL)
-    set(FROLS_USE_SYCL ON)
-
-    # add_compile_definitions(__HIPSYCL_ENABLE_SYCL_TARGET__)
-    add_compile_options("-fsycl")
-
-    endif()
 
 # find_package(nlohmann_json REQUIRED)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
