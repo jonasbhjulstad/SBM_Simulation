@@ -14,6 +14,9 @@ function(add_custom_test source_file)
     target_compile_options(${source_file} PRIVATE "-Wfatal-errors")
 endfunction()
 
+add_sycl_executable(sycl_info)
+target_link_libraries(sycl_info PUBLIC FROLS_Sycl)
+
 # add_custom_executable(neighbor_test)
 # #link frols_network
 # target_link_libraries(neighbor_test PUBLIC FROLS_Graph FROLS_Network)

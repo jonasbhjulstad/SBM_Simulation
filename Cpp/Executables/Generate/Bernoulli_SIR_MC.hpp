@@ -13,7 +13,7 @@ namespace FROLS {
     struct MC_SIR_Params{
         uint16_t N_pop = 100;
         dType p_ER = 1.0f;
-        dType p_I0 = 0.01f;
+        dType p_I0 = 0.5f;
         dType p_R0 = 0.0f;
         dType R0_max = 1.6f;
         dType R0_min = 0.0f;

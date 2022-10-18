@@ -1,0 +1,8 @@
+/home/man/Documents/Bernoulli_MC/array-transform/build/CMakeFiles/array-transform.dir
+/home/man/Documents/Bernoulli_MC/array-transform/build/CMakeFiles/debug-session.dir
+/home/man/Documents/Bernoulli_MC/array-transform/build/CMakeFiles/run.dir
+/home/man/Documents/Bernoulli_MC/array-transform/build/CMakeFiles/run-cpu.dir
+/home/man/Documents/Bernoulli_MC/array-transform/build/CMakeFiles/run-gpu.dir
+/home/man/Documents/Bernoulli_MC/array-transform/build/CMakeFiles/run-fpga.dir
+/home/man/Documents/Bernoulli_MC/array-transform/build/CMakeFiles/edit_cache.dir
+/home/man/Documents/Bernoulli_MC/array-transform/build/CMakeFiles/rebuild_cache.dir

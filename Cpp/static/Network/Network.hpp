@@ -41,6 +41,7 @@ namespace Network_Models {
             trajectory[0] = population_count();
             for (int i = 0; i < Nt; i++)
             {
+                std::cout << i << " of " << Nt << std::endl;
                 advance(p_vec[i]);
                 trajectory[i+1] = population_count();
                 if (terminate(p_vec[i], trajectory[i+1]))
@@ -51,5 +52,10 @@ namespace Network_Models {
             return FROLS::transpose(trajectory);
         }
     };
+
+    size_t get_required_network_space(size_t Nx, size_t Nt)
+    {
+        return Nx * (Nt + 1) * sizeof(uint16_t);
+    }
 }
 #endif

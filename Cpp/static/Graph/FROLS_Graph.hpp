@@ -57,6 +57,11 @@ namespace FROLS::Graph {
             return &_vertices[N_vertices];
         }
 
+        const V& operator[](uint16_t id) const
+        {
+            return get_vertex(id);
+        }
+
         const V &get_vertex(uint16_t id) {
             //find vertex based on index
             auto p_V = std::find_if(_vertices.begin(), _vertices.end(), [id](const Vertex<V> &v) {
@@ -67,10 +72,13 @@ namespace FROLS::Graph {
         }
 
         void assign_vertex(const V &v_data, uint16_t idx) {
-            _vertices[idx] = v_data;
+            //find index of vertex
+            auto p_V = std::find_if(_vertices.begin(), _vertices.end(), [idx](const Vertex<V> &v) {
+                return v.id == idx;
+            });
+            assert(p_V != _vertices.end() && "Vertex not found");
+            p_V->data = v_data;
         }
-
-
 
         void add_vertex(uint16_t id, const V &v_data) {
             assert(N_vertices < NV && "Max number of vertices exceeded");
@@ -80,7 +88,10 @@ namespace FROLS::Graph {
 
 
         void add_edge(uint16_t from, uint16_t to, const E e_data = {}) {
-            assert(N_edges < (NE - 1) && "Exceeded max edge capacity");
+            if (N_edges >= NE)
+            {
+                return;
+            }
             _edges[N_edges++] = {e_data, from,  to};
         }
 
@@ -181,8 +192,6 @@ namespace FROLS::Graph {
     Graph(
             const std::array<V, NV> &vertices,
             const std::array<E, NE> &edges) -> Graph<V, E, NV, NE>;
-
-    
 
 
 } // FROLS::Graph

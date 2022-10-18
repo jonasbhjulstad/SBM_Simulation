@@ -1,0 +1,104 @@
+{
+	"kind" : "toolchains",
+	"toolchains" : 
+	[
+		{
+			"compiler" : 
+			{
+				"id" : "IntelLLVM",
+				"implicit" : 
+				{
+					"includeDirectories" : 
+					[
+						"/opt/intel/oneapi/vpl/2022.2.0/include",
+						"/opt/intel/oneapi/tbb/2021.7.0/include",
+						"/opt/intel/oneapi/mpi/2021.7.0/include",
+						"/opt/intel/oneapi/mkl/2022.2.0/include",
+						"/opt/intel/oneapi/ipp/2021.6.1/include",
+						"/opt/intel/oneapi/ippcp/2021.6.1/include",
+						"/opt/intel/oneapi/dpl/2021.7.1/linux/include",
+						"/opt/intel/oneapi/dpcpp-ct/2022.2.0/include",
+						"/opt/intel/oneapi/dnnl/2022.2.0/cpu_dpcpp_gpu_dpcpp/include",
+						"/opt/intel/oneapi/dev-utilities/2021.7.0/include",
+						"/opt/intel/oneapi/dal/2021.7.0/include",
+						"/opt/intel/oneapi/ccl/2021.7.0/include/cpu_gpu_dpcpp",
+						"/opt/intel/oneapi/compiler/2022.2.0/linux/include/sycl",
+						"/opt/intel/oneapi/compiler/2022.2.0/linux/include",
+						"/opt/intel/oneapi/compiler/2022.2.0/linux/compiler/include",
+						"/usr/include/c++/12.2.0",
+						"/usr/include/c++/12.2.0/x86_64-pc-linux-gnu",
+						"/usr/include/c++/12.2.0/backward",
+						"/opt/intel/oneapi/compiler/2022.2.0/linux/lib/clang/15.0.0/include",
+						"/usr/local/include",
+						"/usr/include"
+					],
+					"linkDirectories" : 
+					[
+						"/opt/intel/oneapi/compiler/2022.2.0/linux/compiler/lib/intel64_lin",
+						"/opt/intel/oneapi/compiler/2022.2.0/linux/lib",
+						"/usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.0",
+						"/usr/lib64",
+						"/lib64",
+						"/lib",
+						"/usr/lib",
+						"/opt/intel/oneapi/vpl/2022.2.0/lib",
+						"/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8",
+						"/opt/intel/oneapi/mpi/2021.7.0/libfabric/lib",
+						"/opt/intel/oneapi/mpi/2021.7.0/lib/release",
+						"/opt/intel/oneapi/mpi/2021.7.0/lib",
+						"/opt/intel/oneapi/mkl/2022.2.0/lib/intel64",
+						"/opt/intel/oneapi/ipp/2021.6.1/lib/intel64",
+						"/opt/intel/oneapi/ippcp/2021.6.1/lib/intel64",
+						"/opt/intel/oneapi/dnnl/2022.2.0/cpu_dpcpp_gpu_dpcpp/lib",
+						"/opt/intel/oneapi/dal/2021.7.0/lib/intel64",
+						"/opt/intel/oneapi/ccl/2021.7.0/lib/cpu_gpu_dpcpp"
+					],
+					"linkFrameworkDirectories" : [],
+					"linkLibraries" : 
+					[
+						"svml",
+						"irng",
+						"stdc++",
+						"imf",
+						"m",
+						"gcc_s",
+						"gcc",
+						"irc",
+						"dl",
+						"gcc_s",
+						"gcc",
+						"sycl",
+						"sycl-devicelib-host",
+						"c",
+						"gcc_s",
+						"gcc",
+						"irc_s"
+					]
+				},
+				"path" : "/opt/intel/oneapi/compiler/2022.2.0/linux/bin/dpcpp",
+				"version" : "2022.2.0"
+			},
+			"language" : "CXX",
+			"sourceFileExtensions" : 
+			[
+				"C",
+				"M",
+				"c++",
+				"cc",
+				"cpp",
+				"cxx",
+				"m",
+				"mm",
+				"mpp",
+				"CPP",
+				"ixx",
+				"cppm"
+			]
+		}
+	],
+	"version" : 
+	{
+		"major" : 1,
+		"minor" : 0
+	}
+}

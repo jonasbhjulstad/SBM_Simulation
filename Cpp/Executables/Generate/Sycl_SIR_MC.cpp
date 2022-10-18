@@ -4,7 +4,7 @@
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_Graph.hpp>
 #include <functional>
-#include <FROLS_sycl.hpp>
+#include <FROLS_Sycl.hpp>
 
 template<uint16_t Nt, typename dType = float>
 void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<Nt> &d, uint16_t iter) {

@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/array-transform/build",
+  "command": "/opt/intel/oneapi/compiler/2022.2.0/linux/bin/dpcpp -g -O0 -std=gnu++17 -o CMakeFiles/array-transform.dir/src/array-transform.cpp.o -c /home/man/Documents/Bernoulli_MC/array-transform/src/array-transform.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/array-transform/src/array-transform.cpp"
+}
+]

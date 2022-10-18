@@ -8,7 +8,7 @@
 #endif
 namespace FROLS::random {
 #ifdef FROLS_USE_INTEL_SYCL
-    using default_rng = oneapi::dpl::minstd_rand;
+    using default_rng = oneapi::dpl::ranlux48;
     using oneapi::dpl::uniform_real_distribution;
 #else
     using std::mt19937_64;
