@@ -99,7 +99,8 @@
         "syncstream": "cpp",
         "hash_map": "cpp",
         "*.inc": "cpp",
-        "*.def": "cpp"
+        "*.def": "cpp",
+        "execution": "cpp"
     },
     "cmake.showConsoleAutomatically": true,
     // "C_Cpp.intelliSenseEngine": "Disabled",

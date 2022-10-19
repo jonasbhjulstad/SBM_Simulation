@@ -5,8 +5,8 @@
 #include <ERR_Regressor.hpp>
 #include <iostream>
 int main() {
-  uint16_t N_sims = 100; // 10000;
-  uint16_t N_pop = 60;
+  uint32_t N_sims = 100; // 10000;
+  uint32_t N_pop = 60;
   float p_ER = 1.0;
   using namespace FROLS;
   std::vector<std::string> df_names(N_sims);
@@ -23,11 +23,11 @@ int main() {
 
   std::cout << X << std::endl;
 
-  uint16_t d_max = 1;
-  uint16_t N_output_features = 16;
+  uint32_t d_max = 1;
+  uint32_t N_output_features = 16;
   using namespace FROLS::Features;
-  uint16_t Nx = X.cols();
-  uint16_t Nu = U.cols();
+  uint32_t Nx = X.cols();
+  uint32_t Nu = U.cols();
 
   FROLS::Features::Polynomial_Model model(Nx, Nu, N_output_features, d_max);
   float ERR_tol = 1e-1;
@@ -37,7 +37,7 @@ int main() {
 
   Vec x0 = X.row(0);
   float u0 = U(0, 0);
-  uint16_t Nt = 30;
+  uint32_t Nt = 30;
   Vec u = Vec::Ones(Nt) * u0;
   // print x0, u
   std::cout << "x0 = " << x0.transpose() << std::endl;

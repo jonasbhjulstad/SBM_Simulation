@@ -6,10 +6,10 @@ namespace FROLS::Regression {
 
     std::vector<Feature> ERR_Regressor::candidate_regression(crMat &X, crVec &y,
                                                              const std::vector<Feature> &used_features) const {
-        std::vector<uint16_t> candidate_idx = unused_feature_indices(used_features, X.cols());
+        std::vector<uint32_t> candidate_idx = unused_feature_indices(used_features, X.cols());
         std::vector<Feature> candidates(X.cols() - used_features.size());
-        std::transform(FROLS::execution::par_unseq,candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
-                       [&](const uint16_t &idx) {
+        std::transform(std::execution::par_unseq,candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
+                       [&](const uint32_t &idx) {
                            Feature f = single_feature_regression(X.col(idx), y);
                            f.index = idx;
                            return f;

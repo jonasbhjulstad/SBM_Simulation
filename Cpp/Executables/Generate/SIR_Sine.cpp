@@ -1,6 +1,7 @@
 //
 // Created by arch on 9/17/22.
 //
+#define SUNDIALS_SINGLE_PRECISION
 #include <Typedefs.hpp>
 #include <Integrators/SIR_Integrators.hpp>
 #include <random>
@@ -10,10 +11,10 @@
 #include <FROLS_Math.hpp>
 #include <Typedefs.hpp>
 
-constexpr uint16_t
+constexpr uint32_t
         Nt = 100;
 
-std::string SIR_Sine_filename(uint16_t
+std::string SIR_Sine_filename(uint32_t
                               sim_iter) {
     return FROLS::FROLS_DATA_DIR + std::string("/SIR_Sine_Trajectory_") +
            std::to_string(sim_iter)
@@ -21,7 +22,7 @@ std::string SIR_Sine_filename(uint16_t
 }
 
 FROLS::Integrators::SIR_Sine_Param
-sineparam_gen(uint16_t
+sineparam_gen(uint32_t
               seed) {
     std::mt19937 rng(seed);
     FROLS::Integrators::SIR_Sine_Param p;
@@ -52,15 +53,15 @@ int main() {
     using namespace FROLS::Integrators;
     using Trajectory = SIR_Sine<Nt>::Trajectory;
     float I0 = 100;
-    float dt = 2.0;
+    float dt = 1.0f;
 
-    uint16_t N_sim = 10000;
-    std::vector<uint16_t> seeds(N_sim);
+    uint32_t N_sim = 10000;
+    std::vector<uint32_t> seeds(N_sim);
     std::random_device rd;
     std::generate(seeds.begin(), seeds.end(), [&rd]() { return rd(); });
     std::vector<std::string> colnames = {"S", "I", "R"};
     typedef std::vector<std::vector<float>> vec_Trajectory;
-    std::for_each(seeds.begin(), seeds.end(), [&](const uint16_t seed) {
+    std::for_each(seeds.begin(), seeds.end(), [&](const uint32_t seed) {
         static int iter = 0;
         SIR_Sine_Param p = sineparam_gen(seed);
         const std::array<float, 3> x0 = {p.N_pop - I0, I0, 0};
@@ -79,7 +80,7 @@ int main() {
     });
     std::vector<std::string> fnames(N_sim);
     auto range = FROLS::range(0, N_sim);
-    std::transform(range.begin(), range.end(), fnames.begin(), [&](const uint16_t &i) {
+    std::transform(range.begin(), range.end(), fnames.begin(), [&](const uint32_t &i) {
         return SIR_Sine_filename(i);
     });
 

@@ -16,19 +16,19 @@ int main() {
     using namespace FROLS;
     using namespace FROLS::Regression;
     using namespace FROLS::Features;
-    uint16_t Nx = 3;
+    uint32_t Nx = 3;
     Vec x0(Nx);
     x0 << 10, 100, -100;
 
     Mat A(Nx, Nx);
     A << .9, 4., 0, 0., .5, 0, .1, 0, 0;
-    uint16_t Nu = 1;
+    uint32_t Nu = 1;
     Mat b(Nx, Nu);
     b.setConstant(1);
 
-    uint16_t Nt = 100;
+    uint32_t Nt = 100;
     Mat u(Nt, 1);
-    uint16_t N_sims = 100;
+    uint32_t N_sims = 100;
     float omega = 4;
     u.col(0).setLinSpaced(Nt, 0, Nt * omega / (2 * M_PI));
     u = u.array().sin();
@@ -49,8 +49,8 @@ int main() {
     }
 
 
-    uint16_t d_max = 1;
-    uint16_t N_features = 16;
+    uint32_t d_max = 1;
+    uint32_t N_features = 16;
     float ERR_tol = 1e-5;
     float MAE_tol = 1;
     float tau = .95;

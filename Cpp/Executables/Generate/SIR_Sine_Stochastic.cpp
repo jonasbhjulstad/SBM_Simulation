@@ -51,7 +51,7 @@ int main() {
     using namespace FROLS;
     using namespace FROLS::Integrators;
     using Trajectory = SIR_Sine<Nt>::Trajectory;
-    float dt = 2.0;
+    float dt = 1.0;
 
     uint32_t N_sim = 10000;
     std::vector<uint32_t> seeds(N_sim);
@@ -63,7 +63,7 @@ int main() {
         static int iter = 0;
         SIR_Sine_Param p = sineparam_gen(seed);
         const std::array<float, 3> x0 = {p.N_pop*9.f/10.f, p.N_pop/10.f, 0.f};
-        Integrators::SIR_Discrete<Nt> model(p);
+        Integrators::SIR_Stochastic<Nt> model(x0, p, dt);
         auto [traj, t] = model.simulate(x0);
         std::vector<std::vector<float>> result(Nt + 1);
         DataFrame df;

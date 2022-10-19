@@ -21,22 +21,25 @@ if __name__ == '__main__':
     csv_model = DATA_DIR + '/model.csv'
 
 
-        
+    N_pop = 20
 
     # find all csv in data_path
-    files = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_1000_1_*.csv")
+    files = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_" + str(N_pop) + "_1/*.csv")
+    # files = glob.glob(DATA_DIR + "SIR_Sine_Trajectory_Discrete_*.csv")
     #sort q_files according to float in name
     fig, ax = plt.subplots(4)
-    dfs = [pd.read_csv(f, delimiter=",") for f in files]
+    dfs = [pd.read_csv(f, delimiter=",") for f in files[:100]]
+    
 
     I = np.zeros_like(dfs[0]["S"].to_numpy())
-    for df in dfs:
+    for df in dfs[:1000]:
         X = df[["S", "I", "R"]].to_numpy()
         ax[0].plot(df["t"], df["S"], color='gray', alpha=.2)
         ax[1].plot(df["t"], df["I"], color='gray', alpha=.2)
         ax[2].plot(df["t"], df["R"], color='gray', alpha=.2)
-        ax[3].plot(df["t"], df["p_I"], color='gray', alpha=.2)
+        ax[3].plot(df["t"][:-1], df["p_I"][:-1], color='gray', alpha=.2)
 
+    _ = [x.set_ylim(0, N_pop) for x in ax[:-1]]
 
     # plot S, I, R, p_I, p_R
     plt.show()

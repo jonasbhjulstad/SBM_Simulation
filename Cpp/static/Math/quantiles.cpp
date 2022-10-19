@@ -8,7 +8,7 @@ namespace FROLS {
         typename std::vector<float>::iterator b = list.begin();
         typename std::vector<float>::iterator e = list.end();
         typename std::vector<float>::iterator quant = list.begin();
-        const uint16_t pos = tau * std::distance(b, e);
+        const uint32_t pos = tau * std::distance(b, e);
         std::advance(quant, pos);
 
         std::nth_element(b, quant, e);
@@ -17,11 +17,11 @@ namespace FROLS {
 
     std::vector<float> dataframe_quantiles(DataFrameStack &dfs,
                                             std::string col_name, float tau) {
-        uint16_t N_rows = 0;
+        uint32_t N_rows = 0;
         for (int i = 0; i < dfs.get_N_frames(); i++) {
-            N_rows = std::max({N_rows, (uint16_t) dfs[i].get_N_rows()});
+            N_rows = std::max({N_rows, (uint32_t) dfs[i].get_N_rows()});
         }
-        uint16_t N_frames = dfs.get_N_frames();
+        uint32_t N_frames = dfs.get_N_frames();
         std::vector<float> result(N_rows);
         std::vector<float> xk;
         xk.reserve(N_rows);
@@ -38,10 +38,10 @@ namespace FROLS {
         return result;
     }
 
-    void quantiles_to_file(uint16_t N_simulations, const std::vector<std::string>& colnames, std::function<std::string(uint16_t)> MC_fname_f, std::function<std::string(uint16_t)> q_fname_f) {
+    void quantiles_to_file(uint32_t N_simulations, const std::vector<std::string>& colnames, std::function<std::string(uint32_t)> MC_fname_f, std::function<std::string(uint32_t)> q_fname_f) {
         static std::thread::id thread_0 = std::this_thread::get_id();
         std::vector<std::string> filenames(N_simulations);
-        uint16_t iter = 0;
+        uint32_t iter = 0;
         for (int i = 0; i < N_simulations; i++)
         {
             filenames[i] = MC_fname_f(i);
@@ -49,13 +49,13 @@ namespace FROLS {
         {
             using namespace FROLS;
             DataFrameStack dfs(filenames);
-            uint16_t N_rows = dfs[0].get_N_rows();
+            uint32_t N_rows = dfs[0].get_N_rows();
             std::vector<float> t = (*dfs[0]["t"]);
             std::vector<float> xk(N_simulations);
 
             std::vector<float> quantiles = FROLS::arange(0.05, 0.95, 0.05);
 
-            std::vector<std::vector<uint16_t>> q_trajectories(quantiles.size());
+            std::vector<std::vector<uint32_t>> q_trajectories(quantiles.size());
             for (auto &traj: q_trajectories) {
                 traj.resize(N_rows);
             }
@@ -67,7 +67,7 @@ namespace FROLS {
                 DataFrame df;
                 df.assign("t", t);
 
-                std::for_each(FROLS::execution::par_unseq, colnames.begin(), colnames.end(), [&](const auto& colname){df.assign(colname, dataframe_quantiles(dfs, colname));});
+                std::for_each(std::execution::par_unseq, colnames.begin(), colnames.end(), [&](const auto& colname){df.assign(colname, dataframe_quantiles(dfs, colname));});
                 df.write_csv(q_fname_f(i), ",");
             }
         }

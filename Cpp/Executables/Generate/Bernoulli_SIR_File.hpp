@@ -4,8 +4,8 @@
 #include <thread>
 namespace FROLS
 {
-    template <uint16_t Nt, uint16_t NV, uint16_t NE, typename dType = float>
-    void MC_SIR_to_file(const MC_SIR_Params<> &p, uint16_t thread_id)
+    template <uint32_t Nt, uint32_t NV, uint32_t NE, typename dType = float>
+    void MC_SIR_to_file(const MC_SIR_Params<> &p, uint32_t thread_id)
     {
 
         static std::thread::id thread_0 = std::this_thread::get_id();
@@ -19,12 +19,12 @@ namespace FROLS
         thread_local Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(p.N_pop, p.p_ER, p.p_I0,
                                                                                               p.p_R0, generator);
 
-        for (uint16_t i = 0; i < p.N_sim; i++)
+        for (uint32_t i = 0; i < p.N_sim; i++)
         {
-            if ((std::this_thread::get_id() == thread_0) && !(i % (p.N_sim / 10)))
-            {
-                std::cout << "Simulation " << i << " of " << p.N_sim << std::endl;
-            }
+            // if ((std::this_thread::get_id() == thread_0) && !(i % (p.N_sim / 10)))
+            // {
+            //     std::cout << "Simulation " << i << " of " << p.N_sim << std::endl;
+            // }
             G.reset();
             while (G.population_count()[1] == 0)
             {
@@ -46,9 +46,9 @@ namespace FROLS
             df.write_csv(MC_filename(p.N_pop, p.p_ER, i + p.iter_offset, "SIR"),
                          ",", p.csv_termination_tol);
 
-            delta_df.assign("S", diff<Nt + 1, uint16_t, int>(traj[0]));
-            delta_df.assign("I", diff<Nt + 1, uint16_t, int>(traj[1]));
-            delta_df.assign("R", diff<Nt + 1, uint16_t, int>(traj[2]));
+            delta_df.assign("S", diff<Nt + 1, uint32_t, int>(traj[0]));
+            delta_df.assign("I", diff<Nt + 1, uint32_t, int>(traj[1]));
+            delta_df.assign("R", diff<Nt + 1, uint32_t, int>(traj[2]));
             delta_df.assign("p_I", p_Is);
             delta_df.assign("p_R", p_Rs);
             delta_df.assign("t", range(0, Nt));
@@ -57,7 +57,7 @@ namespace FROLS
         }
     }
 
-    template <uint16_t Nt, uint16_t NV, uint16_t NE, typename dType = float>
+    template <uint32_t Nt, uint32_t NV, uint32_t NE, typename dType = float>
     Mat MC_SIR_to_Mat(const MC_SIR_Params<> &p)
     {
 
@@ -66,12 +66,12 @@ namespace FROLS
         std::vector<Mat> Xi_vec;
         thread_local Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(p.N_pop, p.p_ER, p.p_I0,
                                                                                               p.p_R0, generator);
-        for (uint16_t i = 0; i < p.N_sim; i++)
+        for (uint32_t i = 0; i < p.N_sim; i++)
         {
-            if ((std::this_thread::get_id() == thread_0) && !(i % (p.N_sim / 10)))
-            {
-                std::cout << "Simulation " << i << " of " << p.N_sim << std::endl;
-            }
+            // if ((std::this_thread::get_id() == thread_0) && !(i % (p.N_sim / 10)))
+            // {
+            //     std::cout << "Simulation " << i << " of " << p.N_sim << std::endl;
+            // }
             G.reset();
             while (G.population_count()[1] == 0)
             {
@@ -88,7 +88,7 @@ namespace FROLS
             Xi.col(4) = Eigen::Map<Vec>(p_I_vec.data(), p_I_vec.size());
             Xi_vec.emplace_back(Xi);
         }
-        uint16_t N_rows = 0;
+        uint32_t N_rows = 0;
         std::for_each(Xi_vec.begin(), Xi_vec.end(), [&](auto &xi)
                       { N_rows += xi.rows(); });
         Mat X(N_rows, 4);

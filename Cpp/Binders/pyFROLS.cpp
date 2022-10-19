@@ -1,5 +1,4 @@
 
-#include <Polynomial_Discrete.hpp>
 #include <Regressor.hpp>
 #include <Quantile_Regressor.hpp>
 #include <ERR_Regressor.hpp>
@@ -31,7 +30,7 @@ PYBIND11_MODULE(pyFROLS, m) {
             .def("simulate", &Feature_Model::simulate);
 
     py::class_<Polynomial_Model, Feature_Model>(m, "Polynomial_Model")
-            .def(py::init<uint16_t, uint16_t, uint16_t, uint16_t>())
+            .def(py::init<uint32_t, uint32_t, uint32_t, uint32_t>())
             .def("transform", static_cast<Mat (Polynomial_Model::*)(crMat &)>(
                     &Polynomial_Model::transform))
             .def("get_features", &Polynomial_Model::get_features)
@@ -53,6 +52,6 @@ PYBIND11_MODULE(pyFROLS, m) {
             .def("fit", &Quantile_Regressor::fit);
     py::class_<ERR_Regressor, Regressor>(m, "ERR_Regressor")
             .def(py::init<float, float>())
-            .def("transform_fit", &Quantile_Regressor::transform_fit)
+            .def("transform_fit", &ERR_Regressor::transform_fit)
             .def("fit", &Quantile_Regressor::fit);
 }

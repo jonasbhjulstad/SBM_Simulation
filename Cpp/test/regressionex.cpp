@@ -3,8 +3,8 @@
 
 // TEST(Regression, single_response_regression)
 // {
-//     uint16_t N_features = 2;
-//     uint16_t N_samples = 10;
+//     uint32_t N_features = 2;
+//     uint32_t N_samples = 10;
 //     Mat X = Mat::Zero(N_samples, N_features);
 //     //Linear feature
 //     X.col(0) = Vec::LinSpaced(N_samples, 0, 1);
@@ -31,8 +31,8 @@ int main()
     df.read("C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\Data\\Bernoulli_SIR_MC_1582.csv", io_format::csv2);
 
 
-    uint16_t N_rows = df.get_column<float>("S").size();
-    uint16_t N_features = df.get_columns_info().size();
+    uint32_t N_rows = df.get_column<float>("S").size();
+    uint32_t N_features = df.get_columns_info().size();
 
     std::vector<std::vector<float>> tmp = {df.get_column<float>("S"), df.get_column<float>("I"), df.get_column<float>("R"), df.get_column<float>("p_I")};
     Mat Y(N_rows, N_features);

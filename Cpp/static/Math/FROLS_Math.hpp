@@ -6,7 +6,7 @@
 namespace FROLS {
     float cov_normalize(const Vec &a, const Vec &b);
 
-    uint16_t n_choose_k(uint16_t n, uint16_t k);
+    uint32_t n_choose_k(uint32_t n, uint32_t k);
 
     Vec vec_orthogonalize(const Vec &v, const Mat &Q);
 
@@ -14,7 +14,7 @@ namespace FROLS {
 
     std::vector<float> arange(float min, float max, float step);
 
-    std::vector<uint16_t> range(uint16_t start, uint16_t end);
+    std::vector<uint32_t> range(uint32_t start, uint32_t end);
 
     template<typename T>
     inline Vec monomial_powers(const Mat &X, const T &powers) {
@@ -78,9 +78,9 @@ namespace FROLS {
         return res;
     }
 
-    std::vector<uint16_t> filtered_range(const std::vector<uint16_t> &filter_idx, uint16_t min, uint16_t max);
+    std::vector<uint32_t> filtered_range(const std::vector<uint32_t> &filter_idx, uint32_t min, uint32_t max);
 
-    template<uint16_t N, typename T, typename T_out = T>
+    template<uint32_t N, typename T, typename T_out = T>
     std::array<T_out, N - 1> diff(const std::array<T, N> &vec) {
         std::array<T_out, N - 1> res;
         for (int i = 0; i < N; i++) {
@@ -89,7 +89,7 @@ namespace FROLS {
         return res;
     }
 
-    template<uint16_t N, typename T, typename T_out = T>
+    template<uint32_t N, typename T, typename T_out = T>
     std::array<T_out, N> integrate(const T v0, const std::array<T, N - 1> &vec) {
         std::array<T_out, N> res;
         res[0] = v0;
@@ -100,9 +100,9 @@ namespace FROLS {
     }
 
     template <typename T>
-    std::vector<std::pair<uint16_t, T>> enumerate(const std::vector<T>& data)
+    std::vector<std::pair<uint32_t, T>> enumerate(const std::vector<T>& data)
     {
-        std::vector<std::pair<uint16_t, T>> enumerated_data(data.size());
+        std::vector<std::pair<uint32_t, T>> enumerated_data(data.size());
         std::transform(data.begin(), data.end(), enumerated_data.begin(), [&, n= -1]
                 (const auto& d)mutable {return std::make_pair(n++, d);});
         return enumerated_data;

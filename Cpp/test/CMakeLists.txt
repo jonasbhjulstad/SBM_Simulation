@@ -14,8 +14,11 @@ function(add_custom_test source_file)
     target_compile_options(${source_file} PRIVATE "-Wfatal-errors")
 endfunction()
 
-add_sycl_executable(sycl_info)
-target_link_libraries(sycl_info PUBLIC FROLS_Sycl)
+add_executable(csv_regression csv_regression.cpp)
+target_link_libraries(csv_regression PUBLIC Common Eigen3::Eigen ${ONEAPI_LIBS} Regressors FROLS_Math Features DataFrame FROLS_Eigen)
+
+# add_sycl_executable(sycl_info)
+# target_link_libraries(sycl_info PUBLIC FROLS_Sycl)
 
 # add_custom_executable(neighbor_test)
 # #link frols_network

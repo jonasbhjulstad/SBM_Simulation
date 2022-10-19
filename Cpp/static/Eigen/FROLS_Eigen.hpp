@@ -28,10 +28,14 @@ namespace FROLS {
 
     Mat dmd_truncate(DataFrameStack &dfs, const std::vector<std::string> &col_names, float threshold);
 
+    Mat diff_dataframe_to_matrix(DataFrame& df, const std::vector<std::string> &col_names, int start_idx, int end_idx);
+
+    Mat diff_dataframe_to_matrix(DataFrameStack& dfs, const std::vector<std::string> &col_names, int start_idx, int end_idx);
+
 
     template <typename T>
     Mat vecs_to_mat(const std::vector<std::vector<T>> &vectors) {
-        uint16_t N_rows = std::max_element(vectors.begin(), vectors.end(),
+        uint32_t N_rows = std::max_element(vectors.begin(), vectors.end(),
                                          [](auto &vec0, auto &vec1) { return vec0.size() > vec1.size(); })->size();
         Mat res(N_rows, vectors.size());
         for (int i = 0; i < res.cols(); i++) {

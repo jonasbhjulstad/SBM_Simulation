@@ -13,104 +13,120 @@
 #include <FROLS_Execution.hpp>
 #include <ranges>
 
-namespace Network_Models {
-    enum SIR_State {
-        SIR_S = 0, SIR_I = 1, SIR_R = 2
+namespace Network_Models
+{
+    enum SIR_State
+    {
+        SIR_S = 0,
+        SIR_I = 1,
+        SIR_R = 2
     };
-    struct SIR_Edge {
+    struct SIR_Edge
+    {
     };
 
-    template <typename dType=float>
-    struct SIR_Param{
+    template <typename dType = float>
+    struct SIR_Param
+    {
         dType p_I;
         dType p_R;
-        uint16_t Nt_min;
-        uint16_t N_I_min;
+        uint32_t Nt_min;
+        uint32_t N_I_min;
     };
-    template<uint16_t NV, uint16_t NE, typename dType=float>
+    template <uint32_t NV, uint32_t NE, typename dType = float>
     using SIR_Graph = FROLS::Graph::Graph<SIR_State, SIR_Edge, NV, NE>;
 
-    template<typename RNG, uint16_t Nt, uint16_t NV, uint16_t NE, typename dType=float>
-    struct SIR_Bernoulli_Network : public Network<SIR_Param<>, 3, Nt, SIR_Bernoulli_Network<RNG, Nt, NV, NE>> {
+    template <typename RNG, uint32_t Nt, uint32_t NV, uint32_t NE, typename dType = float>
+    struct SIR_Bernoulli_Network : public Network<SIR_Param<>, 3, Nt, SIR_Bernoulli_Network<RNG, Nt, NV, NE>>
+    {
         using Vertex_t = typename SIR_Graph<NV, NE>::Vertex_t;
         using Edge_t = typename SIR_Graph<NV, NE>::Edge_t;
         using Edge_Prop_t = typename SIR_Graph<NV, NE>::Edge_Prop_t;
         using Vertex_Prop_t = typename SIR_Graph<NV, NE>::Vertex_Prop_t;
         const dType p_I0;
         const dType p_R0;
-        const uint16_t t = 0;
+        const uint32_t t = 0;
 
-        SIR_Bernoulli_Network(const SIR_Graph<NV, NE> &G, dType p_I0, dType p_R0, RNG rng) : G(G), rng(rng),
-                                                                                               p_I0(p_I0), p_R0(p_R0) {}
+        SIR_Bernoulli_Network(SIR_Graph<NV, NE> &G, dType p_I0, dType p_R0, RNG rng) : G(G), rng(rng),
+                                                                                       p_I0(p_I0), p_R0(p_R0) {}
 
-        void initialize() {
+        void initialize()
+        {
 
             FROLS::random::uniform_real_distribution<dType> d_I;
             FROLS::random::uniform_real_distribution<dType> d_R;
-            for(auto& v: G)
-            {
-                SIR_State state = d_I(rng) < p_I0 ? SIR_I : SIR_S;
-                state = d_R(rng) < p_R0 ? SIR_R : state;
-                v.data = state;
-            }
+            std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](auto &v)
+                          {
+                if (d_I(rng) < p_I0) {
+                    v.data = SIR_I;
+                } else if (d_R(rng) < p_R0) {
+                    v.data = SIR_R;
+                } else {
+                    v.data = SIR_S;
+                } });
         }
 
-        std::array<uint16_t, 3> population_count() {
-            std::array<uint16_t, 3> count = {0, 0, 0};
-            std::for_each(G.begin(), G.end(), [&count](const Vertex_t &v) {
-                count[v.data]++;
-            });
+        std::array<uint32_t, 3> population_count()
+        {
+            std::array<uint32_t, 3> count = {0, 0, 0};
+            std::for_each(G.begin(), G.end(), [&count](const Vertex_t &v)
+                          { count[v.data]++; });
             return count;
         }
 
-// function for infection step
-        void infection_step(dType p_I) {
+        // function for infection step
+        void infection_step(dType p_I)
+        {
 
             FROLS::random::uniform_real_distribution<dType> d_I;
 
-            //print distance between G.begin() and G.end/()
-            // std::cout << std::distance(G.begin(), G.end()) << std::endl;
-            std::for_each(G.begin(), G.end(), [&](auto v0) {
+            // print distance between G.begin() and G.end/()
+            //  std::cout << std::distance(G.begin(), G.end()) << std::endl;
+            std::for_each(std::execution::par_unseq, G.begin(), G.end(),  [&](auto v0)
+                          {
                 if (v0.data == SIR_I) {
-                    for (const auto &v: G.neighbors(v0.id)) {
+                    for (const auto v: G.neighbors(v0.id)) {
+                        if(!v) break;
                         bool trigger = d_I(rng) < p_I;
-                        if (v.data == SIR_S && trigger) {
+                        if (v->data == SIR_S && trigger) {
+                        G.assign(v->id, ((v->data == SIR_S) && (trigger)) ? SIR_I : v->data);
                         }
-                        G.assign(v.id, ((v.data == SIR_S) && (trigger)) ? SIR_I : v.data);
                     };
-                }
-            });
+                } });
         }
 
-        void recovery_step(dType p_R) {
+        void recovery_step(dType p_R)
+        {
 
             FROLS::random::uniform_real_distribution<dType> d_R;
-            std::for_each(G.begin(), G.end(), [&](const auto& v)
-            {
+            std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](const auto &v)
+                          {
                 bool recover_trigger = (v.data == SIR_I) && d_R(rng) < p_R;
-                G.assign(v.id, (recover_trigger) ? SIR_R : v.data);
-            });
+                G.assign(v.id, (recover_trigger) ? SIR_R : v.data); });
         }
 
-        bool terminate(const SIR_Param<>&p, const std::array<uint16_t, 3> &x) {
+        bool terminate(const SIR_Param<> &p, const std::array<uint32_t, 3> &x)
+        {
             bool early_termination = ((t > p.Nt_min) && x[1] < p.N_I_min);
             return early_termination || (t >= Nt);
         }
 
-        void advance(const SIR_Param<>&p) {
+        void advance(const SIR_Param<> &p)
+        {
             infection_step(p.p_I);
             recovery_step(p.p_R);
         }
 
-        void reset() {
-            for (const auto& v: G)
+        void reset()
+        {
+            for (const auto &v : G)
             {
                 G.assign(v.id, SIR_S);
             }
         }
 
     private:
-        SIR_Graph<NV, NE> G;
+        SIR_Graph<NV, NE> &G;
         RNG rng;
     };
 }

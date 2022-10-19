@@ -19,7 +19,8 @@ if __name__ == '__main__':
     else:
         network_type = "SIR"
         statenames = ["S", "I", "R"]
-    N_pop = 1000
+    N_pop = 200
+    # N_pop = 100000
         # read and plot all csv in ../data
         # data_path = "C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\data\\"
     cwd = os.path.dirname(os.path.realpath(__file__))
@@ -28,7 +29,8 @@ if __name__ == '__main__':
     FIGURE_DIR = cwd + '/../../figures/'
 
     # find all csv in data_path
-    files = glob.glob(DATA_DIR + "Bernoulli_" + network_type + "_MC_" + str(N_pop) + "_1_*.csv")
+    # files = glob.glob(DATA_DIR + "Bernoulli_" + network_type + "_MC_" + str(N_pop) + "_1_*.csv")
+    files = glob.glob(DATA_DIR + network_type + "_Sine_Trajectory_Discrete_*.csv")
     qr_files = glob.glob(DATA_DIR + "Quantile_Simulation_" + network_type + "*.csv")
     er_files = glob.glob(DATA_DIR + "ERR_Simulation_" + network_type + "*.csv")
     # sort q_files according to float in name
@@ -55,5 +57,5 @@ if __name__ == '__main__':
             ax1[i].plot(er["t"][:-1], er[name][:-1], color='r', alpha=.3)
         ax1[-1].plot(qr["t"][:-1], qr["p_I"][:-1], color='k', alpha=.8)
         ax1[-1].plot(er["t"][:-1], er["p_I"][:-1], color='r', alpha=.8)
-        _ = [x.set_ylim(0, N_pop) for x in ax1[:-1]]
+        # _ = [x.set_ylim(0, N_pop) for x in ax1[:-1]]
     plt.show()

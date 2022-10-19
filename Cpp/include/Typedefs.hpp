@@ -25,7 +25,7 @@ const std::map<Feature_Tag, std::string> feature_tag_map = {{FEATURE_INVALID, "I
 struct Feature {
   float f_ERR = -std::numeric_limits<float>::infinity(); // objective/Error Reduction Ratio
   float g;       // Feature (Orthogonalized Linear-in-the-parameters form)
-  uint16_t index;   // Index of the feature in the original feature set
+  uint32_t index;   // Index of the feature in the original feature set
   float theta = 0;
   Feature_Tag tag = FEATURE_INVALID;
 };

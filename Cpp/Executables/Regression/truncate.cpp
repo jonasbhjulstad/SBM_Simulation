@@ -5,8 +5,8 @@
 #include <iostream>
 int main()
 {
-    uint16_t N_sims = 10000;
-    uint16_t N_pop = 60;
+    uint32_t N_sims = 10000;
+    uint32_t N_pop = 60;
     float p_ER = 1.0;
     using namespace FROLS;
     std::vector<std::string> df_names(N_sims);

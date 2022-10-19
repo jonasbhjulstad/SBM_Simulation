@@ -11,17 +11,24 @@ namespace FROLS {
     const char *FROLS_LOG_DIR = "/home/man/Documents/Bernoulli_MC/Cpp/log";
 
 
-    std::string MC_filename(uint16_t N_pop, float p_ER, uint16_t iter, std::string network_type) {
+    std::string MC_filename(uint32_t N_pop, float p_ER, uint32_t iter, std::string network_type) {
         std::stringstream ss;
-        ss << FROLS_DATA_DIR << "/Bernoulli_" << network_type << "_MC_" << N_pop << "_" << p_ER << "_" << iter
+        ss << FROLS_DATA_DIR << "/Bernoulli_" << network_type << "_MC_" << N_pop << "_" << p_ER << "/" << iter
            << ".csv";
         return ss.str();
     }
-    std::string quantile_filename(uint16_t N_pop, float p_ER, uint16_t iter, std::string network_type) {
+    std::string quantile_filename(uint32_t N_pop, float p_ER, uint32_t iter, std::string network_type) {
         std::stringstream ss;
-        ss << FROLS_DATA_DIR << "/Quantile_Bernoulli_" << network_type << "_MC_" << N_pop << "_" << p_ER << "_" << iter
+        ss << FROLS_DATA_DIR << "/Quantile_Bernoulli_" << network_type << "_MC_" << N_pop << "_" << p_ER << "/" << iter
            << ".csv";
         return ss.str();
+    }
+    std::string path_dirname(const std::string &fname)
+    {
+        size_t pos = fname.find_last_of("\\/");
+        return (std::string::npos == pos)
+            ? ""
+            : fname.substr(0, pos);
     }
 
 

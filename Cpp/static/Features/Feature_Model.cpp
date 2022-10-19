@@ -3,19 +3,19 @@
 
 namespace FROLS::Features {
 
-    Feature_Model::Feature_Model(const uint16_t N_output_features) : N_output_features(
+    Feature_Model::Feature_Model(const uint32_t N_output_features) : N_output_features(
             N_output_features) {}
 
-    Vec Feature_Model::transform(crMat &X_raw, uint16_t target_index, bool &index_failure) {
+    Vec Feature_Model::transform(crMat &X_raw, uint32_t target_index, bool &index_failure) {
         return _transform(X_raw, target_index, index_failure);
     }
 
     Mat Feature_Model::transform(crMat &X_raw, const std::vector<Feature> preselected_features) {
-        uint16_t N_input_features = X_raw.cols();
-        uint16_t N_rows = X_raw.rows();
+        uint32_t N_input_features = X_raw.cols();
+        uint32_t N_rows = X_raw.rows();
         Mat X_poly(N_rows, N_output_features + preselected_features.size());
-        uint16_t feature_idx = 0;
-        uint16_t col_iter = 0;
+        uint32_t feature_idx = 0;
+        uint32_t col_iter = 0;
         bool index_failure = 0;
         candidate_feature_idx.reserve(N_output_features);
         candidate_feature_idx.clear();
@@ -69,7 +69,7 @@ namespace FROLS::Features {
         return x_next;
     }
 
-    Mat Feature_Model::simulate(crVec &x0, crMat &U, uint16_t Nt) {
+    Mat Feature_Model::simulate(crVec &x0, crMat &U, uint32_t Nt) {
         Mat X(Nt + 1, x0.rows());
         X.setZero();
         X.row(0) = x0;
@@ -79,14 +79,14 @@ namespace FROLS::Features {
         return X;
     }
 
-    void Feature_Model::ignore(uint16_t feature_index) {
+    void Feature_Model::ignore(uint32_t feature_index) {
         ignore_idx.push_back(feature_index);
     }
 
     void Feature_Model::ignore(const std::string &feature_name) {
         ignore(get_feature_index(feature_name));
     }
-    void Feature_Model::preselect(uint16_t feature_index, float theta, uint16_t response_index, Feature_Tag tag)
+    void Feature_Model::preselect(uint32_t feature_index, float theta, uint32_t response_index, Feature_Tag tag)
     {
         if (response_index >= preselected_features.size())
         {
@@ -100,11 +100,11 @@ namespace FROLS::Features {
     }
     float f_ERR = -std::numeric_limits<float>::infinity(); // objective/Error Reduction Ratio
     float g;       // Feature (Orthogonalized Linear-in-the-parameters form)
-    uint16_t index;   // Index of the feature in the original feature set
+    uint32_t index;   // Index of the feature in the original feature set
     float theta = 0;
     Feature_Tag tag = FEATURE_INVALID;
 
-    void Feature_Model::preselect(const std::string& feature_name, float theta, uint16_t response_index, Feature_Tag tag)
+    void Feature_Model::preselect(const std::string& feature_name, float theta, uint32_t response_index, Feature_Tag tag)
     {
         preselect(get_feature_index(feature_name), theta, response_index, tag);
     }

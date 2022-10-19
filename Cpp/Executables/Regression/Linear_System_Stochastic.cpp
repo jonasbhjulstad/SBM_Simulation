@@ -22,13 +22,13 @@ int main() {
     using namespace FROLS;
     using namespace FROLS::Regression;
     using namespace FROLS::Features;
-    uint16_t Nx = 3;
+    uint32_t Nx = 3;
     Vec x0(Nx);
     x0 << 10, 100, -100;
 
     Mat A(Nx, Nx);
     A << .9, 0., 0, 0., .8, 0, 0., 0, .5;
-    uint16_t Nu = 2;
+    uint32_t Nu = 2;
     Mat b(Nx, Nu);
     b << 10,20,0,.4,10,0;
 
@@ -39,12 +39,12 @@ int main() {
     std::random_device rd{};
     std::mt19937 rng{rd()};
     float b_std = 0.;
-    uint16_t Nt = 100;
+    uint32_t Nt = 100;
     Mat u(Nt, Nu);
-    uint16_t N_sims = 100;
+    uint32_t N_sims = 100;
     float omega = 10;
     std::vector<float> t(Nt+1);
-    std::generate(t.begin(), t.end(), [&](){static uint16_t i = 0;
+    std::generate(t.begin(), t.end(), [&](){static uint32_t i = 0;
         return i++;});
     u.col(0) = Vec::LinSpaced(Nt, 0, M_PI_2 + .1);
     u.col(1) = Vec::LinSpaced(Nt, 0, M_PI);
@@ -69,8 +69,8 @@ int main() {
     }
 
 
-    uint16_t d_max = 1;
-    uint16_t N_features = 16;
+    uint32_t d_max = 1;
+    uint32_t N_features = 16;
     using namespace FROLS::Regression;
     Polynomial_Model model(Nx, Nu, N_features, d_max);
     Regressor_Param er_param;

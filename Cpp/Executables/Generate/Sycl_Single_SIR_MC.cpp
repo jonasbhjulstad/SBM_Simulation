@@ -8,8 +8,8 @@
 #include <FROLS_Sycl.hpp>
 #include <Sycl_SIR_Bernoulli_Network.hpp>
 
-template <uint16_t Nt>
-void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<Nt> &d, uint16_t iter)
+template <uint32_t Nt>
+void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<Nt> &d, uint32_t iter)
 {
     FROLS::DataFrame df;
     std::array<float, Nt> p_Is;
@@ -27,11 +27,11 @@ void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<N
                  ",", p.csv_termination_tol);
 }
 
-constexpr uint16_t N_pop = 20;
+constexpr uint32_t N_pop = 20;
 constexpr float p_ER = 1.0;
-constexpr uint16_t Nt = 20;
-constexpr uint16_t NV = N_pop;
-constexpr uint16_t NE = 1000 * NV * NV;
+constexpr uint32_t Nt = 20;
+constexpr uint32_t NV = N_pop;
+constexpr uint32_t NE = 1000 * NV * NV;
 
 int main()
 {

@@ -5,10 +5,10 @@
 TEST(Monomial_Functions, generate_monomial)
 {
     // using namespace FROLS::Features;
-    // constexpr uint16_t Nx = 2;
-    // uint16_t orders[Nx] = {1, 2};
+    // constexpr uint32_t Nx = 2;
+    // uint32_t orders[Nx] = {1, 2};
     // std::vector<MonomialFn<Nx>> monomial_fns;
-    // for (uint16_t i = 0; i < Nx; i++) {
+    // for (uint32_t i = 0; i < Nx; i++) {
     //     MonomialFn<Nx> monomial = generate_monomial<Nx>(orders);
     //     monomial_fns.push_back(monomial);
     // }

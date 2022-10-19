@@ -8,7 +8,7 @@
 #include <FROLS_Path_Config.hpp>
 #include <Regression_Algorithm.hpp>
 
-std::string quantile_simulation_filename(uint16_t N_pop, float p_ER, uint16_t iter, std::string network_type) {
+std::string quantile_simulation_filename(uint32_t N_pop, float p_ER, uint32_t iter, std::string network_type) {
     std::stringstream ss;
     ss << FROLS::FROLS_DATA_DIR << "/Quantile_Simulation_" << network_type << "_" <<  N_pop << "_" << p_ER << "_" << iter
        << ".csv";
@@ -17,17 +17,17 @@ std::string quantile_simulation_filename(uint16_t N_pop, float p_ER, uint16_t it
 
 
 int main(int argc, char **argv) {
-    const uint16_t Nx = 3;
+    const uint32_t Nx = 3;
     const std::string network_type = "SIR";
     const std::vector<std::string> colnames = {"S", "I", "R"};
-    uint16_t N_sims = 2000; // 10000;
-    uint16_t N_pop = 1000;
+    uint32_t N_sims = 2000; // 10000;
+    uint32_t N_pop = 1000;
     float p_ER = 1.0;
     using namespace FROLS;
     using namespace std::placeholders;
-    uint16_t d_max = 1;
-    uint16_t N_output_features = 16;
-    uint16_t Nu = 1;
+    uint32_t d_max = 1;
+    uint32_t N_output_features = 16;
+    uint32_t Nu = 1;
     auto MC_fname_f = std::bind(MC_filename, N_pop, p_ER, _1, network_type);
     auto outfile_f = std::bind(quantile_simulation_filename, N_pop, p_ER, _1, network_type);
     FROLS::Features::Polynomial_Model model(Nx, Nu, N_output_features, d_max);
@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
     model.preselect("x2", 1.0, 2, FEATURE_PRESELECTED_IGNORE);
     model.ignore(0);
     float theta_tol = 1e-6;
-    uint16_t N_terms_max = 2;
+    uint32_t N_terms_max = 2;
     float MAE_tol = 1e-1;
     FROLS::Regression::Quantile_Param reg_param;
     reg_param.N_terms_max = 2;

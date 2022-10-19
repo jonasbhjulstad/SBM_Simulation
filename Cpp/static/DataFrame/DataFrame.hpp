@@ -12,18 +12,18 @@ namespace FROLS {
 
     class DataFrame {
         std::map<std::string, std::shared_ptr<std::vector<float>>> data = {};
-        uint16_t N_rows = 100;
+        uint32_t N_rows = 100;
 
         friend class DataFrameStack;
 
     public:
         DataFrame() {}
 
-        DataFrame(uint16_t N_rows) : N_rows(N_rows) {}
+        DataFrame(uint32_t N_rows) : N_rows(N_rows) {}
 
         DataFrame(const std::string &filename, const std::string delimiter = ",") { read_csv(filename, delimiter); }
 
-        DataFrame(uint16_t N_rows, const std::vector<std::string> &col_names)
+        DataFrame(uint32_t N_rows, const std::vector<std::string> &col_names)
                 : N_rows(N_rows) {
             for (auto &col_name: col_names) {
                 data.insert({col_name, std::make_shared<std::vector<float>>(N_rows)});
@@ -38,7 +38,7 @@ namespace FROLS {
 
         const std::vector<std::vector<float>> operator[](const std::vector<std::string>& col_names) const;
 
-        void assign(const std::string &col_name, const std::vector<uint16_t> &col_data);
+        void assign(const std::string &col_name, const std::vector<uint32_t> &col_data);
 
         void assign(const std::string &col_name, const std::vector<float> &col_data);
 
@@ -60,7 +60,7 @@ namespace FROLS {
             }
         }
 
-        void assign(const std::string &col_name, uint16_t row, float value);
+        void assign(const std::string &col_name, uint32_t row, float value);
 
         void assign(const std::string &col_name, crVec &vec);
 
@@ -70,7 +70,7 @@ namespace FROLS {
                     const std::vector<std::vector<float>> &col_data);
 
         void assign(const std::vector<std::string> &col_names,
-                    const std::vector<std::vector<uint16_t>> &col_data);
+                    const std::vector<std::vector<uint32_t>> &col_data);
 
         template <typename T>
         void assign(const char* col_name, const T& col_data) {
@@ -96,9 +96,9 @@ namespace FROLS {
                        const std::string &delimiter,
                        const float termination_tol = -std::numeric_limits<float>::infinity());
 
-        uint16_t get_N_rows() const { return N_rows; }
+        uint32_t get_N_rows() const { return N_rows; }
 
-        void resize(uint16_t N_rows);
+        void resize(uint32_t N_rows);
 
         void resize();
     };
@@ -111,7 +111,7 @@ namespace FROLS {
         std::vector<DataFrame> dataframes;
         DataFrameStack(const std::vector<std::string> &filenames) {
             dataframes.reserve(filenames.size());
-            for (uint16_t i = 0; i < filenames.size(); i++) {
+            for (uint32_t i = 0; i < filenames.size(); i++) {
                 dataframes.push_back(DataFrame(filenames[i]));
             }
         }
@@ -120,28 +120,28 @@ namespace FROLS {
             this->dataframes = dataframes;
         }
 
-        DataFrameStack(uint16_t N_frames)
+        DataFrameStack(uint32_t N_frames)
         {
             dataframes.resize(N_frames);
         }
 
-        float get_elem(uint16_t frame, const std::string &col_name, uint16_t row) {
+        float get_elem(uint32_t frame, const std::string &col_name, uint32_t row) {
             return dataframes[frame][col_name]->operator[](row);
         }
 
 
 
-        DataFrame &operator[](uint16_t frame) { return dataframes[frame]; }
+        DataFrame &operator[](uint32_t frame) { return dataframes[frame]; }
 
         DataFrame compute_svd();
 
-        const std::vector<float> get_col(uint16_t frame, const std::string &col_name);
+        const std::vector<float> get_col(uint32_t frame, const std::string &col_name);
 
-        std::vector<float> get_row(uint16_t frame, uint16_t row);
+        std::vector<float> get_row(uint32_t frame, uint32_t row);
 
-        uint16_t get_N_frames() const { return dataframes.size(); }
+        uint32_t get_N_frames() const { return dataframes.size(); }
 
-        std::vector<uint16_t> get_N_rows();
+        std::vector<uint32_t> get_N_rows();
     };
 
 } // namespace FROLS

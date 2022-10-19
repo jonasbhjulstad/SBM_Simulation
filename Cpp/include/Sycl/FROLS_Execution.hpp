@@ -10,14 +10,21 @@
 #else
 #include <execution>
 #endif
+#ifdef FROLS_USE_INTEL
+#include <oneapi/tbb/rw_mutex.h>
+#else
+#include <mutex>
+#endif
 namespace FROLS::execution {
 #ifdef FROLS_USE_INTEL_SYCL
     using namespace oneapi::dpl;
     using namespace oneapi::dpl::execution;
+    static auto default_policy = dpcpp_default;
 #else
     static auto par_unseq = std::execution::par_unseq;
     static auto par = std::execution::par;
     static auto seq = std::execution::seq;
+    static auto default_policy = std::execution::par_unseq;
 #endif
 }
 
