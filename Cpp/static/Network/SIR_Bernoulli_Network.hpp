@@ -6,7 +6,6 @@
 #include <FROLS_Math.hpp>
 #include <FROLS_Graph.hpp>
 #include <FROLS_Random.hpp>
-#include <graph_lite.h>
 #include <stddef.h>
 #include <utility>
 #include <vector>
@@ -33,21 +32,23 @@ namespace Network_Models
         uint32_t Nt_min;
         uint32_t N_I_min;
     };
-    template <uint32_t NV, uint32_t NE, typename dType = float>
-    using SIR_Graph = FROLS::Graph::Graph<SIR_State, SIR_Edge, NV, NE>;
+    template <uint32_t NV, uint32_t NE>
+    using SIR_ArrayGraph = FROLS::Graph::ArrayGraph<SIR_State, SIR_Edge, NV, NE>;
 
-    template <typename RNG, uint32_t Nt, uint32_t NV, uint32_t NE, typename dType = float>
-    struct SIR_Bernoulli_Network : public Network<SIR_Param<>, 3, Nt, SIR_Bernoulli_Network<RNG, Nt, NV, NE>>
+    using SIR_VectorGraph = FROLS::Graph::VectorGraph<SIR_State, SIR_Edge>;
+
+    template <typename SIR_Graph, typename RNG, uint32_t Nt, typename dType = float>
+    struct SIR_Bernoulli_Network : public Network<SIR_Param<>, 3, Nt, SIR_Bernoulli_Network<SIR_Graph, RNG, Nt, dType>>
     {
-        using Vertex_t = typename SIR_Graph<NV, NE>::Vertex_t;
-        using Edge_t = typename SIR_Graph<NV, NE>::Edge_t;
-        using Edge_Prop_t = typename SIR_Graph<NV, NE>::Edge_Prop_t;
-        using Vertex_Prop_t = typename SIR_Graph<NV, NE>::Vertex_Prop_t;
+        using Vertex_t = typename SIR_Graph::Vertex_t;
+        using Edge_t = typename SIR_Graph::Edge_t;
+        using Edge_Prop_t = typename SIR_Graph::Edge_Prop_t;
+        using Vertex_Prop_t = typename SIR_Graph::Vertex_Prop_t;
         const dType p_I0;
         const dType p_R0;
         const uint32_t t = 0;
 
-        SIR_Bernoulli_Network(SIR_Graph<NV, NE> &G, dType p_I0, dType p_R0, RNG rng) : G(G), rng(rng),
+        SIR_Bernoulli_Network(SIR_Graph &G, dType p_I0, dType p_R0, RNG rng) : G(G), rng(rng),
                                                                                        p_I0(p_I0), p_R0(p_R0) {}
 
         void initialize()
@@ -55,14 +56,14 @@ namespace Network_Models
 
             FROLS::random::uniform_real_distribution<dType> d_I;
             FROLS::random::uniform_real_distribution<dType> d_R;
-            std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](auto &v)
+            std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](auto v)
                           {
                 if (d_I(rng) < p_I0) {
-                    v.data = SIR_I;
+                    G.assign(v.id, SIR_I);
                 } else if (d_R(rng) < p_R0) {
-                    v.data = SIR_R;
+                    G.assign(v.id, SIR_R);
                 } else {
-                    v.data = SIR_S;
+                    G.assign(v.id, SIR_S);
                 } });
         }
 
@@ -119,14 +120,12 @@ namespace Network_Models
 
         void reset()
         {
-            for (const auto &v : G)
-            {
-                G.assign(v.id, SIR_S);
-            }
+            std::for_each(G.begin(), G.end(), [&](auto v)
+                          {G.assign(v.id, SIR_S);});
         }
 
     private:
-        SIR_Graph<NV, NE> &G;
+        SIR_Graph &G;
         RNG rng;
     };
 }

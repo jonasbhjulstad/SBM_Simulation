@@ -7,7 +7,6 @@
 #include <FROLS_Math.hpp>
 #include <FROLS_Eigen.hpp>
 #include <SIR_Bernoulli_Network.hpp>
-#include <graph_lite.h>
 namespace FROLS {
     template<typename dType=float>
     struct MC_SIR_Params{
@@ -58,12 +57,12 @@ namespace FROLS {
         std::array<Network_Models::SIR_Param<>, Nt> p_vec;
     };
 
-    template<uint32_t Nt, uint32_t NV, uint32_t NE>
+    template<typename SIR_Graph, uint32_t Nt>
     MC_SIR_SimData<Nt>
-    MC_SIR_simulation(Network_Models::SIR_Graph<NV, NE> &G_structure, const MC_SIR_Params<>&p, uint32_t seed) {
+    MC_SIR_simulation(SIR_Graph &G_structure, const MC_SIR_Params<>&p, uint32_t seed) {
 
         random::default_rng generator(seed);
-        Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(G_structure, p.p_I0, p.p_R0,
+        Network_Models::SIR_Bernoulli_Network<SIR_Graph, decltype(generator), Nt> G(G_structure, p.p_I0, p.p_R0,
                                                                                  generator);
         MC_SIR_SimData<Nt> data;
         G.reset();

@@ -28,8 +28,8 @@ list(REMOVE_ITEM importTargetsAfter ${importTargets})
 message("${importTargetsAfter}")
 find_package(SUNDIALS REQUIRED)
 find_package(pybind11 CONFIG)
-set(FROLS_USE_INTEL ON)
-set(FROLS_USE_INTEL_SYCL ON)
+set(FROLS_USE_INTEL OFF)
+set(FROLS_USE_INTEL_SYCL OFF)
 set(FROLS_USE_HIPSYCL OFF)
 
 if(${FROLS_USE_INTEL_SYCL})
@@ -92,17 +92,17 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(cppitertools_repo)
 
-set(COMMON_LIBRARIES "Common;FROLS_Math;DataFrame;FROLS_Eigen;cppitertools;graphlite")
+set(COMMON_LIBRARIES "Common;FROLS_Math;DataFrame;FROLS_Eigen;cppitertools")
 
-set(GRAPH_LITE_SUPPORT_DOT OFF)
-FetchContent_Declare(graphlite_repo
-    GIT_REPOSITORY https://github.com/haasdo95/graphlite.git
-    GIT_TAG master)
+# set(GRAPH_LITE_SUPPORT_DOT OFF)
+# FetchContent_Declare(graphlite_repo
+#     GIT_REPOSITORY https://github.com/haasdo95/graphlite.git
+#     GIT_TAG master)
 
-FetchContent_MakeAvailable(graphlite_repo)
-set_target_properties(graphlite
-    PROPERTIES
-    CXX_STANDARD 17)
+# FetchContent_MakeAvailable(graphlite_repo)
+# set_target_properties(graphlite
+#     PROPERTIES
+#     CXX_STANDARD 17)
 
 set(FROLS_DATA_DIR "${PROJECT_SOURCE_DIR}/data" CACHE INTERNAL "FROLS_DATA_DIR")
 set(FROLS_LOG_DIR "${PROJECT_SOURCE_DIR}/log" CACHE INTERNAL "FROLS_LOG_DIR")

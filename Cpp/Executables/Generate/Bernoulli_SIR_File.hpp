@@ -4,7 +4,7 @@
 #include <thread>
 namespace FROLS
 {
-    template <uint32_t Nt, uint32_t NV, uint32_t NE, typename dType = float>
+    template <typename SIR_Graph, uint32_t Nt, typename dType = float>
     void MC_SIR_to_file(const MC_SIR_Params<> &p, uint32_t thread_id)
     {
 
@@ -16,7 +16,7 @@ namespace FROLS
 
         std::mt19937 generator(p.seed);
 
-        thread_local Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(p.N_pop, p.p_ER, p.p_I0,
+        thread_local Network_Models::SIR_Bernoulli_Network<SIR_Graph, decltype(generator), Nt> G(p.N_pop, p.p_ER, p.p_I0,
                                                                                               p.p_R0, generator);
 
         for (uint32_t i = 0; i < p.N_sim; i++)
@@ -57,14 +57,14 @@ namespace FROLS
         }
     }
 
-    template <uint32_t Nt, uint32_t NV, uint32_t NE, typename dType = float>
+    template <typename SIR_Graph, uint32_t Nt, typename dType = float>
     Mat MC_SIR_to_Mat(const MC_SIR_Params<> &p)
     {
 
         static std::thread::id thread_0 = std::this_thread::get_id();
         thread_local std::mt19937 generator(p.seed);
         std::vector<Mat> Xi_vec;
-        thread_local Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(p.N_pop, p.p_ER, p.p_I0,
+        thread_local Network_Models::SIR_Bernoulli_Network<SIR_Graph, decltype(generator), Nt> G(p.N_pop, p.p_ER, p.p_I0,
                                                                                               p.p_R0, generator);
         for (uint32_t i = 0; i < p.N_sim; i++)
         {

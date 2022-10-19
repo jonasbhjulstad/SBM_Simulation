@@ -71,7 +71,8 @@ int main()
     std::array<size_t, NV> seeds;
     std::generate(seeds.begin(), seeds.end(), [&]()
                   { return generator(); });
-    auto G_structure = generate_erdos_renyi<SIR_Graph<NV, NE>, decltype(generator)>(p.N_pop, p.p_ER, SIR_S, generator);
+    SIR_VectorGraph G(v_mx, e_mx);
+    generate_erdos_renyi<SIR_VectorGraph, decltype(generator)>(G_structure, p.N_pop, p.p_ER, SIR_S, generator);
     auto network = Network_Models::Sycl_SIR_Bernoulli_Network<FROLS::random::default_rng, Nt, NV, NE>{G_structure, p.p_I0, p.p_R0, q, seeds};
     network.reset();
     while (network.population_count()[1] == 0)

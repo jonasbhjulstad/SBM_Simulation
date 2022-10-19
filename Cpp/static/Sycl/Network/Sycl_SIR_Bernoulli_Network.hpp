@@ -5,7 +5,6 @@
 #include <SIR_Bernoulli_Network.hpp>
 #include <FROLS_Math.hpp>
 #include <FROLS_Random.hpp>
-#include <graph_lite.h>
 #include <stddef.h>
 #include <utility>
 #include <vector>

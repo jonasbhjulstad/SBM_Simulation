@@ -10,11 +10,8 @@
 #else
 #include <execution>
 #endif
-#ifdef FROLS_USE_INTEL
-#include <oneapi/tbb/rw_mutex.h>
-#else
+#include <shared_mutex>
 #include <mutex>
-#endif
 namespace FROLS::execution {
 #ifdef FROLS_USE_INTEL_SYCL
     using namespace oneapi::dpl;

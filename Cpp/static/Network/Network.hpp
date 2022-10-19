@@ -3,7 +3,6 @@
 
 #include "Graph_Generation.hpp"
 #include <FROLS_Math.hpp>
-#include <graph_lite.h>
 #include <random>
 #include <stddef.h>
 #include <vector>

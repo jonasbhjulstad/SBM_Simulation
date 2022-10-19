@@ -121,7 +121,7 @@ namespace FROLS {
         std::string filedir = FROLS::path_dirname(filename);
         if (!std::filesystem::is_directory(filedir))
         {
-            std::filesystem::create_directory(FROLS::path_dirname(filename));
+            std::filesystem::create_directories(FROLS::path_dirname(filename));
         }
 
         std::ofstream file(filename);

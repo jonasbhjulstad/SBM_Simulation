@@ -6,7 +6,6 @@
 #include <FROLS_Execution.hpp>
 #include <functional>
 #include <utility>
-// #include <oneapi/dpl/algorithm>
 template <uint32_t Nt, typename dType=float>
 void traj_to_file(const FROLS::MC_SIR_Params<>& p, const FROLS::MC_SIR_SimData<Nt>& d, uint32_t iter)
 {
@@ -39,15 +38,11 @@ constexpr float p_ER = 1.00;
 constexpr uint32_t Nt = 50;
 constexpr uint32_t NV = N_pop;
 constexpr size_t nk = n_choose_k(NV, 2);
-constexpr uint32_t NE = nk + nk/10;
+constexpr uint32_t NE = 1.5*nk;
 int main() {
     using namespace FROLS;
     using namespace Network_Models;
     std::cout << NE << std::endl;
-//    params[1].N_pop = 20;
-//    params[2].p_ER = 0.1;
-//    params[3].p_ER = 0.1;
-//    params[3].N_pop = 20;
     MC_SIR_Params<>p;
     p.N_pop = N_pop;
     p.p_ER = p_ER;
@@ -56,28 +51,31 @@ int main() {
     std::vector<uint32_t> seeds(p.N_sim);
     std::generate(seeds.begin(), seeds.end(), [&](){return rd();});
     auto enum_seeds = enumerate(seeds);
-    std::cout << "Running MC-SIR simulations..." << std::endl;
-    uint32_t MC_iter = 0;
-    std::mt19937_64 rng(rd());
 
-    typedef Network_Models::SIR_Bernoulli_Network<decltype(rng), Nt, N_pop, NE> SIR_Bernoulli_Network;
-//    auto policy_d = make_device_policy<class PolicyD>(oneapi::dpl::execution::dpcpp_default);
-    std::array<std::shared_ptr<std::mutex>, NV+1> v_mx;
-    std::generate(v_mx.begin(), v_mx.end(), [](){return std::make_shared<std::mutex>();});
-    std::array<std::shared_ptr<std::mutex>, NE+1> e_mx;
-    std::generate(e_mx.begin(), e_mx.end(), [](){return std::make_shared<std::mutex>();});
-    
-    auto G = generate_erdos_renyi<SIR_Graph<NV, NE>, decltype(rng)>(p.N_pop, p.p_ER, SIR_S, rng, v_mx, e_mx);
+    std::mt19937_64 rng(rd());
+    typedef Network_Models::SIR_Bernoulli_Network<SIR_VectorGraph, decltype(rng), Nt> SIR_Bernoulli_Network;
+    std::vector<std::mutex*> v_mx(NV+1);
+    //create mutexes
+    for (auto& mx : v_mx) {
+        mx = new std::mutex();
+    }
+    std::vector<std::mutex*> e_mx(NE+1);
+    //create mutexes
+    for (auto& mx : e_mx) {
+        mx = new std::mutex();
+    }
+
+    SIR_VectorGraph G(v_mx, e_mx);
+    generate_erdos_renyi<SIR_VectorGraph, decltype(rng)>(G, p.N_pop, p.p_ER, SIR_S, rng);
     std::vector<MC_SIR_SimData<Nt>> simdatas(p.N_sim);
-    std::transform(enum_seeds.begin(), enum_seeds.end(), simdatas.begin(), [&, n = 0](auto& es) mutable{
+    std::transform(enum_seeds.begin(), enum_seeds.end(), simdatas.begin(), [&](auto& es) {
         uint32_t iter = es.first;
         uint32_t seed = es.second;
-        if ((n++ % (p.N_sim / 10)) == 0)
+        if ((iter % (p.N_sim / 10)) == 0)
         {
-            std::cout << "Simulation " << n << " of " << p.N_sim << std::endl;
+            std::cout << "Simulation " << iter << " of " << p.N_sim << std::endl;
         }
-
-        return MC_SIR_simulation<Nt, NV, NE>(G, p, seed);
+        return MC_SIR_simulation<decltype(G), Nt>(G, p, seed);
     });
 
     
