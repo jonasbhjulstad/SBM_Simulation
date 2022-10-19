@@ -1,5 +1,0 @@
-if(EXISTS "C:/Users/jonas/Documents/Network_Robust_MPC/build/test/monomials[1]_tests.cmake")
-  include("C:/Users/jonas/Documents/Network_Robust_MPC/build/test/monomials[1]_tests.cmake")
-else()
-  add_test(monomials_NOT_BUILT monomials_NOT_BUILT)
-endif()

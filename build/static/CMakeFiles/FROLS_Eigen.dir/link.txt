@@ -1,2 +1,0 @@
-C:\msys64\mingw64\bin\llvm-ar.exe qc libFROLS_Eigen.a CMakeFiles/FROLS_Eigen.dir/FROLS_Eigen.cpp.obj
-C:\msys64\mingw64\bin\llvm-ranlib.exe libFROLS_Eigen.a

@@ -1,2 +1,0 @@
-C:\msys64\mingw64\bin\llvm-ar.exe qc libFROLS_Algorithm.a CMakeFiles/FROLS_Algorithm.dir/FROLS_Algorithm.cpp.obj
-C:\msys64\mingw64\bin\llvm-ranlib.exe libFROLS_Algorithm.a

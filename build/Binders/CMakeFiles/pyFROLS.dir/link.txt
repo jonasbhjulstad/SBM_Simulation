@@ -1,3 +1,0 @@
-C:\msys64\mingw64\bin\cmake.exe -E rm -f CMakeFiles\pyFROLS.dir/objects.a
-C:\msys64\mingw64\bin\llvm-ar.exe qc CMakeFiles\pyFROLS.dir/objects.a @CMakeFiles\pyFROLS.dir\objects1.rsp
-C:\msys64\mingw64\bin\clang++.exe -g -shared -o pyFROLS.cp310-win_amd64.pyd -Wl,--major-image-version,0,--minor-image-version,0 -Wl,--whole-archive CMakeFiles\pyFROLS.dir/objects.a -Wl,--no-whole-archive @CMakeFiles\pyFROLS.dir\linklibs.rsp

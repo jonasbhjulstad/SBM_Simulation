@@ -1,3 +1,0 @@
-C:\msys64\mingw64\bin\cmake.exe -E rm -f CMakeFiles\feature_selection.dir/objects.a
-C:\msys64\mingw64\bin\llvm-ar.exe qc CMakeFiles\feature_selection.dir/objects.a @CMakeFiles\feature_selection.dir\objects1.rsp
-C:\msys64\mingw64\bin\clang++.exe -g -Wl,--whole-archive CMakeFiles\feature_selection.dir/objects.a -Wl,--no-whole-archive -o feature_selection.exe -Wl,--out-implib,libfeature_selection.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\feature_selection.dir\linklibs.rsp

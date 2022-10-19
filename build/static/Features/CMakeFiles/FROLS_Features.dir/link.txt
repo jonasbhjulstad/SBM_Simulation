@@ -1,2 +1,0 @@
-C:\msys64\mingw64\bin\llvm-ar.exe qc libFROLS_Features.a CMakeFiles/FROLS_Features.dir/FROLS_Features.cpp.obj CMakeFiles/FROLS_Features.dir/FROLS_Polynomial.cpp.obj
-C:\msys64\mingw64\bin\llvm-ranlib.exe libFROLS_Features.a

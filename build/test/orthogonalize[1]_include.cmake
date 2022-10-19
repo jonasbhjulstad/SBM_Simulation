@@ -1,5 +1,0 @@
-if(EXISTS "C:/Users/jonas/Documents/Network_Robust_MPC/build/test/orthogonalize[1]_tests.cmake")
-  include("C:/Users/jonas/Documents/Network_Robust_MPC/build/test/orthogonalize[1]_tests.cmake")
-else()
-  add_test(orthogonalize_NOT_BUILT orthogonalize_NOT_BUILT)
-endif()

@@ -1,2 +1,0 @@
-C:\msys64\mingw64\bin\llvm-ar.exe qc libFROLS_DataFrame.a CMakeFiles/FROLS_DataFrame.dir/FROLS_DataFrame.cpp.obj
-C:\msys64\mingw64\bin\llvm-ranlib.exe libFROLS_DataFrame.a
