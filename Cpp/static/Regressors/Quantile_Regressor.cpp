@@ -59,9 +59,9 @@ namespace FROLS::Regression {
         const Vec y_diff = y - predict(X, used_features);
         std::vector<uint32_t> candidate_idx = unused_feature_indices(used_features, X.cols());
         std::vector<Feature> candidates(candidate_idx.size());
-        std::transform(candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
+        std::transform(FROLS::execution::par_unseq, candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
                        [=](const uint32_t &idx) {
-                           Feature f = single_feature_regression(X.col(idx), y);
+                           Feature f = single_feature_regression(X.col(idx), y_diff);
                            f.index = idx;
                            return f;
                        });

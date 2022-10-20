@@ -29,10 +29,11 @@ if __name__ == '__main__':
     FIGURE_DIR = cwd + '/../../figures/'
 
     # find all csv in data_path
-    # files = glob.glob(DATA_DIR + "Bernoulli_" + network_type + "_MC_" + str(N_pop) + "_1_*.csv")
-    files = glob.glob(DATA_DIR + network_type + "_Sine_Trajectory_Discrete_*.csv")
-    qr_files = glob.glob(DATA_DIR + "Quantile_Simulation_" + network_type + "*.csv")
-    er_files = glob.glob(DATA_DIR + "ERR_Simulation_" + network_type + "*.csv")
+    files = glob.glob(DATA_DIR + "Bernoulli_" + network_type + "_MC_" + str(N_pop) + "_1/*.csv")
+    # files = glob.glob(DATA_DIR + network_type + "_Sine_Trajectory_Discrete_*.csv")
+    qr_files = glob.glob(DATA_DIR + "Quantile_Simulation_" + network_type + "_" +  str(N_pop) + "_1/*.csv")
+    er_files = glob.glob(DATA_DIR + "ERR_Simulation_" + network_type + "_" + str(N_pop) + "_1/*.csv")
+    # qr_files = glob.glob(DATA_DIR + "Quantile_ERR_Simulation_" + network_type + "_" + str(N_pop) + "_1/*.csv")
     # sort q_files according to float in name
     fig, ax = plt.subplots(len(statenames) + 1)
     N_files = 100
@@ -57,5 +58,5 @@ if __name__ == '__main__':
             ax1[i].plot(er["t"][:-1], er[name][:-1], color='r', alpha=.3)
         ax1[-1].plot(qr["t"][:-1], qr["p_I"][:-1], color='k', alpha=.8)
         ax1[-1].plot(er["t"][:-1], er["p_I"][:-1], color='r', alpha=.8)
-        # _ = [x.set_ylim(0, N_pop) for x in ax1[:-1]]
+    _ = [x.set_ylim(0, N_pop) for x in ax1[:-1]]
     plt.show()

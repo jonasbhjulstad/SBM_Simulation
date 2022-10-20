@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <utility>
 #include <vector>
+#include <thread>
 #include <FROLS_Execution.hpp>
 #include <ranges>
 
@@ -85,6 +86,7 @@ namespace Network_Models
             //  std::cout << std::distance(G.begin(), G.end()) << std::endl;
             std::for_each(std::execution::par_unseq, G.begin(), G.end(),  [&](auto v0)
                           {
+                //print id of thread
                 if (v0.data == SIR_I) {
                     for (const auto v: G.neighbors(v0.id)) {
                         if(!v) break;

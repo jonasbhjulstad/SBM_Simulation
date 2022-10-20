@@ -6,6 +6,7 @@
 #include <FROLS_Execution.hpp>
 #include <functional>
 #include <utility>
+#include <chrono>
 template <uint32_t Nt, typename dType=float>
 void traj_to_file(const FROLS::MC_SIR_Params<>& p, const FROLS::MC_SIR_SimData<Nt>& d, uint32_t iter)
 {
@@ -33,7 +34,7 @@ constexpr size_t n_choose_k(size_t n, size_t k)
 }
 
 constexpr float p_I0 = 1.0;
-constexpr uint32_t N_pop = 20;
+constexpr uint32_t N_pop =200;
 constexpr float p_ER = 1.00;
 constexpr uint32_t Nt = 50;
 constexpr uint32_t NV = N_pop;
@@ -46,6 +47,9 @@ int main() {
     MC_SIR_Params<>p;
     p.N_pop = N_pop;
     p.p_ER = p_ER;
+
+    //mark start timestamp
+    auto start = std::chrono::high_resolution_clock::now();
 
     std::random_device rd{};
     std::vector<uint32_t> seeds(p.N_sim);
@@ -86,10 +90,15 @@ int main() {
     });
 
     using namespace std::placeholders;
-    const std::vector<std::string> colnames = {"S", "I", "R"};
+    const std::vector<std::string> colnames = {"S", "I", "R", "p_I"};
     auto MC_fname_f = std::bind(MC_filename, p.N_pop, p.p_ER, _1, "SIR");
     auto q_fname_f = std::bind(quantile_filename, p.N_pop, p.p_ER, _1, "SIR");
     quantiles_to_file(p.N_sim, colnames, MC_fname_f, q_fname_f);
+
+    //mark end timestamp
+    auto end = std::chrono::high_resolution_clock::now();
+    //print time
+    std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
 
     return 0;
 }

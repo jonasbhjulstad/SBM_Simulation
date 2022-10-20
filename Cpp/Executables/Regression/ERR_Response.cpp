@@ -8,7 +8,7 @@
 
 std::string err_simulation_filename(uint32_t N_pop, float p_ER, uint32_t iter, std::string network_type) {
     std::stringstream ss;
-    ss << FROLS::FROLS_DATA_DIR << "/ERR_Simulation_" << network_type << "_" << N_pop << "_" << p_ER << "_" << iter
+    ss << FROLS::FROLS_DATA_DIR << "/ERR_Simulation_" << network_type << "_" << N_pop << "_" << p_ER << "/" << iter
        << ".csv";
     return ss.str();
 }
@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
     reg_param.N_terms_max = 4;
     FROLS::Regression::ERR_Regressor regressor(reg_param);
 
-    Regression::from_file_regression(Sine_fname_f, {"S", "I", "R"}, {"p_I"}, N_sims, regressor, model, outfile_f, true);
+    Regression::from_file_regression(MC_fname_f, {"S", "I", "R"}, {"p_I"}, N_sims, regressor, model, outfile_f, true);
     auto fnames = model.feature_names();
     std::for_each(fnames.begin(), fnames.end(), [n = 0](auto &name)mutable {
         std::cout << n << ": " << name << std::endl;

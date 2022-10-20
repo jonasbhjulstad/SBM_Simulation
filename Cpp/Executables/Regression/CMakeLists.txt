@@ -11,5 +11,6 @@ add_regression(ERR_Response)
 target_link_sycl(ERR_Response)
 #add_regression(Linear_System_Deterministic)
 add_regression(Linear_System_Stochastic)
+add_regression(Quantile_ERR_Response)
 
 

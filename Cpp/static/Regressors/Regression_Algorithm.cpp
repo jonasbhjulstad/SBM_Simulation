@@ -40,7 +40,8 @@ namespace FROLS::Regression
             df.assign({colnames_u}, u);
             df.assign("t", FROLS::range(0, u.rows()));
             df.assign(colnames_x, X_sim);
-            df.write_csv(outsim_f(i), ",");
+            df.resize(u.rows());
+            df.write_csv(outsim_f(i), ",", 1e-6);
         }
 
     }

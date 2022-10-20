@@ -53,9 +53,9 @@ namespace FROLS {
             std::vector<float> t = (*dfs[0]["t"]);
             std::vector<float> xk(N_simulations);
 
-            std::vector<float> quantiles = FROLS::arange(0.05, 0.95, 0.05);
+            std::vector<float> tau = FROLS::arange(0.05, 1.00, 0.05);
 
-            std::vector<std::vector<uint32_t>> q_trajectories(quantiles.size());
+            std::vector<std::vector<uint32_t>> q_trajectories(tau.size());
             for (auto &traj: q_trajectories) {
                 traj.resize(N_rows);
             }
@@ -66,10 +66,13 @@ namespace FROLS {
                 }
                 DataFrame df;
                 df.assign("t", t);
+                df.resize(t.size());
 
-                std::for_each(std::execution::par_unseq, colnames.begin(), colnames.end(), [&](const auto& colname){df.assign(colname, dataframe_quantiles(dfs, colname));});
-                df.write_csv(q_fname_f(i), ",");
+                std::for_each(std::execution::par_unseq, colnames.begin(), colnames.end(), [&](const auto& colname){df.assign(colname, dataframe_quantiles(dfs, colname, tau[i]));});
+                df.write_csv(q_fname_f(uint32_t(tau[i]*100)), ",");
+
             }
+
         }
     }
 }
