@@ -17,9 +17,9 @@ namespace FROLS {
            << ".csv";
         return ss.str();
     }
-    std::string quantile_filename(uint32_t N_pop, float p_ER, uint32_t tau, std::string network_type) {
+    std::string quantile_filename(uint32_t N_pop, float p_ER, uint32_t iter, std::string network_type) {
         std::stringstream ss;
-        ss << FROLS_DATA_DIR << "/Quantile_Bernoulli_" << network_type << "_MC_" << N_pop << "_" << p_ER << "/" << tau
+        ss << FROLS_DATA_DIR << "/Quantile_Bernoulli_" << network_type << "_MC_" << N_pop << "_" << p_ER << "/" << iter
            << ".csv";
         return ss.str();
     }

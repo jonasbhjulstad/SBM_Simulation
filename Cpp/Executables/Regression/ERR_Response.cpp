@@ -8,7 +8,7 @@
 
 std::string err_simulation_filename(uint32_t N_pop, float p_ER, uint32_t iter, std::string network_type) {
     std::stringstream ss;
-    ss << FROLS::FROLS_DATA_DIR << "/ERR_Simulation_" << network_type << "_" << N_pop << "_" << p_ER << "/" << iter
+    ss << FROLS::FROLS_DATA_DIR << "/ERR_Simulation_" << network_type << "_" << N_pop << "_" << p_ER << "/trajectory_" << iter
        << ".csv";
     return ss.str();
 }
@@ -69,8 +69,9 @@ int main(int argc, char **argv) {
     });
 
     model.write_csv(FROLS::FROLS_DATA_DIR + std::string("/ERR_param.csv"));
-    model.read_csv(FROLS::FROLS_DATA_DIR + std::string("/ERR_param.csv"));
-    model.feature_summary();
+    // model.read_csv(FROLS::FROLS_DATA_DIR + std::string("/ERR_param.csv"));
+    // model.feature_summary();
+    model.write_csv(path_dirname(outfile_f(0).c_str()) + std::string("/param.csv"));
 
     return 0;
 }

@@ -44,19 +44,27 @@ if __name__ == '__main__':
     
     for j, df in enumerate(dfs):
         for i, name in enumerate(statenames):
+            
             ax[i].plot(df["t"], df[name], color='gray', alpha=.2)
         if (j < 10):
             ax[-1].plot(df["t"][:-1], df["p_I"][:-1], color='gray', alpha=.2)
         if (np.any(df["t"] > 101)):
             a = 1
 
+    def traj_plot(ax, df):
+        for i, name in enumerate(statenames):
+            ax[i].plot(df["t"], df[name], color='gray', alpha=.3)
+        ax[-1].plot(df["t"][:-1], df["p_I"][:-1], color='gray', alpha=.8)
+
     # er_dfs = qr_dfs
     fig1, ax1 = plt.subplots(4)
-    for (qr, er) in zip(er_dfs, er_dfs):
-        for i, name in enumerate(statenames):
-            ax1[i].plot(qr["t"][:-1], qr[name][:-1], color='k', alpha=.3)
-            ax1[i].plot(er["t"][:-1], er[name][:-1], color='r', alpha=.3)
-        ax1[-1].plot(qr["t"][:-1], qr["p_I"][:-1], color='k', alpha=.8)
-        ax1[-1].plot(er["t"][:-1], er["p_I"][:-1], color='r', alpha=.8)
-    _ = [x.set_ylim(0, N_pop) for x in ax1[:-1]]
+    for qr in qr_dfs:
+        traj_plot(ax1, qr)
+        _ = [x.set_ylim(0, N_pop) for x in ax1[:-1]]
+    
+    fig2, ax2 = plt.subplots(4)
+    for er in er_dfs:
+        traj_plot(ax2, er)
+        _ = [x.set_ylim(0, N_pop) for x in ax2[:-1]]
+
     plt.show()

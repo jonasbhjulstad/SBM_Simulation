@@ -19,14 +19,15 @@ namespace FROLS::Regression {
         best_features.reserve(N_terms_max);
         uint32_t end_idx = N_features;
 
+        fmt::print("Max features: {}\n", N_terms_max);
         // Perform one feature selection iteration for each feature
         for (int j = 0; j < N_features; j++) {
-            fmt::print("Feature {} of {}\n", j+1, N_features);
+            fmt::print("Feature {}\n", j+1);
             // Compute remaining variance by orthogonalizing the current feature
             Q_current =
                     used_feature_orthogonalize(X, Q_global, best_features);
             // Determine the best feature to add to the feature set
-            Feature f = best_feature_select(Q_current, y, best_features);
+            Feature f = best_feature_select(Q_current, Q_global, y, best_features);
 
             if ((f.tag == FEATURE_INVALID) || (j >= (N_terms_max))) {
                 end_idx = j;
@@ -44,7 +45,7 @@ namespace FROLS::Regression {
             A(j, j) = 1;
 
             // If ERR-tolerance is met, return non-orthogonalized parameters
-            if (tolerance_check(Q_global.leftCols(j + +1), y, best_features)) {
+            if (tolerance_check(Q_global.leftCols(j +1), y, best_features)) {
                 end_idx = j+1;
                 break;
             }
@@ -52,7 +53,7 @@ namespace FROLS::Regression {
 
             Q_current.setZero();
         }
-        theta_solve(A.topLeftCorner(end_idx, end_idx), g.head(end_idx), best_features);
+        theta_solve(A.topLeftCorner(end_idx, end_idx), g.head(end_idx), X, y, best_features);
 
         return best_features;
     }
@@ -75,24 +76,8 @@ namespace FROLS::Regression {
 
     }
 
-    void Regressor::theta_solve(crMat &A, crVec &g, std::vector<Feature> &features) const {
-        Vec coefficients =
-                A.inverse() * g;
-        //Lectures on network systems
-        // assign coefficients to features
-        std::cout << A << std::endl;
-        std::cout << g << std::endl;
-        for (
-                int i = 0;
-                i < coefficients.rows();
-                i++) {
-            features[i].
-                    theta = coefficients[i];
-        }
-    }
-
-    Feature Regressor::best_feature_select(crMat &X, crVec &y, const std::vector<Feature> &used_features) const {
-        const std::vector<Feature> candidates = candidate_regression(X, y, used_features);
+    Feature Regressor::best_feature_select(crMat &X, crMat& Q_global, crVec &y, const std::vector<Feature> &used_features) const {
+        const std::vector<Feature> candidates = candidate_regression(X, Q_global, y, used_features);
         std::vector<Feature> thresholded_candidates;
         std::copy_if(candidates.begin(), candidates.end(), std::back_inserter(thresholded_candidates),
                      [&](const auto &f) {
@@ -111,8 +96,7 @@ namespace FROLS::Regression {
                 res = thresholded_candidates[0];
                 break;
             default:
-                res = *std::max_element(thresholded_candidates.begin(), thresholded_candidates.end(),
-                                        best_feature_measure);
+                res = feature_selection_criteria(thresholded_candidates);
                 break;
         }
 
@@ -127,7 +111,7 @@ namespace FROLS::Regression {
         uint32_t N_response = Y.cols();
         std::vector<std::vector<Feature>> result(N_response);
         auto cols = Y.colwise();
-        std::transform(FROLS::execution::par_unseq, cols.begin(), cols.end(), result.begin(),
+        std::transform(cols.begin(), cols.end(), result.begin(),
                        [=](const auto &yi) { return this->single_fit(X, yi); });
         return result;
     }
@@ -190,10 +174,6 @@ namespace FROLS::Regression {
         std::vector<uint32_t> used_idx(features.size());
         std::transform(features.begin(), features.end(), used_idx.begin(), [&](auto &f) { return f.index; });
         return filtered_range(used_idx, 0, N_features);
-    }
-
-    bool Regressor::best_feature_measure(const Feature &f0, const Feature &f1) {
-        return f0.f_ERR < f1.f_ERR;
     }
 
     int Regressor::regressor_count = 0;
