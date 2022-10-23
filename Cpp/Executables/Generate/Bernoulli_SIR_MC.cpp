@@ -28,17 +28,12 @@ void traj_to_file(const FROLS::MC_SIR_Params<>& p, const FROLS::MC_SIR_SimData<N
     df.write_csv(FROLS::MC_filename(p.N_pop, p.p_ER, iter, "SIR"),
                  ",", p.csv_termination_tol);
 }
-constexpr size_t n_choose_k(size_t n, size_t k)
-{
-    return (k == 0) ? 1 : (n * n_choose_k(n - 1, k - 1)) / k;
-}
-
 constexpr float p_I0 = 1.0;
 constexpr uint32_t N_pop =200;
 constexpr float p_ER = 1.00;
 constexpr uint32_t Nt = 50;
 constexpr uint32_t NV = N_pop;
-constexpr size_t nk = n_choose_k(NV, 2);
+constexpr size_t nk = FROLS::n_choose_k(NV, 2);
 constexpr uint32_t NE = 1.5*nk;
 int main() {
     using namespace FROLS;
@@ -58,12 +53,12 @@ int main() {
 
     std::mt19937_64 rng(rd());
     typedef Network_Models::SIR_Bernoulli_Network<SIR_VectorGraph, decltype(rng), Nt> SIR_Bernoulli_Network;
-    std::vector<std::mutex*> v_mx(NV+1);
+    std::vector<std::shared_ptr<std::mutex>> v_mx(NV+1);
     //create mutexes
     for (auto& mx : v_mx) {
         mx = new std::mutex();
     }
-    std::vector<std::mutex*> e_mx(NE+1);
+    std::vector<std::shared_ptr<std::mutex>> e_mx(NE+1);
     //create mutexes
     for (auto& mx : e_mx) {
         mx = new std::mutex();

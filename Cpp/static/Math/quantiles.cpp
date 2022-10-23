@@ -53,7 +53,7 @@ namespace FROLS {
             std::vector<float> t = (*dfs[0]["t"]);
             std::vector<float> xk(N_simulations);
 
-            std::vector<float> tau = FROLS::arange(0.05, 1.00, 0.05);
+            std::vector<float> tau = FROLS::arange(0.05f, 1.00f, 0.05f);
 
             std::vector<std::vector<uint32_t>> q_trajectories(tau.size());
             for (auto &traj: q_trajectories) {

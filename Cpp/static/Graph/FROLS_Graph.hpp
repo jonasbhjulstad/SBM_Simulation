@@ -23,7 +23,7 @@ namespace FROLS::Graph
     {
         uint32_t id = std::numeric_limits<uint32_t>::max();
         D data;
-        std::mutex *mx;
+        std::shared_ptr<std::mutex> mx;
     };
     template <typename D>
     struct Edge
@@ -31,7 +31,7 @@ namespace FROLS::Graph
         D data;
         uint32_t to = std::numeric_limits<uint32_t>::max();
         uint32_t from = std::numeric_limits<uint32_t>::max();
-        std::mutex *mx;
+        std::shared_ptr<std::mutex> mx;
     };
 
     template <typename V, typename E, uint32_t NV, uint32_t NE>
@@ -87,7 +87,7 @@ namespace FROLS::Graph
     //     uint32_t N_vertices = 0;
     //     uint32_t N_edges = 0;
 
-    //     VectorGraphContainer(std::vector<std::mutex*> &v_mx, std::vector<std::mutex*> &e_mx) : NV_max(v_mx.size()), NE_max(e_mx.size())
+    //     VectorGraphContainer(std::vector<std::shared_ptr<std::mutex>> &v_mx, std::vector<std::shared_ptr<std::mutex>> &e_mx) : NV_max(v_mx.size()), NE_max(e_mx.size())
     //     {
 
     //             _vertices.resize(NV_max);
@@ -317,7 +317,7 @@ namespace FROLS::Graph
         uint32_t N_vertices = 0;
         uint32_t N_edges = 0;
 
-        VectorGraph(std::vector<std::mutex*> &v_mx, std::vector<std::mutex*> &e_mx) : NV_max(v_mx.size()), NE_max(e_mx.size())
+        VectorGraph(std::vector<std::shared_ptr<std::mutex>> &v_mx, std::vector<std::shared_ptr<std::mutex>> &e_mx) : NV_max(v_mx.size()), NE_max(e_mx.size())
         {
             std::cout << "size: " << sizeof(Edge<E>) << std::endl;
                 _vertices.resize(NV_max);

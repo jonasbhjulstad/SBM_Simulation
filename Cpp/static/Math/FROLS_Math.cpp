@@ -36,15 +36,7 @@ namespace FROLS {
         return res;
     }
 
-    std::vector<float> arange(float min, float max, float step) {
-        float s = min;
-        std::vector<float> res;
-        while (s <= max) {
-            res.push_back(s);
-            s += step;
-        }
-        return res;
-    }
+
 
     std::vector<uint32_t> range(uint32_t start, uint32_t end) {
         std::vector<uint32_t> res(end - start);

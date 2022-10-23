@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 
     FROLS::Regression::Quantile_Regressor regressor(reg_param);
 
-    from_file_regression(MC_fname_f, {"I", "S", "R"}, {"p_I"}, N_sims, regressor, model, outfile_f);
+    from_file_regression(MC_fname_f, colnames, {"p_I"}, N_sims, regressor, model, outfile_f);
     model.write_csv(path_dirname(outfile_f(0).c_str()) + std::string("/param.csv"));
 
     return 0;

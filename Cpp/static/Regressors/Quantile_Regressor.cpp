@@ -36,13 +36,15 @@ namespace FROLS::Regression {
             using namespace operations_research;
             uint32_t N_rows = x.rows();
             Quantile_LP LP(tau, solver_type);
+            float eps = 4;
             LP.construct(N_rows);
             for (int i = 0; i < N_rows; i++) {
-                LP.g[i]->SetCoefficient(LP.theta_pos, x(i));
-                LP.g[i]->SetCoefficient(LP.theta_neg, -x(i));
+                // LP.g[i]->SetCoefficient(LP.theta_pos, x(i));
+                // LP.g[i]->SetCoefficient(LP.theta_neg, -x(i));
+                LP.g[i]->SetCoefficient(LP.theta, x(i));
                 LP.g[i]->SetCoefficient(LP.u_pos[i], 1);
                 LP.g[i]->SetCoefficient(LP.u_neg[i], -1);
-                LP.g[i]->SetBounds(y[i], y[i]);
+                LP.g[i]->SetBounds(y[i] - eps, y[i]);
             }
 //            MX g = xi * (theta_pos - theta_neg) + u_pos - u_neg - dm_y;
             const bool solver_status = LP.solver->Solve() == MPSolver::OPTIMAL;
@@ -58,10 +60,11 @@ namespace FROLS::Regression {
                     u_neg_sol[i] = LP.u_neg[i]->solution_value();
                     u_pos_sol[i] = LP.u_pos[i]->solution_value();
                 }
-                float theta_sol = (LP.theta_pos->solution_value() - LP.theta_neg->solution_value());
-                float theta_pos_sol = LP.theta_pos->solution_value();
-                float theta_neg_sol = LP.theta_neg->solution_value();
-                fmt::print("Solve status, {}, {}, {}, {}, {}\n", solver_status, f, theta_sol, LP.theta_pos->solution_value(), LP.theta_neg->solution_value());
+                // float theta_sol = (LP.theta_pos->solution_value() - LP.theta_neg->solution_value());
+                // float theta_pos_sol = LP.theta_pos->solution_value();
+                // float theta_neg_sol = LP.theta_neg->solution_value();
+                float theta_sol = LP.theta->solution_value();
+                fmt::print("Solve status, {}, {}, {}\n", solver_status, f, theta_sol);
                 if(theta_sol == 0)
                     std::cout << y.head(10).transpose() << std::endl;
                 
@@ -87,7 +90,7 @@ namespace FROLS::Regression {
         Vec y_diff = y - predict(Q_global, used_features);
         std::vector<uint32_t> candidate_idx = unused_feature_indices(used_features, X.cols());
         std::vector<Feature> candidates(candidate_idx.size());
-        std::transform(candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
+        std::transform(FROLS::execution::par_unseq, candidate_idx.begin(), candidate_idx.end(), candidates.begin(),
                        [=](const uint32_t &idx) {
                            Feature f = single_feature_regression(X.col(idx), y_diff);
                            f.index = idx;

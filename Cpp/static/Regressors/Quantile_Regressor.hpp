@@ -38,8 +38,9 @@ namespace FROLS::Regression
             solver = std::make_unique<MPSolver>("Quantile_Solver", problem_type);
             const float infinity = solver->infinity();
 
-            theta_neg = solver->MakeNumVar(0.0, infinity, "theta_neg");
-            theta_pos = solver->MakeNumVar(0.0, infinity, "theta_pos");
+            // theta_neg = solver->MakeNumVar(0.0, infinity, "theta_neg");
+            // theta_pos = solver->MakeNumVar(0.0, infinity, "theta_pos");
+            theta = solver->MakeNumVar(-infinity, infinity, "theta");
 
             solver->MakeNumVarArray(N_rows, 0.0, infinity, "u_pos", &u_pos);
             solver->MakeNumVarArray(N_rows, 0.0, infinity, "u_neg", &u_neg);
@@ -65,8 +66,9 @@ namespace FROLS::Regression
 
         operations_research::MPObjective *objective;
         std::unique_ptr<operations_research::MPSolver> solver;
-        operations_research::MPVariable *theta_neg;
-        operations_research::MPVariable *theta_pos;
+        // operations_research::MPVariable *theta_neg;
+        // operations_research::MPVariable *theta_pos;
+        operations_research::MPVariable *theta;
         std::vector<operations_research::MPVariable *> u_pos;
         std::vector<operations_research::MPVariable *> u_neg;
         std::vector<operations_research::MPConstraint *> g;
