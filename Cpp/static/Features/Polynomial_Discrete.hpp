@@ -32,7 +32,7 @@ namespace FROLS::Features {
 
         const std::string model_equation(uint32_t idx);
 
-        const std::string model_equations();
+        const std::vector<std::string> model_equations();
 
         uint32_t get_feature_index(const std::string&);
 

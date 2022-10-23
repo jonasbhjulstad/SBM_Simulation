@@ -7,34 +7,16 @@
 #include <functional>
 #include <utility>
 #include <chrono>
-template <uint32_t Nt, typename dType=float>
-void traj_to_file(const FROLS::MC_SIR_Params<>& p, const FROLS::MC_SIR_SimData<Nt>& d, uint32_t iter)
-{
-    //print iter
-    FROLS::DataFrame df;
-    std::array<dType, Nt+1> p_Is;
-    std::transform(d.p_vec.begin(), d.p_vec.end(), p_Is.begin(), [](auto& p) { return p.p_I; });
-    std::array<dType, Nt+1> p_Rs;
-    std::fill(p_Rs.begin(), p_Rs.end(), p.p_R);
-    p_Is.back() = 0.;
-    df.assign("S", d.traj[0]);
-    df.assign("I", d.traj[1]);
-    df.assign("R", d.traj[2]);
-    df.assign("p_I", p_Is);
-    df.assign("p_R", p_Rs);
-    auto t = FROLS::range(0, Nt+1);
-    df.assign("t", t);
-    df.resize(Nt+1);
-    df.write_csv(FROLS::MC_filename(p.N_pop, p.p_ER, iter, "SIR"),
-                 ",", p.csv_termination_tol);
-}
+
+
+
 constexpr float p_I0 = 1.0;
 constexpr uint32_t N_pop =200;
 constexpr float p_ER = 1.00;
 constexpr uint32_t Nt = 50;
 constexpr uint32_t NV = N_pop;
-constexpr size_t nk = FROLS::n_choose_k(NV, 2);
-constexpr uint32_t NE = 1.5*nk;
+size_t nk = FROLS::n_choose_k(NV, 2);
+uint32_t NE = 1.5*nk;
 int main() {
     using namespace FROLS;
     using namespace Network_Models;
@@ -56,12 +38,12 @@ int main() {
     std::vector<std::shared_ptr<std::mutex>> v_mx(NV+1);
     //create mutexes
     for (auto& mx : v_mx) {
-        mx = new std::mutex();
+        mx = std::make_shared<std::mutex>();
     }
     std::vector<std::shared_ptr<std::mutex>> e_mx(NE+1);
     //create mutexes
     for (auto& mx : e_mx) {
-        mx = new std::mutex();
+        mx = std::make_shared<std::mutex>();
     }
 
     SIR_VectorGraph G(v_mx, e_mx);

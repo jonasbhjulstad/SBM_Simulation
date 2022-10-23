@@ -64,9 +64,9 @@ namespace FROLS::Regression {
                 // float theta_pos_sol = LP.theta_pos->solution_value();
                 // float theta_neg_sol = LP.theta_neg->solution_value();
                 float theta_sol = LP.theta->solution_value();
-                fmt::print("Solve status, {}, {}, {}\n", solver_status, f, theta_sol);
-                if(theta_sol == 0)
-                    std::cout << y.head(10).transpose() << std::endl;
+                // fmt::print("Solve status, {}, {}, {}\n", solver_status, f, theta_sol);
+                // if(theta_sol == 0)
+                    // std::cout << y.head(10).transpose() << std::endl;
                 
 
                 // std::for_each(LP.g.begin(), LP.g.end(), [&](auto &gi) { gi->Clear(); });
@@ -109,15 +109,15 @@ namespace FROLS::Regression {
         bool no_improvement = (best_features.size() > 1) && (best_features.back().f_ERR < err);
         if (no_improvement)
         {
-            std::cout << "[Quantile_Regressor] Warning: Termination due to lack of improvement" << std::endl;
+            // std::cout << "[Quantile_Regressor] Warning: Termination due to lack of improvement" << std::endl;
             return true;
         }
         else if(err < tol)
         {
-            std::cout << "[Quantile_Regressor] Status: Successful tolerance termination" << std::endl;
+            // std::cout << "[Quantile_Regressor] Status: Successful tolerance termination" << std::endl;
             return true;
         }
-        std::cout << "[Quantile_Regressor] Error: " << err << std::endl;
+        // std::cout << "[Quantile_Regressor] Error: " << err << std::endl;
         return false;
     }
 

@@ -19,10 +19,10 @@ namespace FROLS::Regression {
         best_features.reserve(N_terms_max);
         uint32_t end_idx = N_features;
 
-        fmt::print("Max features: {}\n", N_terms_max);
+        // fmt::print("Max features: {}\n", N_terms_max);
         // Perform one feature selection iteration for each feature
         for (int j = 0; j < N_features; j++) {
-            fmt::print("Feature {}\n", j+1);
+            // fmt::print("Feature {}\n", j+1);
             // Compute remaining variance by orthogonalizing the current feature
             Q_current =
                     used_feature_orthogonalize(X, Q_global, best_features);

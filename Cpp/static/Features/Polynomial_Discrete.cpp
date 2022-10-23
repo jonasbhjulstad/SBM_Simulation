@@ -165,24 +165,21 @@ namespace FROLS::Features {
         std::string model;
         const std::vector<Feature> &rd = features[idx];
         for (int i = 0; i < rd.size(); i++) {
-            model += std::to_string(rd[i].theta);
+            model += std::to_string(rd[i].theta) + " ";
             model += feature_name(rd[i].index);
             if (i != rd.size() - 1) {
                 model += " + ";
             }
         }
-        model += "\n";
         return model;
     }
 
-    const std::string Polynomial_Model::model_equations() {
-        std::string model;
-        uint32_t response_idx = 0;
+    const std::vector<std::string> Polynomial_Model::model_equations() {
+        std::vector<std::string> equations;
         for (int i = 0; i < features.size(); i++) {
-            model += "y" + std::to_string(i) + "=\t";
-            model += model_equation(i);
+            equations.push_back(model_equation(i));
         }
-        return model;
+        return equations;
     }
 
     uint32_t Polynomial_Model::get_feature_index(const std::string& name)

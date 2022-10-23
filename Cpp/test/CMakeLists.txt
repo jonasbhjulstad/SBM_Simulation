@@ -17,6 +17,11 @@ endfunction()
 add_executable(csv_regression csv_regression.cpp)
 target_link_libraries(csv_regression PUBLIC Common Eigen3::Eigen ${ONEAPI_LIBS} Regressors FROLS_Math Features DataFrame FROLS_Eigen)
 
+function(add_regression source_file)
+add_executable(${source_file} "${source_file}.cpp")
+target_link_libraries(${source_file} PUBLIC Common Eigen3::Eigen ${ONEAPI_LIBS} Regressors FROLS_Math Features DataFrame FROLS_Eigen FROLS_Network)
+endfunction()
+add_regression(polynomial_features)
 # add_sycl_executable(sycl_info)
 # target_link_libraries(sycl_info PUBLIC FROLS_Sycl)
 

@@ -133,17 +133,14 @@ namespace FROLS::Features {
                 model += " + ";
             }
         }
-        model += "\n";
         return model;
     }
 
-    const std::string Polynomial_Model::model_equations() {
-        std::string model;
-        uint32_t response_idx = 0;
+    const std::vector<std::string> Polynomial_Model::model_equations() {
+        std::vector<std::string> equations;
         for (int i = 0; i < features.size(); i++) {
-            model += "y" + std::to_string(i) + "=\t";
-            model += model_equation(i);
+            equations.push_back(model_equation(i));
         }
-        return model;
+        return equations;
     }
 } // namespace FROLS::Features::Polynomial

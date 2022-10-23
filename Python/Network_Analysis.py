@@ -10,20 +10,29 @@ import networkx as nx
 import ndlib.models.epidemics as ep
 import ndlib.models.ModelConfig as mc
 from ndlib.utils import multi_runs
-from aesara import tensor as at
+# from aesara import tensor as at
 from bokeh.io import output_notebook, show
 # from ndlib.viz.bokeh.DiffusionTrend import DiffusionTrend
 from ndlib.viz.mpl.TrendComparison import DiffusionTrendComparison
 import pysindy as ps
-from pydmd import DMD
+# from pydmd import DMD
 # from ParameterConfig import DATA_DIR, FIGURE_DIR, ROOT_DIR
 import glob
 import pandas as pd
+from os.path import basename
+import os
+import sys
 
-CPP_Data_Dir = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/data/"
-CPP_Figure_Dir = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/figures/"
+
+cwd = os.path.dirname(os.path.abspath(''))
+print(cwd)
+# sys.path.append(cwd + '/Cpp/build/Binders/')
+# import pyFROLS as pf
+
+DATA_DIR = '/home/man/Documents/Bernoulli_MC/Cpp/data/Bernoulli_SIR_MC_100_1/'
+FIGURE_DIR = cwd + '/../../figures/'
 def load_SIR_trajectories():
-    trajs = glob.glob(CPP_Data_Dir + "*60_1.0*.csv")
+    trajs = glob.glob(DATA_DIR + '*.csv')
     dfs = [pd.read_csv(traj) for traj in trajs[:100] if "Quantile" not in traj]
     N_traj = len(dfs)
     X = [df[['S', 'I', 'R']].to_numpy() for df in dfs]

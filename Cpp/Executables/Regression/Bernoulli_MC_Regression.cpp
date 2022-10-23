@@ -7,6 +7,7 @@
 #include <functional>
 #include <utility>
 #include <chrono>
+#include <fmt/format.h>
 
 #include <FROLS_Eigen.hpp>
 #include <Quantile_Regressor.hpp>
@@ -55,7 +56,7 @@ void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<N
 }
 
 constexpr uint32_t Nt = 50;
-constexpr uint32_t N_sims = 50;
+constexpr uint32_t N_sims = 200;
 const std::string network_type = "SIR";
 void simulation_loop(uint32_t N_pop, float p_ER)
 {
@@ -71,6 +72,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     MC_SIR_Params<> p;
     p.N_pop = N_pop;
     p.p_ER = p_ER;
+    p.N_sim = N_sims;
     uint32_t NV = N_pop;
     size_t nk = FROLS::n_choose_k(NV, 2);
     uint32_t NE = 1.5 * nk;
@@ -109,62 +111,120 @@ void simulation_loop(uint32_t N_pop, float p_ER)
         uint32_t seed = es.second;
         if ((iter % (p.N_sim / 10)) == 0)
         {
-            std::cout << "Simulation " << iter << " of " << p.N_sim << std::endl;
+            // std::cout << "Simulation " << iter << " of " << p.N_sim << std::endl;
         }
         return MC_SIR_simulation<decltype(G), Nt>(G, p, seed); });
 
     std::for_each(simdatas.begin(), simdatas.end(), [&, n = 0](const auto &simdata) mutable
                   { traj_to_file<Nt>(p, simdata, n++); });
 
-    const std::vector<std::string> colnames = {"S", "I", "R", "p_I"};
+    const std::vector<std::string> colnames_x = {"S", "I", "R"};
+    const std::vector<std::string> colnames_u = {"p_I"};
+    const std::vector<std::string> colnames_X = {"S", "I", "R", "p_I"};
     auto q_fname_f = std::bind(quantile_filename, p.N_pop, p.p_ER, _1, "SIR");
-    quantiles_to_file(p.N_sim, colnames, MC_fname_f, q_fname_f);
+    quantiles_to_file(p.N_sim, colnames_X, MC_fname_f, q_fname_f);
 
     // mark end timestamp
     auto end = std::chrono::high_resolution_clock::now();
     // print time
-    std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
-
-
-    std::cout << "Performing ERR-Regression" << std::endl;
-    // ERR-Regression
-
-    uint32_t d_max = 2;
-    uint32_t N_output_features = 16;
+    uint32_t N_terms_max = 2;
+    uint32_t d_max = 1;
+    uint32_t N_output_features = 80;
     uint32_t Nu = 1;
     uint32_t Nx = 3;
-    std::vector<std::vector<Feature>> preselected_features(4);
-    FROLS::Features::Polynomial_Model model(Nx, Nu, N_output_features, d_max);
     FROLS::Regression::Regressor_Param er_param;
     er_param.tol = 1e-4;
-    er_param.theta_tol = 1e-10;
-    er_param.N_terms_max = 4;
+    er_param.theta_tol = 1e-3;
+    er_param.N_terms_max = N_terms_max;
+    // ERR-Regression
+
+
+    std::vector<std::vector<Feature>> preselected_features(4);
+    FROLS::Features::Polynomial_Model er_model(Nx, Nu, N_output_features, d_max);
+    FROLS::Features::Polynomial_Model qr_model(Nx, Nu, N_output_features, d_max);
+
     FROLS::Regression::ERR_Regressor er_regressor(er_param);
-
-    Regression::from_file_regression(MC_fname_f, colnames, {"p_I"}, N_sims, er_regressor, model, er_outfile_f, true);
-
-    model.write_csv(path_dirname(er_outfile_f(0).c_str()) + std::string("/param.csv"));
-
-    std::cout << "Performing Quantile-Regression" << std::endl;
-
-    // Quantile-Regression
 
     float MAE_tol = 1e-6;
     FROLS::Regression::Quantile_Param qr_param;
-    qr_param.N_terms_max = 4;
+    qr_param.N_terms_max = N_terms_max;
     qr_param.tol = MAE_tol;
     qr_param.tau = 0.95;
+    qr_param.theta_tol = 1e-3;
+
+    // Quantile-Regression
+
+
 
     FROLS::Regression::Quantile_Regressor qr_regressor(qr_param);
 
-    from_file_regression(MC_fname_f, colnames, {"p_I"}, N_sims, qr_regressor, model, qr_outfile_f);
-    model.write_csv(path_dirname(qr_outfile_f(0).c_str()) + std::string("/param.csv"));
+    std::vector<std::string> df_names(N_sims);
+    std::generate(df_names.begin(), df_names.end(), [&, n = -1]() mutable
+                    {
+                    n++;
+        return MC_fname_f(n); });
+    uint32_t Nt_max = 0;
+    DataFrameStack dfs(df_names);
+    fmt::print("ERR-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, N_output_features, er_param.tol, er_param.N_terms_max);
+
+    Mat X, Y, U;
+
+    X = dataframe_to_matrix(dfs, colnames_x,
+                            0, -2);
+    Y = dataframe_to_matrix(dfs, colnames_x, 1, -1);
+    U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
+
+    using namespace FROLS::Features;
+
+    er_regressor.transform_fit(X, U, Y, er_model);
+    er_model.feature_summary();
+
+    fmt::print("Quantile-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, N_output_features, qr_param.tol, qr_param.N_terms_max);
+
+    X = dataframe_to_matrix(dfs, colnames_x,
+                            0, -2);
+    Y = dataframe_to_matrix(dfs, colnames_x, 1, -1);
+    U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
+    qr_regressor.transform_fit(X, U, Y, qr_model);
+    qr_model.feature_summary();
+    for (int i = 0; i < N_sims; i++)
+    {
+        Mat u = vecs_to_mat(dfs[i][colnames_u])(Eigen::seq(0, Eigen::last - 1), Eigen::all);
+        Vec x0 = vecs_to_mat(dfs[i][colnames_x]).row(0);
+        Mat X_sim = er_model.simulate(x0, u, u.rows());
+        {
+        FROLS::DataFrame df;
+        df.assign(colnames_u, u);
+        df.assign("t", FROLS::range(0, u.rows()));
+        df.assign(colnames_x, X_sim);
+        df.resize(u.rows());
+        df.write_csv(er_outfile_f(i), ",", 1e-6);
+        }
+        u = vecs_to_mat(dfs[i][colnames_u])(Eigen::seq(0, Eigen::last - 1), Eigen::all);
+        x0 = vecs_to_mat(dfs[i][colnames_x]).row(0);
+        {
+        FROLS::DataFrame df;
+        Mat X_sim = qr_model.simulate(x0, u, u.rows());
+        df.assign(colnames_u, u);
+        df.assign("t", FROLS::range(0, u.rows()));
+        df.assign(colnames_x, X_sim);
+        df.resize(u.rows());
+        df.write_csv(qr_outfile_f(i), ",", 1e-6);
+        }
+    }
+    er_model.write_csv(path_dirname(er_outfile_f(0).c_str()) + std::string("/param.csv"));
+
+    qr_model.write_csv(path_dirname(qr_outfile_f(0).c_str()) + std::string("/param.csv"));
+    std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
+
 }
 
 int main(int argc, char **argv)
 {
     auto N_pop_vec = FROLS::arange((uint32_t)10, (uint32_t)100, (uint32_t)10);
     std::vector<float> p_ER_vec = {0.1, 1.0};
+    std::reverse(N_pop_vec.begin(), N_pop_vec.end());
+    std::reverse(p_ER_vec.begin(), p_ER_vec.end());
     for (const float &p_ER : p_ER_vec)
     {
         for (const uint32_t N_pop : N_pop_vec)

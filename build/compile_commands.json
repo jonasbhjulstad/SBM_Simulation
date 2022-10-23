@@ -1,0 +1,137 @@
+[
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -I/home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googlemock/include -I/home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googlemock -isystem /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest/include -isystem /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest -O3 -DNDEBUG -Wall -Wshadow -Wconversion -DGTEST_HAS_PTHREAD=1 -fexceptions -W -Wpointer-arith -Wreturn-type -Wcast-qual -Wwrite-strings -Wswitch -Wunused-parameter -Wcast-align -Wchar-subscripts -Winline -Wredundant-decls -fPIC -std=c++20 -o _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o -c /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googlemock/src/gmock-all.cc",
+  "file": "/home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googlemock/src/gmock-all.cc"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -isystem /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googlemock/include -isystem /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googlemock -isystem /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest/include -isystem /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest -O3 -DNDEBUG -Wall -Wshadow -Wconversion -DGTEST_HAS_PTHREAD=1 -fexceptions -W -Wpointer-arith -Wreturn-type -Wcast-qual -Wwrite-strings -Wswitch -Wunused-parameter -Wcast-align -Wchar-subscripts -Winline -Wredundant-decls -fPIC -std=c++20 -o _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o -c /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googlemock/src/gmock_main.cc",
+  "file": "/home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googlemock/src/gmock_main.cc"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -I/home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest/include -I/home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest -O3 -DNDEBUG -Wall -Wshadow -Wconversion -DGTEST_HAS_PTHREAD=1 -fexceptions -W -Wpointer-arith -Wreturn-type -Wcast-qual -Wwrite-strings -Wswitch -Wunused-parameter -Wcast-align -Wchar-subscripts -Winline -Wredundant-decls -fPIC -std=c++20 -o _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest/src/gtest-all.cc",
+  "file": "/home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest/src/gtest-all.cc"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -isystem /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest/include -isystem /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest -O3 -DNDEBUG -Wall -Wshadow -Wconversion -DGTEST_HAS_PTHREAD=1 -fexceptions -W -Wpointer-arith -Wreturn-type -Wcast-qual -Wwrite-strings -Wswitch -Wunused-parameter -Wcast-align -Wchar-subscripts -Winline -Wredundant-decls -fPIC -std=c++20 -o _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o -c /home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest/src/gtest_main.cc",
+  "file": "/home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest/src/gtest_main.cc"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -std=gnu++20 -o include/CMakeFiles/Common.dir/FROLS_Path_Config.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/include/FROLS_Path_Config.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/include/FROLS_Path_Config.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/Cpp/include -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -std=gnu++20 -o static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame/DataFrame.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame/DataFrame.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -std=gnu++20 -o static/Eigen/CMakeFiles/FROLS_Eigen.dir/FROLS_Eigen.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/static/Eigen/FROLS_Eigen.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen/FROLS_Eigen.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -std=gnu++20 -o static/Math/CMakeFiles/FROLS_Math.dir/FROLS_Math.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/static/Math/FROLS_Math.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/static/Math/FROLS_Math.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -std=gnu++20 -o static/Math/CMakeFiles/FROLS_Math.dir/quantiles.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/static/Math/quantiles.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/static/Math/quantiles.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -fwrapv -std=gnu++20 -o static/Regressors/CMakeFiles/Regressors.dir/Regressor.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/static/Regressors/Regressor.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors/Regressor.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -fwrapv -std=gnu++20 -o static/Regressors/CMakeFiles/Regressors.dir/ERR_Regressor.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/static/Regressors/ERR_Regressor.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors/ERR_Regressor.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -fwrapv -std=gnu++20 -o static/Regressors/CMakeFiles/Regressors.dir/Quantile_Regressor.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/static/Regressors/Quantile_Regressor.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors/Quantile_Regressor.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -fwrapv -std=gnu++20 -o static/Regressors/CMakeFiles/Regressors.dir/Regression_Algorithm.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/static/Regressors/Regression_Algorithm.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors/Regression_Algorithm.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -fwrapv -std=gnu++20 -o static/Features/CMakeFiles/Features.dir/Feature_Model.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/static/Features/Feature_Model.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/static/Features/Feature_Model.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -fwrapv -std=gnu++20 -o static/Features/CMakeFiles/Features.dir/Polynomial_Discrete.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/static/Features/Polynomial_Discrete.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/static/Features/Polynomial_Discrete.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_Binder_EXPORTS -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -isystem /usr/include/python3.10 -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fvisibility=hidden -fPIC -fwrapv -std=gnu++20 -o Binders/CMakeFiles/FROLS_Binder.dir/pyFROLS.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/Binders/pyFROLS.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/Binders/pyFROLS.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -fwrapv -std=gnu++20 -o test/CMakeFiles/csv_regression.dir/csv_regression.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/test/csv_regression.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/test/csv_regression.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -I/home/man/Documents/Bernoulli_MC/Cpp/static/Network -I/home/man/Documents/Bernoulli_MC/Cpp/static/Graph -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -fwrapv -std=gnu++20 -o test/CMakeFiles/polynomial_features.dir/polynomial_features.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/test/polynomial_features.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/test/polynomial_features.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -I/home/man/Documents/Bernoulli_MC/Cpp/static/Network -I/home/man/Documents/Bernoulli_MC/Cpp/static/Graph -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -fwrapv -std=gnu++20 -o Executables/Regression/CMakeFiles/Quantile_Response.dir/Quantile_Response.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/Executables/Regression/Quantile_Response.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/Executables/Regression/Quantile_Response.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -I/home/man/Documents/Bernoulli_MC/Cpp/static/Network -I/home/man/Documents/Bernoulli_MC/Cpp/static/Graph -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -fwrapv -std=gnu++20 -o Executables/Regression/CMakeFiles/ERR_Response.dir/ERR_Response.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/Executables/Regression/ERR_Response.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/Executables/Regression/ERR_Response.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -I/home/man/Documents/Bernoulli_MC/Cpp/static/Network -I/home/man/Documents/Bernoulli_MC/Cpp/static/Graph -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -fwrapv -std=gnu++20 -o Executables/Regression/CMakeFiles/Linear_System_Stochastic.dir/Linear_System_Stochastic.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/Executables/Regression/Linear_System_Stochastic.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/Executables/Regression/Linear_System_Stochastic.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -I/home/man/Documents/Bernoulli_MC/Cpp/static/Network -I/home/man/Documents/Bernoulli_MC/Cpp/static/Graph -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -fwrapv -std=gnu++20 -o Executables/Regression/CMakeFiles/Quantile_ERR_Response.dir/Quantile_ERR_Response.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/Executables/Regression/Quantile_ERR_Response.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/Executables/Regression/Quantile_ERR_Response.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors -I/home/man/Documents/Bernoulli_MC/Cpp/static/Features -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -I/home/man/Documents/Bernoulli_MC/Cpp/static/Network -I/home/man/Documents/Bernoulli_MC/Cpp/static/Graph -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin  -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -fwrapv -std=gnu++20 -o Executables/Regression/CMakeFiles/Bernoulli_MC_Regression.dir/Bernoulli_MC_Regression.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/Executables/Regression/Bernoulli_MC_Regression.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/Executables/Regression/Bernoulli_MC_Regression.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/Network -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Graph -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -std=gnu++20 -o Executables/Generate/CMakeFiles/Bernoulli_SIR_MC.dir/Bernoulli_SIR_MC.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/Executables/Generate/Bernoulli_SIR_MC.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/Executables/Generate/Bernoulli_SIR_MC.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/Network -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Graph -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -std=gnu++20 -o Executables/Generate/CMakeFiles/SIR_Sine.dir/SIR_Sine.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/Executables/Generate/SIR_Sine.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/Executables/Generate/SIR_Sine.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/Network -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Graph -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -std=gnu++20 -o Executables/Generate/CMakeFiles/SIR_Sine_Discrete.dir/SIR_Sine_Discrete.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/Executables/Generate/SIR_Sine_Discrete.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/Executables/Generate/SIR_Sine_Discrete.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DFROLS_USE_INTEL -I/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame -I/home/man/Documents/Bernoulli_MC/Cpp/include -I/home/man/Documents/Bernoulli_MC/Cpp/static/Math -I/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl -I/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen -I/home/man/Documents/Bernoulli_MC/Cpp/static/Network -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -I/home/man/Documents/Bernoulli_MC/Cpp/static/Graph -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -std=gnu++20 -o Executables/Generate/CMakeFiles/SIR_Sine_Stochastic.dir/SIR_Sine_Stochastic.cpp.o -c /home/man/Documents/Bernoulli_MC/Cpp/Executables/Generate/SIR_Sine_Stochastic.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/Cpp/Executables/Generate/SIR_Sine_Stochastic.cpp"
+}
+]

@@ -2,6 +2,7 @@
 #include <Regressor.hpp>
 #include <Quantile_Regressor.hpp>
 #include <Polynomial_Discrete.hpp>
+#include <Bernoulli_SIR_MC.hpp>
 #include <ERR_Regressor.hpp>
 #include <Typedefs.hpp>
 #include <FROLS_Eigen.hpp>
@@ -9,6 +10,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
+
 
 PYBIND11_MODULE(pyFROLS, m)
 {
@@ -40,8 +42,8 @@ PYBIND11_MODULE(pyFROLS, m)
             .def("feature_summary", &Polynomial_Model::feature_summary)
             .def("feature_name", &Polynomial_Model::feature_name)
             .def("feature_names", &Polynomial_Model::feature_names)
-            .def("model_equation", &Polynomial_Model::model_equation)
-            .def("model_equations", &Polynomial_Model::model_equations);
+            .def("equation", &Polynomial_Model::model_equation)
+            .def("equations", &Polynomial_Model::model_equations);
 
         py::class_<Regressor>(m, "Regressor")
             //   .def(py::init<float>())
@@ -52,4 +54,6 @@ PYBIND11_MODULE(pyFROLS, m)
             .def(py::init<Quantile_Param>());
         py::class_<ERR_Regressor, Regressor>(m, "ERR_Regressor")
             .def(py::init<Regressor_Param>());
+
+        m.def("Bernoulli_SIR_MC_Simulations", &FROLS::Bernoulli_SIR_MC_Simulations<50>);
 }

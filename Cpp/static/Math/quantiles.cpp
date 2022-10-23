@@ -62,7 +62,7 @@ namespace FROLS {
             for (int i = 0; i < q_trajectories.size(); i++) {
                 if (std::this_thread::get_id() == thread_0)
                 {
-                    std::cout << "Quantile " << i+1 << " of " << q_trajectories.size() << std::endl;
+                    // std::cout << "Quantile " << i+1 << " of " << q_trajectories.size() << std::endl;
                 }
                 DataFrame df;
                 df.assign("t", t);

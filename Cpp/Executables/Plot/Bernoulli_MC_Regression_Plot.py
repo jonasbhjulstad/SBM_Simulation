@@ -19,7 +19,8 @@ if __name__ == '__main__':
     else:
         network_type = "SIR"
         statenames = ["S", "I", "R"]
-    N_pop = 200
+    N_pop = 100
+    p_ER = 1
     # N_pop = 100000
         # read and plot all csv in ../data
         # data_path = "C:\\Users\\jonas\\Documents\\Network_Robust_MPC\\Cpp\\data\\"
@@ -29,10 +30,10 @@ if __name__ == '__main__':
     FIGURE_DIR = cwd + '/../../figures/'
 
     # find all csv in data_path
-    files = glob.glob(DATA_DIR + "Bernoulli_" + network_type + "_MC_" + str(N_pop) + "_1/*.csv")
+    files = glob.glob(DATA_DIR + "Bernoulli_" + network_type + "_MC_" + str(N_pop) + "_" + str(p_ER) + "/*.csv")
     # files = glob.glob(DATA_DIR + network_type + "_Sine_Trajectory_Discrete_*.csv")
-    qr_files = glob.glob(DATA_DIR + "Quantile_Simulation_" + network_type + "_" +  str(N_pop) + "_1/*.csv")
-    er_files = glob.glob(DATA_DIR + "ERR_Simulation_" + network_type + "_" + str(N_pop) + "_1/*.csv")
+    qr_files = glob.glob(DATA_DIR + "Quantile_Simulation_" + network_type + "_" +  str(N_pop) + "_" + str(p_ER) + "/trajectory*.csv")
+    er_files = glob.glob(DATA_DIR + "ERR_Simulation_" + network_type + "_" + str(N_pop) + "_" + str(p_ER) + "/trajectory*.csv")
     # qr_files = glob.glob(DATA_DIR + "Quantile_ERR_Simulation_" + network_type + "_" + str(N_pop) + "_1/*.csv")
     # sort q_files according to float in name
     fig, ax = plt.subplots(len(statenames) + 1)
@@ -46,10 +47,7 @@ if __name__ == '__main__':
         for i, name in enumerate(statenames):
             
             ax[i].plot(df["t"], df[name], color='gray', alpha=.2)
-        if (j < 10):
-            ax[-1].plot(df["t"][:-1], df["p_I"][:-1], color='gray', alpha=.2)
-        if (np.any(df["t"] > 101)):
-            a = 1
+        ax[-1].plot(df["t"][:-1], df["p_I"][:-1], color='gray', alpha=.2)
 
     def traj_plot(ax, df):
         for i, name in enumerate(statenames):

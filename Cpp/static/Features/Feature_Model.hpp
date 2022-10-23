@@ -36,7 +36,7 @@ namespace FROLS::Features {
 
         virtual const std::string model_equation(uint32_t idx) = 0;
 
-        virtual const std::string model_equations() = 0;
+        virtual const std::vector<std::string> model_equations() = 0;
         virtual uint32_t get_feature_index(const std::string&) = 0;
         void ignore(const std::string&);
         void ignore(uint32_t);
