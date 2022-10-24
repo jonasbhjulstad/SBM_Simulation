@@ -49,7 +49,7 @@ namespace FROLS
                       {
             dType R0 = R0_mean + R0_std * std::sin(omega * t + offset);
 //            p_SIR.p_I = 1 - exp(-R0*p.alpha/p.N_pop);
-            p_SIR.p_I = R0 / p.N_pop;
+            p_SIR.p_I = R0/ p.N_pop;
             p_SIR.p_R = 1 - std::exp(-p.alpha);
             t++; });
         return param_vec;

@@ -32,29 +32,6 @@ std::string quantile_simulation_filename(uint32_t N_pop, float p_ER, uint32_t it
     return ss.str();
 }
 
-template <uint32_t Nt, typename dType = float>
-void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<Nt> &d, uint32_t iter)
-{
-    // print iter
-    FROLS::DataFrame df;
-    std::array<dType, Nt + 1> p_Is;
-    std::transform(d.p_vec.begin(), d.p_vec.end(), p_Is.begin(), [](auto &p)
-                   { return p.p_I; });
-    std::array<dType, Nt + 1> p_Rs;
-    std::fill(p_Rs.begin(), p_Rs.end(), p.p_R);
-    p_Is.back() = 0.;
-    df.assign("S", d.traj[0]);
-    df.assign("I", d.traj[1]);
-    df.assign("R", d.traj[2]);
-    df.assign("p_I", p_Is);
-    df.assign("p_R", p_Rs);
-    auto t = FROLS::range(0, Nt + 1);
-    df.assign("t", t);
-    df.resize(Nt + 1);
-    df.write_csv(FROLS::MC_filename(p.N_pop, p.p_ER, iter, "SIR"),
-                 ",", p.csv_termination_tol);
-}
-
 constexpr uint32_t Nt = 50;
 constexpr uint32_t N_sims = 200;
 const std::string network_type = "SIR";
@@ -221,9 +198,10 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 
 int main(int argc, char **argv)
 {
-    auto N_pop_vec = FROLS::arange((uint32_t)10, (uint32_t)100, (uint32_t)10);
+    // auto N_pop_vec = FROLS::arange((uint32_t)10, (uint32_t)100, (uint32_t)10);
+    auto N_pop_vec = {20, 100};
     std::vector<float> p_ER_vec = {0.1, 1.0};
-    std::reverse(N_pop_vec.begin(), N_pop_vec.end());
+    // std::reverse(N_pop_vec.begin(), N_pop_vec.end());
     std::reverse(p_ER_vec.begin(), p_ER_vec.end());
     for (const float &p_ER : p_ER_vec)
     {
