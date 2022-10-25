@@ -8,7 +8,7 @@
 
 namespace FROLS::Features {
 
-    void Polynomial_Model::feature_summary() {
+    void Polynomial_Model::feature_summary(const std::vector<std::vector<Feature>>& features) {
         fmt::print("{:^15}{:^15}{:^15}{:^15}{:^15}{:^15}\n", "y", "Feature", "g", "Theta", "f_ERR", "Tag");
         for (int i = 0; i < features.size(); i++) {
             for (const auto &feature: features[i]) {
@@ -23,7 +23,7 @@ namespace FROLS::Features {
         }
     }
 
-    void Polynomial_Model::write_csv(const std::string &filename) {
+    void Polynomial_Model::write_csv(const std::string &filename, const std::vector<std::vector<Feature>>& features) {
         std::ofstream f(filename);
         f << "Response,Feature,Index,g, theta, ERR" << std::endl;
         for (int i = 0; i < features.size(); i++) {
@@ -35,15 +35,16 @@ namespace FROLS::Features {
         }
     }
 
-    void Polynomial_Model::read_csv(const std::string & filename)
+    const std::vector<std::vector<Feature>> Polynomial_Model::read_csv(const std::string & filename)
     {
-        features = {};
+        std::vector<std::vector<Feature>> features = {};
         //read response, feature, index, g, theta, ERR
         std::ifstream f(filename);
         std::string line;
         std::getline(f, line); // skip header
         std::vector<Feature> response_features;
-        size_t response_i = 0;
+        int response_i = 0;
+        uint32_t current_line = 0;
         while (std::getline(f, line)) {
             std::stringstream ss(line);
             std::string response, feature, index, g, theta, ERR;
@@ -68,16 +69,10 @@ namespace FROLS::Features {
             response_features.push_back(Feature{ERR_val, g_val, feature_idx, theta_val, FEATURE_PRESELECTED});
         }
         features.push_back(response_features);
-    }
-
-
-    const std::vector<std::vector<Feature>> Polynomial_Model::get_features() {
-        if (Nx == std::numeric_limits<uint32_t>::max() || Nu == std::numeric_limits<uint32_t>::max()) {
-            std::cout << "Model not yet trained" << std::endl;
-            return {};
-        }
         return features;
     }
+
+
 
 
     Vec Polynomial_Model::_transform(crMat &X_raw, uint32_t target_idx, bool &index_failure) {
@@ -161,26 +156,18 @@ namespace FROLS::Features {
         return feature_names;
     }
 
-    const std::string Polynomial_Model::model_equation(uint32_t idx) {
+    const std::string Polynomial_Model::model_equation(const std::vector<Feature>& features) {
         std::string model;
-        const std::vector<Feature> &rd = features[idx];
-        for (int i = 0; i < rd.size(); i++) {
-            model += std::to_string(rd[i].theta) + " ";
-            model += feature_name(rd[i].index);
-            if (i != rd.size() - 1) {
+        for (int i = 0; i < features.size(); i++) {
+            model += std::to_string(features[i].theta) + " ";
+            model += feature_name(features[i].index);
+            if (i != features.size() - 1) {
                 model += " + ";
             }
         }
         return model;
     }
 
-    const std::vector<std::string> Polynomial_Model::model_equations() {
-        std::vector<std::string> equations;
-        for (int i = 0; i < features.size(); i++) {
-            equations.push_back(model_equation(i));
-        }
-        return equations;
-    }
 
     uint32_t Polynomial_Model::get_feature_index(const std::string& name)
     {

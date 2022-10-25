@@ -33,7 +33,7 @@ std::string quantile_simulation_filename(uint32_t N_pop, float p_ER, uint32_t it
 }
 
 constexpr uint32_t Nt = 50;
-constexpr uint32_t N_sims = 200;
+constexpr uint32_t N_sims = 50;
 const std::string network_type = "SIR";
 void simulation_loop(uint32_t N_pop, float p_ER)
 {
@@ -122,18 +122,25 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 
     FROLS::Regression::ERR_Regressor er_regressor(er_param);
 
+
+    std::vector<FROLS::Regression::Quantile_Regressor> qr_regressors;
     float MAE_tol = 1e-6;
+    float tau = .95;
     FROLS::Regression::Quantile_Param qr_param;
     qr_param.N_terms_max = N_terms_max;
     qr_param.tol = MAE_tol;
-    qr_param.tau = 0.95;
+    qr_param.tau = 1-tau;
     qr_param.theta_tol = 1e-3;
-
+    //Regressor for S
+    qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
+    //Regressor for I
+    qr_param.tau = tau;
+    qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
+    //Regressor for R
+    qr_param.tau = tau;
+    qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
     // Quantile-Regression
 
-
-
-    FROLS::Regression::Quantile_Regressor qr_regressor(qr_param);
 
     std::vector<std::string> df_names(N_sims);
     std::generate(df_names.begin(), df_names.end(), [&, n = -1]() mutable
@@ -152,9 +159,12 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
 
     using namespace FROLS::Features;
+    std::vector<std::vector<Feature>> er_features(3);
+    std::transform(Y.colwise().begin(), Y.colwise().end(), er_features.begin(), [&](const Vec y)
+                   {
+        return er_regressor.transform_fit(X, U, y, er_model);});
 
-    er_regressor.transform_fit(X, U, Y, er_model);
-    er_model.feature_summary();
+    er_model.feature_summary(er_features);
 
     fmt::print("Quantile-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, N_output_features, qr_param.tol, qr_param.N_terms_max);
 
@@ -162,13 +172,17 @@ void simulation_loop(uint32_t N_pop, float p_ER)
                             0, -2);
     Y = dataframe_to_matrix(dfs, colnames_x, 1, -1);
     U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
-    qr_regressor.transform_fit(X, U, Y, qr_model);
-    qr_model.feature_summary();
+    std::vector<std::vector<Feature>> qr_features(3);
+    for (int i = 0; i < Y.cols(); i++)
+    {
+        qr_features[i] = qr_regressors[i].transform_fit(X, U, Y.col(i), qr_model);
+    }
+    qr_model.feature_summary(qr_features);
     for (int i = 0; i < N_sims; i++)
     {
         Mat u = vecs_to_mat(dfs[i][colnames_u])(Eigen::seq(0, Eigen::last - 1), Eigen::all);
         Vec x0 = vecs_to_mat(dfs[i][colnames_x]).row(0);
-        Mat X_sim = er_model.simulate(x0, u, u.rows());
+        Mat X_sim = er_model.simulate(x0, u, u.rows(), er_features);
         {
         FROLS::DataFrame df;
         df.assign(colnames_u, u);
@@ -181,7 +195,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
         x0 = vecs_to_mat(dfs[i][colnames_x]).row(0);
         {
         FROLS::DataFrame df;
-        Mat X_sim = qr_model.simulate(x0, u, u.rows());
+        Mat X_sim = qr_model.simulate(x0, u, u.rows(), qr_features);
         df.assign(colnames_u, u);
         df.assign("t", FROLS::range(0, u.rows()));
         df.assign(colnames_x, X_sim);
@@ -195,20 +209,28 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     std::vector<std::string> latex_colnames_y = {"S_{t+1}", "I_{t+1}", "R_{t+1}"};
     //convert p_ER to string with 1 decimal place
     std::string p_ER_str = fmt::format("{:.1f}", p.p_ER);
-    er_model.write_csv(path_dirname(er_outfile_f(0).c_str()) + std::string("/param.csv"));
-    er_model.write_latex(FROLS_DATA_DIR+ std::string("/latex/er_param_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex", latex_colnames_x, latex_colnames_u, latex_colnames_y);
-    
-    qr_model.write_csv(path_dirname(qr_outfile_f(0).c_str()) + std::string("/param.csv"));
-    qr_model.write_latex(FROLS_DATA_DIR+ std::string("/latex/qr_param_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex", latex_colnames_x, latex_colnames_u, latex_colnames_y);
+    er_model.write_csv(path_dirname(er_outfile_f(0).c_str()) + std::string("/param.csv"), er_features);
+    er_model.write_latex(er_features, FROLS_DATA_DIR+ std::string("/latex/er_param_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex", latex_colnames_x, latex_colnames_u, latex_colnames_y);
+
+    qr_model.write_csv(path_dirname(qr_outfile_f(0).c_str()) + std::string("/param.csv"), qr_features);
+    qr_model.write_latex(qr_features, FROLS_DATA_DIR+ std::string("/latex/qr_param_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex", latex_colnames_x, latex_colnames_u, latex_colnames_y);
     std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
+
+    std::ofstream er_file(FROLS_DATA_DIR+ std::string("/latex/ERR_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex");
+    std::ofstream qr_file(FROLS_DATA_DIR+ std::string("/latex/MAE_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex");
+    for (int i = 0; i < 3; i++)
+    {
+        er_file << fmt::format("{:.2e}", er_features[i].back().f_ERR) << ",";
+        qr_file << fmt::format("{:.2e}", qr_features[i].back().f_ERR) << ",";
+    }
 
 }
 
 int main(int argc, char **argv)
 {
     // auto N_pop_vec = FROLS::arange((uint32_t)10, (uint32_t)100, (uint32_t)10);
-    auto N_pop_vec = {20, 100};
-    std::vector<float> p_ER_vec = {0.1, 1.0};
+    auto N_pop_vec = {20, 50, 100};
+    std::vector<float> p_ER_vec = {0.1,.5, 1.0};
     // std::reverse(N_pop_vec.begin(), N_pop_vec.end());
     std::reverse(p_ER_vec.begin(), p_ER_vec.end());
     for (const float &p_ER : p_ER_vec)

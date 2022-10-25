@@ -19,20 +19,18 @@ namespace FROLS::Features {
         Vec _transform(crMat &X_raw, uint32_t target_index, bool& index_failure);
 
 
-        const std::vector<std::vector<Feature>> get_features();
 
-        void write_csv(const std::string &);
-        void read_csv(const std::string &);
+        void write_csv(const std::string &, const std::vector<std::vector<Feature>>& features);
+        const std::vector<std::vector<Feature>> read_csv(const std::string &);
 
-        void feature_summary();
+        void feature_summary(const std::vector<std::vector<Feature>>& features);
 
         const std::string feature_name(uint32_t target_index, bool indent = true);
 
         const std::vector<std::string> feature_names();
 
-        const std::string model_equation(uint32_t idx);
-
-        const std::vector<std::string> model_equations();
+        const std::string model_equation(const std::vector<Feature>& features);
+        const std::string model_equations(const std::vector<std::vector<Feature>>& features);
 
         uint32_t get_feature_index(const std::string&);
 

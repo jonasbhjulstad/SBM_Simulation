@@ -63,6 +63,7 @@ def deconstruct_equation(eq):
 
 
 #Constructs MX-equations directly from a given pySINDY regression model
-def construct_mx_equations(X, U, reg_model):
-    deceqs = [deconstruct_equation(eq) for eq in reg_model.equations()]
+def construct_mx_equations(X, U, reg_model, features):
+    eqs = [reg_model.equation(f) for f in features]
+    deceqs = [deconstruct_equation(eq) for eq in eqs]
     return [construct_mx_coeff(X, U, deceq) for deceq in deceqs]

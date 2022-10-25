@@ -29,13 +29,17 @@ namespace FROLS::Regression
 
         using namespace FROLS::Features;
 
-        regressor.transform_fit(X, U, Y, feature_model);
-        feature_model.feature_summary();
+        std::vector<std::vector<Feature>> features(3);
+        std::transform(Y.colwise().begin(), Y.colwise().end(), features.begin(), [&](Vec y)
+                       {
+            return regressor.transform_fit(X, U, y, feature_model);
+        });
+        feature_model.feature_summary(features);
         for (int i = 0; i < N_sims; i++)
         {
             Mat u = vecs_to_mat(dfs[i][colnames_u])(Eigen::seq(0, Eigen::last - 1), Eigen::all);
             Vec x0 = vecs_to_mat(dfs[i][colnames_x]).row(0);
-            Mat X_sim = feature_model.simulate(x0, u, u.rows());
+            Mat X_sim = feature_model.simulate(x0, u, u.rows(), features);
             FROLS::DataFrame df;
             df.assign({colnames_u}, u);
             df.assign("t", FROLS::range(0, u.rows()));

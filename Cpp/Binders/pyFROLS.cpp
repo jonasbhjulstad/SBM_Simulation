@@ -37,23 +37,23 @@ PYBIND11_MODULE(pyFROLS, m)
         py::class_<Polynomial_Model, Feature_Model>(m, "Polynomial_Model")
             .def(py::init<uint32_t, uint32_t, uint32_t, uint32_t>())
 
-            .def("get_features", &Polynomial_Model::get_features)
+            // .def("get_features", &Polynomial_Model::get_features)
             .def("write_csv", &Polynomial_Model::write_csv)
             .def("feature_summary", &Polynomial_Model::feature_summary)
             .def("feature_name", &Polynomial_Model::feature_name)
             .def("feature_names", &Polynomial_Model::feature_names)
-            .def("equation", &Polynomial_Model::model_equation)
-            .def("equations", &Polynomial_Model::model_equations);
+            .def("equation", &Polynomial_Model::model_equation);
+            // .def("equations", &Polynomial_Model::model_equations);
 
-        py::class_<Regressor>(m, "Regressor")
-            //   .def(py::init<float>())
-            .def("transform_fit", static_cast<void (Regressor::*)(const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<std::string>&, Features::Feature_Model&)>(&Regressor::transform_fit))
-            .def("fit", &Regressor::fit);
+        // py::class_<Regressor>(m, "Regressor")
+        //     //   .def(py::init<float>())
+        //     .def("transform_fit", static_cast<void (Regressor::*)(const std::vector<std::string>&, const std::vector<std::string>&, const std::vector<std::string>&, Features::Feature_Model&)>(&Regressor::transform_fit))
+        //     .def("fit", &Regressor::fit);
 
-        py::class_<Quantile_Regressor, Regressor>(m, "Quantile_Regressor")
-            .def(py::init<Quantile_Param>());
-        py::class_<ERR_Regressor, Regressor>(m, "ERR_Regressor")
-            .def(py::init<Regressor_Param>());
+        // py::class_<Quantile_Regressor, Regressor>(m, "Quantile_Regressor")
+        //     .def(py::init<Quantile_Param>());
+        // py::class_<ERR_Regressor, Regressor>(m, "ERR_Regressor")
+        //     .def(py::init<Regressor_Param>());
 
         m.def("Bernoulli_SIR_MC_Simulations", &FROLS::Bernoulli_SIR_MC_Simulations<50>);
 }

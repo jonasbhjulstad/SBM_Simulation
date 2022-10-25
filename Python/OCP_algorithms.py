@@ -1,12 +1,9 @@
 import casadi as cs
 from pysindy_casadi_converter import construct_mx_equations
-def quadratic_objective_solve(X_mean, U_mean, Wu, regression_model, Nt, u_max = 0.1, u_min = 1e-6):
+def quadratic_objective_solve(X_mean, U_mean, Wu, F_ODE, Nt, u_max = 0.1, u_min = 1e-6):
     Nx = X_mean.shape[1]
     Nu = 1
-    xk = cs.MX.sym('X', Nx)
-    uk = cs.MX.sym('U', Nu)
-    eqs = cs.vertcat(*construct_mx_equations(xk, uk, regression_model))
-    F_ODE = cs.Function('F', [xk, uk], [eqs])
+
     X = cs.MX.sym('X', Nx, Nt)
     U = cs.MX.sym('U', Nu, Nt)
 
@@ -43,13 +40,10 @@ def quadratic_objective_solve(X_mean, U_mean, Wu, regression_model, Nt, u_max = 
     return (sol, get_X(sol['x'].full()), sol['x'].full())
 
 
-def hospital_capacity_objective_solve(X_mean, U_mean, Wu, I_max, regression_model,Nt,  u_max = 0.1, u_min = 1e-6):
+def hospital_capacity_objective_solve(X_mean, U_mean, Wu, I_max, F_ODE,Nt,  u_max = 0.1, u_min = 1e-6):
     Nx = X_mean.shape[1]
     Nu = 1
-    xk = cs.MX.sym('X', Nx)
-    uk = cs.MX.sym('U', Nu)
-    eqs = cs.vertcat(*construct_mx_equations(xk, uk, regression_model))
-    F_ODE = cs.Function('F', [xk, uk], [eqs])
+
     X = cs.MX.sym('X', Nx, Nt)
     U = cs.MX.sym('U', Nu, Nt)
 

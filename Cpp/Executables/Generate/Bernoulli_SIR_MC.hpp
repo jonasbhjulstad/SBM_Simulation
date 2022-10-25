@@ -181,8 +181,6 @@ namespace FROLS
                 std::cout << "Simulation " << iter << " of " << p.N_sim << std::endl;
             }
             return MC_SIR_simulation<decltype(G), Nt>(G, p, seed, p_Is).traj; });
-            // std::for_each(simdatas.begin(), simdatas.end(), [&, n = 0](const auto &simdata) mutable
-            //               { traj_to_file<Nt>(p, simdata, n++); });
             return simdatas;
     }
 }

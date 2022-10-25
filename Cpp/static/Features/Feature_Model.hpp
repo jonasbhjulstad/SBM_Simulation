@@ -10,45 +10,42 @@ namespace FROLS::Features {
 
         Feature_Model(const uint32_t N_output_features);
 
-        Vec step(crVec &x, crVec &u);
+        Vec step(crVec &x, crVec &u, const std::vector<std::vector<Feature>>& features);
 
-        Mat simulate(crVec &x0, crMat &U, uint32_t Nt);
+        Mat simulate(crVec &x0, crMat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features);
 
         Vec transform(crMat &X_raw, uint32_t target_index, bool &index_failure);
 
-        Mat transform(crMat &X_raw, const std::vector<Feature> preselected_features = {});
+        Mat transform(crMat &X_raw);
 
 
         virtual Vec _transform(crMat &X_raw, uint32_t target_index, bool &index_failure) = 0;
 
-        virtual const std::vector<std::vector<Feature>> get_features() = 0;
 
-        virtual void write_csv(const std::string &) = 0;
+        virtual void write_csv(const std::string &, const std::vector<std::vector<Feature>>& features) = 0;
 
-        virtual void read_csv(const std::string &) = 0;
+        virtual const std::vector<std::vector<Feature>> read_csv(const std::string &) = 0;
 
-        virtual void feature_summary() = 0;
+        virtual void feature_summary(const std::vector<std::vector<Feature>>& features) = 0;
 
         virtual const std::string feature_name(uint32_t target_index,
                                                bool indent = true) = 0;
 
         virtual const std::vector<std::string> feature_names() = 0;
 
-        virtual const std::string model_equation(uint32_t idx) = 0;
+        virtual const std::string model_equation(const std::vector<Feature>&) = 0;
 
-        void write_latex(const std::string &filename,  const std::vector<std::string>& x_names, const std::vector<std::string>& u_names, const std::vector<std::string>& y_names, bool with_align = false, const std::string line_prefix = "&");
+        void write_latex(const std::vector<std::vector<Feature>>& features, const std::string &filename, const std::vector<std::string>& x_names, const std::vector<std::string>& u_names, const std::vector<std::string>& y_names, bool with_align = false, const std::string line_prefix = "&");
 
-        virtual const std::vector<std::string> model_equations() = 0;
         virtual uint32_t get_feature_index(const std::string&) = 0;
         void ignore(const std::string&);
         void ignore(uint32_t);
-        void preselect(const std::string&, float, uint32_t, Feature_Tag);
-        void preselect(uint32_t, float, uint32_t, Feature_Tag);
+        void preselect(const std::string&, float, Feature_Tag);
+        void preselect(uint32_t, float, Feature_Tag);
 
         const uint32_t N_output_features;
         std::vector<uint32_t> ignore_idx;
-        std::vector<std::vector<Feature>> preselected_features;
-        std::vector<std::vector<Feature>> features;
+        std::vector<Feature> preselected_features;
 
         std::vector<uint32_t> get_candidate_feature_idx() { return candidate_feature_idx; }
 

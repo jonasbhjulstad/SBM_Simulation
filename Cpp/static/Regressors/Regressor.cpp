@@ -103,16 +103,12 @@ namespace FROLS::Regression {
         return res;
     }
 
-
-    std::vector<std::vector<Feature>> Regressor::fit(crMat &X, crMat &Y) {
-        if ((X.rows() != Y.rows())) {
-            throw std::invalid_argument("X, U and Y must have same number of rows");
+    std::vector<Feature> Regressor::fit(crMat &X, crVec &y) {
+        if ((X.rows() != y.rows())) {
+            throw std::invalid_argument("X, U and y must have same number of rows");
         }
-        uint32_t N_response = Y.cols();
-        std::vector<std::vector<Feature>> result(N_response);
-        auto cols = Y.colwise();
-        std::transform(cols.begin(), cols.end(), result.begin(),
-                       [=](const auto &yi) { return this->single_fit(X, yi); });
+        std::vector<Feature> result;
+        result = this->single_fit(X, y);
         return result;
     }
 
@@ -135,37 +131,31 @@ namespace FROLS::Regression {
         Vec y;
     };
 
-    void Regressor::transform_fit(crMat &X_raw, crMat &U_raw, crMat &Y,
+
+    std::vector<Feature> Regressor::transform_fit(crMat &X_raw, crMat &U_raw, crVec &y,
                                   Features::Feature_Model &model) {
         Mat XU(X_raw.rows(), X_raw.cols() + U_raw.cols());
         XU << X_raw, U_raw;
-        std::vector<Fit_Data> data(Y.cols());
-        model.preselected_features.resize(Y.cols());
-        for (int i = 0; i < Y.cols(); i++) {
-            data[i] = Fit_Data{model.preselected_features[i], Y.col(i)};
-        }
-        model.features.resize(Y.cols());
-        std::transform(data.begin(), data.end(), model.features.begin(), [&](const auto d) {
-            Mat X = model.transform(XU, d.preselect_features);
-            return single_fit(X, d.y, d.preselect_features);
-        });
-
+        Mat X = model.transform(XU);
+        return single_fit(X, y);
     }
 
-    void Regressor::transform_fit(const std::vector<std::string>& filenames, const std::vector<std::string>& colnames_x, const std::vector<std::string>& colnames_u, Features::Feature_Model& model)
+
+    std::vector<Feature> Regressor::transform_fit(const std::vector<std::string>& filenames, const std::vector<std::string>& colnames_x, const std::vector<std::string>& colnames_u, const std::string& colname_y, Features::Feature_Model& model)
     {
         uint32_t Nx = colnames_x.size();
         using namespace FROLS;
         DataFrameStack dfs(filenames);
-        Mat X, Y, U;
+        Mat X, U;
+        Vec y;
 
         X = dataframe_to_matrix(dfs, colnames_x,
                                 0, -2);
-        Y = dataframe_to_matrix(dfs, colnames_x, 1, -1);
+        y = dataframe_to_vector(dfs, colname_y, 1, -1);
         U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
         std::vector<uint32_t> N_rows = dfs.get_N_rows();
 
-        transform_fit(X, U, Y, model);
+        return transform_fit(X, U, y, model);
     }
 
 
