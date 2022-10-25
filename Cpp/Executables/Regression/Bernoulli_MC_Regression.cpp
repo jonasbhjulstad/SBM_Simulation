@@ -189,9 +189,17 @@ void simulation_loop(uint32_t N_pop, float p_ER)
         df.write_csv(qr_outfile_f(i), ",", 1e-6);
         }
     }
-    er_model.write_csv(path_dirname(er_outfile_f(0).c_str()) + std::string("/param.csv"));
 
+    std::vector<std::string> latex_colnames_x = {"S_t", "I_t", "R_t"};
+    std::vector<std::string> latex_colnames_u = {"p_I"};
+    std::vector<std::string> latex_colnames_y = {"S_{t+1}", "I_{t+1}", "R_{t+1}"};
+    //convert p_ER to string with 1 decimal place
+    std::string p_ER_str = fmt::format("{:.1f}", p.p_ER);
+    er_model.write_csv(path_dirname(er_outfile_f(0).c_str()) + std::string("/param.csv"));
+    er_model.write_latex(FROLS_DATA_DIR+ std::string("/latex/er_param_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex", latex_colnames_x, latex_colnames_u, latex_colnames_y);
+    
     qr_model.write_csv(path_dirname(qr_outfile_f(0).c_str()) + std::string("/param.csv"));
+    qr_model.write_latex(FROLS_DATA_DIR+ std::string("/latex/qr_param_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex", latex_colnames_x, latex_colnames_u, latex_colnames_y);
     std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
 
 }

@@ -36,6 +36,8 @@ namespace FROLS::Features {
 
         virtual const std::string model_equation(uint32_t idx) = 0;
 
+        void write_latex(const std::string &filename,  const std::vector<std::string>& x_names, const std::vector<std::string>& u_names, const std::vector<std::string>& y_names, bool with_align = false, const std::string line_prefix = "&");
+
         virtual const std::vector<std::string> model_equations() = 0;
         virtual uint32_t get_feature_index(const std::string&) = 0;
         void ignore(const std::string&);
