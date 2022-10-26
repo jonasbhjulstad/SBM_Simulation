@@ -1,9 +1,10 @@
 function (link_generation_target name)
-target_link_libraries(${name} PUBLIC ${FROLS_COMMON_LIBS})
+target_link_libraries(${name} PUBLIC ${FROLS_COMMON_LIBS} ${PYTHON_LIBRARIES})
 endfunction()
 
 function(add_generation_executable exec_name)
     add_executable(${exec_name} ${exec_name}.cpp)
+    target_include_directories(${exec_name} PUBLIC ${PYTHON_INCLUDE_DIRS})
     link_generation_target(${exec_name})
 endfunction()
 

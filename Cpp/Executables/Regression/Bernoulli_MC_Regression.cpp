@@ -1,5 +1,5 @@
 
-#include "../Generate/Bernoulli_SIR_MC.hpp"
+#include "../Generate/Bernoulli_SIR_MC_Dynamic.hpp"
 #include <quantiles.hpp>
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_Graph.hpp>
@@ -64,36 +64,11 @@ void simulation_loop(uint32_t N_pop, float p_ER)
                   { return rd(); });
     auto enum_seeds = enumerate(seeds);
 
-    std::mt19937_64 rng(rd());
-    typedef Network_Models::SIR_Bernoulli_Network<SIR_VectorGraph, decltype(rng), Nt> SIR_Bernoulli_Network;
-    std::vector<std::shared_ptr<std::mutex>> v_mx(NV + 1);
-    // create mutexes
-    for (auto &mx : v_mx)
-    {
-        mx = std::make_unique<std::mutex>();
-    }
-    std::vector<std::shared_ptr<std::mutex>> e_mx(NE + 1);
-    // create mutexes
-    for (auto &mx : e_mx)
-    {
-        mx = std::make_unique<std::mutex>();
-    }
 
-    SIR_VectorGraph G(v_mx, e_mx);
-    generate_erdos_renyi<SIR_VectorGraph, decltype(rng)>(G, p.N_pop, p.p_ER, SIR_S, rng);
-    std::vector<MC_SIR_SimData<Nt>> simdatas(p.N_sim);
-    std::transform(enum_seeds.begin(), enum_seeds.end(), simdatas.begin(), [&](auto &es)
-                   {
-        uint32_t iter = es.first;
-        uint32_t seed = es.second;
-        if ((iter % (p.N_sim / 10)) == 0)
-        {
-            // std::cout << "Simulation " << iter << " of " << p.N_sim << std::endl;
-        }
-        return MC_SIR_simulation<decltype(G), Nt>(G, p, seed); });
+    auto trajectories = MC_SIR_simulations(N_pop, p_ER, p.p_I0, seeds, Nt, N_sims);
 
-    std::for_each(simdatas.begin(), simdatas.end(), [&, n = 0](const auto &simdata) mutable
-                  { traj_to_file<Nt>(p, simdata, n++); });
+    std::for_each(trajectories.begin(), trajectories.end(), [&, n = 0](const auto &simdata) mutable
+                  { traj_to_file(p, simdata, n++, Nt); });
 
     const std::vector<std::string> colnames_x = {"S", "I", "R"};
     const std::vector<std::string> colnames_u = {"p_I"};

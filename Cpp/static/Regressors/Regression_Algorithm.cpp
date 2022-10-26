@@ -5,7 +5,7 @@
 #include "Regression_Algorithm.hpp"
 namespace FROLS::Regression
 {
-    void from_file_regression(std::function<std::string(uint32_t)> MC_fname_f, const std::vector<std::string> &colnames_x,
+    std::vector<std::vector<Feature>> from_file_regression(std::function<std::string(uint32_t)> MC_fname_f, const std::vector<std::string> &colnames_x,
                               const std::vector<std::string> &colnames_u, uint32_t N_sims,
                               FROLS::Regression::Regressor &regressor, FROLS::Features::Feature_Model &feature_model,
                               std::function<std::string(uint32_t)> outsim_f, bool differentiate)
@@ -47,6 +47,6 @@ namespace FROLS::Regression
             df.resize(u.rows());
             df.write_csv(outsim_f(i), ",", 1e-6);
         }
-
+        return features;
     }
 }

@@ -9,7 +9,7 @@
 #include <Sycl_SIR_Bernoulli_Network.hpp>
 
 template <uint32_t Nt>
-void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<Nt> &d, uint32_t iter)
+void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_ArrayData<Nt> &d, uint32_t iter)
 {
     FROLS::DataFrame df;
     std::array<float, Nt> p_Is;
@@ -47,7 +47,7 @@ int main()
     FROLS::random::default_rng generator(rng());
     // Network_Models::SIR_Bernoulli_Network<decltype(generator), Nt, NV, NE> G(G_structure, p.p_I0, p.p_R0,
     //  generator);
-    MC_SIR_SimData<Nt> data;
+    MC_SIR_ArrayData<Nt> data;
 
     data.p_vec = generate_interaction_probabilities<decltype(generator), Nt>(p, generator);
 
@@ -59,8 +59,8 @@ int main()
     }
     const size_t ER_seed = 777;
     sycl::queue q(sycl::cpu_selector{});
-    std::vector<MC_SIR_SimData<Nt>> sim_data(p.N_sim);
-    sycl::buffer<MC_SIR_SimData<Nt>, 1> sim_buffer{sim_data.data(), sycl::range<1>(sim_data.size())};
+    std::vector<MC_SIR_ArrayData<Nt>> sim_data(p.N_sim);
+    sycl::buffer<MC_SIR_ArrayData<Nt>, 1> sim_buffer{sim_data.data(), sycl::range<1>(sim_data.size())};
     sycl::buffer<MC_SIR_Params<>, 1> param_buffer{&p, sycl::range<1>(1)};
     std::vector<FROLS::random::default_rng> rng_vec(NV);
     std::generate(rng_vec.begin(), rng_vec.end(), [&]()

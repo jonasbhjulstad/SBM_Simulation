@@ -34,44 +34,6 @@ namespace FROLS::Graph
         std::shared_ptr<std::mutex> mx;
     };
 
-    template <typename V, typename E, uint32_t NV, uint32_t NE>
-    struct ArrayGraphContainer
-    {
-        const uint32_t NV_max;
-        const uint32_t NE_max;
-
-        using Vertex_t = Vertex<V>;
-        using Edge_t = Edge<E>;
-        using Vertex_Prop_t = V;
-        using Edge_Prop_t = E;
-        std::array<Vertex_t, NV+1> _vertices;
-        std::array<Edge_t, NE+1> _edges;
-        uint32_t N_vertices = 0;
-        uint32_t N_edges = 0;
-
-        ArrayGraphContainer(std::array<std::mutex*, NV+1> &v_mx, std::array<std::mutex*, NE+1> &e_mx) : NV_max(v_mx.size()), NE_max(e_mx.size())
-        {
-
-            std::for_each(v_mx.begin(), v_mx.end(), [&, n = 0](auto &mx) mutable
-                          {
-                _vertices[n].mx = mx;
-                n++; });
-            std::for_each(e_mx.begin(), e_mx.end(), [&, n = 0](auto &mx) mutable
-                          {
-                _edges[n].mx = mx;
-                n++; });
-        }
-
-        auto begin()
-        {
-            return std::begin(_vertices);
-        }
-        auto end()
-        {
-            return std::begin(_vertices) + N_vertices;
-        }
-    };
-
     // template <typename V, typename E>
     // struct VectorGraphContainer
     // {
@@ -113,10 +75,11 @@ namespace FROLS::Graph
     //     }
     // };
 
-
     template <typename V, typename E, uint32_t NV, uint32_t NE>
     struct ArrayGraph
     {
+        static constexpr uint32_t NV_MAX = NV;
+        static constexpr uint32_t NE_MAX = NE;
         const uint32_t NV_max;
         const uint32_t NE_max;
 
@@ -124,12 +87,12 @@ namespace FROLS::Graph
         using Edge_t = Edge<E>;
         using Vertex_Prop_t = V;
         using Edge_Prop_t = E;
-        std::array<Vertex_t, NV+1> _vertices;
-        std::array<Edge_t, NE+1> _edges;
+        std::array<Vertex_t, NV + 1> _vertices;
+        std::array<Edge_t, NE + 1> _edges;
         uint32_t N_vertices = 0;
         uint32_t N_edges = 0;
 
-        ArrayGraph(std::array<std::mutex*, NV+1> &v_mx, std::array<std::mutex*, NE+1> &e_mx) : NV_max(v_mx.size()), NE_max(e_mx.size())
+        ArrayGraph(std::array<std::mutex *, NV + 1> &v_mx, std::array<std::mutex *, NE + 1> &e_mx) : NV_max(v_mx.size()), NE_max(e_mx.size())
         {
 
             std::for_each(v_mx.begin(), v_mx.end(), [&, n = 0](auto &mx) mutable
@@ -140,6 +103,20 @@ namespace FROLS::Graph
                           {
                 _edges[n].mx = mx;
                 n++; });
+        }
+
+        ArrayGraph<V, E, NV, NE> operator=(const ArrayGraph<V, E, NV, NE> &other)
+        {
+            _vertices = other._vertices;
+            _edges = other._edges;
+            N_vertices = other.N_vertices;
+            N_edges = other.N_edges;
+            std::for_each(_vertices.begin(), _vertices.end(), [&](auto &v)
+                          { v.mx = std::make_shared<std::mutex>(); });
+            std::for_each(_edges.begin(), _edges.end(), [&](auto &e)
+                          { e.mx = std::make_shared<std::mutex>(); });
+
+            return *this;
         }
 
         auto begin()
@@ -216,6 +193,8 @@ namespace FROLS::Graph
             auto vertex = std::find_if(_vertices.begin(), _vertices.end(), [&](const auto &v)
                                        { 
                 std::lock_guard lock(*v.mx);
+                std::cout << "Locking " << v.id << std::endl;
+
                 return v.id == idx; });
             assert(vertex != std::end(_vertices) && "Index out of bounds");
             vertex->data = v_data;
@@ -281,9 +260,9 @@ namespace FROLS::Graph
             return nullptr;
         }
 
-        const std::array<Vertex_t*, NV+1> neighbors(uint32_t idx) const
+        const std::array<Vertex_t *, NV + 1> neighbors(uint32_t idx) const
         {
-            std::array<Vertex_t*, NV+1> neighbors = {};
+            std::array<Vertex_t *, NV + 1> neighbors = {};
             if (neighbors.size() < NV_max)
             {
                 neighbors.resize(NV_max);
@@ -320,8 +299,8 @@ namespace FROLS::Graph
         VectorGraph(std::vector<std::shared_ptr<std::mutex>> &v_mx, std::vector<std::shared_ptr<std::mutex>> &e_mx) : NV_max(v_mx.size()), NE_max(e_mx.size())
         {
             std::cout << "size: " << sizeof(Edge<E>) << std::endl;
-                _vertices.resize(NV_max);
-                _edges.resize(NE_max);
+            _vertices.resize(NV_max);
+            _edges.resize(NE_max);
             std::for_each(v_mx.begin(), v_mx.end(), [&, n = 0](auto &mx) mutable
                           {
                 _vertices[n].mx = mx;
@@ -330,7 +309,21 @@ namespace FROLS::Graph
                           {
                 _edges[n].mx = mx;
                 n++; });
+        }
 
+        VectorGraph operator=(const VectorGraph &other)
+        {
+            _vertices = other._vertices;
+            _edges = other._edges;
+            N_vertices = other.N_vertices;
+            N_edges = other.N_edges;
+            std::for_each(_vertices.begin(), _vertices.end(), [&](auto &v)
+                          { v.mx = std::make_shared<std::mutex>(); });
+            std::for_each(_edges.begin(), _edges.end(), [&](auto &e)
+                          { e.mx = std::make_shared<std::mutex>(); });
+
+
+            return *this;
         }
 
         auto begin()
@@ -351,14 +344,14 @@ namespace FROLS::Graph
             return get_vertex(id)->data;
         }
 
-        const Vertex_t* get_vertex(uint32_t id) const
+        const Vertex_t *get_vertex(uint32_t id) const
         {
             assert(_vertices[0].id == 0);
             // find vertex based on index
             auto p_V = std::find_if(_vertices.begin(), _vertices.end(), [id](Vertex_t v)
                                     { return v.id == id; });
             assert(p_V != _vertices.end() && "Vertex not found");
-            return (Vertex_t*) &(*p_V);
+            return (Vertex_t *)&(*p_V);
         }
 
         void assign_vertex(const Vertex_Prop_t &v_data, uint32_t idx)
@@ -471,9 +464,9 @@ namespace FROLS::Graph
             return nullptr;
         }
 
-        const std::vector<const Vertex_t*> neighbors(uint32_t idx) const
+        const std::vector<const Vertex_t *> neighbors(uint32_t idx) const
         {
-            std::vector<const Vertex_t*> neighbors(N_vertices);
+            std::vector<const Vertex_t *> neighbors(N_vertices);
             std::for_each(_edges.begin(), _edges.end(), [&, N = 0](const auto e) mutable
                           {
                 if (is_in_edge(e, idx))

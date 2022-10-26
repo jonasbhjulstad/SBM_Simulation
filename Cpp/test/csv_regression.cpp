@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
     std::vector<std::string> filenames(10);
     std::generate(filenames.begin(), filenames.end(), [i = 0]() mutable { return FROLS::FROLS_DATA_DIR + std::string("/SIR_Sine_Trajectory_Discrete_") + std::to_string(i++) + ".csv"; });
 
-    regressor.transform_fit(filenames, {"S", "I", "R"}, {"p_I"}, model);
-    model.feature_summary();
+    auto features = regressor.transform_fit(filenames, {"S", "I", "R"}, {"p_I"}, "I", model);
+    // model.feature_summary();
     return 0;
 }
 

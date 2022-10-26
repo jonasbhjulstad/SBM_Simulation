@@ -7,7 +7,7 @@
 #include <FROLS_Sycl.hpp>
 
 template<uint32_t Nt, typename dType = float>
-void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<Nt> &d, uint32_t iter) {
+void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_ArrayData<Nt> &d, uint32_t iter) {
     FROLS::DataFrame df;
     std::array<float, Nt> p_Is;
     std::array<float, Nt> p_Rs;
@@ -54,8 +54,8 @@ int main() {
     }
     sycl::queue q(sycl::default_selector{});
     sycl::buffer<uint32_t, 1> seed_buffer{seeds.data(), sycl::range<1>(seeds.size())};
-    std::vector<MC_SIR_SimData<Nt>> sim_data(p.N_sim);
-    sycl::buffer<MC_SIR_SimData<Nt>, 1> sim_buffer{sim_data.data(), sycl::range<1>(sim_data.size())};
+    std::vector<MC_SIR_ArrayData<Nt>> sim_data(p.N_sim);
+    sycl::buffer<MC_SIR_ArrayData<Nt>, 1> sim_buffer{sim_data.data(), sycl::range<1>(sim_data.size())};
     sycl::buffer<MC_SIR_Params<>, 1> param_buffer{&p, sycl::range<1>(1)};
     sycl::buffer<SIR_Graph<NV, NE>, 1> graph_buffer{&G, sycl::range<1>(1)};
     std::cout << "Running MC-SIR simulations..." << std::endl;
@@ -73,7 +73,7 @@ int main() {
     });
 
     std::for_each(sim_data.begin(), sim_data.end(), [&, n=0](auto &sim) mutable{
-        traj_to_file<Nt>(p, sim, n++);
+        traj_to_file(p, sim, n++, Nt);
     });
 
 

@@ -7,6 +7,7 @@
 #include <FROLS_Math.hpp>
 #include <FROLS_Eigen.hpp>
 #include <SIR_Bernoulli_Network.hpp>
+#include <array>
 namespace FROLS
 {
     template <typename dType = float>
@@ -33,6 +34,9 @@ namespace FROLS
 
 namespace FROLS
 {
+    template <uint32_t NV, uint32_t NE, uint32_t Nt>
+    using Array_SIR_Bernoulli_Network = Network_Models::Array_SIR_Bernoulli_Network<random::default_rng, NV, NE, Nt>;
+
     template <typename RNG, uint32_t Nt, typename dType = float>
     std::array<Network_Models::SIR_Param<>, Nt> generate_interaction_probabilities(const MC_SIR_Params<> &p, RNG &rng)
     {
@@ -56,7 +60,7 @@ namespace FROLS
     }
 
     template <typename RNG, uint32_t Nt, typename dType = float>
-    std::array<Network_Models::SIR_Param<>, Nt> fixed_interaction_probabilities(const MC_SIR_Params<> &p, const std::vector<float> &p_Is)
+    std::array<Network_Models::SIR_Param<>, Nt> fixed_interaction_probabilities(const MC_SIR_Params<> &p, const std::array<float, Nt> &p_Is)
     {
         std::array<Network_Models::SIR_Param<>, Nt> param_vec;
         std::for_each(std::execution::par_unseq, param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable
@@ -68,21 +72,22 @@ namespace FROLS
         return param_vec;
     }
     template <uint32_t Nt>
-    struct MC_SIR_SimData
+    struct MC_SIR_ArrayData
     {
         std::array<std::array<uint32_t, Nt + 1>, 3> traj;
         std::array<Network_Models::SIR_Param<>, Nt> p_vec;
     };
 
-    template <typename SIR_Graph, uint32_t Nt>
-    MC_SIR_SimData<Nt>
-    MC_SIR_simulation(SIR_Graph &G_structure, const MC_SIR_Params<> &p, uint32_t seed)
+
+    template <uint32_t NV, uint32_t NE, uint32_t Nt>
+    MC_SIR_ArrayData<Nt>
+    MC_SIR_simulation(Network_Models::SIR_ArrayGraph<NV, NE> &G_structure, const MC_SIR_Params<> &p, uint32_t seed)
     {
 
         random::default_rng generator(seed);
-        Network_Models::SIR_Bernoulli_Network<SIR_Graph, decltype(generator), Nt> G(G_structure, p.p_I0, p.p_R0,
+        Array_SIR_Bernoulli_Network<NV, NE, Nt> G(G_structure, p.p_I0, p.p_R0,
                                                                                     generator);
-        MC_SIR_SimData<Nt> data;
+        MC_SIR_ArrayData<Nt> data;
         G.reset();
         while (G.population_count()[1] == 0)
         {
@@ -94,15 +99,15 @@ namespace FROLS
         return data;
     }
 
-    template <typename SIR_Graph, uint32_t Nt>
-    MC_SIR_SimData<Nt>
-    MC_SIR_simulation(SIR_Graph &G_structure, const MC_SIR_Params<> &p, uint32_t seed, const std::vector<float> &p_Is)
+    template <uint32_t NV, uint32_t NE, uint32_t Nt>
+    MC_SIR_ArrayData<Nt>
+    MC_SIR_simulation(Network_Models::SIR_ArrayGraph<NV, NE> &G_structure, const MC_SIR_Params<> &p, uint32_t seed, const std::array<float, Nt> &p_Is)
     {
 
         random::default_rng generator(seed);
-        Network_Models::SIR_Bernoulli_Network<SIR_Graph, decltype(generator), Nt> G(G_structure, p.p_I0, p.p_R0,
+        Array_SIR_Bernoulli_Network<NV, NE, Nt> G(G_structure, p.p_I0, p.p_R0,
                                                                                     generator);
-        MC_SIR_SimData<Nt> data;
+        MC_SIR_ArrayData<Nt> data;
         G.reset();
         while (G.population_count()[1] == 0)
         {
@@ -115,7 +120,7 @@ namespace FROLS
     }
 
     template <uint32_t Nt, typename dType = float>
-    void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_SimData<Nt> &d, uint32_t iter)
+    void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_ArrayData<Nt> &d, uint32_t iter)
     {
         // print iter
         FROLS::DataFrame df;
@@ -137,52 +142,75 @@ namespace FROLS
                      ",", p.csv_termination_tol);
     }
 
-    template <size_t Nt = 50>
-    std::vector<std::array<std::array<uint32_t, Nt + 1>, 3>> Bernoulli_SIR_MC_Simulations(uint32_t N_pop, float p_ER, uint32_t N_sims, std::vector<float> p_Is)
+    template <uint32_t NV, uint32_t NE>
+    Network_Models::SIR_ArrayGraph<NV, NE> generate_SIR_ER_graph(uint32_t N_pop, float p_ER, uint32_t seed)
     {
-        using namespace FROLS;
         using namespace Network_Models;
-        MC_SIR_Params<> p;
-        p.N_pop = N_pop;
-        p.p_ER = p_ER;
-        p.N_sim = N_sims;
-        std::random_device rd{};
-        std::vector<uint32_t> seeds(p.N_sim);
-        std::generate(seeds.begin(), seeds.end(), [&]()
-                      { return rd(); });
-        auto enum_seeds = enumerate(seeds);
-        uint32_t NV = N_pop;
-        size_t nk = FROLS::n_choose_k(NV, 2);
-        uint32_t NE = 1.5 * nk;
-        std::mt19937_64 rng(rd());
-        typedef Network_Models::SIR_Bernoulli_Network<SIR_VectorGraph, decltype(rng), Nt> SIR_Bernoulli_Network;
-        std::vector<std::shared_ptr<std::mutex>> v_mx(NV + 1);
+        random::default_rng rng(seed);
+        std::array<std::shared_ptr<std::mutex>, NV+1> v_mx;
         // create mutexes
         for (auto &mx : v_mx)
         {
             mx = std::make_shared<std::mutex>();
         }
-        std::vector<std::shared_ptr<std::mutex>> e_mx(NE + 1);
+        std::array<std::shared_ptr<std::mutex>, NE+1> e_mx;
         // create mutexes
         for (auto &mx : e_mx)
         {
             mx = std::make_shared<std::mutex>();
         }
 
-        SIR_VectorGraph G(v_mx, e_mx);
-        generate_erdos_renyi<SIR_VectorGraph, decltype(rng)>(G, p.N_pop, p.p_ER, SIR_S, rng);
-        std::vector<std::array<std::array<uint32_t, Nt + 1>, 3>> simdatas(p.N_sim);
+        SIR_ArrayGraph<NV, NE> G(v_mx, e_mx);
+        generate_erdos_renyi<decltype(G), decltype(rng)>(G, N_pop, p_ER, SIR_S, rng);
+        return G;
+    }
+
+    template <uint32_t NV, uint32_t NE, uint32_t Nt>
+    Array_SIR_Bernoulli_Network<NV, NE, Nt>
+    generate_Bernoulli_SIR_Network(const Network_Models::SIR_ArrayGraph<NV, NE>& G_structure, uint32_t seed, float p_I0, float p_R0 = 0.f)
+    {
+
+        random::default_rng generator(seed);
+        Array_SIR_Bernoulli_Network<NV, NE, Nt> G(G_structure, p_I0, p_R0,
+                                                            generator);
+        G.reset();
+        while (G.population_count()[1] == 0)
+        {
+            G.initialize();
+        }
+        return G;
+    }
+
+    template <uint32_t NV, uint32_t NE, uint32_t Nt>
+    Array_SIR_Bernoulli_Network<NV, NE, Nt>
+    generate_Bernoulli_SIR_Network(uint32_t N_pop, float p_ER, float p_I0, uint32_t seed, float p_R0 = 0.f)
+    {
+
+        random::default_rng generator(seed);
+        auto G_structure = generate_SIR_ER_graph<NV, NE>(N_pop, p_ER, seed);
+        return generate_Bernoulli_SIR_Network(G_structure,p_I0, seed, p_R0);
+    }
+
+    template <uint32_t NV, uint32_t NE, uint32_t Nt, uint32_t N_sims>
+    std::vector<MC_SIR_ArrayData<Nt>> Bernoulli_SIR_MC_Simulations(uint32_t N_pop, float p_ER, float p_I0, const std::array<uint32_t, N_sims> &seeds, std::array<float, Nt> p_Is)
+    {
+        using namespace FROLS;
+        using namespace Network_Models;
+        auto G = generate_Bernoulli_SIR_Network<NV, NE, Nt>(N_pop, p_ER, p_I0);
+        auto enum_seeds = enumerate(seeds);
+        std::vector<MC_SIR_ArrayData<Nt>> simdatas(seeds.size());
         std::transform(enum_seeds.begin(), enum_seeds.end(), simdatas.begin(), [&](auto &es)
                        {
             uint32_t iter = es.first;
             uint32_t seed = es.second;
-            if ((iter % (p.N_sim / 10)) == 0)
+            if ((iter % (N_sims / 10)) == 0)
             {
-                std::cout << "Simulation " << iter << " of " << p.N_sim << std::endl;
+                std::cout << "Simulation " << iter << " of " << N_sims << std::endl;
             }
-            return MC_SIR_simulation<decltype(G), Nt>(G, p, seed, p_Is).traj; });
-            return simdatas;
+            return MC_SIR_simulation<NV, NE, Nt>(G, MC_SIR_Params{}, seed, p_Is).traj; });
+        return simdatas;
     }
+
 }
 
 #endif

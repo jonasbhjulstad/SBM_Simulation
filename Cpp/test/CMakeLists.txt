@@ -22,6 +22,8 @@ add_executable(${source_file} "${source_file}.cpp")
 target_link_libraries(${source_file} PUBLIC Common Eigen3::Eigen ${ONEAPI_LIBS} Regressors FROLS_Math Features DataFrame FROLS_Eigen FROLS_Network)
 endfunction()
 add_regression(polynomial_features)
+add_regression(MC_SIR_test)
+target_include_directories(MC_SIR_test PUBLIC "../Executables/Generate/")
 # add_sycl_executable(sycl_info)
 # target_link_libraries(sycl_info PUBLIC FROLS_Sycl)
 
