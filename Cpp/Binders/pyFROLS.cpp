@@ -44,7 +44,6 @@ PYBIND11_MODULE(pyFROLS, m)
         .def("feature_names", &Polynomial_Model::feature_names)
         .def("equation", &Polynomial_Model::model_equation);
 
-
     py::class_<Regressor_Param>(m, "Regressor_Param")
         .def(py::init<>())
         .def_readwrite("tol", &Regressor_Param::tol)
@@ -55,20 +54,18 @@ PYBIND11_MODULE(pyFROLS, m)
         .def_readwrite("tau", &Quantile_Param::tau)
         .def_readonly("solver_type", &Quantile_Param::solver_type);
     py::class_<Regressor>(m, "Regressor")
-    .def("fit", &Regressor::fit)
-    .def("transform_fit", py::overload_cast<crMat &, crMat &, crVec &, Features::Feature_Model &>(&Regressor::transform_fit))
-    .def("transform_fit", py::overload_cast<const std::vector<std::string> &, const std::vector<std::string> &, const std::vector<std::string> &, const std::string &, Features::Feature_Model &>(&Regressor::transform_fit))
-    .def("theta_solve", &Regressor::theta_solve);
+        .def("fit", &Regressor::fit)
+        .def("transform_fit", py::overload_cast<crMat &, crMat &, crVec &, Features::Feature_Model &>(&Regressor::transform_fit))
+        .def("transform_fit", py::overload_cast<const std::vector<std::string> &, const std::vector<std::string> &, const std::vector<std::string> &, const std::string &, Features::Feature_Model &>(&Regressor::transform_fit))
+        .def("theta_solve", &Regressor::theta_solve);
 
     py::class_<ERR_Regressor, Regressor>(m, "ERR_Regressor")
-    .def(py::init<const Regressor_Param &>());
+        .def(py::init<const Regressor_Param &>());
 
     py::class_<Quantile_Regressor, Regressor>(m, "Quantile_Regressor")
-    .def(py::init<const Quantile_Param &>())
-    .def_readonly("tau", &Quantile_Regressor::tau)
-    .def_readonly("solver_type", &Quantile_Regressor::solver_type);
-
-
+        .def(py::init<const Quantile_Param &>())
+        .def_readonly("tau", &Quantile_Regressor::tau)
+        .def_readonly("solver_type", &Quantile_Regressor::solver_type);
 
     using Bernoulli_Network = Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float>;
     typedef VectorNetwork<SIR_Param<>, Bernoulli_Network> SIR_Network;
@@ -87,10 +84,10 @@ PYBIND11_MODULE(pyFROLS, m)
         .def_readonly("p_I0", &Bernoulli_Network::p_I0)
         .def_readonly("p_R0", &Bernoulli_Network::p_R0)
         .def_readonly("t", &Bernoulli_Network::t);
-        // .def("advance", &Bernoulli_Network::advance)
-        // .def("reset", &Bernoulli_Network::reset)
-        // .def("initialize", &Bernoulli_Network::initialize)
-        // .def("population_count", &Bernoulli_Network::population_count);
+    // .def("advance", &Bernoulli_Network::advance)
+    // .def("reset", &Bernoulli_Network::reset)
+    // .def("initialize", &Bernoulli_Network::initialize)
+    // .def("population_count", &Bernoulli_Network::population_count);
 
     py::class_<SIR_Param<float>>(m, "SIR_Param")
         .def(py::init<>())
@@ -127,33 +124,30 @@ PYBIND11_MODULE(pyFROLS, m)
     // m.def("generate_Bernoulli_SIR_Network", py::overload_cast<uint32_t, float, float, uint32_t, float>(&generate_Bernoulli_SIR_Network));
     m.def("traj_to_file", &traj_to_file<float>);
     py::class_<MC_SIR_Params<float>>(m, "MC_SIR_Params")
-              .def(py::init<>())
-              .def_readwrite("N_pop", &MC_SIR_Params<float>::N_pop)
-              .def_readwrite("p_ER", &MC_SIR_Params<float>::p_ER)
-              .def_readwrite("p_I0", &MC_SIR_Params<float>::p_I0)
-              .def_readwrite("p_R0", &MC_SIR_Params<float>::p_R0)
-              .def_readwrite("R0_max", &MC_SIR_Params<float>::R0_max)
-              .def_readwrite("R0_min", &MC_SIR_Params<float>::R0_min)
-              .def_readwrite("alpha", &MC_SIR_Params<float>::alpha)
-              .def_readwrite("p_I", &MC_SIR_Params<float>::p_I)
-              .def_readwrite("N_sim", &MC_SIR_Params<float>::N_sim)
-              .def_readwrite("Nt_min", &MC_SIR_Params<float>::Nt_min)
-              .def_readwrite("p_R", &MC_SIR_Params<float>::p_R)
-              .def_readwrite("seed", &MC_SIR_Params<float>::seed)
-              .def_readwrite("N_I_min", &MC_SIR_Params<float>::N_I_min)
-              .def_readwrite("iter_offset", &MC_SIR_Params<float>::iter_offset)
-              .def_readwrite("csv_termination_tol", &MC_SIR_Params<float>::csv_termination_tol);
-
+        .def(py::init<>())
+        .def_readwrite("N_pop", &MC_SIR_Params<float>::N_pop)
+        .def_readwrite("p_ER", &MC_SIR_Params<float>::p_ER)
+        .def_readwrite("p_I0", &MC_SIR_Params<float>::p_I0)
+        .def_readwrite("p_R0", &MC_SIR_Params<float>::p_R0)
+        .def_readwrite("R0_max", &MC_SIR_Params<float>::R0_max)
+        .def_readwrite("R0_min", &MC_SIR_Params<float>::R0_min)
+        .def_readwrite("alpha", &MC_SIR_Params<float>::alpha)
+        .def_readwrite("p_I", &MC_SIR_Params<float>::p_I)
+        .def_readwrite("N_sim", &MC_SIR_Params<float>::N_sim)
+        .def_readwrite("Nt_min", &MC_SIR_Params<float>::Nt_min)
+        .def_readwrite("p_R", &MC_SIR_Params<float>::p_R)
+        .def_readwrite("seed", &MC_SIR_Params<float>::seed)
+        .def_readwrite("N_I_min", &MC_SIR_Params<float>::N_I_min)
+        .def_readwrite("iter_offset", &MC_SIR_Params<float>::iter_offset)
+        .def_readwrite("csv_termination_tol", &MC_SIR_Params<float>::csv_termination_tol);
 
     m.def("MC_SIR_simulation", py::overload_cast<Network_Models::SIR_VectorGraph &, const MC_SIR_Params<> &, uint32_t, const std::vector<float> &>(&MC_SIR_simulation));
     m.def("MC_SIR_simulation", py::overload_cast<Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> &, const MC_SIR_Params<> &, uint32_t, const std::vector<float> &>(&MC_SIR_simulation));
     m.def("MC_SIR_simulations", py::overload_cast<Network_Models::SIR_VectorGraph &, const MC_SIR_Params<> &, const std::vector<uint32_t> &, uint32_t>(&MC_SIR_simulations));
-    m.def("MC_SIR_simulations", py::overload_cast<Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> &, const MC_SIR_Params<> &, const std::vector<uint32_t>&, const std::vector<float> &, uint32_t>(&MC_SIR_simulations));
+    m.def("MC_SIR_simulations", py::overload_cast<Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> &, const MC_SIR_Params<> &, const std::vector<uint32_t> &, const std::vector<float> &, uint32_t>(&MC_SIR_simulations));
     m.def("MC_SIR_simulation", py::overload_cast<Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> &, const MC_SIR_Params<> &, uint32_t, const std::vector<float> &>(&MC_SIR_simulation));
     m.def("MC_SIR_simulations", py::overload_cast<uint32_t, float, float, const std::vector<uint32_t> &, std::vector<float>, uint32_t, uint32_t>(&MC_SIR_simulations));
     m.def("MC_SIR_simulations", py::overload_cast<uint32_t, float, float, const std::vector<uint32_t> &, uint32_t, uint32_t>(&MC_SIR_simulations));
 
-
-
-
+    m.def("MC_SIR_simulations_to_regression", &MC_SIR_simulations_to_regression);
 }

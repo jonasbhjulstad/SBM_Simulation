@@ -86,17 +86,14 @@ namespace FROLS
         MC_SIR_VectorData() {}
         MC_SIR_VectorData(const std::vector<Network_Models::SIR_Param<>>& p_vec,const std::vector<std::vector<uint32_t>>& t)
         {
-            std::vector<std::vector<float>> t_float(t.size());
-            std::transform(t.begin(), t.end(), t_float.begin(), [](auto &t)
-                           {
-                std::vector<float> t_f(t.size());
-                std::transform(t.begin(), t.end(), t_f.begin(), [](auto &t)
-                               { return static_cast<float>(t); });
-                return t_f; });
-
             traj.resize(t[0].size(), t.size());
-            for (int i = 0; i < t.size(); i++)
-                traj.row(i) = Vec::Map(&t_float[i][0],t_float[i].size());
+            for (int i = 0;i < t.size(); i++)
+            {
+                for (int j = 0; j < t[i].size(); j++)
+                {
+                    traj(j,i) = t[i][j];
+                }
+            }
             //put p_vec into params
             p_I.resize(p_vec.size(), 1);
             for (int i = 0; i < p_vec.size(); i++)
@@ -304,7 +301,6 @@ namespace FROLS
         FROLS::random::default_rng rng(seeds[0]);
 
         auto G = generate_SIR_ER_graph(N_pop, p_ER, seeds[0]);
-        auto enum_seeds = enumerate(seeds);
         std::vector<MC_SIR_VectorData> simdatas(seeds.size());
         MC_SIR_Params<> p;
         p.N_pop = N_pop;
@@ -318,14 +314,13 @@ namespace FROLS
         std::vector<float> p_Is(Nt);
         std::transform(MC_params.begin(), MC_params.end(), p_Is.begin(), [](auto &p)
                        { return p.p_I; });
-        std::transform(enum_seeds.begin(), enum_seeds.end(), simdatas.begin(), [&](auto &es)
+        std::transform(seeds.begin(), seeds.end(), simdatas.begin(), [&, iter = 0](auto &seed) mutable
                        {
-            uint32_t iter = es.first;
-            uint32_t seed = es.second;
-            if ((iter % (p.N_sim / 10)) == 0)
-            {
-                std::cout << "Simulation " << iter << " of " << p.N_sim << std::endl;
-            }
+            // if ((iter % (p.N_sim / 10)) == 0)
+            // {
+            //     std::cout << "Simulation " << iter << " of " << p.N_sim << std::endl;
+            // }
+            iter++;
             return MC_SIR_simulation(G, p, seed, p_Is); });
         return simdatas;
     }
