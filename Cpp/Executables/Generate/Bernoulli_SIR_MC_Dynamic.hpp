@@ -6,6 +6,7 @@
 #include <quantiles.hpp>
 #include <FROLS_Math.hpp>
 #include <FROLS_Eigen.hpp>
+#include <Regressor.hpp>
 #include <SIR_Bernoulli_Network.hpp>
 #include <utility>
 namespace FROLS
@@ -203,14 +204,41 @@ namespace FROLS
         return data_vec;
     }
 
-    struct Regression_Data
-    {
-        Mat X;
-        Mat U;
-        Mat Y;
-    };
 
-    Regression_Data
+    Regression::Regression_Data
+    MC_SIR_simulations_to_regression(Network_Models::SIR_VectorGraph &G_structure, const MC_SIR_Params<> &p, const const std::vector<Network_Models::SIR_Param<>>& p_vec, const std::vector<uint32_t> &seeds, uint32_t Nt)
+    {
+        uint32_t N_sims = seeds.size();
+        std::vector<MC_SIR_VectorData> data_vec(N_sims);
+        std::transform(seeds.begin(), seeds.end(), data_vec.begin(), [&](const auto &seed) mutable
+                      {
+            Network_Models::SIR_VectorGraph G_copy = G_structure;
+            Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> G(G_copy, p.p_I0, p.p_R0, random::default_rng(seed));
+            
+            auto traj = G.simulate(p_vec, Nt, p.N_I_min, p.Nt_min);
+            return MC_SIR_VectorData(p_vec, traj);
+            ; });
+
+        uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
+                                          { return a + b.traj.rows()-1; });
+
+        Regression::Regression_Data rd;
+        rd.X.resize(N_rows, 3);
+        rd.U.resize(N_rows, 1);
+        rd.Y.resize(N_rows, 3);
+        //assign 
+        std::for_each(data_vec.begin(), data_vec.end(), [&, n = 0](auto &data) mutable
+                      {
+            uint32_t N_rows = data.traj.rows()-1;
+            rd.X(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.topRows(N_rows);
+            rd.U(Eigen::seqN(n, N_rows), Eigen::all) = data.p_I;
+            rd.Y(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.bottomRows(N_rows);
+            n+= N_rows;
+        });
+        return rd;
+    }
+
+    Regression::Regression_Data
     MC_SIR_simulations_to_regression(Network_Models::SIR_VectorGraph &G_structure, const MC_SIR_Params<> &p, const std::vector<uint32_t> &seeds, uint32_t Nt)
     {
         uint32_t N_sims = seeds.size();
@@ -218,24 +246,57 @@ namespace FROLS
         std::for_each(data_vec.begin(), data_vec.end(), [&, n = 0](auto &data) mutable
                       {
             Network_Models::SIR_VectorGraph G_copy = G_structure;
-            auto G = generate_Bernoulli_SIR_Network(G_structure, p.p_I0, seeds[n], p.p_R0);
+            Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> G(G_copy, p.p_I0, p.p_R0, random::default_rng(seeds[n]));
+            
             data = MC_SIR_simulation(G, seeds[n], p, Nt);
             n++; });
 
         uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
                                           { return a + b.traj.rows()-1; });
 
-        Regression_Data rd;
+        Regression::Regression_Data rd;
         rd.X.resize(N_rows, 3);
         rd.U.resize(N_rows, 1);
-        rd.Y.resize(N_rows, 1);
+        rd.Y.resize(N_rows, 3);
         //assign 
         std::for_each(data_vec.begin(), data_vec.end(), [&, n = 0](auto &data) mutable
                       {
             uint32_t N_rows = data.traj.rows()-1;
             rd.X(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.topRows(N_rows);
-            rd.U = data.p_I;
+            rd.U(Eigen::seqN(n, N_rows), Eigen::all) = data.p_I;
             rd.Y(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.bottomRows(N_rows);
+            n+= N_rows;
+        });
+        return rd;
+    }
+
+    Regression::Regression_Data
+    MC_SIR_simulations_to_regression(const MC_SIR_Params<> &p, const std::vector<uint32_t> &seeds, uint32_t Nt)
+    {
+        uint32_t N_sims = seeds.size();
+        std::vector<MC_SIR_VectorData> data_vec(N_sims);
+        auto G_structure = generate_SIR_ER_graph(p.N_pop, p.p_ER, seeds[0]);
+        std::for_each(data_vec.begin(), data_vec.end(), [&, n = 0](auto &data) mutable
+                      {
+            auto G = generate_Bernoulli_SIR_Network(G_structure,  p.p_I0, seeds[n], p.p_R0);
+            data = MC_SIR_simulation(G, seeds[n], p, Nt);
+            n++; });
+
+        uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
+                                          { return a + b.traj.rows()-1; });
+
+        Regression::Regression_Data rd;
+        rd.X.resize(N_rows, 3);
+        rd.U.resize(N_rows, 1);
+        rd.Y.resize(N_rows, 3);
+        //assign 
+        std::for_each(data_vec.begin(), data_vec.end(), [&, n = 0](auto &data) mutable
+                      {
+            uint32_t N_rows = data.traj.rows()-1;
+            rd.X(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.topRows(N_rows);
+            rd.U(Eigen::seqN(n, N_rows), Eigen::all) = data.p_I;
+            rd.Y(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.bottomRows(N_rows);
+            n+= N_rows;
         });
         
         

@@ -140,6 +140,20 @@ namespace FROLS::Regression {
         return single_fit(X, y);
     }
 
+    std::vector<std::vector<Feature>> Regressor::transform_fit(const Regression_Data& rd,
+                                  Features::Feature_Model &model) {
+        
+        Mat XU(rd.X.rows(), rd.X.cols() + rd.U.cols());
+        XU << rd.X, rd.U;
+        Mat X = model.transform(XU);
+        std::vector<std::vector<Feature>> results(rd.Y.cols());
+        std::transform(rd.Y.colwise().begin(), rd.Y.colwise().end(), results.begin(), [&](const Vec& y)
+        {
+            return single_fit(X, y);
+        });
+        return results;
+    }
+
 
     std::vector<Feature> Regressor::transform_fit(const std::vector<std::string>& filenames, const std::vector<std::string>& colnames_x, const std::vector<std::string>& colnames_u, const std::string& colname_y, Features::Feature_Model& model)
     {

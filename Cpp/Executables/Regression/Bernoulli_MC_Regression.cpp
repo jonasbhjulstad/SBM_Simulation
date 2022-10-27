@@ -33,7 +33,7 @@ std::string quantile_simulation_filename(uint32_t N_pop, float p_ER, uint32_t it
 }
 
 constexpr uint32_t Nt = 50;
-constexpr uint32_t N_sims = 50;
+constexpr uint32_t N_sims = 200;
 const std::string network_type = "SIR";
 void simulation_loop(uint32_t N_pop, float p_ER)
 {

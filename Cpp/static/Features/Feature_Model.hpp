@@ -51,6 +51,8 @@ namespace FROLS::Features {
 
         std::vector<uint32_t> get_preselect_feature_idx() { return preselect_feature_idx; }
 
+        virtual ~Feature_Model() = default;
+
     protected:
         std::vector<uint32_t> preselect_feature_idx;
         std::vector<uint32_t> candidate_feature_idx;

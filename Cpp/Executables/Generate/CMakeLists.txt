@@ -1,5 +1,5 @@
 function (link_generation_target name)
-target_link_libraries(${name} PUBLIC ${FROLS_COMMON_LIBS} ${PYTHON_LIBRARIES})
+target_link_libraries(${name} PUBLIC ${FROLS_COMMON_LIBS} ${PYTHON_LIBRARIES} Regressors)
 endfunction()
 
 function(add_generation_executable exec_name)

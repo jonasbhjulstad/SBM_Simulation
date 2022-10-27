@@ -32,7 +32,9 @@ PYBIND11_MODULE(pyFROLS, m)
     py::class_<Feature_Model>(m, "Feature_Model")
         .def("step", &Feature_Model::step)
         .def("simulate", &Feature_Model::simulate)
-        .def("read_csv", &Feature_Model::read_csv);
+        .def("read_csv", &Feature_Model::read_csv)
+        .def("write_latex", &Feature_Model::write_latex);
+
 
     py::class_<Polynomial_Model, Feature_Model>(m, "Polynomial_Model")
         .def(py::init<uint32_t, uint32_t, uint32_t, uint32_t>())
@@ -43,6 +45,13 @@ PYBIND11_MODULE(pyFROLS, m)
         .def("feature_name", &Polynomial_Model::feature_name)
         .def("feature_names", &Polynomial_Model::feature_names)
         .def("equation", &Polynomial_Model::model_equation);
+
+    
+
+    py::class_<Regression_Data>(m, "Regression_Data")
+    .def_readwrite("X", &Regression_Data::X)
+    .def_readwrite("Y", &Regression_Data::Y)
+    .def_readwrite("U", &Regression_Data::U);
 
     py::class_<Regressor_Param>(m, "Regressor_Param")
         .def(py::init<>())
@@ -57,6 +66,7 @@ PYBIND11_MODULE(pyFROLS, m)
         .def("fit", &Regressor::fit)
         .def("transform_fit", py::overload_cast<crMat &, crMat &, crVec &, Features::Feature_Model &>(&Regressor::transform_fit))
         .def("transform_fit", py::overload_cast<const std::vector<std::string> &, const std::vector<std::string> &, const std::vector<std::string> &, const std::string &, Features::Feature_Model &>(&Regressor::transform_fit))
+        .def("transform_fit", py::overload_cast<const Regression_Data &, Features::Feature_Model &>(&Regressor::transform_fit))
         .def("theta_solve", &Regressor::theta_solve);
 
     py::class_<ERR_Regressor, Regressor>(m, "ERR_Regressor")
@@ -148,6 +158,12 @@ PYBIND11_MODULE(pyFROLS, m)
     m.def("MC_SIR_simulation", py::overload_cast<Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> &, const MC_SIR_Params<> &, uint32_t, const std::vector<float> &>(&MC_SIR_simulation));
     m.def("MC_SIR_simulations", py::overload_cast<uint32_t, float, float, const std::vector<uint32_t> &, std::vector<float>, uint32_t, uint32_t>(&MC_SIR_simulations));
     m.def("MC_SIR_simulations", py::overload_cast<uint32_t, float, float, const std::vector<uint32_t> &, uint32_t, uint32_t>(&MC_SIR_simulations));
+    
 
-    m.def("MC_SIR_simulations_to_regression", &MC_SIR_simulations_to_regression);
+
+    m.def("MC_SIR_simulations_to_regression", py::overload_cast<Network_Models::SIR_VectorGraph &, const MC_SIR_Params<> &, const std::vector<uint32_t> &, uint32_t>(&MC_SIR_simulations_to_regression));
+    m.def("MC_SIR_simulations_to_regression", py::overload_cast<const MC_SIR_Params<> &, const std::vector<uint32_t> &, uint32_t>(&MC_SIR_simulations_to_regression));
+
+    m.def("MC_SIR_simulations_to_regression", py::overload_cast<Network_Models::SIR_VectorGraph &, const MC_SIR_Params<> &, const std::vector<Network_Models::SIR_Param<>>&, const std::vector<uint32_t>&,uint32_t>(&MC_SIR_simulations_to_regression));
+
 }
