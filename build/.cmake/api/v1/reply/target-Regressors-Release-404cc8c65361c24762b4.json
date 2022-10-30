@@ -1,0 +1,264 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "static/Regressors/libRegressors.a"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"add_compile_options",
+			"target_link_libraries",
+			"add_compile_definitions"
+		],
+		"files" : 
+		[
+			"static/Regressors/CMakeLists.txt",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 1,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 63,
+				"parent" : 2
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 2,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 48,
+				"parent" : 2
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " -stdlib=libstdc++ -O3 -DNDEBUG -fPIC"
+				},
+				{
+					"backtrace" : 3,
+					"fragment" : "-fPIC"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-fwrapv"
+				},
+				{
+					"fragment" : "-std=gnu++20"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 5,
+					"define" : "FROLS_USE_INTEL"
+				},
+				{
+					"backtrace" : 4,
+					"define" : "HAVE_CONFIG_H"
+				},
+				{
+					"backtrace" : 4,
+					"define" : "OR_TOOLS_AS_DYNAMIC_LIB"
+				},
+				{
+					"backtrace" : 4,
+					"define" : "USE_BOP"
+				},
+				{
+					"backtrace" : 4,
+					"define" : "USE_CBC"
+				},
+				{
+					"backtrace" : 4,
+					"define" : "USE_CLP"
+				},
+				{
+					"backtrace" : 4,
+					"define" : "USE_GLOP"
+				},
+				{
+					"backtrace" : 4,
+					"define" : "USE_LP_PARSER"
+				},
+				{
+					"backtrace" : 4,
+					"define" : "USE_PDLP"
+				},
+				{
+					"backtrace" : 4,
+					"define" : "USE_SCIP"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/include"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/Features"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/Math"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl"
+				},
+				{
+					"backtrace" : 4,
+					"isSystem" : true,
+					"path" : "/usr/local/include/eigen3"
+				},
+				{
+					"backtrace" : 4,
+					"isSystem" : true,
+					"path" : "/usr/local/include/coin"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					4,
+					4
+				],
+				"standard" : "20"
+			},
+			"sourceIndexes" : 
+			[
+				1,
+				2,
+				3,
+				6
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"id" : "Features::@668fa06d19dbc11d4cdc"
+		}
+	],
+	"id" : "Regressors::@f1e7241e55aed8935b50",
+	"name" : "Regressors",
+	"nameOnDisk" : "libRegressors.a",
+	"paths" : 
+	{
+		"build" : "static/Regressors",
+		"source" : "static/Regressors"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				0,
+				4,
+				5
+			]
+		},
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				1,
+				2,
+				3,
+				6
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"path" : "static/Regressors/Regressor.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "static/Regressors/Regressor.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "static/Regressors/ERR_Regressor.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "static/Regressors/Quantile_Regressor.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "static/Regressors/ERR_Regressor.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "static/Regressors/Quantile_Regressor.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "static/Regressors/Regression_Algorithm.cpp",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}

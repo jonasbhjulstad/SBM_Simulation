@@ -33,7 +33,7 @@ std::string quantile_simulation_filename(uint32_t N_pop, float p_ER, uint32_t it
 }
 
 constexpr uint32_t Nt = 50;
-constexpr uint32_t N_sims = 200;
+constexpr uint32_t N_sims = 50;
 const std::string network_type = "SIR";
 void simulation_loop(uint32_t N_pop, float p_ER)
 {
@@ -98,23 +98,6 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     FROLS::Regression::ERR_Regressor er_regressor(er_param);
 
 
-    std::vector<FROLS::Regression::Quantile_Regressor> qr_regressors;
-    float MAE_tol = 1e-6;
-    float tau = .95;
-    FROLS::Regression::Quantile_Param qr_param;
-    qr_param.N_terms_max = N_terms_max;
-    qr_param.tol = MAE_tol;
-    qr_param.tau = 1-tau;
-    qr_param.theta_tol = 1e-3;
-    //Regressor for S
-    qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
-    //Regressor for I
-    qr_param.tau = tau;
-    qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
-    //Regressor for R
-    qr_param.tau = tau;
-    qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
-    // Quantile-Regression
 
 
     std::vector<std::string> df_names(N_sims);
@@ -141,12 +124,33 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 
     er_model.feature_summary(er_features);
 
-    fmt::print("Quantile-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, N_output_features, qr_param.tol, qr_param.N_terms_max);
 
     X = dataframe_to_matrix(dfs, colnames_x,
                             0, -2);
     Y = dataframe_to_matrix(dfs, colnames_x, 1, -1);
     U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
+
+    std::vector<FROLS::Regression::Quantile_Regressor> qr_regressors;
+    float MAE_tol = 1e-6;
+    float tau = .95;
+    FROLS::Regression::Quantile_Param qr_param;
+    qr_param.N_terms_max = N_terms_max;
+    qr_param.tol = MAE_tol;
+    qr_param.tau = 1-tau;
+    qr_param.theta_tol = 1e-3;
+    qr_param.N_rows = X.rows();
+    qr_param.N_threads = 8;
+    //Regressor for S
+    qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
+    //Regressor for I
+    qr_param.tau = tau;
+    qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
+    //Regressor for R
+    qr_param.tau = tau;
+    qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
+    // Quantile-Regression
+    fmt::print("Quantile-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, N_output_features, qr_param.tol, qr_param.N_terms_max);
+
     std::vector<std::vector<Feature>> qr_features(3);
     for (int i = 0; i < Y.cols(); i++)
     {

@@ -40,13 +40,13 @@ def quadratic_objective_solve(X_mean, U_mean, Wu, F_ODE, Nt, u_max = 0.1, u_min 
 
     return (sol, get_X(sol['x'].full()), sol['x'].full())
 
-def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-3):
+def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-3, log_file=[]):
     Nx = X0.shape[1]
     Nu = 1
 
     X = cs.MX.sym('X', Nx, Nt)
-    U = cs.MX.sym('U', Nu, int(Nt/7)+1)
-
+    U = cs.MX.sym('U', Nu, int(Nt/7))
+    U0 = np.ones(U.shape[0])*u_min
     g = []
     obj = 0
 
@@ -58,30 +58,36 @@ def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-3
     week_idx = 0
     for i in range(Nt):
         if (i == 0):
-            Xk = F_ODE(X0[0,:], U[week_idx])
+            Xk = F_ODE(X0[0,:], U[np.min(week_idx, U.shape[0]-1)])
         else:
             if (i % 7 == 0):
                 week_idx += 1
             Xk = F_ODE(Xk, U[week_idx])
         X_traj.append(Xk)
         obj += Wu*(u_max - U[week_idx])**2 + (Xk[1])**2/N_pop
+        # obj += Wu*cs.norm_2(u_max - U[week_idx]) + cs.norm_2(Xk[1])/N_pop
     get_X = cs.Function('get_X', [U], [cs.horzcat(*X_traj)])
 
     X0 = X0
-    U0 = U0[::7][:U.shape[0]]
+    # U0 = U0[::7][:U.shape[0]]
     # prob = {'f': obj, 'x': W, 'g': g}
     # solver = cs.nlpsol('solver', 'ipopt', prob)
     lbx = [u_min]*U.shape[0]
     ubx = [u_max]*U.shape[0]
     # for i in range(Nt):
-    #     ubx[1+3*i] = I_max
+        # ubx[1+3*i] = I_max
     opts = {'ipopt.print_level':0, 'print_time':0}
-    # sol = solver(x0=cs.vertcat(X0[:], U0), lbx = lbw, ubx = ubw, lbg = lbg, ubg=ubg)
+    if (log_file) != []:
+        opts['ipopt.output_file'] = log_file
+        opts['ipopt.file_print_level'] = 5
     prob = {'f': obj, 'x': U, 'g': []}
-    solver = cs.nlpsol('solver', 'ipopt', prob, opts)
-    sol = solver(x0=U0, lbx = cs.vertcat(*lbx), ubx = cs.vertcat(*ubx))
 
-    return (sol, get_X(sol['x'].full()), np.array([np.repeat(sol['x'].full(), 7)]).T[:Nt])
+    solver = cs.nlpsol('solver', 'ipopt', prob, opts)
+
+    sol = solver(x0=U0, lbx = cs.vertcat(*lbx), ubx = cs.vertcat(*ubx))
+    stats = solver.stats()
+
+    return (sol, get_X(sol['x'].full()), np.array([np.repeat(sol['x'].full(), 7)]).T[:Nt], stats)
 
 def hospital_capacity_objective_solve(X_mean, U_mean, Wu, I_max, F_ODE,Nt,  u_max = 0.1, u_min = 1e-6):
     Nx = X_mean.shape[1]

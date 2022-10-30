@@ -6,6 +6,7 @@
 #include <ERR_Regressor.hpp>
 #include <Typedefs.hpp>
 #include <FROLS_Eigen.hpp>
+#define PYBIND11_DETAILED_ERROR_MESSAGES
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -24,10 +25,18 @@ PYBIND11_MODULE(pyFROLS, m)
 
     py::class_<Feature>(m, "Feature")
         .def(py::init<>())
-        .def_readwrite("index", &Feature::index)
         .def_readwrite("ERR", &Feature::f_ERR)
         .def_readwrite("g", &Feature::g)
-        .def_readwrite("coeff", &Feature::theta);
+        .def_readwrite("index", &Feature::index)
+        .def_readwrite("coeff", &Feature::theta)
+        .def(py::pickle(
+            [](const Feature& f) { // dump
+                return py::make_tuple(f.f_ERR, f.g, f.index, f.theta);
+            },
+            [](py::tuple t) { // load
+                return Feature{t[0].cast<float>(), t[1].cast<float>(), t[2].cast<uint32_t>(), t[3].cast<float>(), FEATURE_REGRESSION};
+            }));
+
 
     py::class_<Feature_Model>(m, "Feature_Model")
         .def("step", &Feature_Model::step)
@@ -61,6 +70,8 @@ PYBIND11_MODULE(pyFROLS, m)
     py::class_<Quantile_Param, Regressor_Param>(m, "Quantile_Param")
         .def(py::init<>())
         .def_readwrite("tau", &Quantile_Param::tau)
+        .def_readwrite("N_rows", &Quantile_Param::N_rows)
+        .def_readwrite("N_threads", &Quantile_Param::N_threads)
         .def_readonly("solver_type", &Quantile_Param::solver_type);
     py::class_<Regressor>(m, "Regressor")
         .def("fit", &Regressor::fit)
@@ -74,8 +85,7 @@ PYBIND11_MODULE(pyFROLS, m)
 
     py::class_<Quantile_Regressor, Regressor>(m, "Quantile_Regressor")
         .def(py::init<const Quantile_Param &>())
-        .def_readonly("tau", &Quantile_Regressor::tau)
-        .def_readonly("solver_type", &Quantile_Regressor::solver_type);
+        .def_readonly("tau", &Quantile_Regressor::tau);
 
     using Bernoulli_Network = Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float>;
     typedef VectorNetwork<SIR_Param<>, Bernoulli_Network> SIR_Network;

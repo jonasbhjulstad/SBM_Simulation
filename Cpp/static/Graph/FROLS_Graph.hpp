@@ -298,7 +298,6 @@ namespace FROLS::Graph
 
         VectorGraph(std::vector<std::shared_ptr<std::mutex>> &v_mx, std::vector<std::shared_ptr<std::mutex>> &e_mx) : NV_max(v_mx.size()), NE_max(e_mx.size())
         {
-            std::cout << "size: " << sizeof(Edge<E>) << std::endl;
             _vertices.resize(NV_max);
             _edges.resize(NE_max);
             std::for_each(v_mx.begin(), v_mx.end(), [&, n = 0](auto &mx) mutable

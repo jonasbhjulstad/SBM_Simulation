@@ -6,7 +6,7 @@
 #include <fmt/format.h>
 namespace FROLS::Regression {
     Quantile_Regressor::Quantile_Regressor(const Quantile_Param &p)
-            : tau(p.tau), Regressor(p), solver_type(p.solver_type) {}
+            : tau(p.tau), Regressor(p), solver_type(p.solver_type), problem_type(p.problem_type){}
 
     void Quantile_Regressor::theta_solve(crMat &A, crVec &g, crMat& Q, crVec& y, std::vector<Feature> &features) const {
         std::vector<Feature> feature_tmp;
@@ -25,7 +25,6 @@ namespace FROLS::Regression {
                     theta = coefficients[i];
         }
 
-
     }
 
 
@@ -35,45 +34,70 @@ namespace FROLS::Regression {
 
             using namespace operations_research;
             uint32_t N_rows = x.rows();
-            Quantile_LP LP(tau, solver_type);
-            float eps = 4;
-            LP.construct(N_rows);
+
+            using namespace operations_research;
+            MPSolver solver("Quantile_Solver", problem_type);
+            const float infinity = solver.infinity();
+            // theta_neg = solver.MakeNumVar(0.0, infinity, "theta_neg");
+            // theta_pos = solver.MakeNumVar(0.0, infinity, "theta_pos");
+            operations_research::MPVariable *theta = solver.MakeNumVar(-infinity, infinity, "theta");
+            std::vector<operations_research::MPVariable *> u_pos;
+            std::vector<operations_research::MPVariable *> u_neg;
+            std::vector<operations_research::MPConstraint *> g;
+            operations_research::MPObjective *objective;
+
+            solver.MakeNumVarArray(N_rows, 0.0, infinity, "u_pos", &u_pos);
+            solver.MakeNumVarArray(N_rows, 0.0, infinity, "u_neg", &u_neg);
+            objective = solver.MutableObjective();
+            objective->SetMinimization();
+            std::for_each(u_pos.begin(), u_pos.end(),
+                        [=](auto u) { objective->SetCoefficient(u, tau); });
+            std::for_each(u_neg.begin(), u_neg.end(),
+                        [=](auto u) { objective->SetCoefficient(u, (1-tau)); });
+            g.resize(N_rows);
+            std::for_each(g.begin(), g.end(),
+                        [&](auto &gi) { gi = solver.MakeRowConstraint(); });
+
+
+            float eps = 4.f;
+            static int counter = 0;
+            counter++;
             for (int i = 0; i < N_rows; i++) {
-                // LP.g[i]->SetCoefficient(LP.theta_pos, x(i));
-                // LP.g[i]->SetCoefficient(LP.theta_neg, -x(i));
-                LP.g[i]->SetCoefficient(LP.theta, x(i));
-                LP.g[i]->SetCoefficient(LP.u_pos[i], 1);
-                LP.g[i]->SetCoefficient(LP.u_neg[i], -1);
-                LP.g[i]->SetBounds(y[i] - eps, y[i]);
+                // g[i]->SetCoefficient(theta_pos, x(i));
+                // g[i]->SetCoefficient(theta_neg, -x(i));
+                g[i]->SetCoefficient(theta, x(i));
+                g[i]->SetCoefficient(u_pos[i], 1);
+                g[i]->SetCoefficient(u_neg[i], -1);
+                g[i]->SetBounds(y[i], y[i]);
             }
 //            MX g = xi * (theta_pos - theta_neg) + u_pos - u_neg - dm_y;
-            const bool solver_status = LP.solver->Solve() == MPSolver::OPTIMAL;
+            const bool solver_status = solver.Solve() == MPSolver::OPTIMAL;
             Feature candidate;
             candidate.f_ERR = std::numeric_limits<float>::infinity();
 
             if (solver_status) {
-                float f = LP.objective->Value();
+                float f = objective->Value();
 
                 std::vector<float> u_neg_sol(N_rows);
                 std::vector<float> u_pos_sol(N_rows);
                 for (int i = 0; i < N_rows; i++) {
-                    u_neg_sol[i] = LP.u_neg[i]->solution_value();
-                    u_pos_sol[i] = LP.u_pos[i]->solution_value();
+                    u_neg_sol[i] = u_neg[i]->solution_value();
+                    u_pos_sol[i] = u_pos[i]->solution_value();
                 }
-                // float theta_sol = (LP.theta_pos->solution_value() - LP.theta_neg->solution_value());
-                // float theta_pos_sol = LP.theta_pos->solution_value();
-                // float theta_neg_sol = LP.theta_neg->solution_value();
-                float theta_sol = LP.theta->solution_value();
+                // float theta_sol = (theta_pos->solution_value() - theta_neg->solution_value());
+                // float theta_pos_sol = theta_pos->solution_value();
+                // float theta_neg_sol = theta_neg->solution_value();
+                float theta_sol = theta->solution_value();
                 // fmt::print("Solve status, {}, {}, {}\n", solver_status, f, theta_sol);
                 // if(theta_sol == 0)
                     // std::cout << y.head(10).transpose() << std::endl;
                 
 
-                // std::for_each(LP.g.begin(), LP.g.end(), [&](auto &gi) { gi->Clear(); });
+                // std::for_each(g.begin(), g.end(), [&](auto &gi) { gi->Clear(); });
                 return Feature{f, theta_sol, 0, 0., FEATURE_REGRESSION};
             } else {
                 std::cout << "[Quantile_Regressor] Warning: Quantile regression failed" << std::endl;
-                std::for_each(LP.g.begin(), LP.g.end(), [](auto &gi) { gi->Clear(); });
+                // std::for_each(g.begin(), g.end(), [](auto &gi) { gi->Clear(); });
                 return Feature{};
             }
         }

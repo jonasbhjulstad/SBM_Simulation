@@ -206,7 +206,7 @@ namespace FROLS
 
 
     Regression::Regression_Data
-    MC_SIR_simulations_to_regression(Network_Models::SIR_VectorGraph &G_structure, const MC_SIR_Params<> &p, const const std::vector<Network_Models::SIR_Param<>>& p_vec, const std::vector<uint32_t> &seeds, uint32_t Nt)
+    MC_SIR_simulations_to_regression(Network_Models::SIR_VectorGraph &G_structure, const MC_SIR_Params<> &p, const std::vector<Network_Models::SIR_Param<>>& p_vec, const std::vector<uint32_t> &seeds, uint32_t Nt)
     {
         uint32_t N_sims = seeds.size();
         std::vector<MC_SIR_VectorData> data_vec(N_sims);
