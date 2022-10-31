@@ -10,11 +10,11 @@
 
 namespace FROLS {
 
-    void DataFrame::assign(const std::string &col_name, crVec &vec) {
+    void DataFrame::assign(const std::string &col_name, Vec vec) {
         assign(col_name, std::vector<float>(vec.data(), vec.data() + vec.rows()));
     }
 
-    void DataFrame::assign(const std::vector<std::string> &col_names, crMat &mat) {
+    void DataFrame::assign(const std::vector<std::string> &col_names, Mat &mat) {
         for (int i = 0; i < mat.cols(); i++) {
             assign(col_names[i], mat.col(i));
         }
@@ -51,14 +51,6 @@ namespace FROLS {
             return *this->operator[](name);
         });
         return res;
-    }
-    void DataFrame::assign(const std::vector<std::string> &col_names,
-                           const std::vector<std::vector<uint32_t>> &col_data) {
-        for (uint32_t i = 0; i < col_names.size(); i++) {
-            std::vector<float> col(col_data[i].size());
-            std::copy(col_data[i].begin(), col_data[i].end(), col.begin());
-            data[col_names[i]] = std::make_shared<std::vector<float>>(col);
-        }
     }
 
     void DataFrame::assign(const std::vector<std::string> &col_names,

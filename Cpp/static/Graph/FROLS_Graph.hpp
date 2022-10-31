@@ -310,6 +310,12 @@ namespace FROLS::Graph
                 n++; });
         }
 
+
+        VectorGraph(const std::vector<Vertex_t>& vertices, const std::vector<Edge_t>& edges) : _vertices(vertices), _edges(edges), NV_max(vertices.size()), NE_max(edges.size())
+        {
+        }
+
+
         VectorGraph operator=(const VectorGraph &other)
         {
             _vertices = other._vertices;

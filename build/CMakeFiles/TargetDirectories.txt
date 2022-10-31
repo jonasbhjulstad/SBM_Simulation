@@ -118,9 +118,7 @@
 /home/man/Documents/Bernoulli_MC/build/Binders/CMakeFiles/install.dir
 /home/man/Documents/Bernoulli_MC/build/Binders/CMakeFiles/install/local.dir
 /home/man/Documents/Bernoulli_MC/build/Binders/CMakeFiles/install/strip.dir
-/home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/csv_regression.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/polynomial_features.dir
-/home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/MC_SIR_test.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/edit_cache.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/rebuild_cache.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/list_install_components.dir

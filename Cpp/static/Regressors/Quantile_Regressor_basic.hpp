@@ -27,14 +27,14 @@ namespace FROLS::Regression
         Quantile_Regressor(const Quantile_Param &p);
         Feature feature_selection_criteria(const std::vector<Feature> &features) const;
 
-        void theta_solve(crMat &A, crVec &g, crMat &X, crVec &y, std::vector<Feature> &features) const;
+        void theta_solve(Mat &A, Vec &g, Mat &X, Vec &y, std::vector<Feature> &features) const;
 
     private:
         Feature single_feature_regression(const Vec &x, const Vec &y) const;
 
-        std::vector<Feature> candidate_regression(crMat &X, crMat &Q_global, crVec &y, const std::vector<Feature> &used_features) const;
+        std::vector<Feature> candidate_regression(Mat &X, Mat &Q_global, Vec &y, const std::vector<Feature> &used_features) const;
 
-        bool tolerance_check(crMat &Q, crVec &y, const std::vector<Feature> &best_features) const;
+        bool tolerance_check(Mat &Q, Vec &y, const std::vector<Feature> &best_features) const;
 
         uint32_t feature_selection_idx = 0;
     };

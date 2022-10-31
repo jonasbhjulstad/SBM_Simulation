@@ -15,8 +15,8 @@ namespace FROLS::Features {
         Polynomial_Model(uint32_t Nx, uint32_t Nu, uint32_t N_output_features, uint32_t d_max)
                 : d_max(d_max), Nx(Nx), Nu(Nu), Feature_Model(N_output_features) {}
 
-        // float transform(crVec &x_raw, uint32_t target_index) ;
-        Vec _transform(crMat &X_raw, uint32_t target_index, bool& index_failure);
+        // float transform(Vec &x_raw, uint32_t target_index) ;
+        Vec _transform(const Mat &X_raw, uint32_t target_index, bool& index_failure);
 
 
 

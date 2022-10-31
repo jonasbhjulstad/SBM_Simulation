@@ -75,7 +75,7 @@ namespace FROLS::Features {
 
 
 
-    Vec Polynomial_Model::_transform(crMat &X_raw, uint32_t target_idx, bool &index_failure) {
+    Vec Polynomial_Model::_transform(const Mat &X_raw, uint32_t target_idx, bool &index_failure) {
         // get feature names for polynomial combinations with powers between d_min,
         // d_max of the original features
         uint32_t N_input_features = X_raw.cols();

@@ -9,6 +9,7 @@
 #include <Regressor.hpp>
 #include <SIR_Bernoulli_Network.hpp>
 #include <utility>
+#include <FROLS_Eigen.hpp>
 namespace FROLS
 {
     template <typename dType = float>
@@ -41,18 +42,28 @@ namespace FROLS
     std::vector<dType> generate_infection_probabilities(const MC_SIR_Params<> &p, RNG &rng, uint32_t Nt)
     {
         std::vector<dType> p_Is(Nt);
-        dType omega_bounds[] = {(2.f * M_PIf) / 5.f, (2.f * M_PIf) / 10.f};
+        dType omega_bounds[] = {(2.f * M_PIf) / 2000.f, (2.f * M_PIf) / 100.f};
         random::uniform_real_distribution<dType> d_omega(omega_bounds[0], omega_bounds[1]);
         random::uniform_real_distribution<dType> d_offset(0.f, 2.f * M_PIf);
+        random::uniform_real_distribution<dType> d_white(0.f, p.R0_max);
         dType offset = d_offset(rng);
         dType R0_mean = (p.R0_max - p.R0_min) / 2.f + p.R0_min;
-        dType R0_std = R0_mean - p.R0_min;
+        dType R0_std = (p.R0_max - p.R0_min)/2;
         dType omega = d_omega(rng);
+        // omega = 0;
         std::vector<dType> beta(Nt);
-        std::for_each(std::execution::par_unseq, p_Is.begin(), p_Is.end(), [&, t = 0](auto &p_I) mutable
+        R0_mean = 1.5;
+        std::exponential_distribution<dType> d_exp(1);
+        dType p_I_val = R0_mean*d_exp(rng)/p.N_pop;
+        std::for_each(p_Is.begin(), p_Is.end(), [&, t = 0](auto &p_I) mutable
                       {
             dType R0 = R0_mean + R0_std * std::sin(omega * t + offset);
-            p_I = R0/ p.N_pop;
+            // p_I = std::max({R0 / p.N_pop, (dType) 0});//1 - std::exp(-R0/ p.N_pop);
+            p_I = p_I_val;
+            if ((t % 7) == 0)
+            {
+                p_I_val = R0_mean*d_exp(rng)/p.N_pop;
+            }
             t++; });
         return p_Is;
     }
@@ -103,6 +114,30 @@ namespace FROLS
         Mat traj;
         Vec p_I;
     };
+
+    Regression::Regression_Data MC_SIR_to_regression_data(const std::vector<MC_SIR_VectorData>& data)
+    {
+        Regression::Regression_Data reg_data(data.size());
+        for (int i = 0; i < data.size(); i++)
+        {
+            reg_data.U[i] = data[i].p_I;
+            reg_data.X[i] = data[i].traj.topRows(data[i].traj.rows() - 1);
+            reg_data.Y[i] = data[i].traj.bottomRows(data[i].traj.rows() - 1);
+        }
+        return reg_data;
+    }
+
+    // void dataframe_to_regression_data(DataFrameStack& dfs, const std::vector<std::string>& colnames_x, const std::vector<std::string> colnames_u, Regression_Data& reg_data)
+    // {
+    //     uint32_t N_dfs = dfs.dataframes.size();
+    //     for (int i = 0; i < N_dfs; i++)
+    //     {
+    //         reg_data.U[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_u, 0, -2);
+    //         reg_data.X[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_x, 0, -2);
+    //         reg_data.Y[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_x, 1, -1);
+    //     }
+    //     return reg_data;
+    // }
 
     Network_Models::SIR_VectorGraph generate_SIR_ER_graph(uint32_t N_pop, float p_ER, uint32_t seed)
     {
@@ -219,23 +254,8 @@ namespace FROLS
             return MC_SIR_VectorData(p_vec, traj);
             ; });
 
-        uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
-                                          { return a + b.traj.rows()-1; });
 
-        Regression::Regression_Data rd;
-        rd.X.resize(N_rows, 3);
-        rd.U.resize(N_rows, 1);
-        rd.Y.resize(N_rows, 3);
-        //assign 
-        std::for_each(data_vec.begin(), data_vec.end(), [&, n = 0](auto &data) mutable
-                      {
-            uint32_t N_rows = data.traj.rows()-1;
-            rd.X(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.topRows(N_rows);
-            rd.U(Eigen::seqN(n, N_rows), Eigen::all) = data.p_I;
-            rd.Y(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.bottomRows(N_rows);
-            n+= N_rows;
-        });
-        return rd;
+        return MC_SIR_to_regression_data(data_vec);
     }
 
     Regression::Regression_Data
@@ -250,24 +270,7 @@ namespace FROLS
             
             data = MC_SIR_simulation(G, seeds[n], p, Nt);
             n++; });
-
-        uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
-                                          { return a + b.traj.rows()-1; });
-
-        Regression::Regression_Data rd;
-        rd.X.resize(N_rows, 3);
-        rd.U.resize(N_rows, 1);
-        rd.Y.resize(N_rows, 3);
-        //assign 
-        std::for_each(data_vec.begin(), data_vec.end(), [&, n = 0](auto &data) mutable
-                      {
-            uint32_t N_rows = data.traj.rows()-1;
-            rd.X(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.topRows(N_rows);
-            rd.U(Eigen::seqN(n, N_rows), Eigen::all) = data.p_I;
-            rd.Y(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.bottomRows(N_rows);
-            n+= N_rows;
-        });
-        return rd;
+        return MC_SIR_to_regression_data(data_vec);
     }
 
     Regression::Regression_Data
@@ -282,25 +285,11 @@ namespace FROLS
             data = MC_SIR_simulation(G, seeds[n], p, Nt);
             n++; });
 
-        uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
-                                          { return a + b.traj.rows()-1; });
 
-        Regression::Regression_Data rd;
-        rd.X.resize(N_rows, 3);
-        rd.U.resize(N_rows, 1);
-        rd.Y.resize(N_rows, 3);
-        //assign 
-        std::for_each(data_vec.begin(), data_vec.end(), [&, n = 0](auto &data) mutable
-                      {
-            uint32_t N_rows = data.traj.rows()-1;
-            rd.X(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.topRows(N_rows);
-            rd.U(Eigen::seqN(n, N_rows), Eigen::all) = data.p_I;
-            rd.Y(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.bottomRows(N_rows);
-            n+= N_rows;
-        });
+
         
         
-        return rd;
+        return MC_SIR_to_regression_data(data_vec);
     }
 
 

@@ -32,7 +32,7 @@ int main()
 
 
     auto rd = MC_SIR_simulations_to_regression(G_structure, p, seeds, Nt);
-    std::cout << rd.X.topRows(5) << std::endl;
+    std::cout << rd.X[0].topRows(5) << std::endl;
         // print time
     uint32_t N_terms_max = 2;
     uint32_t d_max = 1;

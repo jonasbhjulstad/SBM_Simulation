@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Executables/Generate/SIR_Sine"
+			"path" : "Executables/Generate/SIR_Sine_Discrete"
 		}
 	],
 	"backtrace" : 2,
@@ -37,8 +37,7 @@
 			"/usr/local/lib/cmake/ortools/modules/FindCbc.cmake",
 			"/usr/local/lib/cmake/Clp/ClpTargets.cmake",
 			"/usr/local/lib/cmake/Clp/ClpConfig.cmake",
-			"/usr/local/lib/cmake/ortools/modules/FindClp.cmake",
-			"/usr/lib64/cmake/sundials/SUNDIALSConfig.cmake"
+			"/usr/local/lib/cmake/ortools/modules/FindClp.cmake"
 		],
 		"nodes" : 
 		[
@@ -48,7 +47,7 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 20,
+				"line" : 22,
 				"parent" : 0
 			},
 			{
@@ -90,7 +89,7 @@
 			{
 				"command" : 6,
 				"file" : 4,
-				"line" : 22,
+				"line" : 25,
 				"parent" : 8
 			},
 			{
@@ -398,43 +397,15 @@
 				"parent" : 5
 			},
 			{
-				"command" : 6,
-				"file" : 4,
-				"line" : 30,
-				"parent" : 8
-			},
-			{
-				"file" : 14,
-				"parent" : 64
-			},
-			{
-				"command" : 2,
-				"file" : 14,
-				"line" : 86,
-				"parent" : 65
-			},
-			{
-				"command" : 2,
-				"file" : 14,
-				"line" : 86,
-				"parent" : 65
-			},
-			{
-				"command" : 2,
-				"file" : 14,
-				"line" : 86,
-				"parent" : 65
-			},
-			{
 				"command" : 8,
 				"file" : 4,
-				"line" : 63,
+				"line" : 66,
 				"parent" : 8
 			},
 			{
 				"command" : 9,
 				"file" : 4,
-				"line" : 48,
+				"line" : 51,
 				"parent" : 8
 			},
 			{
@@ -454,7 +425,7 @@
 					"fragment" : " -stdlib=libstdc++ -O3 -DNDEBUG -fPIE"
 				},
 				{
-					"backtrace" : 69,
+					"backtrace" : 64,
 					"fragment" : "-fPIC"
 				},
 				{
@@ -468,7 +439,7 @@
 			"defines" : 
 			[
 				{
-					"backtrace" : 70,
+					"backtrace" : 65,
 					"define" : "FROLS_USE_INTEL"
 				},
 				{
@@ -511,8 +482,8 @@
 			"includes" : 
 			[
 				{
-					"backtrace" : 71,
-					"path" : "/usr/include/python3.10"
+					"backtrace" : 66,
+					"path" : "/home/man/.pyenv/versions/3.9.13/include/python3.9"
 				},
 				{
 					"backtrace" : 4,
@@ -608,7 +579,7 @@
 			"id" : "Regressors::@f1e7241e55aed8935b50"
 		}
 	],
-	"id" : "SIR_Sine::@68a3a1e162b02809d69b",
+	"id" : "SIR_Sine_Discrete::@68a3a1e162b02809d69b",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -1069,27 +1040,12 @@
 				"backtrace" : 4,
 				"fragment" : "include/libCommon.a",
 				"role" : "libraries"
-			},
-			{
-				"backtrace" : 66,
-				"fragment" : "/usr/lib/libsundials_nvecserial.so.6.3.0",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 67,
-				"fragment" : "/usr/lib/libsundials_cvode.so.6.3.0",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 68,
-				"fragment" : "/usr/lib/libsundials_cvodes.so.6.3.0",
-				"role" : "libraries"
 			}
 		],
 		"language" : "CXX"
 	},
-	"name" : "SIR_Sine",
-	"nameOnDisk" : "SIR_Sine",
+	"name" : "SIR_Sine_Discrete",
+	"nameOnDisk" : "SIR_Sine_Discrete",
 	"paths" : 
 	{
 		"build" : "Executables/Generate",
@@ -1110,7 +1066,7 @@
 		{
 			"backtrace" : 2,
 			"compileGroupIndex" : 0,
-			"path" : "Executables/Generate/SIR_Sine.cpp",
+			"path" : "Executables/Generate/SIR_Sine_Discrete.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

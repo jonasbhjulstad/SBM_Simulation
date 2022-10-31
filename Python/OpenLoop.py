@@ -55,27 +55,30 @@ from copy import deepcopy
 # qr_sims = pf.Bernoulli_SIR_MC_Simulations(N_pop, p_ER, p_I0, qr_seeds, Nt, 100)
 # er_X_list = [np.array([x[0], x[1], x[2]]) for x in er_sims]
 # qr_X_list = [np.array([x[0], x[1], x[2]]) for x in qr_sims]
-graph_seed = 777
+graph_seed = 642
 p_gen = pf.MC_SIR_Params()
 p_gen.N_pop = 20
 p_gen.p_I0 = 0.2
 er_param = pf.Regressor_Param()
 er_param.tol = 1e-6
-er_param.N_terms_max = 4
+er_param.theta_tol = 1e-6
+er_param.N_terms_max = 2
 er_regressor = pf.ERR_Regressor(er_param)
 qr_param = pf.Quantile_Param()
-qr_param.tol = 1e-6
+qr_param.tol = 1e-12
 qr_param.N_terms_max = 2
-qr_param.tau = .95
+qr_param.theta_tol = 1e-16
+tau = .7
+qr_param.tau = tau
 qr_regressor = pf.Quantile_Regressor(qr_param)
 
-qr_param.tau = 0.05
+qr_param.tau = 1-tau
 reverse_qr_regressor = pf.Quantile_Regressor(qr_param)
-
+from copy import deepcopy
 er_seeds = [random.randint(0, 1000000) for i in range(N_sims)]
-def openloop_solve(N_pop, p_ER, er_regressor, er_model, qr_regressor, qr_model,seed, N_sims, Nt, Wu):
+def uncontrolled_trajectory_generation(N_pop, p_ER):
     p_gen = pf.MC_SIR_Params()
-    p_gen.R0_max = 3
+    p_gen.R0_max = 1.5
     p_gen.N_pop = N_pop
     p_gen.p_ER = p_ER
     p_gen.p_I0 = 0.2
@@ -84,8 +87,7 @@ def openloop_solve(N_pop, p_ER, er_regressor, er_model, qr_regressor, qr_model,s
     np.random.seed(seed)
     #generate integer seeds
     seeds = [random.randint(0, 1000000) for i in range(N_sims)]
-    x = cs.MX.sym('x', 3)
-    u = cs.MX.sym('u', 1)
+
     G_structure = pf.generate_SIR_ER_graph(N_pop, p_ER, seed)
     G = pf.generate_Bernoulli_SIR_Network(G_structure, p_I0, seed, 0)
     G_mpc = G
@@ -100,90 +102,132 @@ def openloop_solve(N_pop, p_ER, er_regressor, er_model, qr_regressor, qr_model,s
     max_infected_idx = np.argmax(np.max(X_sim[:,:,1], axis=1))
     X0 = X_sim[max_infected_idx,:,:]
     U0 = U_sim[max_infected_idx,:,:]
-    #Quantile Regression and optimiation
-    
-    er_features = er_regressor.transform_fit(rd, er_model)
-    er_model.write_latex(er_features, DATA_DIR + '/latex/param/er_param_{}_{}.tex'.format(N_pop, p_ER), x_names, u_names, y_names, False, "&")
+    uncontrolled_data = {'X_mean': X_mean, 'U_mean': U_mean, 'Gs': G_structure, 'X0': X0, 'U0': U0, 'N_pop': N_pop, 'p_ER': p_ER}
+    return uncontrolled_data, rd
 
-    xdot = cs.vertcat(*construct_mx_equations(x, u, er_model, er_features))
+
+def openloop_solve(uc_data, rd, regressor, model, N_sims, Nt, Wu, file_prefix = ''):
+
+    # feature_S = regressor.transform_fit(rd.X, rd.U, rd.Y[:,0], model)
+    # feature_I = regressor.transform_fit(rd.X, rd.U, rd.Y[:,1], model)
+    # feature_R = regressor.transform_fit(rd.X, rd.U, rd.Y[:,2], model)
+    features = regressor.transform_fit(rd.X, rd.U, rd.Y, model)
+
+    # features = [feature_S, feature_I, feature_R]
+    model.feature_summary(features)
+    model.write_latex(features, DATA_DIR + '/latex/param/' + file_prefix + 'param_{}_{}.tex'.format(N_pop, p_ER), x_names, u_names, y_names, False, "&")
+
+    x = cs.MX.sym('x', 3)
+    u = cs.MX.sym('u', 1)
+
+    xdot = cs.vertcat(*construct_mx_equations(x, u, er_model, features))
+    #Quantile Regression and optimiation
     F_ODE = cs.Function("F_ODE", [x, u], [xdot])
-    log_filename = log_file=DATA_DIR + '/latex/log/er_week_objective_solve_{}_{}.txt'.format(N_pop, p_ER)
-    er_sol, er_x_pred, er_u_sol, er_stats = week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, log_file=log_filename)
+    log_filename = DATA_DIR + '/latex/log/' + file_prefix + 'week_objective_solve_{}_{}.txt'.format(N_pop, p_ER)    
+    sol, u_sol, x_pred, stats = week_objective_solve(uc_data['X0'], uc_data['U0'], Wu, F_ODE, Nt, N_pop, log_file=log_filename)
+    x_pred = model.simulate(uc_data['X0'][0,:], u_sol, Nt, features)
 
+    #MPC simulations
+    mpc_sir_p = [pf.SIR_Param() for i in range(Nt)]
+    for i in range(Nt):
+        mpc_sir_p[i].p_R = 0.1
+        mpc_sir_p[i].p_I = u_sol[i]
+        mpc_sir_p[i].N_I_min = 0        
+
+    seeds = [random.randint(0, 1000000) for i in range(N_sims)]
+    mpc_rd = pf.MC_SIR_simulations_to_regression(uc_data['Gs'], p_gen, mpc_sir_p, seeds, Nt)
+
+
+    openloop_data = {'X': mpc_rd.X, 'U': mpc_rd.U, 'features': features,
+               'x_pred': x_pred, 'u_sol': u_sol, 'sol': sol, 'stats': stats}
+
+    return openloop_data
+
+def openloop_solve_from_csv(rd, param_filename, model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix = ''):
+
+    # feature_S = regressor.transform_fit(rd.X, rd.U, rd.Y[:,0], model)
+    # feature_I = regressor.transform_fit(rd.X, rd.U, rd.Y[:,1], model)
+    # feature_R = regressor.transform_fit(rd.X, rd.U, rd.Y[:,2], model)
+    # features = [feature_S, feature_I, feature_R]
+
+
+    features = model.read_csv(param_filename)
+
+    model.write_latex(features, DATA_DIR + '/latex/param/' + file_prefix + 'param_{}_{}.tex'.format(N_pop, p_ER), x_names, u_names, y_names, False, "&")
+
+    x = cs.MX.sym('x', 3)
+    u = cs.MX.sym('u', 1)
+
+    xdot = cs.vertcat(*construct_mx_equations(x, u, er_model, features))
     #Quantile Regression and optimiation
-    qr_feature_S = qr_regressor.transform_fit(rd.X, rd.U, rd.Y[:,0], qr_model)
-    qr_feature_I = qr_regressor.transform_fit(rd.X, rd.U, rd.Y[:,1], qr_model)
-    qr_feature_R = qr_regressor.transform_fit(rd.X, rd.U, rd.Y[:,2], qr_model)
-    # qr_features = qr_regressor.transform_fit(rd, qr_model)
-    qr_features = [qr_feature_S, qr_feature_I, qr_feature_R]
-    qr_model.write_latex(qr_features, DATA_DIR + '/latex/param/qr_param_{}_{}.tex'.format(N_pop, p_ER), x_names, u_names, y_names, False, "&")
-    F_ODE = cs.Function("F_ODE", [x, u], [cs.vertcat(*construct_mx_equations(x, u, qr_model, qr_features))])
-    log_filename = log_file=DATA_DIR + '/latex/log/qr_week_objective_solve_{}_{}.txt'.format(N_pop, p_ER)    
-    qr_sol, qr_x_pred, qr_u_sol, qr_stats = week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, log_file=log_filename)
-
-
-    #FROLS simulations
+    F_ODE = cs.Function("F_ODE", [x, u], [xdot])
+    log_filename = DATA_DIR + '/latex/log/' + file_prefix + 'week_objective_solve_{}_{}.txt'.format(N_pop, p_ER)    
+    sol, u_sol, x_pred, stats = week_objective_solve(rd.X[0], rd.U[0], Wu, F_ODE, Nt, N_pop, log_file=log_filename)
+    # x_pred = model.simulate(rd.X[0][0,:], u_sol, Nt, features)
+    #MPC simulations
 
     mpc_sir_p = [pf.SIR_Param() for i in range(Nt)]
     for i in range(Nt):
         mpc_sir_p[i].p_R = 0.1
-        mpc_sir_p[i].p_I = er_u_sol[i]
+        mpc_sir_p[i].p_I = u_sol[i]
         mpc_sir_p[i].N_I_min = 0        
 
     seeds = [random.randint(0, 1000000) for i in range(N_sims)]
-    er_mpc_rd = pf.MC_SIR_simulations_to_regression(G_structure, p_gen, mpc_sir_p, seeds, Nt)
+    mpc_rd = pf.MC_SIR_simulations_to_regression(uc_data['Gs'], p_gen, mpc_sir_p, seeds, Nt)
 
-    #Quantile simulations
 
-    for i in range(Nt):
-        mpc_sir_p[i].p_R = 0.1
-        mpc_sir_p[i].p_I = qr_u_sol[i]
-        mpc_sir_p[i].N_I_min = 0   
+    openloop_data = {'X': mpc_rd.X, 'U': mpc_rd.U, 'features': features,
+               'x_pred': x_pred, 'u_sol': u_sol, 'sol': sol, 'stats': stats}
 
-    seeds = [random.randint(0, 1000000) for i in range(N_sims)]
-    qr_mpc_rd = pf.MC_SIR_simulations_to_regression(G_structure, p_gen, mpc_sir_p, seeds, Nt)
-
-    qr_data = {'X': qr_mpc_rd.X, 'U': qr_mpc_rd.U, 'features': qr_features,
-               'x_pred': qr_x_pred, 'u_sol': qr_u_sol, 'sol': qr_sol, 'stats': qr_stats}
-
-    er_data = {'X': er_mpc_rd.X, 'U': er_mpc_rd.U, 'features': er_features,
-                'x_pred': er_x_pred, 'u_sol': er_u_sol, 'sol': er_sol, 'stats': er_stats}
-
-    uncontrolled_data = {'X': rd.X, 'U': rd.U, 'X_mean': X_mean, 'U_mean': U_mean}
-
-    return er_data, qr_data, uncontrolled_data
+    return openloop_data
     
 
 # %%
 seed = random.randint(0, 1000000)
-Wu = 200
+Wu = 100
 from copy import deepcopy
 uc_datas = []
 G_param_pairs = []
-N_pops = [30, 100, 200]
-p_ERs = [0.1,0.5, 1.0]
+N_pops = reversed([50, 100])
+p_ERs = [0.1, 1.0]
 t = np.array(range(Nt))
 uncontrolled_traj_fname = lambda p: DATA_DIR + '/latex/Figures/MPC_Trajectory_comparison_{}_{}.pdf'.format(p[0], p[1])
-
 for N_pop in N_pops:
     for p_ER in p_ERs:
         G_param_pairs.append((N_pop, p_ER))
-figx, axx = plt.subplots(3)
+uc_rds = []
+
 for p in G_param_pairs:
     print('Solving for N_pop = {}, p_ER = {}'.format(p[0], p[1]))
-    qr_data, er_data, uc_data = openloop_solve(p[0], p[1], er_regressor, er_model, qr_regressor, qr_model, seed, N_sims, Nt, Wu)
-    # mpc_trajectory_plot(p, er_data, qr_data, t, uncontrolled_traj_fname(p))
-    # plt.show()
+    uc_data, rd = uncontrolled_trajectory_generation(p[0], p[1])
+
+    #convert p[1] to a string
+    p_str = str(p[1])
+    #remove the decimal point if equal to 1
+    if p_str[-1] == '0':
+        p_str = p_str[:1]
+    uc_filename = DATA_DIR + '/Bernoulli_SIR_MC_{}_{}/regression_data.csv'.format(p[0], p_str)
+    er_param_filename = DATA_DIR + '/ERR_Simulation_SIR_{}_{}/param.csv'.format(p[0], p_str)
+    qr_param_filename = DATA_DIR + '/Quantile_Simulation_SIR_{}_{}/param.csv'.format(p[0], p_str)
+    qr_data = openloop_solve_from_csv(rd, er_param_filename, qr_model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix='qr_')
+    # er_data = openloop_solve(uc_data, rd, er_regressor, er_model, N_sims, Nt, Wu, file_prefix='er_')
+    # qr_model.feature_susmmary(er_data['features'])
+    # qr_data = openloop_solve(uc_data, rd, qr_regressor, qr_model, N_sims, Nt, Wu, file_prefix='qr_')
+    er_data = openloop_solve_from_csv(rd, qr_param_filename, er_model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix='er_')
+    # qr_model.feature_summary(qr_data['features'])
+    #plot er_data['x_pred']
+    # _ = [x.plot(t, er_data['x_pred'][i,:t.shape[0]].T, label='ER') for i, x in enumerate(ax)]
+    mpc_trajectory_plot(p, er_data, qr_data, t, uncontrolled_traj_fname(p))
 
     uc_datas.append(uc_data)
+    uc_rds.append(rd)
 
 # %%
 
 t = np.array(range(Nt))
 uncontrolled_traj_fname = DATA_DIR + '/latex/Figures/MPC_Trajectory_comparison.pdf'
-plot_uncontrolled(G_param_pairs, uc_datas, t, uncontrolled_traj_fname)
+plot_uncontrolled(G_param_pairs, uc_rds, t, uncontrolled_traj_fname)
 
 # %%
-uc_datas[0]['X']
 
 

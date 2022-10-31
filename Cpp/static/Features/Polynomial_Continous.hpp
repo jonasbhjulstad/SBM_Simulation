@@ -17,8 +17,8 @@ namespace FROLS::Features {
                 : d_max(d_max), Nx(Nx), Nu(Nu), Feature_Model(N_output_features, ignore_idx) {}
 
 
-        // float transform(crVec &x_raw, uint32_t target_index) ;
-        Vec _transform(crMat &X_raw, uint32_t target_index, bool& index_failure);
+        // float transform(Vec &x_raw, uint32_t target_index) ;
+        Vec _transform(Mat &X_raw, uint32_t target_index, bool& index_failure);
 
 
         const std::vector<std::vector<Feature>> get_features();

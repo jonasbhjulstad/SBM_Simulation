@@ -45,7 +45,7 @@ def plot_sim_comparison_SIR(ax, rd, x, u, t, N_sims, alpha_multiplier=1, scale=1
     # ax[-1].plot(t, U_mean, color='k', linestyle='dashed', label='Uncontrolled', alpha=alpha_multiplier)
     
     if (u.shape[0] < t.shape[0]):
-        ax[-1].plot(t[::7][:u.shape[0]], u, color='k', linestyle='dotted', label='MPC controlled', alpha=alpha_multiplier)
+        ax[-1].plot(t[:-1], u, color='k', linestyle='dotted', label='MPC controlled', alpha=alpha_multiplier)
     else:
         ax[-1].plot(t, u, color='k', linestyle='--', label='MPC controlled', alpha=alpha_multiplier)
     if(simple):
@@ -100,16 +100,16 @@ def fake_plot(ax, t, X_stack, U_stack, X_mean, er_X_list, U_mean, er_X, er_U):
     ax[-1].set_ylabel('Contact Probability')
 
 def mpc_single_plot(ax, data, t, label=None):
-    Nx = data['X'].shape[1]
+    Nx = data['X'][0].shape[1]
     Nt = t.shape[0]
-    N_sims = int(data['X'].shape[0]/Nt)
+    N_sims = int(data['X'][0].shape[0]/Nt)
 
-    X_sim = np.reshape(data['X'], (N_sims, Nt, Nx))
+    X_sim = np.stack(data['X'])
     _ = [percentile_plot(ax[j], t, X_sim[:,:,j], color='gray', hatch='', alpha_mul=0.2, label='MC-simulations') for j in range(Nx)]
     single_percentile_plot(ax[0], t, X_sim[:,:,0], 5, color='black',linestyle='dotted', alpha=1, label='95-percentile')
     single_percentile_plot(ax[1], t, X_sim[:,:,1], 95, color='black',linestyle='dotted', alpha=1, label='95-percentile')
     single_percentile_plot(ax[2], t, X_sim[:,:,2], 95, color='black',linestyle='dotted', alpha=1, label='95-percentile')
-    _ = [ax[j].plot(t, data['x_pred'][j,:-1].T, color='black', linestyle='--', label='Prediction') for j in range(Nx)]
+    _ = [ax[j].plot(t, data['x_pred'][:-1,j], color='black', linestyle='--', label='Prediction') for j in range(Nx)]
 def mpc_plot(er_ax, qr_ax, u_ax, data_er, data_qr, t):
     
     mpc_single_plot(er_ax, data_er, t, label='FROLS')
@@ -118,9 +118,9 @@ def mpc_plot(er_ax, qr_ax, u_ax, data_er, data_qr, t):
     u_ax.plot(t, data_qr['u_sol'], color='black', linestyle='dashdot', label='Quantile Regression')
 
 def mpc_trajectory_plot(Gp, er_d, qr_d, t, filename):
-    Nx = er_d['X'].shape[1]
+    Nx = er_d['X'][0].shape[1]
     Nt = t.shape[0]
-    N_sims = er_d['X'].shape[0]/Nt
+    N_sims = er_d['X'][0].shape[0]/Nt
 
     fig = plt.figure()
     gs0 = gridspec.GridSpec(2, 2, figure=fig)
@@ -159,11 +159,12 @@ def mpc_trajectory_plot(Gp, er_d, qr_d, t, filename):
         fig.savefig(filename, bbox_inches='tight')
         _ = [[x.clear() for x in ax] for ax in axs]
         ax1.clear()
+    fig.clear()
 
 def plot_uncontrolled(G_param_pairs, uc_datas, t, filename):
-    Nx = uc_datas[0]['X'].shape[1]
+    Nx = uc_datas[0].X[0].shape[1]
     Nt = t.shape[0]
-    N_sims = int(uc_datas[0]['X'].shape[0]/Nt)
+    N_sims = int(uc_datas[0].X[0].shape[0]/Nt)
 
     fig = plt.figure()
     gs0 = gridspec.GridSpec(2, 2, figure=fig)
@@ -185,7 +186,7 @@ def plot_uncontrolled(G_param_pairs, uc_datas, t, filename):
     # er_mpc_X_sim = np.reshape(er_mpc_rd.X, (N_sims, Nt, Nx))
     for i, gp in enumerate(G_param_pairs):
         ax = axs[i]
-        X_sim = np.reshape(uc_datas[i]['X'], (N_sims, Nt, Nx))
+        X_sim = np.stack(uc_datas[i].X)
         _ = [percentile_plot(ax[j], t, X_sim[:,:,j], color='gray', hatch='', alpha_mul=0.2) for j in range(Nx)]
         single_percentile_plot(ax[0], t, X_sim[:,:,0], 5, color='black',linestyle='dotted', alpha=1)
         single_percentile_plot(ax[1], t, X_sim[:,:,1], 95, color='black',linestyle='dotted', alpha=1)

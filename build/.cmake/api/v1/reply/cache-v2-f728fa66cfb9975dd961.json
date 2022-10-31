@@ -1679,7 +1679,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/man/Env/Default/bin/python33.10.7"
+			"value" : "/home/man/.pyenv/versions/3.9.13/bin/python33.9.13"
 		},
 		{
 			"name" : "FIND_PACKAGE_MESSAGE_DETAILS_PkgConfig",
@@ -1718,6 +1718,18 @@
 			"value" : "[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.7()]"
 		},
 		{
+			"name" : "FIND_PACKAGE_MESSAGE_DETAILS_Python3",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Details about finding Python3"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.7(3.9)]"
+		},
+		{
 			"name" : "FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp",
 			"properties" : 
 			[
@@ -1727,7 +1739,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "[/home/man/Env/Default/bin/python3][v3.10.7(3.10)]"
+			"value" : "[/home/man/.pyenv/versions/3.9.13/bin/python3][v3.9.13(3.9)]"
 		},
 		{
 			"name" : "FIND_PACKAGE_MESSAGE_DETAILS_PythonLibs",
@@ -2071,7 +2083,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/usr/include/python3.10/"
+			"value" : "/home/man/.pyenv/versions/3.9.13/include/python3.9"
 		},
 		{
 			"name" : "PYTHON_IS_DEBUG",
@@ -2163,7 +2175,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "3.10.7"
+			"value" : "3.9.13"
 		},
 		{
 			"name" : "PYTHON_VERSION_MAJOR",
@@ -2187,7 +2199,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "10"
+			"value" : "9"
 		},
 		{
 			"name" : "Protobuf_INCLUDE_DIR",
@@ -2460,6 +2472,42 @@
 			],
 			"type" : "INTERNAL",
 			"value" : "PYTHON"
+		},
+		{
+			"name" : "_Python3_EXECUTABLE",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Path to a program."
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "/usr/bin/python3.10"
+		},
+		{
+			"name" : "_Python3_INTERPRETER_PROPERTIES",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Python3 Properties"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "Python;3;10;7;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages"
+		},
+		{
+			"name" : "_Python3_INTERPRETER_SIGNATURE",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : ""
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "2e995cd2bd888af83868128ab4554325"
 		},
 		{
 			"name" : "_Python_EXECUTABLE",
@@ -2879,7 +2927,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/usr/include;/usr/include/python3.10/"
+			"value" : "/usr/include;/home/man/.pyenv/versions/3.9.13/include/python3.9"
 		},
 		{
 			"name" : "range-v3_DIR",

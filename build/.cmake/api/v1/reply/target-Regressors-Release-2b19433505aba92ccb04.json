@@ -3,7 +3,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "static/Features/libFeatures.a"
+			"path" : "static/Regressors/libRegressors.a"
 		}
 	],
 	"backtrace" : 1,
@@ -12,13 +12,13 @@
 		"commands" : 
 		[
 			"add_library",
-			"target_link_libraries",
 			"add_compile_options",
+			"target_link_libraries",
 			"add_compile_definitions"
 		],
 		"files" : 
 		[
-			"static/Features/CMakeLists.txt",
+			"static/Regressors/CMakeLists.txt",
 			"CMakeLists.txt"
 		],
 		"nodes" : 
@@ -33,25 +33,25 @@
 				"parent" : 0
 			},
 			{
+				"file" : 1
+			},
+			{
 				"command" : 1,
+				"file" : 1,
+				"line" : 66,
+				"parent" : 2
+			},
+			{
+				"command" : 2,
 				"file" : 0,
 				"line" : 2,
 				"parent" : 0
 			},
 			{
-				"file" : 1
-			},
-			{
-				"command" : 2,
-				"file" : 1,
-				"line" : 63,
-				"parent" : 3
-			},
-			{
 				"command" : 3,
 				"file" : 1,
-				"line" : 48,
-				"parent" : 3
+				"line" : 51,
+				"parent" : 2
 			}
 		]
 	},
@@ -64,11 +64,11 @@
 					"fragment" : " -stdlib=libstdc++ -O3 -DNDEBUG -fPIC"
 				},
 				{
-					"backtrace" : 4,
+					"backtrace" : 3,
 					"fragment" : "-fPIC"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"fragment" : "-fwrapv"
 				},
 				{
@@ -82,83 +82,83 @@
 					"define" : "FROLS_USE_INTEL"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"define" : "HAVE_CONFIG_H"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"define" : "OR_TOOLS_AS_DYNAMIC_LIB"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"define" : "USE_BOP"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"define" : "USE_CBC"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"define" : "USE_CLP"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"define" : "USE_GLOP"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"define" : "USE_LP_PARSER"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"define" : "USE_PDLP"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"define" : "USE_SCIP"
 				}
 			],
 			"includes" : 
 			[
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/include"
 				},
 				{
-					"backtrace" : 2,
-					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen"
-				},
-				{
-					"backtrace" : 2,
-					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame"
-				},
-				{
-					"backtrace" : 2,
-					"path" : "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src"
-				},
-				{
-					"backtrace" : 2,
-					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors"
-				},
-				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/Features"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/Eigen"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/DataFrame"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors"
+				},
+				{
+					"backtrace" : 4,
 					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/static/Math"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"path" : "/home/man/Documents/Bernoulli_MC/Cpp/include/Sycl"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"isSystem" : true,
 					"path" : "/usr/local/include/eigen3"
 				},
 				{
-					"backtrace" : 2,
+					"backtrace" : 4,
 					"isSystem" : true,
 					"path" : "/usr/local/include/coin"
 				}
@@ -168,53 +168,53 @@
 			{
 				"backtraces" : 
 				[
-					2,
-					2
+					4,
+					4
 				],
 				"standard" : "20"
 			},
 			"sourceIndexes" : 
 			[
-				0,
-				1
+				1,
+				2,
+				3,
+				6
 			]
 		}
 	],
 	"dependencies" : 
 	[
 		{
-			"backtrace" : 2,
-			"id" : "Common::@14b3099d61bfdbeae804"
-		},
-		{
-			"backtrace" : 2,
-			"id" : "DataFrame::@cfcca68eedd85cdf7cc1"
-		},
-		{
-			"backtrace" : 2,
-			"id" : "FROLS_Eigen::@7463138972980bfc91cd"
-		},
-		{
-			"backtrace" : 2,
-			"id" : "FROLS_Math::@61e7a8d1fb04f340172e"
+			"id" : "Features::@668fa06d19dbc11d4cdc"
 		}
 	],
-	"id" : "Features::@668fa06d19dbc11d4cdc",
-	"name" : "Features",
-	"nameOnDisk" : "libFeatures.a",
+	"id" : "Regressors::@f1e7241e55aed8935b50",
+	"name" : "Regressors",
+	"nameOnDisk" : "libRegressors.a",
 	"paths" : 
 	{
-		"build" : "static/Features",
-		"source" : "static/Features"
+		"build" : "static/Regressors",
+		"source" : "static/Regressors"
 	},
 	"sourceGroups" : 
 	[
 		{
-			"name" : "Source Files",
+			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
 				0,
-				1
+				4,
+				5
+			]
+		},
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				1,
+				2,
+				3,
+				6
 			]
 		}
 	],
@@ -222,15 +222,42 @@
 	[
 		{
 			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "static/Features/Feature_Model.cpp",
+			"path" : "static/Regressors/Regressor.hpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "static/Features/Polynomial_Discrete.cpp",
+			"path" : "static/Regressors/Regressor.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "static/Regressors/ERR_Regressor.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "static/Regressors/Quantile_Regressor.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "static/Regressors/ERR_Regressor.hpp",
 			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "static/Regressors/Quantile_Regressor.hpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "static/Regressors/Regression_Algorithm.cpp",
+			"sourceGroupIndex" : 1
 		}
 	],
 	"type" : "STATIC_LIBRARY"

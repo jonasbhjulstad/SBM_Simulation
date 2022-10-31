@@ -688,15 +688,17 @@ FIND_PACKAGE_MESSAGE_DETAILS_Clp:INTERNAL=[/usr/local/lib/cmake/Clp/ClpConfig.cm
 //Details about finding GTest
 FIND_PACKAGE_MESSAGE_DETAILS_GTest:INTERNAL=[/usr/lib64/cmake/GTest/GTestConfig.cmake][c ][v1.12.1()]
 //Details about finding PYTHON
-FIND_PACKAGE_MESSAGE_DETAILS_PYTHON:INTERNAL=/home/man/Env/Default/bin/python33.10.7
+FIND_PACKAGE_MESSAGE_DETAILS_PYTHON:INTERNAL=/home/man/.pyenv/versions/3.9.13/bin/python33.9.13
 //Details about finding PkgConfig
 FIND_PACKAGE_MESSAGE_DETAILS_PkgConfig:INTERNAL=[/usr/bin/pkg-config][v1.8.0()]
 //Details about finding Protobuf
 FIND_PACKAGE_MESSAGE_DETAILS_Protobuf:INTERNAL=[/usr/local/lib/libprotobuf.a][/usr/local/include][v3.19.4()]
 //Details about finding Python
 FIND_PACKAGE_MESSAGE_DETAILS_Python:INTERNAL=[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.7()]
+//Details about finding Python3
+FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.7(3.9)]
 //Details about finding PythonInterp
-FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/home/man/Env/Default/bin/python3][v3.10.7(3.10)]
+FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/home/man/.pyenv/versions/3.9.13/bin/python3][v3.9.13(3.9)]
 //Details about finding PythonLibs
 FIND_PACKAGE_MESSAGE_DETAILS_PythonLibs:INTERNAL=[/usr/lib/libpython3.10.so][/usr/include/python3.10/][v3.10.7()]
 //Details about finding SCIP
@@ -727,7 +729,7 @@ PKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1
 PYTHON_EXECUTABLE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PYTHON_INCLUDE_DIR
 PYTHON_INCLUDE_DIR-ADVANCED:INTERNAL=1
-PYTHON_INCLUDE_DIRS:INTERNAL=/usr/include/python3.10/
+PYTHON_INCLUDE_DIRS:INTERNAL=/home/man/.pyenv/versions/3.9.13/include/python3.9
 PYTHON_IS_DEBUG:INTERNAL=0
 PYTHON_LIBRARIES:INTERNAL=/usr/lib/libpython3.10.so
 //ADVANCED property for variable: PYTHON_LIBRARY
@@ -736,9 +738,9 @@ PYTHON_LIBRARY-ADVANCED:INTERNAL=1
 PYTHON_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
 PYTHON_MODULE_EXTENSION:INTERNAL=.cpython-310-x86_64-linux-gnu.so
 PYTHON_MODULE_PREFIX:INTERNAL=
-PYTHON_VERSION:INTERNAL=3.10.7
+PYTHON_VERSION:INTERNAL=3.9.13
 PYTHON_VERSION_MAJOR:INTERNAL=3
-PYTHON_VERSION_MINOR:INTERNAL=10
+PYTHON_VERSION_MINOR:INTERNAL=9
 //ADVANCED property for variable: Protobuf_INCLUDE_DIR
 Protobuf_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Protobuf_LIBRARY_DEBUG
@@ -767,6 +769,11 @@ _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 //CMAKE_INSTALL_PREFIX during last run
 _GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/usr/local
 _Python:INTERNAL=PYTHON
+//Path to a program.
+_Python3_EXECUTABLE:INTERNAL=/usr/bin/python3.10
+//Python3 Properties
+_Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;10;7;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages
+_Python3_INTERPRETER_SIGNATURE:INTERNAL=2e995cd2bd888af83868128ab4554325
 _Python_EXECUTABLE:INTERNAL=/usr/bin/python3.10
 //Python Properties
 _Python_INTERPRETER_PROPERTIES:INTERNAL=Python;3;10;7;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages
@@ -786,6 +793,6 @@ gtest_force_shared_crt-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: gtest_hide_internal_symbols
 gtest_hide_internal_symbols-ADVANCED:INTERNAL=1
 //Directories where pybind11 and possibly Python headers are located
-pybind11_INCLUDE_DIRS:INTERNAL=/usr/include;/usr/include/python3.10/
+pybind11_INCLUDE_DIRS:INTERNAL=/usr/include;/home/man/.pyenv/versions/3.9.13/include/python3.9
 targets_export_name:INTERNAL=GTestTargets
 

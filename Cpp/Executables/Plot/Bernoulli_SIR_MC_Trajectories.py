@@ -21,7 +21,7 @@ if __name__ == '__main__':
     csv_model = DATA_DIR + '/model.csv'
 
 
-    N_pop = 20
+    N_pop = 100
 
     # find all csv in data_path
     files = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_" + str(N_pop) + "_1/*.csv")
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     
 
     I = np.zeros_like(dfs[0]["S"].to_numpy())
-    for df in dfs[:1000]:
+    for df in dfs[:100]:
         X = df[["S", "I", "R"]].to_numpy()
         ax[0].plot(df["t"], df["S"], color='gray', alpha=.2)
         ax[1].plot(df["t"], df["I"], color='gray', alpha=.2)

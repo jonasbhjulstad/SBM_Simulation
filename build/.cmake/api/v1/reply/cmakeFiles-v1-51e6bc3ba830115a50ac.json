@@ -1233,7 +1233,7 @@
 		{
 			"isCMake" : true,
 			"isExternal" : true,
-			"path" : "/usr/share/cmake/Modules/FindPython.cmake"
+			"path" : "/usr/share/cmake/Modules/FindPython3.cmake"
 		},
 		{
 			"isCMake" : true,

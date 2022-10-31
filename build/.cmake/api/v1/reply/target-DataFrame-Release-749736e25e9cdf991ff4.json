@@ -45,13 +45,13 @@
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 63,
+				"line" : 66,
 				"parent" : 3
 			},
 			{
 				"command" : 3,
 				"file" : 1,
-				"line" : 48,
+				"line" : 51,
 				"parent" : 3
 			},
 			{
@@ -68,7 +68,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -stdlib=libstdc++ -O3 -DNDEBUG"
+					"fragment" : " -stdlib=libstdc++ -O3 -DNDEBUG -fPIC"
 				},
 				{
 					"backtrace" : 4,
