@@ -34,7 +34,7 @@ std::string quantile_simulation_filename(uint32_t N_pop, float p_ER, uint32_t it
 using namespace Eigen;
 const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ",", "\n");
 constexpr uint32_t Nt = 50;
-constexpr uint32_t N_sims = 500;
+constexpr uint32_t N_sims = 50;
 const std::string network_type = "SIR";
 void simulation_loop(uint32_t N_pop, float p_ER)
 {
@@ -50,7 +50,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     MC_SIR_Params<> p;
     p.N_pop = N_pop;
     p.p_ER = p_ER;
-    p.N_I_min = (N_pop/100)*5;
+    p.N_I_min = (N_pop/100)*10;
     p.N_sim = N_sims;
     p.p_I0 = 0.2;
     p.R0_max = 1.5;
@@ -99,8 +99,9 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 
 
     std::vector<std::vector<Feature>> preselected_features(4);
-    FROLS::Features::Polynomial_Model er_model(Nx, Nu, N_output_features, d_max);
-    FROLS::Features::Polynomial_Model qr_model(Nx, Nu, N_output_features, d_max);
+    FROLS::Features::Polynomial_Model er_model(Nx, Nu, d_max);
+    FROLS::Features::Polynomial_Model qr_model(Nx, Nu, d_max);
+
 
     FROLS::Regression::ERR_Regressor er_regressor(er_param);
 
@@ -123,7 +124,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     {
         X_list[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_x, 0, -2);
         U_list[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_u, 0, -2);
-        Y_list[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_x, 1, -1);
+        Y_list[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_x, 1, -1) - X_list[i];
     }
 
     using namespace FROLS::Features;
@@ -208,8 +209,8 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 int main(int argc, char **argv)
 {
     // auto N_pop_vec = FROLS::arange((uint32_t)10, (uint32_t)100, (uint32_t)10);
-    std::vector<float> N_pop_vec = {100};
-    std::vector<float> p_ER_vec = {0.1, 1.0};
+    std::vector<float> N_pop_vec = {20,50,100};
+    std::vector<float> p_ER_vec = {0.1, 0.5,1.0};
     std::reverse(N_pop_vec.begin(), N_pop_vec.end());
     std::reverse(p_ER_vec.begin(), p_ER_vec.end());
     for (const float &p_ER : p_ER_vec)

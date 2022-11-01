@@ -20,9 +20,7 @@ private:
   Feature single_feature_regression(const Vec &x, const Vec &y) const;
 
   static bool best_feature_measure(const Feature &, const Feature &);
-  Feature
-  feature_selection_criteria(const std::vector<std::vector<Feature>> &features) const;
-
+  bool objective_condition(float, float) const;
   void theta_solve(const Mat &A, const Vec &g,
                    std::vector<Feature> &features) const;
 };

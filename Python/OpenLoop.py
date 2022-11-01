@@ -188,7 +188,7 @@ Wu = 100
 from copy import deepcopy
 uc_datas = []
 G_param_pairs = []
-N_pops = reversed([50, 100])
+N_pops = reversed([10, 50, 100])
 p_ERs = [0.1, 1.0]
 t = np.array(range(Nt))
 uncontrolled_traj_fname = lambda p: DATA_DIR + '/latex/Figures/MPC_Trajectory_comparison_{}_{}.pdf'.format(p[0], p[1])

@@ -12,13 +12,12 @@ namespace FROLS::Features {
         fmt::print("{:^15}{:^15}{:^15}{:^15}{:^15}{:^15}\n", "y", "Feature", "g", "Theta", "f_ERR", "Tag");
         for (int i = 0; i < features.size(); i++) {
             for (const auto &feature: features[i]) {
-                uint32_t absolute_idx = (feature.tag == FEATURE_PRESELECTED) ? feature.index : candidate_feature_idx[feature.index];
-                std::string name = feature_name(absolute_idx, false);
+                std::string name = feature_name(feature.index, false);
                 name = (name == "") ? "1" : name;
 
                 // print features aligned with tabs
                 fmt::print("{:^15}{:^15}{:^15.3f}{:^15.3f}{:^15.3f}{:^15}{:^15}\n", i, name, feature.g, feature.theta,
-                           feature.f_ERR, feature_tag_map.at(feature.tag), absolute_idx);
+                           feature.f_ERR, feature_tag_map.at(feature.tag), feature.index);
             }
         }
     }
@@ -75,7 +74,7 @@ namespace FROLS::Features {
 
 
 
-    Vec Polynomial_Model::_transform(const Mat &X_raw, uint32_t target_idx, bool &index_failure) {
+    Vec Polynomial_Model::_transform(const Mat &X_raw, uint32_t target_idx) {
         // get feature names for polynomial combinations with powers between d_min,
         // d_max of the original features
         uint32_t N_input_features = X_raw.cols();
@@ -92,7 +91,6 @@ namespace FROLS::Features {
                 feature_idx++;
             }
         }
-        index_failure = true;
         return Vec::Zero(N_rows);
     }
 
@@ -184,6 +182,21 @@ namespace FROLS::Features {
             index++;
         }
         return index-1;
+    }
+
+    uint32_t Polynomial_Model::get_N_features_max() const
+    {
+        uint32_t N_input_features = Nx + Nu;
+        uint32_t N_features = 0;
+        for (int d = 1; d < d_max; d++) {
+            for (auto &&comb: iter::combinations_with_replacement(range(0, d + 1),
+                                                                  N_input_features)) {
+                for (auto &&powers: iter::permutations(comb)) {
+                    N_features++;
+                }
+            }
+        }
+        return N_features;
     }
 
 } // namespace FROLS::Features::Polynomial

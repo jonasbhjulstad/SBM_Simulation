@@ -51,6 +51,7 @@ std::vector<std::vector<Feature>> transform_fit(const Regression_Data &rd,
   // std::vector<Feature> transform_fit(const std::vector<Mat> &X_raw,
   //                                               const Mat &U_raw, const Vec &y,
   //                                               Features::Feature_Model &model);
+  virtual bool objective_condition(float, float) const = 0;
   virtual void theta_solve(const Mat &A, const Vec &g,
                            std::vector<Feature> &features) const = 0;
   virtual ~Regressor() = default;
@@ -77,8 +78,8 @@ private:
                                const std::vector<Vec> &y_list,
                                const std::vector<Feature> &best_features,
                                uint32_t) const = 0;
-  virtual Feature feature_selection_criteria(
-      const std::vector<std::vector<Feature>> &candidate_features) const = 0;
+  Feature feature_selection_criteria(
+      const std::vector<std::vector<Feature>> &candidate_features) const;
 
   Feature best_feature_select(const std::vector<Mat> &X_list,
                               const std::vector<Mat> &Q_global,

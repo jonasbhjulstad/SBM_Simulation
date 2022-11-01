@@ -14,12 +14,12 @@ namespace FROLS::Features {
 
         Mat simulate(const Vec &x0, const Mat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features);
 
-        Vec transform(const Mat &X_raw, uint32_t target_index, bool &index_failure);
+        Vec transform(const Mat &X_raw, uint32_t target_index);
 
         Mat transform(const Mat &X_raw);
 
 
-        virtual Vec _transform(const Mat &X_raw, uint32_t target_index, bool &index_failure) = 0;
+        virtual Vec _transform(const Mat &X_raw, uint32_t target_index) = 0;
 
 
         virtual void write_csv(const std::string &, const std::vector<std::vector<Feature>>& features) = 0;
@@ -38,24 +38,11 @@ namespace FROLS::Features {
         void write_latex(const std::vector<std::vector<Feature>>& features, const std::string &filename, const std::vector<std::string>& x_names, const std::vector<std::string>& u_names, const std::vector<std::string>& y_names, bool with_align = false, const std::string line_prefix = "&");
 
         virtual uint32_t get_feature_index(const std::string&) = 0;
-        void ignore(const std::string&);
-        void ignore(uint32_t);
-        void preselect(const std::string&, float, Feature_Tag);
-        void preselect(uint32_t, float, Feature_Tag);
 
-        const uint32_t N_output_features;
-        std::vector<uint32_t> ignore_idx;
-        std::vector<Feature> preselected_features;
-
-        std::vector<uint32_t> get_candidate_feature_idx() { return candidate_feature_idx; }
-
-        std::vector<uint32_t> get_preselect_feature_idx() { return preselect_feature_idx; }
+        uint32_t N_output_features;
 
         virtual ~Feature_Model() = default;
 
-    protected:
-        std::vector<uint32_t> preselect_feature_idx;
-        std::vector<uint32_t> candidate_feature_idx;
     };
 } // namespace FROLS::Features
 

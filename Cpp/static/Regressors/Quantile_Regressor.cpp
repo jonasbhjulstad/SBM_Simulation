@@ -167,37 +167,10 @@ bool Quantile_Regressor::tolerance_check(
   return false;
 }
 
-Feature Quantile_Regressor::feature_selection_criteria(
-    const std::vector<std::vector<Feature>> &features) const {
-  uint32_t N_timeseries = features.size();
-  uint32_t N_features = features[0].size();
-  std::vector<float> MAEs(N_features);
-
-  for (int i = 0; i < N_timeseries; i++) {
-    for (int j = 0; j < N_features; j++) {
-      MAEs[j] += features[i][j].f_ERR;
-    }
-  }
-  uint32_t best_feature_idx = 0;
-  for (int j = 0; j < N_features; j++) {
-    if ((MAEs[j] > 0) && (MAEs[j] < MAEs[best_feature_idx])) {
-      best_feature_idx = j;
-    }
-  }
-  Feature best_avg_feature;
-  best_avg_feature.f_ERR = 0;
-  for (int j = 0; j < N_features; j++) {
-    best_avg_feature.g += features[j][best_feature_idx].g;
-    best_avg_feature.f_ERR += features[j][best_feature_idx].f_ERR;
+  bool Quantile_Regressor::objective_condition(float f0, float f1) const
+  {
+    return f0 < f1;
   }
 
-  best_avg_feature.g /= N_timeseries;
-  best_avg_feature.f_ERR /= N_timeseries;
-  best_avg_feature.index = features[0][best_feature_idx].index;
-  best_avg_feature.tag = FEATURE_REGRESSION;
-
-
-  return best_avg_feature;
-}
 
 } // namespace FROLS::Regression

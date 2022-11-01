@@ -22,8 +22,6 @@ struct Quantile_Regressor : public Regressor {
   const float tau;
 
   Quantile_Regressor(const Quantile_Param &p);
-  Feature
-  feature_selection_criteria(const std::vector<std::vector<Feature>> &features) const;
 
   void theta_solve(const Mat &A, const Vec &g,
                    std::vector<Feature> &features) const;
@@ -43,6 +41,7 @@ private:
 
   operations_research::MPSolver::OptimizationProblemType problem_type;
   const std::string solver_type;
+  bool objective_condition(float, float) const;
 
   // Quantile_LP construct_solver(uint32_t N_rows) const;
 };

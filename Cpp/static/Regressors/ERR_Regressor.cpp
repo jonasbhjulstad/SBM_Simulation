@@ -74,41 +74,10 @@ void ERR_Regressor::theta_solve(const Mat &A, const Vec &g,
   }
 }
 
-Feature ERR_Regressor::feature_selection_criteria(
-    const std::vector<std::vector<Feature>> &features) const {
-      uint32_t N_timeseries = features.size();
-      uint32_t N_features = features[0].size();
-      std::vector<float> ERRs(N_features);
-
-      for (int i = 0; i < N_timeseries; i++)
-      {
-        for (int j = 0; j < N_features; j++)
-        {
-          ERRs[j] += features[i][j].f_ERR;
-        }
-      }
-      uint32_t best_feature_idx = 0;
-      for (int j = 0; j < N_features; j++)
-      {
-        if (ERRs[j] > ERRs[best_feature_idx])
-        {
-          best_feature_idx = j;
-        }
-      }
-      Feature best_avg_feature{};
-      best_avg_feature.f_ERR = 0;
-      for (int i = 0; i < N_timeseries; i++)
-      {
-        best_avg_feature.g += features[i][best_feature_idx].g;
-        best_avg_feature.f_ERR += features[i][best_feature_idx].f_ERR;
-      }
-
-      best_avg_feature.g /= N_timeseries;
-      best_avg_feature.f_ERR /= N_timeseries;
-      best_avg_feature.index = features[0][best_feature_idx].index;
-      best_avg_feature.tag = FEATURE_REGRESSION;
-
-  return best_avg_feature;
+bool ERR_Regressor::objective_condition(float f0, float f1) const {
+  return f0 > f1;
 }
 
 } // namespace FROLS::Regression
+
+

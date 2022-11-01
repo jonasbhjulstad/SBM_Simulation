@@ -1,5 +1,6 @@
 import casadi as cs
 import numpy as np
+import os
 from pysindy_casadi_converter import construct_mx_equations
 def quadratic_objective_solve(X_mean, U_mean, Wu, F_ODE, Nt, u_max = 0.1, u_min = 1e-6):
     Nx = X_mean.shape[1]
@@ -81,6 +82,10 @@ def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-5
         opts['ipopt.output_file'] = log_file
         opts['ipopt.file_print_level'] = 5
     prob = {'f': obj, 'x': U, 'g': []}
+    
+    # get parent directory name of logfile
+    parent_dir = os.path.dirname(log_file)
+    os.makedirs(parent_dir)
 
     solver = cs.nlpsol('solver', 'ipopt', prob, opts)
 

@@ -130,10 +130,6 @@ Vec Regressor::predict(const Mat &Q,
   return y_pred;
 }
 
-struct Fit_Data {
-  std::vector<Feature> preselect_features;
-  Vec y;
-};
 
 std::vector<std::vector<Feature>> Regressor::transform_fit(
     const std::vector<Mat>& X_raw, const std::vector<Mat>& U_raw,
@@ -169,41 +165,45 @@ Regressor::transform_fit(const Regression_Data &rd,
   return transform_fit(rd.X, rd.U, rd.Y, model);
 }
 
-// std::vector<std::vector<Feature>> Regressor::transform_fit(const
-// Regression_Data& rd,
-//                               Features::Feature_Model &model) {
+Feature Regressor::feature_selection_criteria(
+    const std::vector<std::vector<Feature>> &features) const {
+      uint32_t N_timeseries = features.size();
+      uint32_t N_features = features[0].size();
+      std::vector<float> ERRs(N_features,0);
 
-//     Mat XU(rd.X.rows(), rd.X.cols() + rd.U.cols());
-//     XU << rd.X, rd.U;
-//     Mat X = model.transform(XU);
-//     std::vector<std::vector<Feature>> results(rd.Y.cols());
-//     std::transform(rd.Y.colwise().begin(), rd.Y.colwise().end(),
-//     results.begin(), [&](const Vec& y)
-//     {
-//         return single_fit(X, y);
-//     });
-//     return results;
-// }
+      for (int i = 0; i < N_timeseries; i++)
+      {
+        for (int j = 0; j < N_features; j++)
+        {
+          ERRs[j] += features[i][j].f_ERR;
+        }
+      }
+      uint32_t best_feature_idx = 0;
+      for (int j = 0; j < N_features; j++)
+      {
+        if (objective_condition(ERRs[j], ERRs[best_feature_idx]))
+        {
+          best_feature_idx = j;
+        }
+        {
+          best_feature_idx = j;
+        }
+      }
+      Feature best_avg_feature{};
+      best_avg_feature.f_ERR = 0;
+      for (int i = 0; i < N_timeseries; i++)
+      {
+        best_avg_feature.g += features[i][best_feature_idx].g;
+        best_avg_feature.f_ERR += features[i][best_feature_idx].f_ERR;
+      }
 
-// std::vector<Feature> Regressor::transform_fit(const std::vector<std::string>&
-// filenames, const std::vector<std::string>& colnames_x, const
-// std::vector<std::string>& colnames_u, const std::string& colname_y,
-// Features::Feature_Model& model)
-// {
-//     uint32_t Nx = colnames_x.size();
-//     using namespace FROLS;
-//     DataFrameStack dfs(filenames);
-//     Mat X, U;
-//     Vec y;
+      best_avg_feature.g /= N_timeseries;
+      best_avg_feature.f_ERR /= N_timeseries;
+      best_avg_feature.index = features[0][best_feature_idx].index;
+      best_avg_feature.tag = FEATURE_REGRESSION;
 
-//     X = dataframe_to_matrix(dfs, colnames_x,
-//                             0, -2);
-//     y = dataframe_to_vector(dfs, colname_y, 1, -1);
-//     U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
-//     std::vector<uint32_t> N_rows = dfs.get_N_rows();
-
-//     return transform_fit(X, U, y, model);
-// }
+  return best_avg_feature;
+}
 
 std::vector<uint32_t>
 Regressor::unused_feature_indices(const std::vector<Feature> &features,
