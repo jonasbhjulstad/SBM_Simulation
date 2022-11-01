@@ -53,7 +53,8 @@ PYBIND11_MODULE(pyFROLS, m) {
       .def("feature_summary", &Polynomial_Model::feature_summary)
       .def("feature_name", &Polynomial_Model::feature_name)
       .def("feature_names", &Polynomial_Model::feature_names)
-      .def("equation", &Polynomial_Model::model_equation);
+      .def("equation", &Polynomial_Model::model_equation)
+      .def("get_N_features_max", &Polynomial_Model::get_N_features_max);
 
   py::class_<Regression_Data>(m, "Regression_Data")
       .def_readwrite("X", &Regression_Data::X)
@@ -64,7 +65,8 @@ PYBIND11_MODULE(pyFROLS, m) {
       .def(py::init<>())
       .def_readwrite("tol", &Regressor_Param::tol)
       .def_readwrite("theta_tol", &Regressor_Param::theta_tol)
-      .def_readwrite("N_terms_max", &Regressor_Param::N_terms_max);
+      .def_readwrite("N_terms_max", &Regressor_Param::N_terms_max)
+      .def_readwrite("f_ERR_tol", &Regressor_Param::f_ERR_tol);
   py::class_<Quantile_Param, Regressor_Param>(m, "Quantile_Param")
       .def(py::init<>())
       .def_readwrite("tau", &Quantile_Param::tau)

@@ -33,7 +33,7 @@ namespace Network_Models {
         }
         
         std::array<std::array<uint32_t, Nt+1>, Nx>
-        simulate(const std::array<Param, Nt>& p_vec, uint32_t infection_count_tolerance = 0, uint32_t Nt_min = 15) {
+        simulate(const std::array<Param, Nt>& p_vec, uint32_t Nt_min = 15) {
 
             std::array<Trajectory,Nt+1> trajectory;
             uint32_t t = 0;
@@ -79,7 +79,7 @@ namespace Network_Models {
         }
         
         std::vector<std::vector<uint32_t>>
-        simulate(const std::vector<Param>& p_vec, uint32_t Nt, uint32_t infection_count_tolerance = 0, uint32_t Nt_min = 15) {
+        simulate(const std::vector<Param>& p_vec, uint32_t Nt, uint32_t Nt_min = 15) {
 
             std::vector<Trajectory> trajectory(Nt+1);
             uint32_t t = 0;

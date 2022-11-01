@@ -11,7 +11,7 @@
 namespace FROLS::Regression {
 Quantile_Regressor::Quantile_Regressor(const Quantile_Param &p)
     : tau(p.tau), Regressor(p), solver_type(p.solver_type),
-      problem_type(p.problem_type) {}
+      problem_type(p.problem_type),y_tol(p.y_tol), x_tol(p.x_tol) {}
 
 void Quantile_Regressor::theta_solve(const Mat &A, const Vec &g,
                                      std::vector<Feature> &features) const {
@@ -28,6 +28,13 @@ void Quantile_Regressor::theta_solve(const Mat &A, const Vec &g,
 Feature Quantile_Regressor::single_feature_regression(const Vec &x,
                                                       const Vec &y) const
   {
+    if ((y.lpNorm<Eigen::Infinity>() < y_tol) || (x.lpNorm<Eigen::Infinity>() < x_tol))
+    {
+      float ynorm = y.lpNorm<Eigen::Infinity>();
+      float xnorm = x.lpNorm<Eigen::Infinity>();
+      return Feature{std::numeric_limits<float>::infinity(), 0, 0, 0., FEATURE_INVALID};
+    }
+
 
     using namespace operations_research;
     uint32_t N_rows = x.rows();
@@ -83,18 +90,11 @@ Feature Quantile_Regressor::single_feature_regression(const Vec &x,
         u_neg_sol[i] = u_neg[i]->solution_value();
         u_pos_sol[i] = u_pos[i]->solution_value();
       }
-      // float theta_sol = (theta_pos->solution_value() -
-      // theta_neg->solution_value()); float theta_pos_sol =
-      // theta_pos->solution_value(); float theta_neg_sol =
-      // theta_neg->solution_value();
+
       float theta_sol = theta->solution_value();
-      // solver->Clear();
-      // fmt::print("Solve status, {}, {}, {}\n", solver_status, f, theta_sol);
-      // if(theta_sol == 0)
-      // std::cout << y.head(10).transpose() << std::endl;
-      // std::for_each(g.begin(), g.end(), [&](auto &gi) { gi->Clear(); });
       return Feature{f, theta_sol, 0, 0., FEATURE_REGRESSION};
     } else {
+
       std::cout << "[Quantile_Regressor] Warning: Quantile regression failed"
                 << std::endl;
       std::for_each(g.begin(), g.end(), [](auto &gi) { gi->Clear(); });

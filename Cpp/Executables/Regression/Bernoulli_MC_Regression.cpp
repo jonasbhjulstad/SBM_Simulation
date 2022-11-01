@@ -31,6 +31,8 @@ std::string quantile_simulation_filename(uint32_t N_pop, float p_ER, uint32_t it
        << ".csv";
     return ss.str();
 }
+
+static bool qr_invoked = false;
 using namespace Eigen;
 const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ",", "\n");
 constexpr uint32_t Nt = 50;
@@ -50,7 +52,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     MC_SIR_Params<> p;
     p.N_pop = N_pop;
     p.p_ER = p_ER;
-    p.N_I_min = (N_pop/100)*10;
+    p.N_I_min = (N_pop*10/100);
     p.N_sim = N_sims;
     p.p_I0 = 0.2;
     p.R0_max = 1.5;
@@ -115,7 +117,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
         return MC_fname_f(n); });
     uint32_t Nt_max = 0;
     DataFrameStack dfs(df_names);
-    fmt::print("ERR-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, N_output_features, er_param.tol, er_param.N_terms_max);
+    fmt::print("ERR-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, er_model.N_output_features, er_param.tol, er_param.N_terms_max);
 
     std::vector<Mat> X_list(N_sims);
     std::vector<Mat> U_list(N_sims);
@@ -150,11 +152,20 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     qr_param.tau = tau;
     qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
     // Quantile-Regression
-    fmt::print("Quantile-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, N_output_features, qr_param.tol, qr_param.N_terms_max);
-
-    Quantile_Regressor qr_regressor(qr_param);
-
-    auto qr_features = qr_regressor.transform_fit(X_list, U_list, Y_list, qr_model);
+    fmt::print("Quantile-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, qr_model.N_output_features, qr_param.tol, qr_param.N_terms_max);
+    std::vector<std::vector<Vec>> Y_sep(3);
+    std::vector<std::vector<Feature>> qr_features(3);
+    qr_invoked = true;
+    for (int i = 0; i < Y_sep.size();i++)
+    {
+        Y_sep[i].reserve(N_sims);
+        for (int j = 0; j < N_sims; j++)
+        {
+            Y_sep[i].push_back(Y_list[j].col(i));
+        }
+        qr_features[i] = qr_regressors[i].transform_fit(X_list, U_list, Y_sep[i], qr_model);
+    }
+    // auto qr_features = qr_regressor.transform_fit(X_list, U_list, Y_list, qr_model);
     qr_model.feature_summary(qr_features);
     for (int i = 0; i < N_sims; i++)
     {
@@ -209,7 +220,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 int main(int argc, char **argv)
 {
     // auto N_pop_vec = FROLS::arange((uint32_t)10, (uint32_t)100, (uint32_t)10);
-    std::vector<float> N_pop_vec = {20,50,100};
+    std::vector<float> N_pop_vec = {20};
     std::vector<float> p_ER_vec = {0.1, 0.5,1.0};
     std::reverse(N_pop_vec.begin(), N_pop_vec.end());
     std::reverse(p_ER_vec.begin(), p_ER_vec.end());

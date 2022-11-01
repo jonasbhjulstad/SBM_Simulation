@@ -12,6 +12,14 @@ struct Regressor_Param {
   float tol = 1e-2;
   float theta_tol = 1e-4;
   uint32_t N_terms_max = 4;
+  float f_ERR_tol = std::numeric_limits<float>::epsilon();
+};
+
+struct Timeseries
+{
+  Mat X;
+  Mat U;
+  Mat Y;
 };
 struct Regression_Data {
   Regression_Data(uint32_t size): X(size), U(size), Y(size) {}
@@ -25,8 +33,10 @@ struct Regression_Data {
   std::vector<Mat> Y;
 };
 
+
+
 struct Regressor {
-  const float tol, theta_tol;
+  const float tol, theta_tol, f_ERR_tol;
   const uint32_t N_terms_max;
 
   Regressor(const Regressor_Param &);
@@ -40,7 +50,9 @@ struct Regressor {
   std::vector<std::vector<Feature>> transform_fit(const std::vector<Mat>& X_raw, const std::vector<Mat>& U_raw, const std::vector<Mat>& Y_list,
                                 Features::Feature_Model &model);
 
-
+std::vector<Feature> transform_fit(
+    const std::vector<Mat> &X_raw, const std::vector<Mat> &U_raw,
+    const std::vector<Vec> &y_list, Features::Feature_Model &model);
 std::vector<std::vector<Feature>> transform_fit(const Regression_Data &rd,
                          Features::Feature_Model &model);
   // std::vector<Feature> transform_fit(const std::vector<std::string> &filenames,

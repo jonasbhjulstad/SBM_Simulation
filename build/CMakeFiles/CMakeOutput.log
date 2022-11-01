@@ -509,3 +509,21 @@ int main(void)
   return 0;
 }
 
+Performing C++ SOURCE FILE Test HAS_FLTO succeeded with the following output:
+Change Dir: /home/man/Documents/Bernoulli_MC/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/ninja cmTC_bf99f && [1/2] Building CXX object CMakeFiles/cmTC_bf99f.dir/src.cxx.o
+[2/2] Linking CXX static library libcmTC_bf99f.a
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test HAS_FLTO_THIN succeeded with the following output:
+Change Dir: /home/man/Documents/Bernoulli_MC/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/ninja cmTC_ed009 && [1/2] Building CXX object CMakeFiles/cmTC_ed009.dir/src.cxx.o
+[2/2] Linking CXX static library libcmTC_ed009.a
+
+
+Source file was:
+int main() { return 0; }

@@ -12,9 +12,8 @@ namespace FROLS::Features {
         const uint32_t Nx;
         const uint32_t Nu;
 
-        Polynomial_Model(uint32_t Nx, uint32_t Nu, uint32_t N_output_features, uint32_t d_max,
-                         const std::vector<uint32_t> ignore_idx = std::vector<uint32_t>())
-                : d_max(d_max), Nx(Nx), Nu(Nu), Feature_Model(N_output_features, ignore_idx) {}
+        Polynomial_Model(uint32_t Nx, uint32_t Nu, uint32_t N_output_features, uint32_t d_max)
+                : d_max(d_max), Nx(Nx), Nu(Nu), Feature_Model(N_output_features) {}
 
 
         // float transform(Vec &x_raw, uint32_t target_index) ;

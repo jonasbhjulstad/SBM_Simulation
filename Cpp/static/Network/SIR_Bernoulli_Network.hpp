@@ -111,7 +111,7 @@ namespace Network_Models
 
         bool terminate(const SIR_Param<> &p, const std::array<uint32_t, 3> &x)
         {
-            bool early_termination = ((t > p.Nt_min) && x[1] < p.N_I_min);
+            bool early_termination = ((t > p.Nt_min) || x[1] < p.N_I_min);
             return early_termination;
         }
 
@@ -211,7 +211,7 @@ namespace Network_Models
 
         bool terminate(const SIR_Param<> &p, const std::vector<uint32_t> &x)
         {
-            bool early_termination = ((t > p.Nt_min) && x[1] < p.N_I_min);
+            bool early_termination = ((t > p.Nt_min) || (x[1] < p.N_I_min));
             return early_termination;
         }
 

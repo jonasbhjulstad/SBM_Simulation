@@ -6,7 +6,7 @@
 namespace FROLS::Regression {
 
 Regressor::Regressor(const Regressor_Param &p)
-    : tol(p.tol), theta_tol(p.theta_tol), N_terms_max(p.N_terms_max) {}
+    : tol(p.tol), theta_tol(p.theta_tol), N_terms_max(p.N_terms_max), f_ERR_tol(p.f_ERR_tol) {}
 
 std::vector<Feature>
 Regressor::single_fit(const std::vector<Mat> &X_list,
@@ -46,7 +46,7 @@ Regressor::single_fit(const std::vector<Mat> &X_list,
     Feature f = best_feature_select(Q_list_current, Q_list_global, y_list,
                                     best_features);
     if (f.tag == FEATURE_INVALID) {
-      end_idx = j+1;
+      end_idx = j + 1;
       break;
     }
 
@@ -69,7 +69,8 @@ Regressor::single_fit(const std::vector<Mat> &X_list,
     A(j, j) = 1;
 
     // If ERR-tolerance is met, return non-orthogonalized parameters
-    if (tolerance_check(Q_list_global, y_list, best_features, j + 1) || (j == (N_terms_max - 1))) {
+    if (tolerance_check(Q_list_global, y_list, best_features, j + 1) ||
+        (j == (N_terms_max - 1))) {
       end_idx = j + 1;
       break;
     }
@@ -79,9 +80,6 @@ Regressor::single_fit(const std::vector<Mat> &X_list,
   }
   theta_solve(A.topLeftCorner(end_idx, end_idx), g.head(end_idx),
               best_features);
-  for (int i = 0; i < y_list.size(); i++){
-  // std::cout << y_list[i].head(5).transpose() <<  std::endl;
-                      }
   return best_features;
 }
 
@@ -91,12 +89,6 @@ Feature Regressor::best_feature_select(
     const std::vector<Feature> &used_features) const {
   const std::vector<std::vector<Feature>> candidates =
       candidate_regression(X_list, Q_list_global, y_list, used_features);
-  // std::vector<Feature> thresholded_candidates;
-  // std::copy_if(candidates.begin(), candidates.end(),
-  // std::back_inserter(thresholded_candidates),
-  //              [&](const auto &f) {
-  //                  return abs(f.g) > theta_tol;
-  //              });
   static bool warn_msg = true;
 
   Feature res;
@@ -115,6 +107,7 @@ Feature Regressor::best_feature_select(
   return res;
 }
 
+
 Vec Regressor::predict(const Mat &Q,
                        const std::vector<Feature> &features) const {
   Vec y_pred(Q.rows());
@@ -130,10 +123,9 @@ Vec Regressor::predict(const Mat &Q,
   return y_pred;
 }
 
-
 std::vector<std::vector<Feature>> Regressor::transform_fit(
-    const std::vector<Mat>& X_raw, const std::vector<Mat>& U_raw,
-    const std::vector<Mat>& Y_list, Features::Feature_Model &model) {
+    const std::vector<Mat> &X_raw, const std::vector<Mat> &U_raw,
+    const std::vector<Mat> &Y_list, Features::Feature_Model &model) {
   uint32_t N_timeseries = X_raw.size();
   uint32_t N_response = Y_list[0].cols();
   std::vector<Mat> XU_list(N_timeseries);
@@ -159,49 +151,68 @@ std::vector<std::vector<Feature>> Regressor::transform_fit(
   return feature_list;
 }
 
+std::vector<Feature> Regressor::transform_fit(
+    const std::vector<Mat> &X_raw, const std::vector<Mat> &U_raw,
+    const std::vector<Vec> &y_list, Features::Feature_Model &model) {
+  uint32_t N_timeseries = X_raw.size();
+  std::vector<Mat> XU_list(N_timeseries);
+  for (int i = 0; i < N_timeseries; i++) {
+    XU_list[i] = Mat::Zero(X_raw[i].rows(), X_raw[i].cols() + U_raw[i].cols());
+    XU_list[i] << X_raw[i], U_raw[i];
+  }
+  std::vector<Mat> X_list(N_timeseries);
+  std::transform(XU_list.begin(), XU_list.end(), X_list.begin(),
+                 [&model](const Mat &XU) { return model.transform(XU); });
+
+  return single_fit(X_list, y_list);
+}
+
 std::vector<std::vector<Feature>>
 Regressor::transform_fit(const Regression_Data &rd,
-                         Features::Feature_Model &model){
+                         Features::Feature_Model &model) {
   return transform_fit(rd.X, rd.U, rd.Y, model);
 }
 
 Feature Regressor::feature_selection_criteria(
     const std::vector<std::vector<Feature>> &features) const {
-      uint32_t N_timeseries = features.size();
-      uint32_t N_features = features[0].size();
-      std::vector<float> ERRs(N_features,0);
-
-      for (int i = 0; i < N_timeseries; i++)
+  uint32_t N_timeseries = features.size();
+  uint32_t N_features = features[0].size();
+  std::vector<std::pair<float, bool>> ERRs(N_features, {0,true});
+  for (int i = 0; i < N_timeseries; i++) {
+    for (int j = 0; j < N_features; j++) {
+      auto err =  (features[i][j].tag == FEATURE_REGRESSION) && (features[i][j].f_ERR > 0) ? features[i][j].f_ERR : 0;   
+      ERRs[j].first += err;
+      if (features[i][j].tag == FEATURE_INVALID)
       {
-        for (int j = 0; j < N_features; j++)
-        {
-          ERRs[j] += features[i][j].f_ERR;
-        }
+        ERRs[j].second = false;
       }
-      uint32_t best_feature_idx = 0;
-      for (int j = 0; j < N_features; j++)
-      {
-        if (objective_condition(ERRs[j], ERRs[best_feature_idx]))
-        {
-          best_feature_idx = j;
-        }
-        {
-          best_feature_idx = j;
-        }
-      }
-      Feature best_avg_feature{};
-      best_avg_feature.f_ERR = 0;
-      for (int i = 0; i < N_timeseries; i++)
-      {
-        best_avg_feature.g += features[i][best_feature_idx].g;
-        best_avg_feature.f_ERR += features[i][best_feature_idx].f_ERR;
-      }
+    }
+  }
 
-      best_avg_feature.g /= N_timeseries;
-      best_avg_feature.f_ERR /= N_timeseries;
-      best_avg_feature.index = features[0][best_feature_idx].index;
-      best_avg_feature.tag = FEATURE_REGRESSION;
+  assert(!std::all_of(ERRs.begin(), ERRs.end(), [](const auto &p) {
+    return p.second == false;
+  }));
 
+
+  // find index of best ERR according to objective_condition with std::
+  auto best_index = std::distance(ERRs.begin(), std::min_element(ERRs.begin(), ERRs.end(),
+                              [&](const auto &f0, const auto &f1) {
+                                return (f0.second) && objective_condition(f0.first, f1.first);
+                              }));
+  Feature best_avg_feature{};
+  best_avg_feature.f_ERR = 0;
+  for (int i = 0; i < N_timeseries; i++) {
+    best_avg_feature.g += features[i][best_index].g;
+  }
+
+  best_avg_feature.g /= N_timeseries;
+  best_avg_feature.f_ERR = ERRs[best_index].first / N_timeseries;
+  best_avg_feature.index = features[0][best_index].index;
+  best_avg_feature.tag = FEATURE_REGRESSION;
+  if (best_avg_feature.f_ERR < f_ERR_tol)
+  {
+    best_avg_feature.tag = FEATURE_INVALID;
+  }
   return best_avg_feature;
 }
 

@@ -188,7 +188,7 @@ namespace FROLS::Features {
     {
         uint32_t N_input_features = Nx + Nu;
         uint32_t N_features = 0;
-        for (int d = 1; d < d_max; d++) {
+        for (int d = 1; d <= d_max; d++) {
             for (auto &&comb: iter::combinations_with_replacement(range(0, d + 1),
                                                                   N_input_features)) {
                 for (auto &&powers: iter::permutations(comb)) {

@@ -13,11 +13,10 @@ namespace FROLS::Features {
         const uint32_t Nu;
 
         Polynomial_Model(uint32_t Nx, uint32_t Nu, uint32_t d_max, uint32_t N_output_features = 20)
-                : d_max(d_max), Nx(Nx), Nu(Nu), Feature_Model(std::min({N_output_features, get_N_features_max()})) 
+                : d_max(d_max), Nx(Nx), Nu(Nu) ,Feature_Model(N_output_features)
                 {
-                    if (N_output_features > get_N_features_max()) {
-                        std::cout << "Warning: N_output_features is greater than the number supported" << std::endl;
-                        N_output_features = get_N_features_max();
+                    if (this->N_output_features > get_N_features_max()) {
+                        this->N_output_features = get_N_features_max();
                     }
 
                 }

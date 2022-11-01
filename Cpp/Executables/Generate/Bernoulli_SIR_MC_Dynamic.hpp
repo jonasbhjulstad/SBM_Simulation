@@ -72,6 +72,10 @@ namespace FROLS
     std::vector<Network_Models::SIR_Param<>> generate_interaction_probabilities(const MC_SIR_Params<> &p_gen, RNG &rng, uint32_t Nt)
     {
         std::vector<Network_Models::SIR_Param<>> param_vec(Nt);
+        std::for_each(param_vec.begin(), param_vec.end(), [&](auto &param)
+                      {
+                        param.N_I_min = p_gen.N_I_min;
+        });
         auto p_Is = generate_infection_probabilities(p_gen, rng, Nt);
         std::transform(p_Is.begin(), p_Is.end(), param_vec.begin(), [&](auto p_I)
                        {
@@ -181,7 +185,7 @@ namespace FROLS
     {
         random::default_rng generator(seed);
         auto p_vec = generate_interaction_probabilities(p, generator, Nt);
-        auto traj = G.simulate(p_vec, Nt, p.N_I_min, p.Nt_min);
+        auto traj = G.simulate(p_vec, Nt, p.Nt_min);
         
         return MC_SIR_VectorData(p_vec, traj);
     }
@@ -192,7 +196,7 @@ namespace FROLS
         uint32_t Nt = p_Is.size();
         random::default_rng generator(seed);
         auto p_vec = fixed_interaction_probabilities<decltype(generator)>(p, p_Is, Nt);
-        auto traj = G.simulate(p_vec, Nt, p.N_I_min, p.Nt_min);
+        auto traj = G.simulate(p_vec, Nt, p.Nt_min);
         return MC_SIR_VectorData(p_vec, traj);
     }
     std::vector<MC_SIR_VectorData>
@@ -250,7 +254,7 @@ namespace FROLS
             Network_Models::SIR_VectorGraph G_copy = G_structure;
             Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> G(G_copy, p.p_I0, p.p_R0, random::default_rng(seed));
             
-            auto traj = G.simulate(p_vec, Nt, p.N_I_min, p.Nt_min);
+            auto traj = G.simulate(p_vec, Nt, p.Nt_min);
             return MC_SIR_VectorData(p_vec, traj);
             ; });
 

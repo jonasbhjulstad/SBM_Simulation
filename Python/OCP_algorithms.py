@@ -41,7 +41,7 @@ def quadratic_objective_solve(X_mean, U_mean, Wu, F_ODE, Nt, u_max = 0.1, u_min 
 
     return (sol, get_X(sol['x'].full()), sol['x'].full())
 
-def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-5, log_file=[]):
+def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-6, log_file=[]):
     Nx = X0.shape[1]
     Nu = 1
 
@@ -57,20 +57,18 @@ def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-5
     week_idx = 0
     for i in range(Nt):
         if (i == 0):
-            Xk = F_ODE(X0[0,:], U[week_idx])
+            Xk = X0[0,:] + F_ODE(X0[0,:], U[week_idx])
         else:
             if (i % 7 == 0):
                 week_idx += 1
                 week_idx = np.min([week_idx, U.shape[1]-1])
-            Xk = F_ODE(Xk, U[week_idx])
+            Xk = Xk + F_ODE(Xk, U[week_idx])
         X_traj.append(Xk)
         # obj += Wu*(u_max - U[week_idx])**2 + (Xk[1])**2/N_pop
         obj += -Wu*(U[week_idx] - u_max) + (Xk[1])/N_pop
         # obj += Wu*cs.norm_2(u_max - U[week_idx]) + cs.norm_2(Xk[1])/N_pop
     get_X = cs.Function('get_X', [U], [cs.horzcat(*X_traj)])
 
-    X0 = X0
-    # U0 = U0[::7][:U.shape[0]]
     # prob = {'f': obj, 'x': W, 'g': g}
     # solver = cs.nlpsol('solver', 'ipopt', prob)
     lbx = [u_min]*U.shape[0]
@@ -85,7 +83,8 @@ def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-5
     
     # get parent directory name of logfile
     parent_dir = os.path.dirname(log_file)
-    os.makedirs(parent_dir)
+    if not os.path.exists(parent_dir):
+        os.makedirs(parent_dir)
 
     solver = cs.nlpsol('solver', 'ipopt', prob, opts)
 

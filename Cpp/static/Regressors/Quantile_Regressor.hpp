@@ -12,6 +12,8 @@ struct Quantile_Param : public Regressor_Param {
   float tau = .95;
   uint32_t N_rows;
   uint32_t N_threads = 4;
+  const float y_tol = 0.5;
+  const float x_tol = std::numeric_limits<float>::epsilon();
   const std::string solver_type = "SCIP";
   operations_research::MPSolver::OptimizationProblemType problem_type =
       operations_research::MPSolver::OptimizationProblemType::
@@ -20,7 +22,8 @@ struct Quantile_Param : public Regressor_Param {
 
 struct Quantile_Regressor : public Regressor {
   const float tau;
-
+  const float y_tol;
+  const float x_tol;
   Quantile_Regressor(const Quantile_Param &p);
 
   void theta_solve(const Mat &A, const Vec &g,

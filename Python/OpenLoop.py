@@ -28,12 +28,12 @@ N_output_max = 80
 Nx = 3
 Nu = 1
 Nt = 56
-er_model = pf.Polynomial_Model(Nx,Nu,N_output_max,d_max)
+er_model = pf.Polynomial_Model(Nx,Nu,d_max, N_output_max)
 # er_features = er_model.read_csv(DATA_DIR + 'ERR_Simulation_SIR_' + str(N_pop) + '_' + str(p_ER) + '/param.csv')
 
 
 # %%
-qr_model = pf.Polynomial_Model(Nx,Nu,N_output_max,d_max)
+qr_model = pf.Polynomial_Model(Nx,Nu,d_max, N_output_max)
 # qr_features = qr_model.read_csv(DATA_DIR + 'Quantile_Simulation_SIR_' + str(N_pop) + '_' + str(p_ER) + '/param.csv')
 
 # %%
@@ -184,12 +184,11 @@ def openloop_solve_from_csv(rd, param_filename, model, N_sims, Nt, Wu, N_pop, p_
 
 # %%
 seed = random.randint(0, 1000000)
-Wu = 100
-from copy import deepcopy
+Wu = 50
 uc_datas = []
 G_param_pairs = []
 N_pops = reversed([10, 50, 100])
-p_ERs = [0.1, 1.0]
+p_ERs = [0.1, 0.5, 1.0]
 t = np.array(range(Nt))
 uncontrolled_traj_fname = lambda p: DATA_DIR + '/latex/Figures/MPC_Trajectory_comparison_{}_{}.pdf'.format(p[0], p[1])
 for N_pop in N_pops:
@@ -209,11 +208,11 @@ for p in G_param_pairs:
     uc_filename = DATA_DIR + '/Bernoulli_SIR_MC_{}_{}/regression_data.csv'.format(p[0], p_str)
     er_param_filename = DATA_DIR + '/ERR_Simulation_SIR_{}_{}/param.csv'.format(p[0], p_str)
     qr_param_filename = DATA_DIR + '/Quantile_Simulation_SIR_{}_{}/param.csv'.format(p[0], p_str)
-    qr_data = openloop_solve_from_csv(rd, er_param_filename, qr_model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix='qr_')
+    er_data = openloop_solve_from_csv(rd, er_param_filename, er_model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix='er_')
+    qr_data = openloop_solve_from_csv(rd, qr_param_filename, qr_model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix='qr_')
     # er_data = openloop_solve(uc_data, rd, er_regressor, er_model, N_sims, Nt, Wu, file_prefix='er_')
     # qr_model.feature_susmmary(er_data['features'])
     # qr_data = openloop_solve(uc_data, rd, qr_regressor, qr_model, N_sims, Nt, Wu, file_prefix='qr_')
-    er_data = openloop_solve_from_csv(rd, qr_param_filename, er_model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix='er_')
     # qr_model.feature_summary(qr_data['features'])
     #plot er_data['x_pred']
     # _ = [x.plot(t, er_data['x_pred'][i,:t.shape[0]].T, label='ER') for i, x in enumerate(ax)]
