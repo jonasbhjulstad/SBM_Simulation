@@ -1,8 +1,8 @@
 #ifndef BERNOULLI_SIR_FILE_HPP
 #define BERNOULLI_SIR_FILE_HPP
-#ifndef FROLS_USE_INTEL_SYCL
+#ifndef SYCL_GRAPH_USE_INTEL_SYCL
 #include <thread>
-namespace FROLS
+namespace SYCL::Graph
 {
     // template <typename SIR_Graph, uint32_t Nt, typename dType = float>
     // void MC_SIR_to_file(const MC_SIR_Params<> &p, uint32_t thread_id)

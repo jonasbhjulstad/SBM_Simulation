@@ -1,4 +1,4 @@
-if(${FROLS_USE_HIPSYCL})
+if(${SYCL_GRAPH_USE_HIPSYCL})
     find_package(HIPSYCL REQUIRED)
 
     if(NOT HIPSYCL_DEBUG_LEVEL)
@@ -18,7 +18,7 @@ if(${FROLS_USE_HIPSYCL})
     cmake_policy(SET CMP0005 NEW)
     add_definitions(-DHIPSYCL_DEBUG_LEVEL=${HIPSYCL_DEBUG_LEVEL})
     
-    set(FROLS_USE_SYCL ON)
+    set(SYCL_GRAPH_USE_SYCL ON)
 
     # add_compile_definitions(__HIPSYCL_ENABLE_SYCL_TARGET__)
 endif()

@@ -2,7 +2,7 @@
 #include "Bernoulli_SIR_MC.hpp"
 #include "Bernoulli_SIS_MC.hpp"
 PYBIND11_MODULE(Network_Models, m) {
-  using namespace FROLS;
+  using namespace SYCL::Graph;
   namespace py = pybind11;
   m.doc() = "OpenMP-accelerated Bernoulli-SIR Monte-Carlo simulations";
 py::class_<MC_SIR_Params>(m, "MC_SIR_Params")

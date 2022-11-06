@@ -1,8 +1,8 @@
-#ifndef FROLS_NETWORK_HPP
-#define FROLS_NETWORK_HPP
+#ifndef SYCL_GRAPH_NETWORK_HPP
+#define SYCL_GRAPH_NETWORK_HPP
 
 #include "Graph_Generation.hpp"
-#include <FROLS_Math.hpp>
+#include <Sycl_Graph_Math.hpp>
 #include <random>
 #include <stddef.h>
 #include <vector>

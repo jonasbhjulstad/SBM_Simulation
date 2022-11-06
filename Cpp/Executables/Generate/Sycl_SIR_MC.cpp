@@ -1,8 +1,8 @@
 
 #include "Bernoulli_SIR_MC.hpp"
 #include <quantiles.hpp>
-#include <FROLS_Path_Config.hpp>
-#include <FROLS_Graph.hpp>
+#include <Sycl_Graph_Path_Config.hpp>
+#include <Sycl_Graph.hpp>
 #include <functional>
 #include <FROLS_Sycl.hpp>
 
@@ -30,7 +30,7 @@ constexpr uint32_t NV = N_pop;
 constexpr uint32_t NE = NV * NV;
 
 int main() {
-    using namespace FROLS;
+    using namespace SYCL::Graph;
     using namespace Network_Models;
 //    params[1].N_pop = 20;
 //    params[2].p_ER = 0.1;

@@ -1,8 +1,8 @@
 
 #include "Bernoulli_SIR_MC_Dynamic.hpp"
 #include <quantiles.hpp>
-#include <FROLS_Path_Config.hpp>
-#include <FROLS_Graph.hpp>
+#include <Sycl_Graph_Path_Config.hpp>
+#include <Sycl_Graph.hpp>
 #include <FROLS_Execution.hpp>
 #include <functional>
 #include <utility>
@@ -18,7 +18,7 @@ constexpr uint32_t NV = N_pop;
 size_t nk = FROLS::n_choose_k(NV, 2);
 uint32_t NE = 1.5*nk;
 int main() {
-    using namespace FROLS;
+    using namespace SYCL::Graph;
     using namespace Network_Models;
     std::cout << NE << std::endl;
     MC_SIR_Params<>p;

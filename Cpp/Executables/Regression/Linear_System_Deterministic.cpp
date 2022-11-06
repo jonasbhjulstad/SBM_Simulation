@@ -1,21 +1,21 @@
 
 #include <DataFrame.hpp>
-#include <FROLS_Eigen.hpp>
+#include <Sycl_Graph_Eigen.hpp>
 #include <Features.hpp>
 #include <Quantile_Regressor.hpp>
 #include <ERR_Regressor.hpp>
 #include <iostream>
 #include <vector>
 
-using namespace FROLS;
+using namespace SYCL::Graph;
 Vec linsys_step(const Mat &A, const Mat &b, const Vec &x, const Vec &u) {
     return A * x + b * u;
 }
 
 int main() {
-    using namespace FROLS;
-    using namespace FROLS::Regression;
-    using namespace FROLS::Features;
+    using namespace SYCL::Graph;
+    using namespace SYCL::Graph::Regression;
+    using namespace SYCL::Graph::Features;
     uint32_t Nx = 3;
     Vec x0(Nx);
     x0 << 10, 100, -100;

@@ -1,14 +1,14 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 
 #include <DataFrame.hpp>
-#include <FROLS_Eigen.hpp>
+#include <Sycl_Graph_Eigen.hpp>
 #include <Features.hpp>
 #include <Quantile_Regressor.hpp>
 #include <ERR_Regressor.hpp>
 #include <iostream>
 #include <vector>
 #include <random>
-using namespace FROLS;
+using namespace SYCL::Graph;
 template<typename RNG>
 Vec linsys_step(const Mat &A, const Mat &b, const Vec &x, const Vec &u, float b_std, RNG &rng) {
     std::normal_distribution<> d_b{0, b_std};
@@ -19,9 +19,9 @@ using namespace Eigen;
 const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ",", "\n");
 
 int main() {
-    using namespace FROLS;
-    using namespace FROLS::Regression;
-    using namespace FROLS::Features;
+    using namespace SYCL::Graph;
+    using namespace SYCL::Graph::Regression;
+    using namespace SYCL::Graph::Features;
     uint32_t Nx = 3;
     Vec x0(Nx);
     x0 << 10, 100, -100;
@@ -71,7 +71,7 @@ int main() {
 
     uint32_t d_max = 1;
     uint32_t N_features = 16;
-    using namespace FROLS::Regression;
+    using namespace SYCL::Graph::Regression;
     Polynomial_Model model(Nx, Nu, N_features, d_max);
     Regressor_Param er_param;
     er_param.tol = 1e-1;

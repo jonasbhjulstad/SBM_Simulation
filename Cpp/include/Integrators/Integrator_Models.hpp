@@ -1,7 +1,7 @@
 
 
-#ifndef FROLS_MCMC_GENERATE_SIR_HPP
-#define FROLS_MCMC_GENERATE_SIR_HPP
+#ifndef SYCL_GRAPH_MCMC_GENERATE_SIR_HPP
+#define SYCL_GRAPH_MCMC_GENERATE_SIR_HPP
 
 #include <array>
 #define SUNDIALS_SINGLE_PRECISION
@@ -19,7 +19,7 @@
 #include <vector>
 #include <array>
 
-namespace FROLS::Integrators {
+namespace SYCL::Graph::Integrators {
     template<uint32_t Nx, uint32_t Nt, typename Derived>
     struct Model_Integrator {
         Model_Integrator(float t0 = 0.): t_current(t0){}
@@ -189,5 +189,5 @@ namespace FROLS::Integrators {
             return EXIT_SUCCESS;
         }
     };
-} // namespace FROLS::Integrators
+} // namespace SYCL::Graph::Integrators
 #endif

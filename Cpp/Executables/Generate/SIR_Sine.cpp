@@ -7,8 +7,8 @@
 #include <random>
 #include <DataFrame.hpp>
 #include <FROLS_Execution.hpp>
-#include <FROLS_Path_Config.hpp>
-#include <FROLS_Math.hpp>
+#include <Sycl_Graph_Path_Config.hpp>
+#include <Sycl_Graph_Math.hpp>
 #include <Typedefs.hpp>
 
 constexpr uint32_t
@@ -49,8 +49,8 @@ sineparam_gen(uint32_t
 }
 
 int main() {
-    using namespace FROLS;
-    using namespace FROLS::Integrators;
+    using namespace SYCL::Graph;
+    using namespace SYCL::Graph::Integrators;
     using Trajectory = SIR_Sine<Nt>::Trajectory;
     float I0 = 100;
     float dt = 1.0f;

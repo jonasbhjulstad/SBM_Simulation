@@ -1,10 +1,10 @@
-#ifndef FROLS_SIR_BERNOULLI_NETWORK_HPP
-#define FROLS_SIR_BERNOULLI_NETWORK_HPP
+#ifndef SYCL_GRAPH_SIR_BERNOULLI_NETWORK_HPP
+#define SYCL_GRAPH_SIR_BERNOULLI_NETWORK_HPP
 
 #include "Graph_Generation.hpp"
 #include "Network.hpp"
-#include <FROLS_Math.hpp>
-#include <FROLS_Graph.hpp>
+#include <Sycl_Graph_Math.hpp>
+#include <Sycl_Graph.hpp>
 #include <FROLS_Random.hpp>
 #include <stddef.h>
 #include <utility>

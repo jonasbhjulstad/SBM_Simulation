@@ -1,14 +1,14 @@
-#ifndef FROLS_BERNOULLI_SIR_MC_HPP
-#define FROLS_BERNOULLI_SIR_MC_HPP
+#ifndef SYCL_GRAPH_BERNOULLI_SIR_MC_HPP
+#define SYCL_GRAPH_BERNOULLI_SIR_MC_HPP
 
-#include <FROLS_Path_Config.hpp>
+#include <Sycl_Graph_Path_Config.hpp>
 #include <FROLS_Random.hpp>
 #include <quantiles.hpp>
-#include <FROLS_Math.hpp>
-#include <FROLS_Eigen.hpp>
+#include <Sycl_Graph_Math.hpp>
+#include <Sycl_Graph_Eigen.hpp>
 #include <SIR_Bernoulli_Network.hpp>
 #include <array>
-namespace FROLS
+namespace SYCL::Graph
 {
     template <typename dType = float>
     struct MC_SIR_Params
@@ -32,7 +32,7 @@ namespace FROLS
 }
 #include "Bernoulli_SIR_File.hpp"
 
-namespace FROLS
+namespace SYCL::Graph
 {
     template <uint32_t NV, uint32_t NE, uint32_t Nt>
     using Array_SIR_Bernoulli_Network = Network_Models::Array_SIR_Bernoulli_Network<random::default_rng, NV, NE, Nt>;
@@ -194,7 +194,7 @@ namespace FROLS
     template <uint32_t NV, uint32_t NE, uint32_t Nt, uint32_t N_sims>
     std::vector<MC_SIR_ArrayData<Nt>> Bernoulli_SIR_MC_Simulations(uint32_t N_pop, float p_ER, float p_I0, const std::array<uint32_t, N_sims> &seeds, std::array<float, Nt> p_Is)
     {
-        using namespace FROLS;
+        using namespace SYCL::Graph;
         using namespace Network_Models;
         auto G = generate_Bernoulli_SIR_Network<NV, NE, Nt>(N_pop, p_ER, p_I0);
         auto enum_seeds = enumerate(seeds);

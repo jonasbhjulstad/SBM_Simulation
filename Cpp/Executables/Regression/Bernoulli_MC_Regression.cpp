@@ -1,15 +1,15 @@
 
 #include "../Generate/Bernoulli_SIR_MC_Dynamic.hpp"
 #include <quantiles.hpp>
-#include <FROLS_Path_Config.hpp>
-#include <FROLS_Graph.hpp>
+#include <Sycl_Graph_Path_Config.hpp>
+#include <Sycl_Graph.hpp>
 #include <FROLS_Execution.hpp>
 #include <functional>
 #include <utility>
 #include <chrono>
 #include <fmt/format.h>
 
-#include <FROLS_Eigen.hpp>
+#include <Sycl_Graph_Eigen.hpp>
 #include <Quantile_Regressor.hpp>
 #include <ERR_Regressor.hpp>
 #include <Regression_Algorithm.hpp>
@@ -46,8 +46,8 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     auto MC_fname_f = std::bind(FROLS::MC_filename, N_pop, p_ER, _1, network_type);
     auto er_outfile_f = std::bind(err_simulation_filename, N_pop, p_ER, _1, network_type);
     auto qr_outfile_f = std::bind(quantile_simulation_filename, N_pop, p_ER, _1, network_type);
-    using namespace FROLS::Regression;
-    using namespace FROLS;
+    using namespace SYCL::Graph::Regression;
+    using namespace SYCL::Graph;
     using namespace Network_Models;
     MC_SIR_Params<> p;
     p.N_pop = N_pop;
@@ -129,7 +129,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
         Y_list[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_x, 1, -1) - X_list[i];
     }
 
-    using namespace FROLS::Features;
+    using namespace SYCL::Graph::Features;
     auto er_features = er_regressor.transform_fit(X_list, U_list, Y_list, er_model);
 
     er_model.feature_summary(er_features);

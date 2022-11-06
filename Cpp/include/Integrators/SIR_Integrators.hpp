@@ -1,12 +1,12 @@
-#ifndef FROLS_SIR_INTEGRATORS_HPP
-#define FROLS_SIR_INTEGRATORS_HPP
+#ifndef SYCL_GRAPH_SIR_INTEGRATORS_HPP
+#define SYCL_GRAPH_SIR_INTEGRATORS_HPP
 
 #include <Integrators/Integrator_Models.hpp>
 #include <algorithm>
 #include <cassert>
 #include <random>
 
-namespace FROLS::Integrators
+namespace SYCL::Graph::Integrators
 {
 
     template <typename dType = float>
@@ -174,5 +174,5 @@ namespace FROLS::Integrators
         }
     };
 
-} // namespace FROLS::Integrators
+} // namespace SYCL::Graph::Integrators
 #endif // SIR_INTEGRATORS_HPP

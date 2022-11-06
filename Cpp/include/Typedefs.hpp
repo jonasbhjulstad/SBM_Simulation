@@ -1,5 +1,5 @@
-#ifndef FROLS_EIGEN_TYPEDEFS_HPP
-#define FROLS_EIGEN_TYPEDEFS_HPP
+#ifndef SYCL_GRAPH_EIGEN_TYPEDEFS_HPP
+#define SYCL_GRAPH_EIGEN_TYPEDEFS_HPP
 #include <cmath>
 #include <Eigen/Dense>
 #include <fstream>
@@ -11,7 +11,7 @@
 #include <limits>
 #include <map>
 #include <stdint.h>
-namespace FROLS {
+namespace SYCL::Graph {
 
 typedef Eigen::Matrix<float, -1, -1> Mat;
 typedef Eigen::Vector<float, -1> Vec;
@@ -29,5 +29,5 @@ struct Feature {
   float theta = 0;
   Feature_Tag tag = FEATURE_INVALID;
 };
-} // namespace FROLS
+} // namespace SYCL::Graph
 #endif

@@ -2,8 +2,8 @@
 // Created by arch on 9/14/22.
 //
 
-#ifndef FROLS_GRAPH_GENERATION_HPP
-#define FROLS_GRAPH_GENERATION_HPP
+#ifndef SYCL_GRAPH_GRAPH_GENERATION_HPP
+#define SYCL_GRAPH_GRAPH_GENERATION_HPP
 
 #include <itertools.hpp>
 #include <memory>

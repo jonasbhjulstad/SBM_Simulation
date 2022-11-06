@@ -1,8 +1,8 @@
-#include "FROLS_Eigen.hpp"
+#include "SYCL_GRAPH_Eigen.hpp"
 #include <Eigen/SVD>
 #include <numeric>
 
-namespace FROLS
+namespace SYCL::Graph
 {
 
     Vec dataframe_to_vector(DataFrame &df, const std::string &col_name, int start_idx, int end_idx)

@@ -1,5 +1,5 @@
-#ifndef FROLS_EIGEN_HPP
-#define FROLS_EIGEN_HPP
+#ifndef SYCL_GRAPH_EIGEN_HPP
+#define SYCL_GRAPH_EIGEN_HPP
 
 #include <DataFrame.hpp>
 #include <Typedefs.hpp>
@@ -7,7 +7,7 @@
 #include <string>
 #include <Eigen/Dense>
 
-namespace FROLS {
+namespace SYCL::Graph {
     Vec dataframe_to_vector(DataFrame &df, const std::string &col_name, int start_idx = 0, int end_idx = -1);
 
     Vec dataframe_to_vector(DataFrameStack &dfs, const std::string &col_name, int start_idx = 0, int end_idx = -1);
