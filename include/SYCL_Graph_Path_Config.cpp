@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 
-namespace SYCL::Graph {
+namespace Sycl::Graph {
 // const char *FROLS_ROOT_DIR = "";
 // const char *FROLS_INCLUDE_DIR = "";
     const char *FROLS_DATA_DIR = "";

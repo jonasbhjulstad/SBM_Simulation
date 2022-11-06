@@ -1,5 +1,5 @@
 #include "DataFrame.hpp"
-#include <FROLS_Path_Config.hpp>
+#include <Sycl_Graph_Path_Config.hpp>
 #include <algorithm>
 #include <fstream>
 #include <sstream>
@@ -8,13 +8,13 @@
 #include <sys/stat.h>
 #include <filesystem>
 
-namespace FROLS {
+namespace Sycl::Graph {
 
-    void DataFrame::assign(const std::string &col_name, crVec &vec) {
+    void DataFrame::assign(const std::string &col_name, const Vec &vec) {
         assign(col_name, std::vector<float>(vec.data(), vec.data() + vec.rows()));
     }
 
-    void DataFrame::assign(const std::vector<std::string> &col_names, crMat &mat) {
+    void DataFrame::assign(const std::vector<std::string> &col_names, const Mat &mat) {
         for (int i = 0; i < mat.cols(); i++) {
             assign(col_names[i], mat.col(i));
         }
@@ -118,10 +118,10 @@ namespace FROLS {
     void DataFrame::write_csv(const std::string &filename,
                               const std::string &delimiter,
                               const float termination_tol) {
-        std::string filedir = FROLS::path_dirname(filename);
+        std::string filedir = Sycl::Graph::path_dirname(filename);
         if (!std::filesystem::is_directory(filedir))
         {
-            std::filesystem::create_directories(FROLS::path_dirname(filename));
+            std::filesystem::create_directories(Sycl::Graph::path_dirname(filename));
         }
 
         std::ofstream file(filename);

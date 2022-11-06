@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace SYCL::Graph
+namespace Sycl::Graph
 {
     extern const char *SYCL_Graph_DATA_DIR;
     extern const char *SYCL_Graph_LOG_DIR;

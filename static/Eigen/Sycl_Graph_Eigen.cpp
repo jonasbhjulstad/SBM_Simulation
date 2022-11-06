@@ -1,8 +1,8 @@
-#include "SYCL_GRAPH_Eigen.hpp"
+#include "Sycl_Graph_Eigen.hpp"
 #include <Eigen/SVD>
 #include <numeric>
 
-namespace SYCL::Graph
+namespace Sycl::Graph
 {
 
     Vec dataframe_to_vector(DataFrame &df, const std::string &col_name, int start_idx, int end_idx)

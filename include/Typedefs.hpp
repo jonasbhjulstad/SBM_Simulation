@@ -11,12 +11,10 @@
 #include <limits>
 #include <map>
 #include <stdint.h>
-namespace SYCL::Graph {
+namespace Sycl::Graph {
 
 typedef Eigen::Matrix<float, -1, -1> Mat;
 typedef Eigen::Vector<float, -1> Vec;
 typedef Eigen::Vector<int, -1> iVec;
-typedef const Eigen::Ref<const Vec> crVec;
-typedef const Eigen::Ref<const Mat> crMat;
-} // namespace SYCL::Graph
+} // namespace Sycl::Graph
 #endif

@@ -3,7 +3,7 @@
 
 #include <Typedefs.hpp>
 
-namespace SYCL::Graph
+namespace Sycl::Graph
 {
 
     uint32_t n_choose_k(uint32_t n, uint32_t k);
@@ -136,9 +136,6 @@ namespace SYCL::Graph
                        { return std::make_pair(n++, d); });
         return enumerated_data;
     }
-
-    Mat used_feature_orthogonalize(const Mat &X, const Mat &Q,
-                                   const std::vector<Feature> &used_features);
-} // namespace SYCL::Graph
+} // namespace Sycl::Graph
 
 #endif

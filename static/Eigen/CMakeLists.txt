@@ -1,3 +1,3 @@
-add_library(SYCL_GRAPH_Eigen STATIC SYCL_GRAPH_Eigen.cpp SYCL_GRAPH_Eigen.hpp)
-target_link_libraries(SYCL_GRAPH_Eigen PUBLIC Common Eigen3::Eigen DataFrame)
-target_include_directories(SYCL_GRAPH_Eigen PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(Sycl_Graph_Eigen STATIC Sycl_Graph_Eigen.cpp Sycl_Graph_Eigen.hpp)
+target_link_libraries(Sycl_Graph_Eigen PUBLIC Sycl_Graph Eigen3::Eigen DataFrame)
+target_include_directories(Sycl_Graph_Eigen PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

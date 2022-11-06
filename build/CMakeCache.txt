@@ -204,6 +204,9 @@ CMAKE_STRIP:FILEPATH=/usr/bin/llvm-strip
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//Dependencies for the target
+DataFrame_LIB_DEPENDS:STATIC=general;Common;
+
 //The directory containing a CMake configuration file for Eigen3.
 Eigen3_DIR:PATH=/usr/local/share/eigen3/cmake
 
@@ -221,7 +224,7 @@ FETCHCONTENT_QUIET:BOOL=ON
 FETCHCONTENT_UPDATES_DISCONNECTED:BOOL=OFF
 
 //Dependencies for the target
-Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;general;SYCL_Graph_Sycl;
+Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
 
 //Arguments to supply to pkg-config
 PKG_CONFIG_ARGN:STRING=
@@ -235,14 +238,11 @@ PYBIND11_PYTHON_VERSION:STRING=3.9
 //Path to a library.
 PYTHON_LIBRARY:FILEPATH=/home/man/.pyenv/versions/3.9.13/lib/libpython3.9.so
 
-//The directory containing a CMake configuration file for SUNDIALS.
-SUNDIALS_DIR:PATH=/usr/lib64/cmake/sundials
-
-//Dependencies for the target
-SYCL_GRAPH_Eigen_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
-
 //Value Computed by CMake
 Sycl_Graph_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build
+
+//Dependencies for the target
+Sycl_Graph_Eigen_LIB_DEPENDS:STATIC=general;DataFrame;
 
 //Value Computed by CMake
 Sycl_Graph_IS_TOP_LEVEL:STATIC=ON
@@ -359,7 +359,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=11
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=12
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

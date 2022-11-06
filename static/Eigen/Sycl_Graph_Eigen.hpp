@@ -7,7 +7,7 @@
 #include <string>
 #include <Eigen/Dense>
 
-namespace SYCL::Graph {
+namespace Sycl::Graph {
     Vec dataframe_to_vector(DataFrame &df, const std::string &col_name, int start_idx = 0, int end_idx = -1);
 
     Vec dataframe_to_vector(DataFrameStack &dfs, const std::string &col_name, int start_idx = 0, int end_idx = -1);

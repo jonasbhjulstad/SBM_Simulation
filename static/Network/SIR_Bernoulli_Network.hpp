@@ -3,7 +3,7 @@
 
 #include "Graph_Generation.hpp"
 #include "Network.hpp"
-#include <Sycl_Graph_Math.hpp>
+#include <Graph_Math.hpp>
 #include <Sycl_Graph.hpp>
 #include <FROLS_Random.hpp>
 #include <stddef.h>
@@ -35,9 +35,9 @@ namespace Network_Models
         uint32_t N_I_min = 0;
     };
     template <uint32_t NV, uint32_t NE>
-    using SIR_ArrayGraph = FROLS::Graph::ArrayGraph<SIR_State, SIR_Edge, NV, NE>;
+    using SIR_ArrayGraph = Sycl::Graph::Graph::ArrayGraph<SIR_State, SIR_Edge, NV, NE>;
 
-    using SIR_VectorGraph = FROLS::Graph::VectorGraph<SIR_State, SIR_Edge>;
+    using SIR_VectorGraph = Sycl::Graph::Graph::VectorGraph<SIR_State, SIR_Edge>;
 
     template <typename RNG, uint32_t NV, uint32_t NE, uint32_t Nt, typename dType = float>
     struct Array_SIR_Bernoulli_Network : public ArrayNetwork<SIR_Param<>, 3, Nt, Array_SIR_Bernoulli_Network<RNG, NV, NE, Nt, dType>>
@@ -56,8 +56,8 @@ namespace Network_Models
         void initialize()
         {
 
-            FROLS::random::uniform_real_distribution<dType> d_I;
-            FROLS::random::uniform_real_distribution<dType> d_R;
+            Sycl::Graph::random::uniform_real_distribution<dType> d_I;
+            Sycl::Graph::random::uniform_real_distribution<dType> d_R;
             std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](auto v)
                           {
                 if (d_I(rng) < p_I0) {
@@ -81,7 +81,7 @@ namespace Network_Models
         void infection_step(dType p_I)
         {
 
-            FROLS::random::uniform_real_distribution<dType> d_I;
+            Sycl::Graph::random::uniform_real_distribution<dType> d_I;
 
             // print distance between G.begin() and G.end/()
             //  std::cout << std::distance(G.begin(), G.end()) << std::endl;
@@ -102,7 +102,7 @@ namespace Network_Models
         void recovery_step(dType p_R)
         {
 
-            FROLS::random::uniform_real_distribution<dType> d_R;
+            Sycl::Graph::random::uniform_real_distribution<dType> d_R;
             std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](const auto &v)
                           {
                 bool recover_trigger = (v.data == SIR_I) && d_R(rng) < p_R;
@@ -156,8 +156,8 @@ namespace Network_Models
         void initialize()
         {
 
-            FROLS::random::uniform_real_distribution<dType> d_I;
-            FROLS::random::uniform_real_distribution<dType> d_R;
+            Sycl::Graph::random::uniform_real_distribution<dType> d_I;
+            Sycl::Graph::random::uniform_real_distribution<dType> d_R;
             std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](auto v)
                           {
                 if (d_I(rng) < p_I0) {
@@ -181,7 +181,7 @@ namespace Network_Models
         void infection_step(dType p_I)
         {
 
-            FROLS::random::uniform_real_distribution<dType> d_I;
+            Sycl::Graph::random::uniform_real_distribution<dType> d_I;
 
             // print distance between G.begin() and G.end/()
             //  std::cout << std::distance(G.begin(), G.end()) << std::endl;
@@ -202,7 +202,7 @@ namespace Network_Models
         void recovery_step(dType p_R)
         {
 
-            FROLS::random::uniform_real_distribution<dType> d_R;
+            Sycl::Graph::random::uniform_real_distribution<dType> d_R;
             std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](const auto &v)
                           {
                 bool recover_trigger = (v.data == SIR_I) && d_R(rng) < p_R;

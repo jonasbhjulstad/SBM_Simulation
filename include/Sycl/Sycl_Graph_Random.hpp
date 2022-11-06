@@ -6,7 +6,7 @@
 #else
 #include <random>
 #endif
-namespace SYCL::Graph::random {
+namespace Sycl::Graph::random {
 #ifdef SYCL_GRAPH_USE_INTEL_SYCL
     using default_rng = oneapi::dpl::ranlux48;
     using oneapi::dpl::uniform_real_distribution;

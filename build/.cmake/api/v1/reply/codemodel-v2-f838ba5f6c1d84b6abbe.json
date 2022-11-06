@@ -1,0 +1,275 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						4,
+						11
+					],
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "include",
+					"childIndexes" : 
+					[
+						2,
+						3
+					],
+					"jsonFile" : "directory-include-Release-7ead17b99bffc88b66bb.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "include/Sycl",
+					"jsonFile" : "directory-include.Sycl-Release-4642b1769f8136dbf2db.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "include/Sycl"
+				},
+				{
+					"build" : "include/Graph",
+					"jsonFile" : "directory-include.Graph-Release-eae0121d3fa2cedc5eb4.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "include/Graph"
+				},
+				{
+					"build" : "static",
+					"childIndexes" : 
+					[
+						5,
+						6,
+						7,
+						8,
+						10
+					],
+					"jsonFile" : "directory-static-Release-6fd93e04ae97ed3bad43.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "static"
+				},
+				{
+					"build" : "static/DataFrame",
+					"jsonFile" : "directory-static.DataFrame-Release-05d5fd9b45174ea7efea.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 4,
+					"projectIndex" : 0,
+					"source" : "static/DataFrame",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "static/Eigen",
+					"jsonFile" : "directory-static.Eigen-Release-70084a9c2382e4037e2a.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 4,
+					"projectIndex" : 0,
+					"source" : "static/Eigen",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "static/Network",
+					"jsonFile" : "directory-static.Network-Release-df3b4caa94c695bf4513.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 4,
+					"projectIndex" : 0,
+					"source" : "static/Network",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "static/Sycl",
+					"childIndexes" : 
+					[
+						9
+					],
+					"jsonFile" : "directory-static.Sycl-Release-f56d8290fadae19296f0.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 4,
+					"projectIndex" : 0,
+					"source" : "static/Sycl"
+				},
+				{
+					"build" : "static/Sycl/Network",
+					"jsonFile" : "directory-static.Sycl.Network-Release-3b641de89866080eebd5.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 8,
+					"projectIndex" : 0,
+					"source" : "static/Sycl/Network"
+				},
+				{
+					"build" : "static/Math",
+					"jsonFile" : "directory-static.Math-Release-e5d1be384b5a0dda6750.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 4,
+					"projectIndex" : 0,
+					"source" : "static/Math",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "test",
+					"jsonFile" : "directory-test-Release-451c0598f41488bb20b9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "test",
+					"targetIndexes" : 
+					[
+						5
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					],
+					"name" : "Sycl_Graph",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "Common::@14b3099d61bfdbeae804",
+					"jsonFile" : "target-Common-Release-9c9bcf7b89087bfb1f84.json",
+					"name" : "Common",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "DataFrame::@cfcca68eedd85cdf7cc1",
+					"jsonFile" : "target-DataFrame-Release-43878d916d8560ea2ac7.json",
+					"name" : "DataFrame",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 7,
+					"id" : "FROLS_Network::@eee0f727d2ba5170cad8",
+					"jsonFile" : "target-FROLS_Network-Release-31d1c425ec1d7903aa14.json",
+					"name" : "FROLS_Network",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "Math::@61e7a8d1fb04f340172e",
+					"jsonFile" : "target-Math-Release-fea0aad31ad999332504.json",
+					"name" : "Math",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "Sycl_Graph_Eigen::@7463138972980bfc91cd",
+					"jsonFile" : "target-Sycl_Graph_Eigen-Release-2fe4d8a4675338ca3ecc.json",
+					"name" : "Sycl_Graph_Eigen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "array_constraints::@36f028580bb02cc8272a",
+					"jsonFile" : "target-array_constraints-Release-f13f6b6a6c16ab9c7741.json",
+					"name" : "array_constraints",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/man/Documents/Bernoulli_MC/build",
+		"source" : "/home/man/Documents/Bernoulli_MC"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

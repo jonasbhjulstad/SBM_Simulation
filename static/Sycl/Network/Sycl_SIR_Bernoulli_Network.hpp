@@ -3,7 +3,7 @@
 
 #include <Graph_Generation.hpp>
 #include <SIR_Bernoulli_Network.hpp>
-#include <Sycl_Graph_Math.hpp>
+#include <Graph_Math.hpp>
 #include <FROLS_Random.hpp>
 #include <stddef.h>
 #include <utility>
@@ -21,15 +21,15 @@ namespace Network_Models
         using Edge_t = typename SIR_Graph<NV, NE>::Edge_t;
         using Edge_Prop_t = typename SIR_Graph<NV, NE>::Edge_Prop_t;
         using Vertex_Prop_t = typename SIR_Graph<NV, NE>::Vertex_Prop_t;
-        // using RNG_accessor = sycl::accessor<FROLS::random::default_rng, 1, sycl::access::mode::read_write, sycl::access::target::local>;
-        using RNG_accessor = sycl::accessor<FROLS::random::default_rng, 1, sycl::access::mode::read_write, sycl::access::target::device>;
+        // using RNG_accessor = sycl::accessor<Sycl::Graph::random::default_rng, 1, sycl::access::mode::read_write, sycl::access::target::local>;
+        using RNG_accessor = sycl::accessor<Sycl::Graph::random::default_rng, 1, sycl::access::mode::read_write, sycl::access::target::device>;
         const uint32_t t = 0;
 
         Sycl_SIR_Bernoulli_Network(const SIR_Graph<NV, NE> &G, dType p_I0, dType p_R0, sycl::queue &q, const std::array<size_t, NV> &seeds) : G(G),
                                                                                                                                               q(q), p0{p_I0, p_R0}
         {
             std::transform(seeds.begin(), seeds.end(), rng_vec.begin(), [](const auto &seed)
-                           { return FROLS::random::default_rng(seed); });
+                           { return Sycl::Graph::random::default_rng(seed); });
         }
 
         void initialize()
@@ -44,8 +44,8 @@ namespace Network_Models
                            {
                             auto p_I0 = p0_acc[0];
                             auto p_R0 = p0_acc[1];
-                    FROLS::random::uniform_real_distribution<dType> d_I;
-                    FROLS::random::uniform_real_distribution<dType> d_R;
+                    Sycl::Graph::random::uniform_real_distribution<dType> d_I;
+                    Sycl::Graph::random::uniform_real_distribution<dType> d_R;
                     SIR_State state = d_I(rng_acc[i]) < p_I0 ? SIR_I : SIR_S;
                     state = d_R(rng_acc[i]) < p_R0 ? SIR_R : state;
                     G_acc[0].assign_vertex(state, i); }); });
@@ -67,7 +67,7 @@ namespace Network_Models
             q.submit([&](sycl::handler &h)
                      {
 
-            FROLS::random::uniform_real_distribution<dType> d_I;
+            Sycl::Graph::random::uniform_real_distribution<dType> d_I;
             RNG_accessor rng_acc{rng_buffer, h};
 
             h.parallel_for(sycl::range<1>{NV}, [=](sycl::id<1> it)
@@ -89,7 +89,7 @@ namespace Network_Models
         {
             q.submit([&](sycl::handler &h)
                      {
-                FROLS::random::uniform_real_distribution<dType> d_R;
+                Sycl::Graph::random::uniform_real_distribution<dType> d_R;
                 RNG_accessor rng_acc{rng_buffer, h};
                 h.parallel_for<>(sycl::range<1>{NV}, [=](sycl::id<1> it)
                                  { 

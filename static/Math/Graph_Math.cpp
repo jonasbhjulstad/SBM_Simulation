@@ -1,6 +1,6 @@
-#include "Sycl_Graph_Math.hpp"
+#include "Graph_Math.hpp"
 
-namespace SYCL::Graph {
+namespace Sycl::Graph {
 
     uint32_t n_choose_k(uint32_t n, uint32_t k) {
         if (k > n) return 0;
@@ -44,19 +44,6 @@ namespace SYCL::Graph {
         return res;
     }
 
-    Mat used_feature_orthogonalize(const Mat &X, const Mat &Q,
-                                   const std::vector<Feature> &used_features) {
-        uint32_t N_features = X.cols();
-        Mat Q_current = Mat::Zero(X.rows(), X.cols());
-        for (int k = 0; k < N_features; k++) {
-            if (std::none_of(used_features.begin(), used_features.end(),
-                             [&](const auto &feature) { return feature.index == k; })) {
-                Q_current.col(k) = vec_orthogonalize(X.col(k), Q.leftCols(used_features.size()));
-            }
-        }
-        return Q_current;
-    }
 
 
-
-} // namespace SYCL::Graph
+} // namespace Sycl::Graph

@@ -1,0 +1,27 @@
+[
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DSYCL_GRAPH_USE_INTEL  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -std=gnu++20 -o include/CMakeFiles/Common.dir/SYCL_Graph_Path_Config.cpp.o -c /home/man/Documents/Bernoulli_MC/include/SYCL_Graph_Path_Config.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/include/SYCL_Graph_Path_Config.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/static/DataFrame -I/home/man/Documents/Bernoulli_MC/include -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -std=gnu++20 -o static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o -c /home/man/Documents/Bernoulli_MC/static/DataFrame/DataFrame.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/static/DataFrame/DataFrame.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/static/Eigen -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/DataFrame -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -std=gnu++20 -o static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o -c /home/man/Documents/Bernoulli_MC/static/Eigen/Sycl_Graph_Eigen.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/static/Eigen/Sycl_Graph_Eigen.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/static/Math -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/DataFrame -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -std=gnu++20 -o static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o -c /home/man/Documents/Bernoulli_MC/static/Math/Graph_Math.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/static/Math/Graph_Math.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o -c /home/man/Documents/Bernoulli_MC/test/array_constraints.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/test/array_constraints.cpp"
+}
+]

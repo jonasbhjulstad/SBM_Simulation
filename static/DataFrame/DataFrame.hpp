@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace FROLS {
+namespace Sycl::Graph {
     class DataFrameStack;
 
     class DataFrame {
@@ -62,9 +62,9 @@ namespace FROLS {
 
         void assign(const std::string &col_name, uint32_t row, float value);
 
-        void assign(const std::string &col_name, crVec &vec);
+        void assign(const std::string &col_name, const Vec &vec);
 
-        void assign(const std::vector<std::string> &col_names, crMat &mat);
+        void assign(const std::vector<std::string> &col_names, const Mat &mat);
 
         void assign(const std::vector<std::string> &col_names,
                     const std::vector<std::vector<float>> &col_data);

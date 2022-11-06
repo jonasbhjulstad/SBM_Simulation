@@ -1,0 +1,13 @@
+# ninja log v5
+4	518	1667751319798490738	include/CMakeFiles/Common.dir/SYCL_Graph_Path_Config.cpp.o	7a357de689b4152f
+4	43	1667751337195157872	include/libCommon.a	dfe3043081e12bee
+5	2540	1667751361865158539	static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o	7feea97a4898f1d3
+3	584	1667751451351827648	test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o	f129f9bbff4b0718
+4	1751	1667751347918491496	static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o	f3e87eaf6b1073df
+2	34	1667751373231825518	static/DataFrame/libDataFrame.a	b30d8bad9b075f84
+3	9113	1667751459871827881	static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o	bd281bb7418f3a90
+584	684	1667751451451827653	test/array_constraints	6e1e2e27981de8e7
+34	71	1667751373268492185	static/Math/libMath.a	bf49008b45951f91
+4	506	1667751221955154744	include/CMakeFiles/Sycl_Graph.dir/SYCL_Graph_Path_Config.cpp.o	7e656e6f97bca718
+9113	9156	1667751459911827883	static/Eigen/libSycl_Graph_Eigen.a	f3067e05f205260c
+3	45	1667751237641821837	include/libSycl_Graph.a	242759d268b46799

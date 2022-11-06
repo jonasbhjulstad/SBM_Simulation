@@ -2,7 +2,7 @@
 #define SYCL_GRAPH_NETWORK_HPP
 
 #include "Graph_Generation.hpp"
-#include <Sycl_Graph_Math.hpp>
+#include <Graph_Math.hpp>
 #include <random>
 #include <stddef.h>
 #include <vector>
@@ -47,7 +47,7 @@ namespace Network_Models {
                     break;
                 }
             }
-            return FROLS::transpose(trajectory);
+            return Sycl::Graph::transpose(trajectory);
         }
     };
 
@@ -93,7 +93,7 @@ namespace Network_Models {
                     break;
                 }
             }
-            return FROLS::transpose(trajectory);
+            return Sycl::Graph::transpose(trajectory);
         }
     };
 

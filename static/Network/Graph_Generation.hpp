@@ -14,9 +14,9 @@ namespace Network_Models
     template <typename Graph, typename RNG, typename dType = float>
     void random_connect(Graph &G, dType p_ER, RNG &rng)
     {
-        FROLS::random::uniform_real_distribution d_ER;
+        Sycl::Graph::random::uniform_real_distribution d_ER;
         uint32_t N_edges = 0;
-        for (auto &&v_idx : iter::combinations(FROLS::range(0, G.NV_max), 2))
+        for (auto &&v_idx : iter::combinations(Sycl::Graph::range(0, G.NV_max), 2))
         {
             if (d_ER(rng) < p_ER)
             {

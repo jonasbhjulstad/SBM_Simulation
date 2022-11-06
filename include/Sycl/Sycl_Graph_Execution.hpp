@@ -12,7 +12,7 @@
 #endif
 #include <shared_mutex>
 #include <mutex>
-namespace SYCL::Graph::execution {
+namespace Sycl::Graph::execution {
 #ifdef SYCL_GRAPH_USE_INTEL_SYCL
     using namespace oneapi::dpl;
     using namespace oneapi::dpl::execution;

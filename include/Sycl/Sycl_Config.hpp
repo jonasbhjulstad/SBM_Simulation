@@ -1,7 +1,7 @@
 #ifndef SYCL_GRAPH_SYCL_HPP
 #define SYCL_GRAPH_SYCL_HPP
 #include <CL/sycl.hpp>
-namespace SYCL::Graph
+namespace Sycl::Graph
 {
 
 #ifdef SYCL_GRAPH_USE_INTEL_SYCL

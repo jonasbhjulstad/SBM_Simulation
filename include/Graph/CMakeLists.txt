@@ -1,0 +1,2 @@
+add_library(Sycl_Graph INTERFACE)
+target_link_libraries(Sycl_Graph INTERFACE Common)
