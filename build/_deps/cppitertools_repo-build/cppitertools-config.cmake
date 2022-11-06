@@ -1,5 +1,0 @@
-# Dummy config file
-# When a dependency is added with add_subdirectory, but searched with find_package
-
-# Redirect to the directory added with add_subdirectory
-add_subdirectory(/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src /home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build)

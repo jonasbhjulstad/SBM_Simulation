@@ -14,9 +14,6 @@
 # EXTERNAL cache entries
 ########################
 
-//Builds the googlemock subproject
-BUILD_GMOCK:BOOL=ON
-
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=/usr/bin/llvm-addr2line
 
@@ -26,8 +23,8 @@ CMAKE_AR:FILEPATH=/usr/bin/llvm-ar
 //No help, variable specified on the command line.
 CMAKE_BUILD_TYPE:STRING=Release
 
-//No help, variable specified on the command line.
-CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++
+//CXX compiler
+CMAKE_CXX_COMPILER:STRING=/usr/bin/clang++
 
 //LLVM archiver
 CMAKE_CXX_COMPILER_AR:FILEPATH=/usr/bin/llvm-ar
@@ -50,8 +47,8 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 //Flags used by the CXX compiler during RELWITHDEBINFO builds.
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
-//No help, variable specified on the command line.
-CMAKE_C_COMPILER:FILEPATH=/usr/bin/clang
+//C compiler
+CMAKE_C_COMPILER:STRING=/usr/bin/clang
 
 //LLVM archiver
 CMAKE_C_COMPILER_AR:FILEPATH=/usr/bin/llvm-ar
@@ -98,59 +95,11 @@ CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE
 //Value Computed by CMake.
 CMAKE_FIND_PACKAGE_REDIRECTS_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/CMakeFiles/pkgRedirects
 
-//User executables (bin)
-CMAKE_INSTALL_BINDIR:PATH=bin
-
-//Read-only architecture-independent data (DATAROOTDIR)
-CMAKE_INSTALL_DATADIR:PATH=
-
-//Read-only architecture-independent data root (share)
-CMAKE_INSTALL_DATAROOTDIR:PATH=share
-
-//Documentation root (DATAROOTDIR/doc/PROJECT_NAME)
-CMAKE_INSTALL_DOCDIR:PATH=
-
-//C header files (include)
-CMAKE_INSTALL_INCLUDEDIR:PATH=include
-
-//Info documentation (DATAROOTDIR/info)
-CMAKE_INSTALL_INFODIR:PATH=
-
-//Object code libraries (lib)
-CMAKE_INSTALL_LIBDIR:PATH=lib
-
-//Program executables (libexec)
-CMAKE_INSTALL_LIBEXECDIR:PATH=libexec
-
-//Locale-dependent data (DATAROOTDIR/locale)
-CMAKE_INSTALL_LOCALEDIR:PATH=
-
-//Modifiable single-machine data (var)
-CMAKE_INSTALL_LOCALSTATEDIR:PATH=var
-
-//Man documentation (DATAROOTDIR/man)
-CMAKE_INSTALL_MANDIR:PATH=
-
-//C header files for non-gcc (/usr/include)
-CMAKE_INSTALL_OLDINCLUDEDIR:PATH=/usr/include
-
 //Install path prefix, prepended onto install directories.
 CMAKE_INSTALL_PREFIX:PATH=/usr/local
 
-//Run-time variable data (LOCALSTATEDIR/run)
-CMAKE_INSTALL_RUNSTATEDIR:PATH=
-
-//System admin executables (sbin)
-CMAKE_INSTALL_SBINDIR:PATH=sbin
-
-//Modifiable architecture-independent data (com)
-CMAKE_INSTALL_SHAREDSTATEDIR:PATH=com
-
-//Read-only single-machine data (etc)
-CMAKE_INSTALL_SYSCONFDIR:PATH=etc
-
 //Path to a program.
-CMAKE_LINKER:FILEPATH=/usr/bin/ld.lld
+CMAKE_LINKER:FILEPATH=/usr/bin/ld
 
 //Program used to build from build.ninja files.
 CMAKE_MAKE_PROGRAM:FILEPATH=/usr/bin/ninja
@@ -191,22 +140,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=FROLS
-
-//Value Computed by CMake
-CMAKE_PROJECT_VERSION:STATIC=1.12.1
-
-//Value Computed by CMake
-CMAKE_PROJECT_VERSION_MAJOR:STATIC=1
-
-//Value Computed by CMake
-CMAKE_PROJECT_VERSION_MINOR:STATIC=12
-
-//Value Computed by CMake
-CMAKE_PROJECT_VERSION_PATCH:STATIC=1
-
-//Value Computed by CMake
-CMAKE_PROJECT_VERSION_TWEAK:STATIC=
+CMAKE_PROJECT_NAME:STATIC=Sycl_Graph
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/llvm-ranlib
@@ -270,21 +204,6 @@ CMAKE_STRIP:FILEPATH=/usr/bin/llvm-strip
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
-//The directory containing a CMake configuration file for Cbc.
-Cbc_DIR:PATH=/usr/local/lib/cmake/Cbc
-
-//The directory containing a CMake configuration file for Cgl.
-Cgl_DIR:PATH=/usr/local/lib/cmake/Cgl
-
-//The directory containing a CMake configuration file for Clp.
-Clp_DIR:PATH=/usr/local/lib/cmake/Clp
-
-//The directory containing a CMake configuration file for CoinUtils.
-CoinUtils_DIR:PATH=/usr/local/lib/cmake/CoinUtils
-
-//Dependencies for the target
-DataFrame_LIB_DEPENDS:STATIC=general;Common;
-
 //The directory containing a CMake configuration file for Eigen3.
 Eigen3_DIR:PATH=/usr/local/share/eigen3/cmake
 
@@ -298,56 +217,11 @@ FETCHCONTENT_FULLY_DISCONNECTED:BOOL=OFF
 //Enables QUIET option for all content population
 FETCHCONTENT_QUIET:BOOL=ON
 
-//When not empty, overrides where to find pre-populated content
-// for cppitertools_repo
-FETCHCONTENT_SOURCE_DIR_CPPITERTOOLS_REPO:PATH=
-
-//When not empty, overrides where to find pre-populated content
-// for googletest
-FETCHCONTENT_SOURCE_DIR_GOOGLETEST:PATH=
-
 //Enables UPDATE_DISCONNECTED behavior for all content population
 FETCHCONTENT_UPDATES_DISCONNECTED:BOOL=OFF
 
-//Enables UPDATE_DISCONNECTED behavior just for population of cppitertools_repo
-FETCHCONTENT_UPDATES_DISCONNECTED_CPPITERTOOLS_REPO:BOOL=OFF
-
-//Enables UPDATE_DISCONNECTED behavior just for population of googletest
-FETCHCONTENT_UPDATES_DISCONNECTED_GOOGLETEST:BOOL=OFF
-
-//Value Computed by CMake
-FROLS_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build
-
 //Dependencies for the target
-FROLS_Binder_LIB_DEPENDS:STATIC=general;Common;general;TBB::tbb;general;Regressors;general;FROLS_Math;general;Features;general;DataFrame;general;FROLS_Eigen;general;TBB::tbb;general;/home/man/.pyenv/versions/3.9.13/lib/libpython3.9.so;
-
-//Dependencies for the target
-FROLS_Eigen_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
-
-//Value Computed by CMake
-FROLS_IS_TOP_LEVEL:STATIC=ON
-
-//Dependencies for the target
-FROLS_Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
-
-//Value Computed by CMake
-FROLS_SOURCE_DIR:STATIC=/home/man/Documents/Bernoulli_MC/Cpp
-
-//Dependencies for the target
-Features_LIB_DEPENDS:STATIC=general;Common;general;FROLS_Eigen;general;Regressors;
-
-//Git command line client
-GIT_EXECUTABLE:FILEPATH=/usr/bin/git
-
-//The directory containing a CMake configuration file for GTest.
-GTest_DIR:PATH=/usr/lib64/cmake/GTest
-
-//Enable installation of googletest. (Projects embedding googletest
-// may want to turn this OFF.)
-INSTALL_GTEST:BOOL=ON
-
-//The directory containing a CMake configuration file for Osi.
-Osi_DIR:PATH=/usr/local/lib/cmake/Osi
+Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;general;SYCL_Graph_Sycl;
 
 //Arguments to supply to pkg-config
 PKG_CONFIG_ARGN:STRING=
@@ -361,136 +235,26 @@ PYBIND11_PYTHON_VERSION:STRING=3.9
 //Path to a library.
 PYTHON_LIBRARY:FILEPATH=/home/man/.pyenv/versions/3.9.13/lib/libpython3.9.so
 
-//Path to a file.
-Protobuf_INCLUDE_DIR:PATH=/usr/local/include
-
-//Path to a library.
-Protobuf_LIBRARY_DEBUG:FILEPATH=/usr/local/lib/libprotobuf.a
-
-//Path to a library.
-Protobuf_LIBRARY_RELEASE:FILEPATH=/usr/local/lib/libprotobuf.a
-
-//Path to a library.
-Protobuf_LITE_LIBRARY_DEBUG:FILEPATH=/usr/local/lib/libprotobuf-lite.a
-
-//Path to a library.
-Protobuf_LITE_LIBRARY_RELEASE:FILEPATH=/usr/local/lib/libprotobuf-lite.a
-
-//The Google Protocol Buffers Compiler
-Protobuf_PROTOC_EXECUTABLE:FILEPATH=/opt/intel/oneapi/intelpython/latest/bin/protoc
-
-//Path to a library.
-Protobuf_PROTOC_LIBRARY_DEBUG:FILEPATH=/usr/local/lib/libprotoc.a
-
-//Path to a library.
-Protobuf_PROTOC_LIBRARY_RELEASE:FILEPATH=/usr/local/lib/libprotoc.a
-
-//Dependencies for the target
-Regressors_LIB_DEPENDS:STATIC=general;Common;general;Features;general;FROLS_Math;general;TBB::tbb;general;ortools::ortools;general;fmt;general;TBB::tbb;
-
-//The directory containing a CMake configuration file for SCIP.
-SCIP_DIR:PATH=/usr/local/lib/cmake/scip
-
 //The directory containing a CMake configuration file for SUNDIALS.
 SUNDIALS_DIR:PATH=/usr/lib64/cmake/sundials
+
+//Dependencies for the target
+SYCL_GRAPH_Eigen_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
+
+//Value Computed by CMake
+Sycl_Graph_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build
+
+//Value Computed by CMake
+Sycl_Graph_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+Sycl_Graph_SOURCE_DIR:STATIC=/home/man/Documents/Bernoulli_MC
 
 //The directory containing a CMake configuration file for TBB.
 TBB_DIR:PATH=/usr/lib64/cmake/TBB
 
-//Path to a file.
-ZLIB_INCLUDE_DIR:PATH=/usr/local/include
-
-//Path to a library.
-ZLIB_LIBRARY_DEBUG:FILEPATH=ZLIB_LIBRARY_DEBUG-NOTFOUND
-
-//Path to a library.
-ZLIB_LIBRARY_RELEASE:FILEPATH=/usr/local/lib/libz.a
-
-//The directory containing a CMake configuration file for absl.
-absl_DIR:PATH=/usr/local/lib/cmake/absl
-
-//Value Computed by CMake
-cppitertools_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build
-
-//The installation cmake directory
-cppitertools_INSTALL_CMAKE_DIR:STRING=share
-
-//The installation include directory
-cppitertools_INSTALL_INCLUDE_DIR:STRING=include
-
-//Value Computed by CMake
-cppitertools_IS_TOP_LEVEL:STATIC=OFF
-
-//Value Computed by CMake
-cppitertools_SOURCE_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src
-
-//The directory containing a CMake configuration file for fmt.
-fmt_DIR:PATH=/usr/lib64/cmake/fmt
-
-//Value Computed by CMake
-gmock_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/googletest-build/googlemock
-
-//Value Computed by CMake
-gmock_IS_TOP_LEVEL:STATIC=OFF
-
-//Dependencies for the target
-gmock_LIB_DEPENDS:STATIC=general;gtest;
-
-//Value Computed by CMake
-gmock_SOURCE_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googlemock
-
-//Build all of Google Mock's own tests.
-gmock_build_tests:BOOL=OFF
-
-//Dependencies for the target
-gmock_main_LIB_DEPENDS:STATIC=general;gmock;
-
-//Value Computed by CMake
-googletest-distribution_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/googletest-build
-
-//Value Computed by CMake
-googletest-distribution_IS_TOP_LEVEL:STATIC=OFF
-
-//Value Computed by CMake
-googletest-distribution_SOURCE_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/googletest-src
-
-//Value Computed by CMake
-gtest_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/googletest-build/googletest
-
-//Value Computed by CMake
-gtest_IS_TOP_LEVEL:STATIC=OFF
-
-//Value Computed by CMake
-gtest_SOURCE_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/googletest-src/googletest
-
-//Build gtest's sample programs.
-gtest_build_samples:BOOL=OFF
-
-//Build all of gtest's own tests.
-gtest_build_tests:BOOL=OFF
-
-//Disable uses of pthreads in gtest.
-gtest_disable_pthreads:BOOL=OFF
-
-gtest_force_shared_crt:BOOL=ON
-
-//Build gtest with internal symbols hidden in shared libraries.
-gtest_hide_internal_symbols:BOOL=OFF
-
-//Dependencies for the target
-gtest_main_LIB_DEPENDS:STATIC=general;gtest;
-
-//The directory containing a CMake configuration file for ortools.
-ortools_DIR:PATH=/usr/local/lib/cmake/ortools
-
 //The directory containing a CMake configuration file for pybind11.
 pybind11_DIR:PATH=/usr/lib64/cmake/pybind11
-
-//The directory containing a CMake configuration file for range-v3.
-range-v3_DIR:PATH=/usr/lib64/cmake/range-v3
-
-//The directory containing a CMake configuration file for re2.
-re2_DIR:PATH=/usr/local/lib/cmake/re2
 
 
 ########################
@@ -573,45 +337,11 @@ CMAKE_GENERATOR_INSTANCE:INTERNAL=
 CMAKE_GENERATOR_PLATFORM:INTERNAL=
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
-//Test CMAKE_HAVE_LIBC_PTHREAD
-CMAKE_HAVE_LIBC_PTHREAD:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
-CMAKE_HOME_DIRECTORY:INTERNAL=/home/man/Documents/Bernoulli_MC/Cpp
-//ADVANCED property for variable: CMAKE_INSTALL_BINDIR
-CMAKE_INSTALL_BINDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_DATADIR
-CMAKE_INSTALL_DATADIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_DATAROOTDIR
-CMAKE_INSTALL_DATAROOTDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_DOCDIR
-CMAKE_INSTALL_DOCDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_INCLUDEDIR
-CMAKE_INSTALL_INCLUDEDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_INFODIR
-CMAKE_INSTALL_INFODIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_LIBDIR
-CMAKE_INSTALL_LIBDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_LIBEXECDIR
-CMAKE_INSTALL_LIBEXECDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_LOCALEDIR
-CMAKE_INSTALL_LOCALEDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_LOCALSTATEDIR
-CMAKE_INSTALL_LOCALSTATEDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_MANDIR
-CMAKE_INSTALL_MANDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_OLDINCLUDEDIR
-CMAKE_INSTALL_OLDINCLUDEDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_RUNSTATEDIR
-CMAKE_INSTALL_RUNSTATEDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_SBINDIR
-CMAKE_INSTALL_SBINDIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_INSTALL_SHAREDSTATEDIR
-CMAKE_INSTALL_SHAREDSTATEDIR-ADVANCED:INTERNAL=1
+CMAKE_HOME_DIRECTORY:INTERNAL=/home/man/Documents/Bernoulli_MC
 //Install .so files without execute permission.
 CMAKE_INSTALL_SO_NO_EXE:INTERNAL=0
-//ADVANCED property for variable: CMAKE_INSTALL_SYSCONFDIR
-CMAKE_INSTALL_SYSCONFDIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_LINKER
 CMAKE_LINKER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MAKE_PROGRAM
@@ -629,7 +359,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=23
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=11
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -672,40 +402,14 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
-//Details about finding Cbc
-FIND_PACKAGE_MESSAGE_DETAILS_Cbc:INTERNAL=[/usr/local/lib/cmake/Cbc/CbcConfig.cmake][v2.10.7()]
-//Details about finding Clp
-FIND_PACKAGE_MESSAGE_DETAILS_Clp:INTERNAL=[/usr/local/lib/cmake/Clp/ClpConfig.cmake][v1.17.7()]
-//Details about finding GTest
-FIND_PACKAGE_MESSAGE_DETAILS_GTest:INTERNAL=[/usr/lib64/cmake/GTest/GTestConfig.cmake][c ][v1.12.1()]
 //Details about finding PYTHON
 FIND_PACKAGE_MESSAGE_DETAILS_PYTHON:INTERNAL=/home/man/.pyenv/versions/3.9.13/bin/python33.9.13
 //Details about finding PkgConfig
 FIND_PACKAGE_MESSAGE_DETAILS_PkgConfig:INTERNAL=[/usr/bin/pkg-config][v1.8.0()]
-//Details about finding Protobuf
-FIND_PACKAGE_MESSAGE_DETAILS_Protobuf:INTERNAL=[/usr/local/lib/libprotobuf.a][/usr/local/include][v3.19.4()]
-//Details about finding Python
-FIND_PACKAGE_MESSAGE_DETAILS_Python:INTERNAL=[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.7()]
 //Details about finding Python3
 FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.7(3.9)]
 //Details about finding PythonInterp
 FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/home/man/.pyenv/versions/3.9.13/bin/python3][v3.9.13(3.9)]
-//Details about finding SCIP
-FIND_PACKAGE_MESSAGE_DETAILS_SCIP:INTERNAL=[/usr/local/lib/cmake/scip/scip-config.cmake][v8.0.0()]
-//Details about finding Threads
-FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
-//Details about finding ZLIB
-FIND_PACKAGE_MESSAGE_DETAILS_ZLIB:INTERNAL=[/usr/local/lib/libz.a][/usr/local/include][v1.2.11()]
-//FROLS_DATA_DIR
-FROLS_DATA_DIR:INTERNAL=/home/man/Documents/Bernoulli_MC/Cpp/data
-//FROLS_INCLUDE
-FROLS_INCLUDE:INTERNAL=/home/man/Documents/Bernoulli_MC/Cpp/include
-//FROLS_INCLUDE_DIRS
-FROLS_INCLUDE_DIRS:INTERNAL=/home/man/Documents/Bernoulli_MC/Cpp/include;/home/man/Documents/Bernoulli_MC/Cpp/static;/home/man/Documents/Bernoulli_MC/Cpp/static/Features;/home/man/Documents/Bernoulli_MC/Cpp/static/Algorithm;/home/man/Documents/Bernoulli_MC/Cpp/static/Regressors
-//FROLS_LOG_DIR
-FROLS_LOG_DIR:INTERNAL=/home/man/Documents/Bernoulli_MC/Cpp/log
-//ADVANCED property for variable: GIT_EXECUTABLE
-GIT_EXECUTABLE-ADVANCED:INTERNAL=1
 //Test HAS_FLTO
 HAS_FLTO:INTERNAL=1
 //Test HAS_FLTO_THIN
@@ -724,59 +428,23 @@ PYTHON_MODULE_PREFIX:INTERNAL=
 PYTHON_VERSION:INTERNAL=3.9.13
 PYTHON_VERSION_MAJOR:INTERNAL=3
 PYTHON_VERSION_MINOR:INTERNAL=9
-//ADVANCED property for variable: Protobuf_INCLUDE_DIR
-Protobuf_INCLUDE_DIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: Protobuf_LIBRARY_DEBUG
-Protobuf_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: Protobuf_LIBRARY_RELEASE
-Protobuf_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: Protobuf_LITE_LIBRARY_DEBUG
-Protobuf_LITE_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: Protobuf_LITE_LIBRARY_RELEASE
-Protobuf_LITE_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: Protobuf_PROTOC_EXECUTABLE
-Protobuf_PROTOC_EXECUTABLE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: Protobuf_PROTOC_LIBRARY_DEBUG
-Protobuf_PROTOC_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: Protobuf_PROTOC_LIBRARY_RELEASE
-Protobuf_PROTOC_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 Python_ADDITIONAL_VERSIONS:INTERNAL=3.11;3.10;3.9;3.8;3.7;3.6
-//ADVANCED property for variable: ZLIB_INCLUDE_DIR
-ZLIB_INCLUDE_DIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: ZLIB_LIBRARY_DEBUG
-ZLIB_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: ZLIB_LIBRARY_RELEASE
-ZLIB_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//SYCL_GRAPH_DATA_DIR
+SYCL_GRAPH_DATA_DIR:INTERNAL=/home/man/Documents/Bernoulli_MC/data
+//SYCL_GRAPH_INCLUDE
+SYCL_GRAPH_INCLUDE:INTERNAL=/home/man/Documents/Bernoulli_MC/include
+//SYCL_GRAPH_INCLUDE_DIRS
+SYCL_GRAPH_INCLUDE_DIRS:INTERNAL=/home/man/Documents/Bernoulli_MC/include;/home/man/Documents/Bernoulli_MC/static;/home/man/Documents/Bernoulli_MC/static/Features;/home/man/Documents/Bernoulli_MC/static/Algorithm;/home/man/Documents/Bernoulli_MC/static/Regressors
+//SYCL_GRAPH_LOG_DIR
+SYCL_GRAPH_LOG_DIR:INTERNAL=/home/man/Documents/Bernoulli_MC/log
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
-//CMAKE_INSTALL_PREFIX during last run
-_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/usr/local
 _Python:INTERNAL=PYTHON
 //Path to a program.
 _Python3_EXECUTABLE:INTERNAL=/usr/bin/python3.10
 //Python3 Properties
 _Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;10;7;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages
 _Python3_INTERPRETER_SIGNATURE:INTERNAL=2e995cd2bd888af83868128ab4554325
-//Path to a program.
-_Python_EXECUTABLE:INTERNAL=/usr/bin/python3.10
-//Python Properties
-_Python_INTERPRETER_PROPERTIES:INTERNAL=Python;3;10;7;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages
-_Python_INTERPRETER_SIGNATURE:INTERNAL=b91b4035ecb3bb3f5760d35922531bcd
-cmake_package_name:INTERNAL=GTest
-generated_dir:INTERNAL=/home/man/Documents/Bernoulli_MC/build/_deps/googletest-build/googletest/generated
-//ADVANCED property for variable: gmock_build_tests
-gmock_build_tests-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: gtest_build_samples
-gtest_build_samples-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: gtest_build_tests
-gtest_build_tests-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: gtest_disable_pthreads
-gtest_disable_pthreads-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: gtest_force_shared_crt
-gtest_force_shared_crt-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: gtest_hide_internal_symbols
-gtest_hide_internal_symbols-ADVANCED:INTERNAL=1
 //Directories where pybind11 and possibly Python headers are located
 pybind11_INCLUDE_DIRS:INTERNAL=/usr/include;/home/man/.pyenv/versions/3.9.13/include/python3.9
-targets_export_name:INTERNAL=GTestTargets
 

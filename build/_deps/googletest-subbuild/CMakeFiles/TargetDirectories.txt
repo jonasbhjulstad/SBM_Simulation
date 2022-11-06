@@ -1,3 +1,0 @@
-/home/man/Documents/Bernoulli_MC/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate.dir
-/home/man/Documents/Bernoulli_MC/build/_deps/googletest-subbuild/CMakeFiles/edit_cache.dir
-/home/man/Documents/Bernoulli_MC/build/_deps/googletest-subbuild/CMakeFiles/rebuild_cache.dir
