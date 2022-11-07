@@ -3,7 +3,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "static/Math/libMath.a"
+			"path" : "static/Eigen/libSycl_Graph_Eigen.a"
 		}
 	],
 	"backtrace" : 1,
@@ -19,7 +19,7 @@
 		],
 		"files" : 
 		[
-			"static/Math/CMakeLists.txt",
+			"static/Eigen/CMakeLists.txt",
 			"CMakeLists.txt"
 		],
 		"nodes" : 
@@ -45,7 +45,7 @@
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 58,
+				"line" : 59,
 				"parent" : 3
 			},
 			{
@@ -89,7 +89,7 @@
 			[
 				{
 					"backtrace" : 6,
-					"path" : "/home/man/Documents/Bernoulli_MC/static/Math"
+					"path" : "/home/man/Documents/Bernoulli_MC/static/Eigen"
 				},
 				{
 					"backtrace" : 2,
@@ -131,13 +131,13 @@
 			"id" : "DataFrame::@cfcca68eedd85cdf7cc1"
 		}
 	],
-	"id" : "Math::@61e7a8d1fb04f340172e",
-	"name" : "Math",
-	"nameOnDisk" : "libMath.a",
+	"id" : "Sycl_Graph_Eigen::@7463138972980bfc91cd",
+	"name" : "Sycl_Graph_Eigen",
+	"nameOnDisk" : "libSycl_Graph_Eigen.a",
 	"paths" : 
 	{
-		"build" : "static/Math",
-		"source" : "static/Math"
+		"build" : "static/Eigen",
+		"source" : "static/Eigen"
 	},
 	"sourceGroups" : 
 	[
@@ -147,6 +147,13 @@
 			[
 				0
 			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				1
+			]
 		}
 	],
 	"sources" : 
@@ -154,8 +161,13 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "static/Math/Graph_Math.cpp",
+			"path" : "static/Eigen/Sycl_Graph_Eigen.cpp",
 			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "static/Eigen/Sycl_Graph_Eigen.hpp",
+			"sourceGroupIndex" : 1
 		}
 	],
 	"type" : "STATIC_LIBRARY"

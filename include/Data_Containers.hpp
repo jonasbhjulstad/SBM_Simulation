@@ -3,6 +3,7 @@
 #include <concepts>
 #include <ranges>
 #include <tuple>
+#include <iterator>
 namespace containers {
 template <typename T>
 concept Indexable = requires(T container) {
@@ -15,22 +16,29 @@ concept ElementIterable = requires(T x) {
 };
 
 template <typename T>
-concept FixedArray = std::ranges::contiguous_range<std::ranges::range_value_t<T>> &&
-                std::ranges::sized_range<T> &&
-                std::ranges::random_access_range<T> &&
-                std::ranges::contiguous_range<T>
-                && requires(T container)
+concept GenericArray = ElementIterable<T> &&
+Indexable<T> && requires(T x) {
+  x.size(); // must have `x.size()`
+};
+
+template <typename T>
+concept FixedSize = requires(T container)
                 {
                     {std::tuple_size_v<T>}-> std::convertible_to<std::size_t>;
                 };
 template <typename T>
-concept DynamicArray =
+concept DynamicSize =
                 std::ranges::random_access_range<T>
                 && requires(T container)
                 {
                     container.resize(0);
+                    container.push_back({});
                 };
 
+template <typename T>
+concept DynamicArray = GenericArray<T> && DynamicSize<T>;
+template <typename T>
+concept FixedArray = GenericArray<T> && FixedSize<T>;
 
 } // namespace containers
 

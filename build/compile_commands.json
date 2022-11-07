@@ -21,7 +21,12 @@
 },
 {
   "directory": "/home/man/Documents/Bernoulli_MC/build",
-  "command": "/usr/bin/clang++ -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -isystem /usr/local/include/eigen3  -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o -c /home/man/Documents/Bernoulli_MC/test/array_constraints.cpp",
+  "command": "/usr/bin/clang++ -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include  -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o -c /home/man/Documents/Bernoulli_MC/test/array_constraints.cpp",
   "file": "/home/man/Documents/Bernoulli_MC/test/array_constraints.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/usr/bin/clang++ -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include  -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o -c /home/man/Documents/Bernoulli_MC/test/sycl_mutex.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/test/sycl_mutex.cpp"
 }
 ]

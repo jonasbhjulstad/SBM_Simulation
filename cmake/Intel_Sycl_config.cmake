@@ -4,11 +4,11 @@ if(${SYCL_GRAPH_USE_INTEL_SYCL})
     find_package(IntelDPCPP REQUIRED HINTS "/opt/intel/oneapi/compiler/latest/linux/IntelDPCPP")
     set(TBB_DIR "/opt/intel/oneapi/tbb/latest/lib/cmake/tbb
 /")
-    find_package(TBB REQUIRED)
+    # find_package(TBB REQUIRED)
 
-    find_package(oneDPL REQUIRED HINTS "/opt/intel/oneapi/dpl/2021.7.0/lib/cmake/oneDPL/")
+    # find_package(oneDPL REQUIRED HINTS "/opt/intel/oneapi/dpl/2021.7.0/lib/cmake/oneDPL/")
 
-    set(ONEAPI_LIBS oneDPL TBB::tbb)
+    # set(ONEAPI_LIBRARIES oneDPL TBB::tbb)
 
     # list(REMOVE_ITEM importTargetsAfter ${importTargets})
     # message(WARNING "${importTargetsAfter}")

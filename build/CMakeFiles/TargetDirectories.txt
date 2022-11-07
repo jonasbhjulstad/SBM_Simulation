@@ -26,5 +26,6 @@
 /home/man/Documents/Bernoulli_MC/build/static/Math/CMakeFiles/edit_cache.dir
 /home/man/Documents/Bernoulli_MC/build/static/Math/CMakeFiles/rebuild_cache.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/array_constraints.dir
+/home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/sycl_mutex.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/edit_cache.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/rebuild_cache.dir

@@ -2,16 +2,16 @@
 #include <array>
 #include <vector>
 using namespace containers;
-template <template <typename ...> typename Array_t, typename D>
-requires DynamicArray<Array_t<D>>
-void resizable_fn(Array_t<D> a)
+template <template <typename ...> typename Array_t, typename ... Data_t>
+requires DynamicArray<Array_t<Data_t ...>>
+void resizable_fn(Array_t<Data_t ...> a)
 {
     a.resize(10);
 }
 
-template <template <typename ...> typename Array_t, typename D>
-requires FixedArray<Array_t<D>>
-void fixed_fn(Array_t<D> a)
+template <template <typename, size_t> typename Array_t, typename Data_t, std::size_t N>
+requires FixedArray<Array_t<Data_t, N>>
+void fixed_fn(Array_t<Data_t, N> a)
 {
     auto elem = a[0];
 }

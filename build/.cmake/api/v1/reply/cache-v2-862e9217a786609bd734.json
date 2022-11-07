@@ -139,10 +139,10 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "CXX compiler"
+					"value" : "No help, variable specified on the command line."
 				}
 			],
-			"type" : "STRING",
+			"type" : "FILEPATH",
 			"value" : "/usr/bin/clang++"
 		},
 		{
@@ -267,10 +267,10 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "C compiler"
+					"value" : "No help, variable specified on the command line."
 				}
 			],
-			"type" : "STRING",
+			"type" : "FILEPATH",
 			"value" : "/usr/bin/clang"
 		},
 		{
@@ -1587,7 +1587,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "/usr/lib64/cmake/TBB"
+			"value" : "/usr/local/lib/cmake/tbb-2021.7.0"
 		},
 		{
 			"name" : "_CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED",
@@ -1648,6 +1648,30 @@
 			],
 			"type" : "INTERNAL",
 			"value" : "2e995cd2bd888af83868128ab4554325"
+		},
+		{
+			"name" : "_fsycl_option",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Test _fsycl_option"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "1"
+		},
+		{
+			"name" : "oneDPL_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for oneDPL."
+				}
+			],
+			"type" : "PATH",
+			"value" : "/usr/local/lib/cmake/oneDPL-2021.7.1"
 		},
 		{
 			"name" : "pybind11_DIR",
