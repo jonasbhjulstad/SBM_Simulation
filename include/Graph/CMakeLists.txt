@@ -1,2 +1,3 @@
 add_library(Sycl_Graph INTERFACE)
 target_link_libraries(Sycl_Graph INTERFACE Common)
+target_include_directories(Sycl_Graph INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})

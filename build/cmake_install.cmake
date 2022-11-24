@@ -44,6 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
+  include("/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build/cmake_install.cmake")
   include("/home/man/Documents/Bernoulli_MC/build/include/cmake_install.cmake")
   include("/home/man/Documents/Bernoulli_MC/build/static/cmake_install.cmake")
   include("/home/man/Documents/Bernoulli_MC/build/test/cmake_install.cmake")

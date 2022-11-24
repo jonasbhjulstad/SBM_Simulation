@@ -142,6 +142,21 @@ CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 //Value Computed by CMake
 CMAKE_PROJECT_NAME:STATIC=Sycl_Graph
 
+//Value Computed by CMake
+CMAKE_PROJECT_VERSION:STATIC=2.0
+
+//Value Computed by CMake
+CMAKE_PROJECT_VERSION_MAJOR:STATIC=2
+
+//Value Computed by CMake
+CMAKE_PROJECT_VERSION_MINOR:STATIC=0
+
+//Value Computed by CMake
+CMAKE_PROJECT_VERSION_PATCH:STATIC=
+
+//Value Computed by CMake
+CMAKE_PROJECT_VERSION_TWEAK:STATIC=
+
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/llvm-ranlib
 
@@ -220,8 +235,18 @@ FETCHCONTENT_FULLY_DISCONNECTED:BOOL=OFF
 //Enables QUIET option for all content population
 FETCHCONTENT_QUIET:BOOL=ON
 
+//When not empty, overrides where to find pre-populated content
+// for cppitertools_repo
+FETCHCONTENT_SOURCE_DIR_CPPITERTOOLS_REPO:PATH=
+
 //Enables UPDATE_DISCONNECTED behavior for all content population
 FETCHCONTENT_UPDATES_DISCONNECTED:BOOL=OFF
+
+//Enables UPDATE_DISCONNECTED behavior just for population of cppitertools_repo
+FETCHCONTENT_UPDATES_DISCONNECTED_CPPITERTOOLS_REPO:BOOL=OFF
+
+//Git command line client
+GIT_EXECUTABLE:FILEPATH=/usr/bin/git
 
 //Dependencies for the target
 Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
@@ -256,6 +281,21 @@ Sycl_Graph_SOURCE_DIR:STATIC=/home/man/Documents/Bernoulli_MC
 
 //The directory containing a CMake configuration file for TBB.
 TBB_DIR:PATH=/usr/local/lib/cmake/tbb-2021.7.0
+
+//Value Computed by CMake
+cppitertools_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build
+
+//The installation cmake directory
+cppitertools_INSTALL_CMAKE_DIR:STRING=share
+
+//The installation include directory
+cppitertools_INSTALL_INCLUDE_DIR:STRING=include
+
+//Value Computed by CMake
+cppitertools_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+cppitertools_SOURCE_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src
 
 //The directory containing a CMake configuration file for oneDPL.
 oneDPL_DIR:PATH=/usr/local/lib/cmake/oneDPL-2021.7.1
@@ -366,7 +406,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=12
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=13
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -417,6 +457,8 @@ FIND_PACKAGE_MESSAGE_DETAILS_PkgConfig:INTERNAL=[/usr/bin/pkg-config][v1.8.0()]
 FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.8(3.9)]
 //Details about finding PythonInterp
 FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/home/man/.pyenv/versions/3.9.13/bin/python3][v3.9.13(3.9)]
+//ADVANCED property for variable: GIT_EXECUTABLE
+GIT_EXECUTABLE-ADVANCED:INTERNAL=1
 //Test HAS_FLTO
 HAS_FLTO:INTERNAL=1
 //Test HAS_FLTO_THIN
@@ -450,7 +492,7 @@ _Python:INTERNAL=PYTHON
 //Path to a program.
 _Python3_EXECUTABLE:INTERNAL=/usr/bin/python3.10
 //Python3 Properties
-_Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;10;7;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages
+_Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;10;8;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages
 _Python3_INTERPRETER_SIGNATURE:INTERNAL=2e995cd2bd888af83868128ab4554325
 //Test _fsycl_option
 _fsycl_option:INTERNAL=1

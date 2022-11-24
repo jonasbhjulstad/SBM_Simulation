@@ -33,6 +33,16 @@ set(SYCL_GRAPH_USE_AMD OFF)
 set(SYCL_GRAPH_USE_INTEL_SYCL OFF)
 set(SYCL_GRAPH_USE_HIPSYCL OFF)
 
+include(FetchContent)
+FetchContent_Declare(
+    cppitertools_repo
+    GIT_REPOSITORY https://github.com/ryanhaining/cppitertools.git
+    GIT_TAG master
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+)
+FetchContent_MakeAvailable(cppitertools_repo)
+
 if(${SYCL_GRAPH_USE_INTEL_SYCL})
 add_compile_definitions(SYCL_GRAPH_USE_INTEL_SYCL)
 endif()

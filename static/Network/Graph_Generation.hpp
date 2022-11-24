@@ -7,7 +7,8 @@
 
 #include <itertools.hpp>
 #include <memory>
-#include <random>
+#include <Sycl/Sycl_Graph_Random.hpp>
+#include <Graph_Math.hpp>
 
 namespace Network_Models
 {
