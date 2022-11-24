@@ -30,9 +30,8 @@ template <typename D, std::unsigned_integral ID_t> struct Edge {
 
 template <typename Derived, std::unsigned_integral uI_t, typename V, typename E>
 struct GraphContainer {
-  GraphContainer(uI_t NV_max, uI_t NE_max, uI_t NV_mx, uI_t NE_mx)
-      : NV_max(NV_max), NE_max(NE_max), NV_mx(NV_mx), NE_mx(NE_mx),
-        NV_per_mx(NV_max / NV_mx), NE_per_mx(NE_max / NE_mx) {}
+  GraphContainer(uI_t NV_max, uI_t NE_max)
+      : NV_max(NV_max), NE_max(NE_max){}
 
   auto begin() {
     const auto &derived = static_cast<Derived const &>(*this);
@@ -84,63 +83,13 @@ struct GraphContainer {
     return derived.get_edge_mutex_count();
   }
 
-  void lock_vertex(uI_t idx) {
-    const auto &derived = static_cast<Derived const &>(*this);
-    std::mutex &mx = derived.get_vertex_mutex(idx);
-    mx.lock();
-  }
-
-  void unlock_vertex(uI_t idx) {
-    const auto &derived = static_cast<Derived const &>(*this);
-    std::mutex &mx = derived.get_vertex_mutex(idx);
-    mx.unlock();
-  }
-
-  void lock_edge(uI_t idx) {
-    const auto &derived = static_cast<Derived const &>(*this);
-    std::mutex &mx = derived.get_edge_mutex(idx);
-    mx.lock();
-  }
-
-  void unlock_edge(uI_t idx) {
-    const auto &derived = static_cast<Derived const &>(*this);
-    std::mutex &mx = derived.get_edge_mutex(idx);
-    mx.unlock();
-  }
-
-  void add(uI_t id, const V &v_data) {
-    assert(N_vertices < NV_max && "Max number of vertices exceeded");
-    lock_vertex(N_vertices);
-    const auto &derived = static_cast<Derived const &>(*this);
-    std::mutex &mx = derived.add(id, v_data);
-    ++N_vertices;
-    unlock_vertex(N_vertices);
-  }
-
-  void add(uI_t from, uI_t to, const E &e_data) {
-    assert(N_edges < NE_max && "Max number of edges exceeded");
-    lock_vertex(N_edges);
-    const auto &derived = static_cast<Derived const &>(*this);
-    std::mutex &mx = derived.add(from, to, e_data);
-    N_edges++;
-    unlock_edge(N_vertices);
-  }
-
   V node_prop(uI_t id) {
     const auto &derived = static_cast<Derived const &>(*this);
 
-    for (int i = 0; i < NV_max; i += NV_per_mx)
-    {
-        auto start = derived.vertex_iterator(i);
-        auto end = (i + NV_per_mx) < NV_max ? derived.vertex_iterator(i + NV_per_mx) : derived.v_end();
-        lock_vertex(i);
-        auto it = std::find_if(start, end, [id](const auto &v) { return v.id == id; });
-        unlock_vertex(i);
-        if (it != end) {
+        auto it = std::find_if(derived._vertices.begin(), derived._vertices.end(), [id](const auto &v) { return v.id == id; });
+        if (it != derived._vertices.end()) {
           return it->data;
         }
-    }
-    assert(node != v_end() && "Index out of bounds");
     return {};
   }
 
@@ -152,9 +101,7 @@ struct GraphContainer {
     {
         auto start = derived.vertex_iterator(i);
         auto end = (i + NV_per_mx) < NV_max ? derived.vertex_iterator(i + NV_per_mx) : derived.v_end();
-        lock_vertex(i);
         auto it = std::find_if(start, end, [id](const auto &v) { return v.id == id; });
-        unlock_vertex(i);
         if (it != end) {
           return it;
         }
@@ -185,24 +132,24 @@ struct GraphContainer {
     {
         auto start = derived.vertex_iterator(i);
         auto end = (i + NV_per_mx) < NV_max ? derived.vertex_iterator(i + NV_per_mx) : derived.v_end();
-        lock_vertex(i);
          std::sort(start, end,
               [](const auto &v1, const auto &v2) {
                 return v1.id < v2.id;
               });   
-        unlock_vertex(i);
     }
   }
 
   void remove_edge(uI_t to, uI_t from) {
-    auto edge = std::find_if(_edges.begin(), _edges.end(), [&](const auto &e) {
+    const auto &derived = static_cast<Derived const &>(*this);
+
+    auto edge = std::find_if(derived._edges.begin(), derived._edges.end(), [&](const auto &e) {
       return e.from == from && e.to == to;
     });
     assert(N_edges > 0 && "No edges to remove");
-    assert(edge != std::end(_edges) && "Index not found");
+    assert(edge != std::end(derived._edges) && "Index not found");
     edge->from = std::numeric_limits<uI_t>::max();
     // sort separate edges by from
-    std::sort(_edges.begin(), _edges.end(), [](const auto &e1, const auto &e2) {
+    std::sort(derived._edges.begin(), derived._edges.end(), [](const auto &e1, const auto &e2) {
       std::lock_guard lock1(*e1.mx);
       std::lock_guard lock2(*e2.mx);
       return e1.from < e2.from;
@@ -227,8 +174,6 @@ struct FixedGraphContainer
       V, E>;
   FixedArray_t<V, NV> vertices;
   FixedArray_t<E, NE> edges;
-  FixedArray_t<std::mutex, NV_MX> edge_mx;
-  FixedArray_t<std::mutex, NE_MX> vertex_mx;
   uI_t &N_vertices = Base::N_vertices;
   uI_t &N_edges = Base::N_edges;
   auto begin() { return std::begin(vertices); }
@@ -237,12 +182,14 @@ struct FixedGraphContainer
   void add(uI_t id, const V &v_data) {
     vertices[N_vertices].id = id;
     vertices[N_vertices].data = v_data;
+    N_vertices++;
   }
 
   void add(uI_t from, uI_t to, const E &e_data) {
     edges[N_edges].from = from;
     edges[N_edges].to = to;
     edges[N_edges].data = e_data;
+    N_edges++;
   }
 };
 
@@ -264,51 +211,12 @@ struct Graph {
   uI_t N_vertices = 0;
   uI_t N_edges = 0;
 
-  ArrayGraph(std::array<std::mutex *, NV + 1> &v_mx,
-             std::array<std::mutex *, NE + 1> &e_mx)
-      : NV_max(v_mx.size()), NE_max(e_mx.size()) {}
-
-  ArrayGraph<V, E, NV, NE> operator=(const ArrayGraph<V, E, NV, NE> &other) {
-    _vertices = other._vertices;
-    _edges = other._edges;
-    N_vertices = other.N_vertices;
-    N_edges = other.N_edges;
-    std::for_each(_vertices.begin(), _vertices.end(),
-                  [&](auto &v) { v.mx = std::make_shared<std::mutex>(); });
-    std::for_each(_edges.begin(), _edges.end(),
-                  [&](auto &e) { e.mx = std::make_shared<std::mutex>(); });
-
-    return *this;
-  }
 
   const Vertex_Prop_t &operator[](uI_t id) const { return get_vertex_prop(id); }
 
   const Vertex_Prop_t &get_vertex_prop(uI_t id) const {
     return get_vertex(id)->data;
   }
-
-  // const Vertex_t *get_vertex(uI_t id) const
-  // {
-  //     assert(_vertices[0].id == 0);
-  //     // find vertex based on index
-  //     auto p_V = std::find_if(_vertices.begin(), _vertices.end(),
-  //     [id](Vertex_t v)
-  //                             { return v.id == id; });
-  //     assert(p_V != _vertices.end() && "Vertex not found");
-  //     return p_V;
-  // }
-
-  // void assign_vertex(const Vertex_Prop_t &v_data, uI_t idx)
-  // {
-  //     // find index of vertex
-  //     auto p_V = std::find_if(_vertices.begin(), _vertices.end(), [idx](const
-  //     Vertex_t &v)
-  //                             {
-  //         std::lock_guard lock(*v.mx);
-  //         return v.id == idx; });
-  //     assert(p_V != _vertices.end() && "Vertex not found");
-  //     p_V->data = v_data;
-  // }
 
   bool is_in_edge(const Edge_t &e, uI_t idx) const {
     return (e.to == idx && e.from != std::numeric_limits<uI_t>::max()) ||
@@ -325,15 +233,13 @@ struct Graph {
   }
 
   const Vertex_t *get_neighbor(const Edge_t &e, uI_t idx) const {
-    const Sycl::Graph::lock_guard lock(*e.mx);
-    uI_t n_idx = 0;
     if (is_valid(e)) {
       return e.to == idx ? get_vertex(e.from) : get_vertex(e.to);
     }
     return nullptr;
   }
 
-  const std::array<Vertex_t *, NV + 1> neighbors(ID_t idx) const {
+  const std::array<Vertex_t *, NV + 1> neighbors(uI_t idx) const {
     std::array<Vertex_t *, NV + 1> neighbors = {};
     if (neighbors.size() < NV_max) {
       neighbors.resize(NV_max);

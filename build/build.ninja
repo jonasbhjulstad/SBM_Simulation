@@ -12,7 +12,7 @@
 
 # =============================================================================
 # Project: Sycl_Graph
-# Configurations: Release
+# Configurations: Debug
 # =============================================================================
 
 #############################################
@@ -24,7 +24,7 @@ ninja_required_version = 1.5
 #############################################
 # Set configuration variable for custom commands.
 
-CONFIGURATION = Release
+CONFIGURATION = Debug
 # =============================================================================
 # Include auxiliary files.
 
@@ -78,10 +78,10 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 
 build cmake_object_order_depends_target_Common: phony || include/CMakeFiles/Common.dir
 
-build include/CMakeFiles/Common.dir/SYCL_Graph_Path_Config.cpp.o: CXX_COMPILER__Common_Release /home/man/Documents/Bernoulli_MC/include/SYCL_Graph_Path_Config.cpp || cmake_object_order_depends_target_Common
+build include/CMakeFiles/Common.dir/SYCL_Graph_Path_Config.cpp.o: CXX_COMPILER__Common_Debug /home/man/Documents/Bernoulli_MC/include/SYCL_Graph_Path_Config.cpp || cmake_object_order_depends_target_Common
   DEFINES = -DSYCL_GRAPH_USE_INTEL
   DEP_FILE = include/CMakeFiles/Common.dir/SYCL_Graph_Path_Config.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -std=gnu++20
+  FLAGS = -stdlib=libstdc++ -g -fPIC -fPIC -std=gnu++20
   OBJECT_DIR = include/CMakeFiles/Common.dir
   OBJECT_FILE_DIR = include/CMakeFiles/Common.dir
 
@@ -93,8 +93,8 @@ build include/CMakeFiles/Common.dir/SYCL_Graph_Path_Config.cpp.o: CXX_COMPILER__
 #############################################
 # Link the static library include/libCommon.a
 
-build include/libCommon.a: CXX_STATIC_LIBRARY_LINKER__Common_Release include/CMakeFiles/Common.dir/SYCL_Graph_Path_Config.cpp.o
-  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG
+build include/libCommon.a: CXX_STATIC_LIBRARY_LINKER__Common_Debug include/CMakeFiles/Common.dir/SYCL_Graph_Path_Config.cpp.o
+  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -g
   OBJECT_DIR = include/CMakeFiles/Common.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -226,10 +226,10 @@ build static/rebuild_cache: phony static/CMakeFiles/rebuild_cache.util
 
 build cmake_object_order_depends_target_DataFrame: phony || cmake_object_order_depends_target_Common
 
-build static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o: CXX_COMPILER__DataFrame_Release /home/man/Documents/Bernoulli_MC/static/DataFrame/DataFrame.cpp || cmake_object_order_depends_target_DataFrame
+build static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o: CXX_COMPILER__DataFrame_Debug /home/man/Documents/Bernoulli_MC/static/DataFrame/DataFrame.cpp || cmake_object_order_depends_target_DataFrame
   DEFINES = -DSYCL_GRAPH_USE_INTEL
   DEP_FILE = static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -std=gnu++20
+  FLAGS = -stdlib=libstdc++ -g -fPIC -fPIC -std=gnu++20
   INCLUDES = -I/home/man/Documents/Bernoulli_MC/static/DataFrame -I/home/man/Documents/Bernoulli_MC/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = static/DataFrame/CMakeFiles/DataFrame.dir
   OBJECT_FILE_DIR = static/DataFrame/CMakeFiles/DataFrame.dir
@@ -242,8 +242,8 @@ build static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o: CXX_COMPILER__D
 #############################################
 # Link the static library static/DataFrame/libDataFrame.a
 
-build static/DataFrame/libDataFrame.a: CXX_STATIC_LIBRARY_LINKER__DataFrame_Release static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o || include/libCommon.a
-  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG
+build static/DataFrame/libDataFrame.a: CXX_STATIC_LIBRARY_LINKER__DataFrame_Debug static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o || include/libCommon.a
+  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -g
   OBJECT_DIR = static/DataFrame/CMakeFiles/DataFrame.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -288,10 +288,10 @@ build static/DataFrame/rebuild_cache: phony static/DataFrame/CMakeFiles/rebuild_
 
 build cmake_object_order_depends_target_Sycl_Graph_Eigen: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame
 
-build static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o: CXX_COMPILER__Sycl_Graph_Eigen_Release /home/man/Documents/Bernoulli_MC/static/Eigen/Sycl_Graph_Eigen.cpp || cmake_object_order_depends_target_Sycl_Graph_Eigen
+build static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o: CXX_COMPILER__Sycl_Graph_Eigen_Debug /home/man/Documents/Bernoulli_MC/static/Eigen/Sycl_Graph_Eigen.cpp || cmake_object_order_depends_target_Sycl_Graph_Eigen
   DEFINES = -DSYCL_GRAPH_USE_INTEL
   DEP_FILE = static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -std=gnu++20
+  FLAGS = -stdlib=libstdc++ -g -fPIC -fPIC -std=gnu++20
   INCLUDES = -I/home/man/Documents/Bernoulli_MC/static/Eigen -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/DataFrame -isystem /usr/local/include/eigen3
   OBJECT_DIR = static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
   OBJECT_FILE_DIR = static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
@@ -304,8 +304,8 @@ build static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o: CXX_C
 #############################################
 # Link the static library static/Eigen/libSycl_Graph_Eigen.a
 
-build static/Eigen/libSycl_Graph_Eigen.a: CXX_STATIC_LIBRARY_LINKER__Sycl_Graph_Eigen_Release static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o || include/libCommon.a static/DataFrame/libDataFrame.a
-  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG
+build static/Eigen/libSycl_Graph_Eigen.a: CXX_STATIC_LIBRARY_LINKER__Sycl_Graph_Eigen_Debug static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o || include/libCommon.a static/DataFrame/libDataFrame.a
+  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -g
   OBJECT_DIR = static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -343,9 +343,9 @@ build static/Eigen/rebuild_cache: phony static/Eigen/CMakeFiles/rebuild_cache.ut
 
 
 #############################################
-# Utility command for FROLS_Network
+# Utility command for Network
 
-build static/Network/FROLS_Network: phony
+build static/Network/Network: phony
 
 
 #############################################
@@ -443,10 +443,10 @@ build static/Sycl/Network/rebuild_cache: phony static/Sycl/Network/CMakeFiles/re
 
 build cmake_object_order_depends_target_Math: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame
 
-build static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o: CXX_COMPILER__Math_Release /home/man/Documents/Bernoulli_MC/static/Math/Graph_Math.cpp || cmake_object_order_depends_target_Math
+build static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o: CXX_COMPILER__Math_Debug /home/man/Documents/Bernoulli_MC/static/Math/Graph_Math.cpp || cmake_object_order_depends_target_Math
   DEFINES = -DSYCL_GRAPH_USE_INTEL
   DEP_FILE = static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG -fPIC -fPIC -std=gnu++20
+  FLAGS = -stdlib=libstdc++ -g -fPIC -fPIC -std=gnu++20
   INCLUDES = -I/home/man/Documents/Bernoulli_MC/static/Math -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/DataFrame -isystem /usr/local/include/eigen3
   OBJECT_DIR = static/Math/CMakeFiles/Math.dir
   OBJECT_FILE_DIR = static/Math/CMakeFiles/Math.dir
@@ -459,8 +459,8 @@ build static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o: CXX_COMPILER__Math_Relea
 #############################################
 # Link the static library static/Math/libMath.a
 
-build static/Math/libMath.a: CXX_STATIC_LIBRARY_LINKER__Math_Release static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o || include/libCommon.a static/DataFrame/libDataFrame.a
-  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG
+build static/Math/libMath.a: CXX_STATIC_LIBRARY_LINKER__Math_Debug static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o || include/libCommon.a static/DataFrame/libDataFrame.a
+  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -g
   OBJECT_DIR = static/Math/CMakeFiles/Math.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -503,13 +503,13 @@ build static/Math/rebuild_cache: phony static/Math/CMakeFiles/rebuild_cache.util
 #############################################
 # Order-only phony target for array_constraints
 
-build cmake_object_order_depends_target_array_constraints: phony || cmake_object_order_depends_target_Common
+build cmake_object_order_depends_target_array_constraints: phony || cmake_object_order_depends_target_Common static/Network/Network
 
-build test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o: CXX_COMPILER__array_constraints_Release /home/man/Documents/Bernoulli_MC/test/array_constraints.cpp || cmake_object_order_depends_target_array_constraints
+build test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o: CXX_COMPILER__array_constraints_Debug /home/man/Documents/Bernoulli_MC/test/array_constraints.cpp || cmake_object_order_depends_target_array_constraints
   DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL
   DEP_FILE = test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -std=gnu++20
-  INCLUDES = -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include
+  FLAGS = -stdlib=libstdc++ -g -fPIE -fPIC -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/Network -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include
   OBJECT_DIR = test/CMakeFiles/array_constraints.dir
   OBJECT_FILE_DIR = test/CMakeFiles/array_constraints.dir
 
@@ -521,9 +521,9 @@ build test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o: CXX_COMPILE
 #############################################
 # Link the executable test/array_constraints
 
-build test/array_constraints: CXX_EXECUTABLE_LINKER__array_constraints_Release test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o | include/libCommon.a /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb.so.12 || include/libCommon.a
-  FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8  include/libCommon.a  /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb.so.12
+build test/array_constraints: CXX_EXECUTABLE_LINKER__array_constraints_Debug test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o | include/libCommon.a /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12 || include/libCommon.a static/Network/Network
+  FLAGS = -stdlib=libstdc++ -g
+  LINK_LIBRARIES = -Wl,-rpath,/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8  include/libCommon.a  /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12  -lSycl_Graph_Math  -lcppitertools  -lFROLS_Graph
   OBJECT_DIR = test/CMakeFiles/array_constraints.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -537,13 +537,13 @@ build test/array_constraints: CXX_EXECUTABLE_LINKER__array_constraints_Release t
 #############################################
 # Order-only phony target for sycl_mutex
 
-build cmake_object_order_depends_target_sycl_mutex: phony || cmake_object_order_depends_target_Common
+build cmake_object_order_depends_target_sycl_mutex: phony || cmake_object_order_depends_target_Common static/Network/Network
 
-build test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o: CXX_COMPILER__sycl_mutex_Release /home/man/Documents/Bernoulli_MC/test/sycl_mutex.cpp || cmake_object_order_depends_target_sycl_mutex
+build test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o: CXX_COMPILER__sycl_mutex_Debug /home/man/Documents/Bernoulli_MC/test/sycl_mutex.cpp || cmake_object_order_depends_target_sycl_mutex
   DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL
   DEP_FILE = test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG -fPIE -fPIC -std=gnu++20
-  INCLUDES = -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include
+  FLAGS = -stdlib=libstdc++ -g -fPIE -fPIC -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/Network -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include
   OBJECT_DIR = test/CMakeFiles/sycl_mutex.dir
   OBJECT_FILE_DIR = test/CMakeFiles/sycl_mutex.dir
 
@@ -555,14 +555,48 @@ build test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o: CXX_COMPILER__sycl_mutex_
 #############################################
 # Link the executable test/sycl_mutex
 
-build test/sycl_mutex: CXX_EXECUTABLE_LINKER__sycl_mutex_Release test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o | include/libCommon.a /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb.so.12 || include/libCommon.a
-  FLAGS = -stdlib=libstdc++ -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8  include/libCommon.a  /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb.so.12
+build test/sycl_mutex: CXX_EXECUTABLE_LINKER__sycl_mutex_Debug test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o | include/libCommon.a /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12 || include/libCommon.a static/Network/Network
+  FLAGS = -stdlib=libstdc++ -g
+  LINK_LIBRARIES = -Wl,-rpath,/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8  include/libCommon.a  /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12  -lSycl_Graph_Math  -lcppitertools  -lFROLS_Graph
   OBJECT_DIR = test/CMakeFiles/sycl_mutex.dir
   POST_BUILD = :
   PRE_LINK = :
   TARGET_FILE = test/sycl_mutex
   TARGET_PDB = sycl_mutex.dbg
+
+# =============================================================================
+# Object build statements for EXECUTABLE target erdos_renyi_gen
+
+
+#############################################
+# Order-only phony target for erdos_renyi_gen
+
+build cmake_object_order_depends_target_erdos_renyi_gen: phony || cmake_object_order_depends_target_Common static/Network/Network
+
+build test/CMakeFiles/erdos_renyi_gen.dir/erdos_renyi_gen.cpp.o: CXX_COMPILER__erdos_renyi_gen_Debug /home/man/Documents/Bernoulli_MC/test/erdos_renyi_gen.cpp || cmake_object_order_depends_target_erdos_renyi_gen
+  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL
+  DEP_FILE = test/CMakeFiles/erdos_renyi_gen.dir/erdos_renyi_gen.cpp.o.d
+  FLAGS = -stdlib=libstdc++ -g -fPIE -fPIC -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/Network -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include
+  OBJECT_DIR = test/CMakeFiles/erdos_renyi_gen.dir
+  OBJECT_FILE_DIR = test/CMakeFiles/erdos_renyi_gen.dir
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target erdos_renyi_gen
+
+
+#############################################
+# Link the executable test/erdos_renyi_gen
+
+build test/erdos_renyi_gen: CXX_EXECUTABLE_LINKER__erdos_renyi_gen_Debug test/CMakeFiles/erdos_renyi_gen.dir/erdos_renyi_gen.cpp.o | include/libCommon.a /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12 || include/libCommon.a static/Network/Network
+  FLAGS = -stdlib=libstdc++ -g
+  LINK_LIBRARIES = -Wl,-rpath,/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8  include/libCommon.a  /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12  -lSycl_Graph_Math  -lcppitertools  -lFROLS_Graph
+  OBJECT_DIR = test/CMakeFiles/erdos_renyi_gen.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = test/erdos_renyi_gen
+  TARGET_PDB = erdos_renyi_gen.dbg
 
 
 #############################################
@@ -595,13 +629,15 @@ build Common: phony include/libCommon.a
 
 build DataFrame: phony static/DataFrame/libDataFrame.a
 
-build FROLS_Network: phony static/Network/FROLS_Network
-
 build Math: phony static/Math/libMath.a
+
+build Network: phony static/Network/Network
 
 build Sycl_Graph_Eigen: phony static/Eigen/libSycl_Graph_Eigen.a
 
 build array_constraints: phony test/array_constraints
+
+build erdos_renyi_gen: phony test/erdos_renyi_gen
 
 build libCommon.a: phony include/libCommon.a
 
@@ -677,7 +713,7 @@ build static/Math/all: phony static/Math/libMath.a
 #############################################
 # Folder: /home/man/Documents/Bernoulli_MC/build/static/Network
 
-build static/Network/all: phony static/Network/FROLS_Network
+build static/Network/all: phony static/Network/Network
 
 # =============================================================================
 
@@ -698,7 +734,7 @@ build static/Sycl/Network/all: phony
 #############################################
 # Folder: /home/man/Documents/Bernoulli_MC/build/test
 
-build test/all: phony test/array_constraints test/sycl_mutex
+build test/all: phony test/array_constraints test/sycl_mutex test/erdos_renyi_gen
 
 # =============================================================================
 # Built-in targets
@@ -707,14 +743,14 @@ build test/all: phony test/array_constraints test/sycl_mutex
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | /home/man/Documents/Bernoulli_MC/CMakeLists.txt /home/man/Documents/Bernoulli_MC/cmake/HIP_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Intel_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Sycl_executable.cmake /home/man/Documents/Bernoulli_MC/include/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/SYCL_Graph_Path_Config.cpp.in /home/man/Documents/Bernoulli_MC/include/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/DataFrame/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Eigen/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Math/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/test/CMakeLists.txt /usr/lib64/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib64/cmake/pybind11/pybind11Common.cmake /usr/lib64/cmake/pybind11/pybind11Config.cmake /usr/lib64/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib64/cmake/pybind11/pybind11Targets.cmake /usr/lib64/cmake/pybind11/pybind11Tools.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfig.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfigVersion.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfig.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/Clang-C.cmake /usr/share/cmake/Modules/Compiler/Clang-CXX.cmake /usr/share/cmake/Modules/Compiler/Clang.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-C.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.24.2/CMakeCCompiler.cmake CMakeFiles/3.24.2/CMakeCXXCompiler.cmake CMakeFiles/3.24.2/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | /home/man/Documents/Bernoulli_MC/CMakeLists.txt /home/man/Documents/Bernoulli_MC/cmake/HIP_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Intel_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Sycl_executable.cmake /home/man/Documents/Bernoulli_MC/include/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/SYCL_Graph_Path_Config.cpp.in /home/man/Documents/Bernoulli_MC/include/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/DataFrame/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Eigen/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Math/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/test/CMakeLists.txt /usr/lib64/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib64/cmake/pybind11/pybind11Common.cmake /usr/lib64/cmake/pybind11/pybind11Config.cmake /usr/lib64/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib64/cmake/pybind11/pybind11Targets.cmake /usr/lib64/cmake/pybind11/pybind11Tools.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfig.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfigVersion.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfig.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/Clang-C.cmake /usr/share/cmake/Modules/Compiler/Clang-CXX.cmake /usr/share/cmake/Modules/Compiler/Clang.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-C.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.24.3/CMakeCCompiler.cmake CMakeFiles/3.24.3/CMakeCXXCompiler.cmake CMakeFiles/3.24.3/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /home/man/Documents/Bernoulli_MC/CMakeLists.txt /home/man/Documents/Bernoulli_MC/cmake/HIP_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Intel_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Sycl_executable.cmake /home/man/Documents/Bernoulli_MC/include/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/SYCL_Graph_Path_Config.cpp.in /home/man/Documents/Bernoulli_MC/include/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/DataFrame/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Eigen/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Math/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/test/CMakeLists.txt /usr/lib64/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib64/cmake/pybind11/pybind11Common.cmake /usr/lib64/cmake/pybind11/pybind11Config.cmake /usr/lib64/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib64/cmake/pybind11/pybind11Targets.cmake /usr/lib64/cmake/pybind11/pybind11Tools.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfig.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfigVersion.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfig.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/Clang-C.cmake /usr/share/cmake/Modules/Compiler/Clang-CXX.cmake /usr/share/cmake/Modules/Compiler/Clang.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-C.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.24.2/CMakeCCompiler.cmake CMakeFiles/3.24.2/CMakeCXXCompiler.cmake CMakeFiles/3.24.2/CMakeSystem.cmake: phony
+build /home/man/Documents/Bernoulli_MC/CMakeLists.txt /home/man/Documents/Bernoulli_MC/cmake/HIP_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Intel_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Sycl_executable.cmake /home/man/Documents/Bernoulli_MC/include/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/SYCL_Graph_Path_Config.cpp.in /home/man/Documents/Bernoulli_MC/include/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/DataFrame/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Eigen/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Math/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/test/CMakeLists.txt /usr/lib64/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib64/cmake/pybind11/pybind11Common.cmake /usr/lib64/cmake/pybind11/pybind11Config.cmake /usr/lib64/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib64/cmake/pybind11/pybind11Targets.cmake /usr/lib64/cmake/pybind11/pybind11Tools.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfig.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfigVersion.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfig.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/Clang-C.cmake /usr/share/cmake/Modules/Compiler/Clang-CXX.cmake /usr/share/cmake/Modules/Compiler/Clang.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-C.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.24.3/CMakeCCompiler.cmake CMakeFiles/3.24.3/CMakeCXXCompiler.cmake CMakeFiles/3.24.3/CMakeSystem.cmake: phony
 
 
 #############################################

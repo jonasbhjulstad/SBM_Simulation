@@ -15,7 +15,7 @@
 /home/man/Documents/Bernoulli_MC/build/static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
 /home/man/Documents/Bernoulli_MC/build/static/Eigen/CMakeFiles/edit_cache.dir
 /home/man/Documents/Bernoulli_MC/build/static/Eigen/CMakeFiles/rebuild_cache.dir
-/home/man/Documents/Bernoulli_MC/build/static/Network/CMakeFiles/FROLS_Network.dir
+/home/man/Documents/Bernoulli_MC/build/static/Network/CMakeFiles/Network.dir
 /home/man/Documents/Bernoulli_MC/build/static/Network/CMakeFiles/edit_cache.dir
 /home/man/Documents/Bernoulli_MC/build/static/Network/CMakeFiles/rebuild_cache.dir
 /home/man/Documents/Bernoulli_MC/build/static/Sycl/CMakeFiles/edit_cache.dir
@@ -27,5 +27,6 @@
 /home/man/Documents/Bernoulli_MC/build/static/Math/CMakeFiles/rebuild_cache.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/array_constraints.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/sycl_mutex.dir
+/home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/erdos_renyi_gen.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/edit_cache.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/rebuild_cache.dir

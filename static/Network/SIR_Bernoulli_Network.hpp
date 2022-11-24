@@ -35,9 +35,9 @@ namespace Network_Models
         uint32_t N_I_min = 0;
     };
     template <uint32_t NV, uint32_t NE>
-    using SIR_ArrayGraph = Sycl::Graph::Graph::ArrayGraph<SIR_State, SIR_Edge, NV, NE>;
+    using SIR_ArrayGraph = Sycl::Graph::ArrayGraph<SIR_State, SIR_Edge, NV, NE>;
 
-    using SIR_VectorGraph = Sycl::Graph::Graph::VectorGraph<SIR_State, SIR_Edge>;
+    using SIR_VectorGraph = Sycl::Graph::VectorGraph<SIR_State, SIR_Edge>;
 
     template <typename RNG, uint32_t NV, uint32_t NE, uint32_t Nt, typename dType = float>
     struct Array_SIR_Bernoulli_Network : public ArrayNetwork<SIR_Param<>, 3, Nt, Array_SIR_Bernoulli_Network<RNG, NV, NE, Nt, dType>>
