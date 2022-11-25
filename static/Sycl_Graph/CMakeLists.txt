@@ -1,0 +1,5 @@
+add_subdirectory(DataFrame)
+add_subdirectory(Eigen)
+add_subdirectory(Network)
+add_subdirectory(Sycl)
+add_subdirectory(Math)

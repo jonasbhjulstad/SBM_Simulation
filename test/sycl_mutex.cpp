@@ -15,8 +15,8 @@ int main()
     std::mutex m;
     std::vector<int> v(10000000);
     int j = 0;
-    // std::for_each(oneapi::dpl::execution::par_unseq, v.begin(), v.end(), [&](int& i)
-    std::for_each(std::execution::par_unseq, v.begin(), v.end(), [&](int& i)
+    // std::for_each(oneapi::dpl::execution::par_unseq,v.begin(), v.end(), [&](int& i)
+    std::for_each(std::execution::par_unseq,v.begin(), v.end(), [&](int& i)
     {   
         // std::lock_guard g(m);
         j++;

@@ -1,0 +1,5 @@
+if (SYCL_GRAPH_USE_SYCL)
+cmake_policy(SET CMP0079 NEW)
+target_include_directories(FROLS_Network INTERFACE ${SYCL_GRAPH_INCLUDE_DIRS})
+target_link_libraries(FROLS_Network INTERFACE FROLS_Sycl)
+endif()

@@ -39,16 +39,12 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/usr/bin/llvm-objdump")
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/man/Documents/Bernoulli_MC/build/static/DataFrame/cmake_install.cmake")
-  include("/home/man/Documents/Bernoulli_MC/build/static/Eigen/cmake_install.cmake")
-  include("/home/man/Documents/Bernoulli_MC/build/static/Network/cmake_install.cmake")
-  include("/home/man/Documents/Bernoulli_MC/build/static/Sycl/cmake_install.cmake")
-  include("/home/man/Documents/Bernoulli_MC/build/static/Math/cmake_install.cmake")
+  include("/home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/cmake_install.cmake")
 
 endif()
 

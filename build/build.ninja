@@ -182,38 +182,6 @@ build _deps/cppitertools_repo-build/install/strip: phony _deps/cppitertools_repo
 # /home/man/Documents/Bernoulli_MC/CMakeLists.txt
 # =============================================================================
 
-# =============================================================================
-# Object build statements for STATIC_LIBRARY target Common
-
-
-#############################################
-# Order-only phony target for Common
-
-build cmake_object_order_depends_target_Common: phony || include/CMakeFiles/Common.dir
-
-build include/CMakeFiles/Common.dir/SYCL_Graph_Path_Config.cpp.o: CXX_COMPILER__Common_Debug /home/man/Documents/Bernoulli_MC/include/SYCL_Graph_Path_Config.cpp || cmake_object_order_depends_target_Common
-  DEFINES = -DSYCL_GRAPH_USE_INTEL
-  DEP_FILE = include/CMakeFiles/Common.dir/SYCL_Graph_Path_Config.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -g -fPIC -fPIC -std=gnu++20
-  OBJECT_DIR = include/CMakeFiles/Common.dir
-  OBJECT_FILE_DIR = include/CMakeFiles/Common.dir
-
-
-# =============================================================================
-# Link build statements for STATIC_LIBRARY target Common
-
-
-#############################################
-# Link the static library include/libCommon.a
-
-build include/libCommon.a: CXX_STATIC_LIBRARY_LINKER__Common_Debug include/CMakeFiles/Common.dir/SYCL_Graph_Path_Config.cpp.o
-  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -g
-  OBJECT_DIR = include/CMakeFiles/Common.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = include/libCommon.a
-  TARGET_PDB = Common.a.dbg
-
 
 #############################################
 # Utility command for edit_cache
@@ -285,142 +253,174 @@ build include/install/strip: phony include/CMakeFiles/install/strip.util
 # /home/man/Documents/Bernoulli_MC/include/CMakeLists.txt
 # =============================================================================
 
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target Common
+
+
+#############################################
+# Order-only phony target for Common
+
+build cmake_object_order_depends_target_Common: phony || include/Sycl_Graph/CMakeFiles/Common.dir
+
+build include/Sycl_Graph/CMakeFiles/Common.dir/path_config.cpp.o: CXX_COMPILER__Common_Debug /home/man/Documents/Bernoulli_MC/include/Sycl_Graph/path_config.cpp || cmake_object_order_depends_target_Common
+  DEFINES = -DSYCL_GRAPH_USE_INTEL
+  DEP_FILE = include/Sycl_Graph/CMakeFiles/Common.dir/path_config.cpp.o.d
+  FLAGS = -g -fPIC -fPIC -std=gnu++20
+  OBJECT_DIR = include/Sycl_Graph/CMakeFiles/Common.dir
+  OBJECT_FILE_DIR = include/Sycl_Graph/CMakeFiles/Common.dir
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target Common
+
+
+#############################################
+# Link the static library include/Sycl_Graph/libCommon.a
+
+build include/Sycl_Graph/libCommon.a: CXX_STATIC_LIBRARY_LINKER__Common_Debug include/Sycl_Graph/CMakeFiles/Common.dir/path_config.cpp.o
+  LANGUAGE_COMPILE_FLAGS = -g
+  OBJECT_DIR = include/Sycl_Graph/CMakeFiles/Common.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = include/Sycl_Graph/libCommon.a
+  TARGET_PDB = Common.a.dbg
+
 
 #############################################
 # Utility command for edit_cache
 
-build include/Sycl/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build include/Sycl_Graph/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
 
-build include/Sycl/edit_cache: phony include/Sycl/CMakeFiles/edit_cache.util
+build include/Sycl_Graph/edit_cache: phony include/Sycl_Graph/CMakeFiles/edit_cache.util
 
 
 #############################################
 # Utility command for rebuild_cache
 
-build include/Sycl/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build include/Sycl_Graph/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
 
-build include/Sycl/rebuild_cache: phony include/Sycl/CMakeFiles/rebuild_cache.util
+build include/Sycl_Graph/rebuild_cache: phony include/Sycl_Graph/CMakeFiles/rebuild_cache.util
 
 
 #############################################
 # Utility command for list_install_components
 
-build include/Sycl/list_install_components: phony
+build include/Sycl_Graph/list_install_components: phony
 
 
 #############################################
 # Utility command for install
 
-build include/Sycl/CMakeFiles/install.util: CUSTOM_COMMAND include/Sycl/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl && /usr/bin/cmake -P cmake_install.cmake
+build include/Sycl_Graph/CMakeFiles/install.util: CUSTOM_COMMAND include/Sycl_Graph/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph && /usr/bin/cmake -P cmake_install.cmake
   DESC = Install the project...
   pool = console
   restat = 1
 
-build include/Sycl/install: phony include/Sycl/CMakeFiles/install.util
+build include/Sycl_Graph/install: phony include/Sycl_Graph/CMakeFiles/install.util
 
 
 #############################################
 # Utility command for install/local
 
-build include/Sycl/CMakeFiles/install/local.util: CUSTOM_COMMAND include/Sycl/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+build include/Sycl_Graph/CMakeFiles/install/local.util: CUSTOM_COMMAND include/Sycl_Graph/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
   DESC = Installing only the local directory...
   pool = console
   restat = 1
 
-build include/Sycl/install/local: phony include/Sycl/CMakeFiles/install/local.util
+build include/Sycl_Graph/install/local: phony include/Sycl_Graph/CMakeFiles/install/local.util
 
 
 #############################################
 # Utility command for install/strip
 
-build include/Sycl/CMakeFiles/install/strip.util: CUSTOM_COMMAND include/Sycl/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+build include/Sycl_Graph/CMakeFiles/install/strip.util: CUSTOM_COMMAND include/Sycl_Graph/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
   DESC = Installing the project stripped...
   pool = console
   restat = 1
 
-build include/Sycl/install/strip: phony include/Sycl/CMakeFiles/install/strip.util
+build include/Sycl_Graph/install/strip: phony include/Sycl_Graph/CMakeFiles/install/strip.util
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# /home/man/Documents/Bernoulli_MC/include/CMakeLists.txt
+# /home/man/Documents/Bernoulli_MC/include/Sycl_Graph/CMakeLists.txt
 # =============================================================================
 
 
 #############################################
 # Utility command for edit_cache
 
-build include/Graph/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Graph && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build include/Sycl_Graph/Graph/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/Graph && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
 
-build include/Graph/edit_cache: phony include/Graph/CMakeFiles/edit_cache.util
+build include/Sycl_Graph/Graph/edit_cache: phony include/Sycl_Graph/Graph/CMakeFiles/edit_cache.util
 
 
 #############################################
 # Utility command for rebuild_cache
 
-build include/Graph/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Graph && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build include/Sycl_Graph/Graph/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/Graph && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
 
-build include/Graph/rebuild_cache: phony include/Graph/CMakeFiles/rebuild_cache.util
+build include/Sycl_Graph/Graph/rebuild_cache: phony include/Sycl_Graph/Graph/CMakeFiles/rebuild_cache.util
 
 
 #############################################
 # Utility command for list_install_components
 
-build include/Graph/list_install_components: phony
+build include/Sycl_Graph/Graph/list_install_components: phony
 
 
 #############################################
 # Utility command for install
 
-build include/Graph/CMakeFiles/install.util: CUSTOM_COMMAND include/Graph/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Graph && /usr/bin/cmake -P cmake_install.cmake
+build include/Sycl_Graph/Graph/CMakeFiles/install.util: CUSTOM_COMMAND include/Sycl_Graph/Graph/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/Graph && /usr/bin/cmake -P cmake_install.cmake
   DESC = Install the project...
   pool = console
   restat = 1
 
-build include/Graph/install: phony include/Graph/CMakeFiles/install.util
+build include/Sycl_Graph/Graph/install: phony include/Sycl_Graph/Graph/CMakeFiles/install.util
 
 
 #############################################
 # Utility command for install/local
 
-build include/Graph/CMakeFiles/install/local.util: CUSTOM_COMMAND include/Graph/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Graph && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+build include/Sycl_Graph/Graph/CMakeFiles/install/local.util: CUSTOM_COMMAND include/Sycl_Graph/Graph/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/Graph && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
   DESC = Installing only the local directory...
   pool = console
   restat = 1
 
-build include/Graph/install/local: phony include/Graph/CMakeFiles/install/local.util
+build include/Sycl_Graph/Graph/install/local: phony include/Sycl_Graph/Graph/CMakeFiles/install/local.util
 
 
 #############################################
 # Utility command for install/strip
 
-build include/Graph/CMakeFiles/install/strip.util: CUSTOM_COMMAND include/Graph/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Graph && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+build include/Sycl_Graph/Graph/CMakeFiles/install/strip.util: CUSTOM_COMMAND include/Sycl_Graph/Graph/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/Graph && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
   DESC = Installing the project stripped...
   pool = console
   restat = 1
 
-build include/Graph/install/strip: phony include/Graph/CMakeFiles/install/strip.util
+build include/Sycl_Graph/Graph/install/strip: phony include/Sycl_Graph/Graph/CMakeFiles/install/strip.util
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -498,6 +498,77 @@ build static/install/strip: phony static/CMakeFiles/install/strip.util
 # /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt
 # =============================================================================
 
+
+#############################################
+# Utility command for edit_cache
+
+build static/Sycl_Graph/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+  DESC = Running CMake cache editor...
+  pool = console
+  restat = 1
+
+build static/Sycl_Graph/edit_cache: phony static/Sycl_Graph/CMakeFiles/edit_cache.util
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build static/Sycl_Graph/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build static/Sycl_Graph/rebuild_cache: phony static/Sycl_Graph/CMakeFiles/rebuild_cache.util
+
+
+#############################################
+# Utility command for list_install_components
+
+build static/Sycl_Graph/list_install_components: phony
+
+
+#############################################
+# Utility command for install
+
+build static/Sycl_Graph/CMakeFiles/install.util: CUSTOM_COMMAND static/Sycl_Graph/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph && /usr/bin/cmake -P cmake_install.cmake
+  DESC = Install the project...
+  pool = console
+  restat = 1
+
+build static/Sycl_Graph/install: phony static/Sycl_Graph/CMakeFiles/install.util
+
+
+#############################################
+# Utility command for install/local
+
+build static/Sycl_Graph/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Sycl_Graph/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+  DESC = Installing only the local directory...
+  pool = console
+  restat = 1
+
+build static/Sycl_Graph/install/local: phony static/Sycl_Graph/CMakeFiles/install/local.util
+
+
+#############################################
+# Utility command for install/strip
+
+build static/Sycl_Graph/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Sycl_Graph/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+  DESC = Installing the project stripped...
+  pool = console
+  restat = 1
+
+build static/Sycl_Graph/install/strip: phony static/Sycl_Graph/CMakeFiles/install/strip.util
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/CMakeLists.txt
+# =============================================================================
+
 # =============================================================================
 # Object build statements for STATIC_LIBRARY target DataFrame
 
@@ -507,13 +578,13 @@ build static/install/strip: phony static/CMakeFiles/install/strip.util
 
 build cmake_object_order_depends_target_DataFrame: phony || cmake_object_order_depends_target_Common
 
-build static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o: CXX_COMPILER__DataFrame_Debug /home/man/Documents/Bernoulli_MC/static/DataFrame/DataFrame.cpp || cmake_object_order_depends_target_DataFrame
+build static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o: CXX_COMPILER__DataFrame_Debug /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/DataFrame/DataFrame.cpp || cmake_object_order_depends_target_DataFrame
   DEFINES = -DSYCL_GRAPH_USE_INTEL
-  DEP_FILE = static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -g -fPIC -fPIC -std=gnu++20
-  INCLUDES = -I/home/man/Documents/Bernoulli_MC/static/DataFrame -I/home/man/Documents/Bernoulli_MC/include -isystem /usr/local/include/eigen3
-  OBJECT_DIR = static/DataFrame/CMakeFiles/DataFrame.dir
-  OBJECT_FILE_DIR = static/DataFrame/CMakeFiles/DataFrame.dir
+  DEP_FILE = static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o.d
+  FLAGS = -g -fPIC -fPIC -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -isystem /usr/local/include/eigen3
+  OBJECT_DIR = static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir
+  OBJECT_FILE_DIR = static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir
 
 
 # =============================================================================
@@ -521,85 +592,85 @@ build static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o: CXX_COMPILER__D
 
 
 #############################################
-# Link the static library static/DataFrame/libDataFrame.a
+# Link the static library static/Sycl_Graph/DataFrame/libDataFrame.a
 
-build static/DataFrame/libDataFrame.a: CXX_STATIC_LIBRARY_LINKER__DataFrame_Debug static/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o || include/libCommon.a
-  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -g
-  OBJECT_DIR = static/DataFrame/CMakeFiles/DataFrame.dir
+build static/Sycl_Graph/DataFrame/libDataFrame.a: CXX_STATIC_LIBRARY_LINKER__DataFrame_Debug static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o || include/Sycl_Graph/libCommon.a
+  LANGUAGE_COMPILE_FLAGS = -g
+  OBJECT_DIR = static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_FILE = static/DataFrame/libDataFrame.a
+  TARGET_FILE = static/Sycl_Graph/DataFrame/libDataFrame.a
   TARGET_PDB = DataFrame.a.dbg
 
 
 #############################################
 # Utility command for edit_cache
 
-build static/DataFrame/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/DataFrame && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build static/Sycl_Graph/DataFrame/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/DataFrame && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
 
-build static/DataFrame/edit_cache: phony static/DataFrame/CMakeFiles/edit_cache.util
+build static/Sycl_Graph/DataFrame/edit_cache: phony static/Sycl_Graph/DataFrame/CMakeFiles/edit_cache.util
 
 
 #############################################
 # Utility command for rebuild_cache
 
-build static/DataFrame/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/DataFrame && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build static/Sycl_Graph/DataFrame/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/DataFrame && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
 
-build static/DataFrame/rebuild_cache: phony static/DataFrame/CMakeFiles/rebuild_cache.util
+build static/Sycl_Graph/DataFrame/rebuild_cache: phony static/Sycl_Graph/DataFrame/CMakeFiles/rebuild_cache.util
 
 
 #############################################
 # Utility command for list_install_components
 
-build static/DataFrame/list_install_components: phony
+build static/Sycl_Graph/DataFrame/list_install_components: phony
 
 
 #############################################
 # Utility command for install
 
-build static/DataFrame/CMakeFiles/install.util: CUSTOM_COMMAND static/DataFrame/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/DataFrame && /usr/bin/cmake -P cmake_install.cmake
+build static/Sycl_Graph/DataFrame/CMakeFiles/install.util: CUSTOM_COMMAND static/Sycl_Graph/DataFrame/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/DataFrame && /usr/bin/cmake -P cmake_install.cmake
   DESC = Install the project...
   pool = console
   restat = 1
 
-build static/DataFrame/install: phony static/DataFrame/CMakeFiles/install.util
+build static/Sycl_Graph/DataFrame/install: phony static/Sycl_Graph/DataFrame/CMakeFiles/install.util
 
 
 #############################################
 # Utility command for install/local
 
-build static/DataFrame/CMakeFiles/install/local.util: CUSTOM_COMMAND static/DataFrame/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/DataFrame && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+build static/Sycl_Graph/DataFrame/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Sycl_Graph/DataFrame/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/DataFrame && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
   DESC = Installing only the local directory...
   pool = console
   restat = 1
 
-build static/DataFrame/install/local: phony static/DataFrame/CMakeFiles/install/local.util
+build static/Sycl_Graph/DataFrame/install/local: phony static/Sycl_Graph/DataFrame/CMakeFiles/install/local.util
 
 
 #############################################
 # Utility command for install/strip
 
-build static/DataFrame/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/DataFrame/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/DataFrame && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+build static/Sycl_Graph/DataFrame/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Sycl_Graph/DataFrame/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/DataFrame && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
   DESC = Installing the project stripped...
   pool = console
   restat = 1
 
-build static/DataFrame/install/strip: phony static/DataFrame/CMakeFiles/install/strip.util
+build static/Sycl_Graph/DataFrame/install/strip: phony static/Sycl_Graph/DataFrame/CMakeFiles/install/strip.util
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt
+# /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/CMakeLists.txt
 # =============================================================================
 
 # =============================================================================
@@ -611,13 +682,13 @@ build static/DataFrame/install/strip: phony static/DataFrame/CMakeFiles/install/
 
 build cmake_object_order_depends_target_Sycl_Graph_Eigen: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame
 
-build static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o: CXX_COMPILER__Sycl_Graph_Eigen_Debug /home/man/Documents/Bernoulli_MC/static/Eigen/Sycl_Graph_Eigen.cpp || cmake_object_order_depends_target_Sycl_Graph_Eigen
+build static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o: CXX_COMPILER__Sycl_Graph_Eigen_Debug /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Eigen/Sycl_Graph_Eigen.cpp || cmake_object_order_depends_target_Sycl_Graph_Eigen
   DEFINES = -DSYCL_GRAPH_USE_INTEL
-  DEP_FILE = static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -g -fPIC -fPIC -std=gnu++20
-  INCLUDES = -I/home/man/Documents/Bernoulli_MC/static/Eigen -I/home/man/Documents/Bernoulli_MC/include/Graph -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/DataFrame -isystem /usr/local/include/eigen3
-  OBJECT_DIR = static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
-  OBJECT_FILE_DIR = static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
+  DEP_FILE = static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o.d
+  FLAGS = -g -fPIC -fPIC -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -isystem /usr/local/include/eigen3
+  OBJECT_DIR = static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
+  OBJECT_FILE_DIR = static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
 
 
 # =============================================================================
@@ -625,304 +696,304 @@ build static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o: CXX_C
 
 
 #############################################
-# Link the static library static/Eigen/libSycl_Graph_Eigen.a
+# Link the static library static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.a
 
-build static/Eigen/libSycl_Graph_Eigen.a: CXX_STATIC_LIBRARY_LINKER__Sycl_Graph_Eigen_Debug static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o || include/libCommon.a static/DataFrame/libDataFrame.a
-  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -g
-  OBJECT_DIR = static/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
+build static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.a: CXX_STATIC_LIBRARY_LINKER__Sycl_Graph_Eigen_Debug static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o || include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a
+  LANGUAGE_COMPILE_FLAGS = -g
+  OBJECT_DIR = static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_FILE = static/Eigen/libSycl_Graph_Eigen.a
+  TARGET_FILE = static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.a
   TARGET_PDB = Sycl_Graph_Eigen.a.dbg
 
 
 #############################################
 # Utility command for edit_cache
 
-build static/Eigen/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Eigen && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build static/Sycl_Graph/Eigen/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Eigen && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
 
-build static/Eigen/edit_cache: phony static/Eigen/CMakeFiles/edit_cache.util
+build static/Sycl_Graph/Eigen/edit_cache: phony static/Sycl_Graph/Eigen/CMakeFiles/edit_cache.util
 
 
 #############################################
 # Utility command for rebuild_cache
 
-build static/Eigen/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Eigen && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build static/Sycl_Graph/Eigen/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Eigen && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
 
-build static/Eigen/rebuild_cache: phony static/Eigen/CMakeFiles/rebuild_cache.util
+build static/Sycl_Graph/Eigen/rebuild_cache: phony static/Sycl_Graph/Eigen/CMakeFiles/rebuild_cache.util
 
 
 #############################################
 # Utility command for list_install_components
 
-build static/Eigen/list_install_components: phony
+build static/Sycl_Graph/Eigen/list_install_components: phony
 
 
 #############################################
 # Utility command for install
 
-build static/Eigen/CMakeFiles/install.util: CUSTOM_COMMAND static/Eigen/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Eigen && /usr/bin/cmake -P cmake_install.cmake
+build static/Sycl_Graph/Eigen/CMakeFiles/install.util: CUSTOM_COMMAND static/Sycl_Graph/Eigen/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Eigen && /usr/bin/cmake -P cmake_install.cmake
   DESC = Install the project...
   pool = console
   restat = 1
 
-build static/Eigen/install: phony static/Eigen/CMakeFiles/install.util
+build static/Sycl_Graph/Eigen/install: phony static/Sycl_Graph/Eigen/CMakeFiles/install.util
 
 
 #############################################
 # Utility command for install/local
 
-build static/Eigen/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Eigen/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Eigen && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+build static/Sycl_Graph/Eigen/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Sycl_Graph/Eigen/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Eigen && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
   DESC = Installing only the local directory...
   pool = console
   restat = 1
 
-build static/Eigen/install/local: phony static/Eigen/CMakeFiles/install/local.util
+build static/Sycl_Graph/Eigen/install/local: phony static/Sycl_Graph/Eigen/CMakeFiles/install/local.util
 
 
 #############################################
 # Utility command for install/strip
 
-build static/Eigen/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Eigen/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Eigen && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+build static/Sycl_Graph/Eigen/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Sycl_Graph/Eigen/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Eigen && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
   DESC = Installing the project stripped...
   pool = console
   restat = 1
 
-build static/Eigen/install/strip: phony static/Eigen/CMakeFiles/install/strip.util
+build static/Sycl_Graph/Eigen/install/strip: phony static/Sycl_Graph/Eigen/CMakeFiles/install/strip.util
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt
+# /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/CMakeLists.txt
 # =============================================================================
 
 
 #############################################
 # Utility command for Network
 
-build static/Network/Network: phony
+build static/Sycl_Graph/Network/Network: phony
 
 
 #############################################
 # Utility command for edit_cache
 
-build static/Network/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Network && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build static/Sycl_Graph/Network/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Network && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
 
-build static/Network/edit_cache: phony static/Network/CMakeFiles/edit_cache.util
+build static/Sycl_Graph/Network/edit_cache: phony static/Sycl_Graph/Network/CMakeFiles/edit_cache.util
 
 
 #############################################
 # Utility command for rebuild_cache
 
-build static/Network/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Network && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build static/Sycl_Graph/Network/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Network && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
 
-build static/Network/rebuild_cache: phony static/Network/CMakeFiles/rebuild_cache.util
+build static/Sycl_Graph/Network/rebuild_cache: phony static/Sycl_Graph/Network/CMakeFiles/rebuild_cache.util
 
 
 #############################################
 # Utility command for list_install_components
 
-build static/Network/list_install_components: phony
+build static/Sycl_Graph/Network/list_install_components: phony
 
 
 #############################################
 # Utility command for install
 
-build static/Network/CMakeFiles/install.util: CUSTOM_COMMAND static/Network/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Network && /usr/bin/cmake -P cmake_install.cmake
+build static/Sycl_Graph/Network/CMakeFiles/install.util: CUSTOM_COMMAND static/Sycl_Graph/Network/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Network && /usr/bin/cmake -P cmake_install.cmake
   DESC = Install the project...
   pool = console
   restat = 1
 
-build static/Network/install: phony static/Network/CMakeFiles/install.util
+build static/Sycl_Graph/Network/install: phony static/Sycl_Graph/Network/CMakeFiles/install.util
 
 
 #############################################
 # Utility command for install/local
 
-build static/Network/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Network/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Network && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+build static/Sycl_Graph/Network/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Sycl_Graph/Network/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Network && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
   DESC = Installing only the local directory...
   pool = console
   restat = 1
 
-build static/Network/install/local: phony static/Network/CMakeFiles/install/local.util
+build static/Sycl_Graph/Network/install/local: phony static/Sycl_Graph/Network/CMakeFiles/install/local.util
 
 
 #############################################
 # Utility command for install/strip
 
-build static/Network/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Network/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Network && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+build static/Sycl_Graph/Network/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Sycl_Graph/Network/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Network && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
   DESC = Installing the project stripped...
   pool = console
   restat = 1
 
-build static/Network/install/strip: phony static/Network/CMakeFiles/install/strip.util
+build static/Sycl_Graph/Network/install/strip: phony static/Sycl_Graph/Network/CMakeFiles/install/strip.util
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt
-# =============================================================================
-
-
-#############################################
-# Utility command for edit_cache
-
-build static/Sycl/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
-  DESC = Running CMake cache editor...
-  pool = console
-  restat = 1
-
-build static/Sycl/edit_cache: phony static/Sycl/CMakeFiles/edit_cache.util
-
-
-#############################################
-# Utility command for rebuild_cache
-
-build static/Sycl/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
-  DESC = Running CMake to regenerate build system...
-  pool = console
-  restat = 1
-
-build static/Sycl/rebuild_cache: phony static/Sycl/CMakeFiles/rebuild_cache.util
-
-
-#############################################
-# Utility command for list_install_components
-
-build static/Sycl/list_install_components: phony
-
-
-#############################################
-# Utility command for install
-
-build static/Sycl/CMakeFiles/install.util: CUSTOM_COMMAND static/Sycl/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl && /usr/bin/cmake -P cmake_install.cmake
-  DESC = Install the project...
-  pool = console
-  restat = 1
-
-build static/Sycl/install: phony static/Sycl/CMakeFiles/install.util
-
-
-#############################################
-# Utility command for install/local
-
-build static/Sycl/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Sycl/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-  DESC = Installing only the local directory...
-  pool = console
-  restat = 1
-
-build static/Sycl/install/local: phony static/Sycl/CMakeFiles/install/local.util
-
-
-#############################################
-# Utility command for install/strip
-
-build static/Sycl/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Sycl/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-  DESC = Installing the project stripped...
-  pool = console
-  restat = 1
-
-build static/Sycl/install/strip: phony static/Sycl/CMakeFiles/install/strip.util
-
-# =============================================================================
-# Write statements declared in CMakeLists.txt:
-# /home/man/Documents/Bernoulli_MC/static/Sycl/CMakeLists.txt
+# /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/CMakeLists.txt
 # =============================================================================
 
 
 #############################################
 # Utility command for edit_cache
 
-build static/Sycl/Network/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl/Network && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build static/Sycl_Graph/Sycl/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
 
-build static/Sycl/Network/edit_cache: phony static/Sycl/Network/CMakeFiles/edit_cache.util
+build static/Sycl_Graph/Sycl/edit_cache: phony static/Sycl_Graph/Sycl/CMakeFiles/edit_cache.util
 
 
 #############################################
 # Utility command for rebuild_cache
 
-build static/Sycl/Network/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl/Network && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build static/Sycl_Graph/Sycl/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
 
-build static/Sycl/Network/rebuild_cache: phony static/Sycl/Network/CMakeFiles/rebuild_cache.util
+build static/Sycl_Graph/Sycl/rebuild_cache: phony static/Sycl_Graph/Sycl/CMakeFiles/rebuild_cache.util
 
 
 #############################################
 # Utility command for list_install_components
 
-build static/Sycl/Network/list_install_components: phony
+build static/Sycl_Graph/Sycl/list_install_components: phony
 
 
 #############################################
 # Utility command for install
 
-build static/Sycl/Network/CMakeFiles/install.util: CUSTOM_COMMAND static/Sycl/Network/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl/Network && /usr/bin/cmake -P cmake_install.cmake
+build static/Sycl_Graph/Sycl/CMakeFiles/install.util: CUSTOM_COMMAND static/Sycl_Graph/Sycl/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl && /usr/bin/cmake -P cmake_install.cmake
   DESC = Install the project...
   pool = console
   restat = 1
 
-build static/Sycl/Network/install: phony static/Sycl/Network/CMakeFiles/install.util
+build static/Sycl_Graph/Sycl/install: phony static/Sycl_Graph/Sycl/CMakeFiles/install.util
 
 
 #############################################
 # Utility command for install/local
 
-build static/Sycl/Network/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Sycl/Network/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl/Network && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+build static/Sycl_Graph/Sycl/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Sycl_Graph/Sycl/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
   DESC = Installing only the local directory...
   pool = console
   restat = 1
 
-build static/Sycl/Network/install/local: phony static/Sycl/Network/CMakeFiles/install/local.util
+build static/Sycl_Graph/Sycl/install/local: phony static/Sycl_Graph/Sycl/CMakeFiles/install/local.util
 
 
 #############################################
 # Utility command for install/strip
 
-build static/Sycl/Network/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Sycl/Network/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl/Network && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+build static/Sycl_Graph/Sycl/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Sycl_Graph/Sycl/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
   DESC = Installing the project stripped...
   pool = console
   restat = 1
 
-build static/Sycl/Network/install/strip: phony static/Sycl/Network/CMakeFiles/install/strip.util
+build static/Sycl_Graph/Sycl/install/strip: phony static/Sycl_Graph/Sycl/CMakeFiles/install/strip.util
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt
+# /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Sycl/CMakeLists.txt
+# =============================================================================
+
+
+#############################################
+# Utility command for edit_cache
+
+build static/Sycl_Graph/Sycl/Network/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl/Network && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+  DESC = Running CMake cache editor...
+  pool = console
+  restat = 1
+
+build static/Sycl_Graph/Sycl/Network/edit_cache: phony static/Sycl_Graph/Sycl/Network/CMakeFiles/edit_cache.util
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build static/Sycl_Graph/Sycl/Network/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl/Network && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build static/Sycl_Graph/Sycl/Network/rebuild_cache: phony static/Sycl_Graph/Sycl/Network/CMakeFiles/rebuild_cache.util
+
+
+#############################################
+# Utility command for list_install_components
+
+build static/Sycl_Graph/Sycl/Network/list_install_components: phony
+
+
+#############################################
+# Utility command for install
+
+build static/Sycl_Graph/Sycl/Network/CMakeFiles/install.util: CUSTOM_COMMAND static/Sycl_Graph/Sycl/Network/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl/Network && /usr/bin/cmake -P cmake_install.cmake
+  DESC = Install the project...
+  pool = console
+  restat = 1
+
+build static/Sycl_Graph/Sycl/Network/install: phony static/Sycl_Graph/Sycl/Network/CMakeFiles/install.util
+
+
+#############################################
+# Utility command for install/local
+
+build static/Sycl_Graph/Sycl/Network/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Sycl_Graph/Sycl/Network/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl/Network && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+  DESC = Installing only the local directory...
+  pool = console
+  restat = 1
+
+build static/Sycl_Graph/Sycl/Network/install/local: phony static/Sycl_Graph/Sycl/Network/CMakeFiles/install/local.util
+
+
+#############################################
+# Utility command for install/strip
+
+build static/Sycl_Graph/Sycl/Network/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Sycl_Graph/Sycl/Network/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl/Network && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+  DESC = Installing the project stripped...
+  pool = console
+  restat = 1
+
+build static/Sycl_Graph/Sycl/Network/install/strip: phony static/Sycl_Graph/Sycl/Network/CMakeFiles/install/strip.util
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/CMakeLists.txt
 # =============================================================================
 
 # =============================================================================
@@ -934,13 +1005,13 @@ build static/Sycl/Network/install/strip: phony static/Sycl/Network/CMakeFiles/in
 
 build cmake_object_order_depends_target_Math: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame
 
-build static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o: CXX_COMPILER__Math_Debug /home/man/Documents/Bernoulli_MC/static/Math/Graph_Math.cpp || cmake_object_order_depends_target_Math
+build static/Sycl_Graph/Math/CMakeFiles/Math.dir/math.cpp.o: CXX_COMPILER__Math_Debug /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Math/math.cpp || cmake_object_order_depends_target_Math
   DEFINES = -DSYCL_GRAPH_USE_INTEL
-  DEP_FILE = static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -g -fPIC -fPIC -std=gnu++20
-  INCLUDES = -I/home/man/Documents/Bernoulli_MC/static/Math -I/home/man/Documents/Bernoulli_MC/include/Graph -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/DataFrame -isystem /usr/local/include/eigen3
-  OBJECT_DIR = static/Math/CMakeFiles/Math.dir
-  OBJECT_FILE_DIR = static/Math/CMakeFiles/Math.dir
+  DEP_FILE = static/Sycl_Graph/Math/CMakeFiles/Math.dir/math.cpp.o.d
+  FLAGS = -g -fPIC -fPIC -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -isystem /usr/local/include/eigen3
+  OBJECT_DIR = static/Sycl_Graph/Math/CMakeFiles/Math.dir
+  OBJECT_FILE_DIR = static/Sycl_Graph/Math/CMakeFiles/Math.dir
 
 
 # =============================================================================
@@ -948,81 +1019,81 @@ build static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o: CXX_COMPILER__Math_Debug
 
 
 #############################################
-# Link the static library static/Math/libMath.a
+# Link the static library static/Sycl_Graph/Math/libMath.a
 
-build static/Math/libMath.a: CXX_STATIC_LIBRARY_LINKER__Math_Debug static/Math/CMakeFiles/Math.dir/Graph_Math.cpp.o || include/libCommon.a static/DataFrame/libDataFrame.a
-  LANGUAGE_COMPILE_FLAGS = -stdlib=libstdc++ -g
-  OBJECT_DIR = static/Math/CMakeFiles/Math.dir
+build static/Sycl_Graph/Math/libMath.a: CXX_STATIC_LIBRARY_LINKER__Math_Debug static/Sycl_Graph/Math/CMakeFiles/Math.dir/math.cpp.o || include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a
+  LANGUAGE_COMPILE_FLAGS = -g
+  OBJECT_DIR = static/Sycl_Graph/Math/CMakeFiles/Math.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_FILE = static/Math/libMath.a
+  TARGET_FILE = static/Sycl_Graph/Math/libMath.a
   TARGET_PDB = Math.a.dbg
 
 
 #############################################
 # Utility command for edit_cache
 
-build static/Math/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Math && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build static/Sycl_Graph/Math/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Math && /usr/bin/ccmake -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
 
-build static/Math/edit_cache: phony static/Math/CMakeFiles/edit_cache.util
+build static/Sycl_Graph/Math/edit_cache: phony static/Sycl_Graph/Math/CMakeFiles/edit_cache.util
 
 
 #############################################
 # Utility command for rebuild_cache
 
-build static/Math/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Math && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
+build static/Sycl_Graph/Math/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Math && /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC -B/home/man/Documents/Bernoulli_MC/build
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
 
-build static/Math/rebuild_cache: phony static/Math/CMakeFiles/rebuild_cache.util
+build static/Sycl_Graph/Math/rebuild_cache: phony static/Sycl_Graph/Math/CMakeFiles/rebuild_cache.util
 
 
 #############################################
 # Utility command for list_install_components
 
-build static/Math/list_install_components: phony
+build static/Sycl_Graph/Math/list_install_components: phony
 
 
 #############################################
 # Utility command for install
 
-build static/Math/CMakeFiles/install.util: CUSTOM_COMMAND static/Math/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Math && /usr/bin/cmake -P cmake_install.cmake
+build static/Sycl_Graph/Math/CMakeFiles/install.util: CUSTOM_COMMAND static/Sycl_Graph/Math/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Math && /usr/bin/cmake -P cmake_install.cmake
   DESC = Install the project...
   pool = console
   restat = 1
 
-build static/Math/install: phony static/Math/CMakeFiles/install.util
+build static/Sycl_Graph/Math/install: phony static/Sycl_Graph/Math/CMakeFiles/install.util
 
 
 #############################################
 # Utility command for install/local
 
-build static/Math/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Math/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Math && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+build static/Sycl_Graph/Math/CMakeFiles/install/local.util: CUSTOM_COMMAND static/Sycl_Graph/Math/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Math && /usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
   DESC = Installing only the local directory...
   pool = console
   restat = 1
 
-build static/Math/install/local: phony static/Math/CMakeFiles/install/local.util
+build static/Sycl_Graph/Math/install/local: phony static/Sycl_Graph/Math/CMakeFiles/install/local.util
 
 
 #############################################
 # Utility command for install/strip
 
-build static/Math/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Math/all
-  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Math && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+build static/Sycl_Graph/Math/CMakeFiles/install/strip.util: CUSTOM_COMMAND static/Sycl_Graph/Math/all
+  COMMAND = cd /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Math && /usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
   DESC = Installing the project stripped...
   pool = console
   restat = 1
 
-build static/Math/install/strip: phony static/Math/CMakeFiles/install/strip.util
+build static/Sycl_Graph/Math/install/strip: phony static/Sycl_Graph/Math/CMakeFiles/install/strip.util
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -1036,13 +1107,13 @@ build static/Math/install/strip: phony static/Math/CMakeFiles/install/strip.util
 #############################################
 # Order-only phony target for array_constraints
 
-build cmake_object_order_depends_target_array_constraints: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math static/Network/Network
+build cmake_object_order_depends_target_array_constraints: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math static/Sycl_Graph/Network/Network
 
 build test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o: CXX_COMPILER__array_constraints_Debug /home/man/Documents/Bernoulli_MC/test/array_constraints.cpp || cmake_object_order_depends_target_array_constraints
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL
+  DEFINES = -DONEDPL_USE_DPCPP_BACKEND=0 -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL
   DEP_FILE = test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -g -fPIE -fPIC -std=gnu++20
-  INCLUDES = -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include/Graph -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/Network -I/home/man/Documents/Bernoulli_MC/static/Math -I/home/man/Documents/Bernoulli_MC/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include
+  FLAGS = -g -fPIE -fPIC -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/array_constraints.dir
   OBJECT_FILE_DIR = test/CMakeFiles/array_constraints.dir
 
@@ -1054,9 +1125,9 @@ build test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o: CXX_COMPILE
 #############################################
 # Link the executable test/array_constraints
 
-build test/array_constraints: CXX_EXECUTABLE_LINKER__array_constraints_Debug test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o | /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Math/libMath.a static/DataFrame/libDataFrame.a include/libCommon.a || include/libCommon.a static/DataFrame/libDataFrame.a static/Math/libMath.a static/Network/Network
-  FLAGS = -stdlib=libstdc++ -g
-  LINK_LIBRARIES = -Wl,-rpath,/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8  /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Math/libMath.a  static/DataFrame/libDataFrame.a  include/libCommon.a
+build test/array_constraints: CXX_EXECUTABLE_LINKER__array_constraints_Debug test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o | /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/Network/Network
+  FLAGS = -g
+  LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/array_constraints.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -1070,13 +1141,13 @@ build test/array_constraints: CXX_EXECUTABLE_LINKER__array_constraints_Debug tes
 #############################################
 # Order-only phony target for sycl_mutex
 
-build cmake_object_order_depends_target_sycl_mutex: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math static/Network/Network
+build cmake_object_order_depends_target_sycl_mutex: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math static/Sycl_Graph/Network/Network
 
 build test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o: CXX_COMPILER__sycl_mutex_Debug /home/man/Documents/Bernoulli_MC/test/sycl_mutex.cpp || cmake_object_order_depends_target_sycl_mutex
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL
+  DEFINES = -DONEDPL_USE_DPCPP_BACKEND=0 -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL
   DEP_FILE = test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -g -fPIE -fPIC -std=gnu++20
-  INCLUDES = -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include/Graph -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/Network -I/home/man/Documents/Bernoulli_MC/static/Math -I/home/man/Documents/Bernoulli_MC/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include
+  FLAGS = -g -fPIE -fPIC -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/sycl_mutex.dir
   OBJECT_FILE_DIR = test/CMakeFiles/sycl_mutex.dir
 
@@ -1088,9 +1159,9 @@ build test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o: CXX_COMPILER__sycl_mutex_
 #############################################
 # Link the executable test/sycl_mutex
 
-build test/sycl_mutex: CXX_EXECUTABLE_LINKER__sycl_mutex_Debug test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o | /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Math/libMath.a static/DataFrame/libDataFrame.a include/libCommon.a || include/libCommon.a static/DataFrame/libDataFrame.a static/Math/libMath.a static/Network/Network
-  FLAGS = -stdlib=libstdc++ -g
-  LINK_LIBRARIES = -Wl,-rpath,/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8  /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Math/libMath.a  static/DataFrame/libDataFrame.a  include/libCommon.a
+build test/sycl_mutex: CXX_EXECUTABLE_LINKER__sycl_mutex_Debug test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o | /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/Network/Network
+  FLAGS = -g
+  LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/sycl_mutex.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -1104,13 +1175,13 @@ build test/sycl_mutex: CXX_EXECUTABLE_LINKER__sycl_mutex_Debug test/CMakeFiles/s
 #############################################
 # Order-only phony target for erdos_renyi_gen
 
-build cmake_object_order_depends_target_erdos_renyi_gen: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math static/Network/Network
+build cmake_object_order_depends_target_erdos_renyi_gen: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math static/Sycl_Graph/Network/Network
 
 build test/CMakeFiles/erdos_renyi_gen.dir/erdos_renyi_gen.cpp.o: CXX_COMPILER__erdos_renyi_gen_Debug /home/man/Documents/Bernoulli_MC/test/erdos_renyi_gen.cpp || cmake_object_order_depends_target_erdos_renyi_gen
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL
+  DEFINES = -DONEDPL_USE_DPCPP_BACKEND=0 -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL
   DEP_FILE = test/CMakeFiles/erdos_renyi_gen.dir/erdos_renyi_gen.cpp.o.d
-  FLAGS = -stdlib=libstdc++ -g -fPIE -fPIC -std=gnu++20
-  INCLUDES = -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include/Graph -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static/Network -I/home/man/Documents/Bernoulli_MC/static/Math -I/home/man/Documents/Bernoulli_MC/static/DataFrame -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include
+  FLAGS = -g -fPIE -fPIC -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/erdos_renyi_gen.dir
   OBJECT_FILE_DIR = test/CMakeFiles/erdos_renyi_gen.dir
 
@@ -1122,9 +1193,9 @@ build test/CMakeFiles/erdos_renyi_gen.dir/erdos_renyi_gen.cpp.o: CXX_COMPILER__e
 #############################################
 # Link the executable test/erdos_renyi_gen
 
-build test/erdos_renyi_gen: CXX_EXECUTABLE_LINKER__erdos_renyi_gen_Debug test/CMakeFiles/erdos_renyi_gen.dir/erdos_renyi_gen.cpp.o | /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Math/libMath.a static/DataFrame/libDataFrame.a include/libCommon.a || include/libCommon.a static/DataFrame/libDataFrame.a static/Math/libMath.a static/Network/Network
-  FLAGS = -stdlib=libstdc++ -g
-  LINK_LIBRARIES = -Wl,-rpath,/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8  /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Math/libMath.a  static/DataFrame/libDataFrame.a  include/libCommon.a
+build test/erdos_renyi_gen: CXX_EXECUTABLE_LINKER__erdos_renyi_gen_Debug test/CMakeFiles/erdos_renyi_gen.dir/erdos_renyi_gen.cpp.o | /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/Network/Network
+  FLAGS = -g
+  LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/erdos_renyi_gen.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -1200,27 +1271,27 @@ build test/install/strip: phony test/CMakeFiles/install/strip.util
 # =============================================================================
 # Target aliases.
 
-build Common: phony include/libCommon.a
+build Common: phony include/Sycl_Graph/libCommon.a
 
-build DataFrame: phony static/DataFrame/libDataFrame.a
+build DataFrame: phony static/Sycl_Graph/DataFrame/libDataFrame.a
 
-build Math: phony static/Math/libMath.a
+build Math: phony static/Sycl_Graph/Math/libMath.a
 
-build Network: phony static/Network/Network
+build Network: phony static/Sycl_Graph/Network/Network
 
-build Sycl_Graph_Eigen: phony static/Eigen/libSycl_Graph_Eigen.a
+build Sycl_Graph_Eigen: phony static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.a
 
 build array_constraints: phony test/array_constraints
 
 build erdos_renyi_gen: phony test/erdos_renyi_gen
 
-build libCommon.a: phony include/libCommon.a
+build libCommon.a: phony include/Sycl_Graph/libCommon.a
 
-build libDataFrame.a: phony static/DataFrame/libDataFrame.a
+build libDataFrame.a: phony static/Sycl_Graph/DataFrame/libDataFrame.a
 
-build libMath.a: phony static/Math/libMath.a
+build libMath.a: phony static/Sycl_Graph/Math/libMath.a
 
-build libSycl_Graph_Eigen.a: phony static/Eigen/libSycl_Graph_Eigen.a
+build libSycl_Graph_Eigen.a: phony static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.a
 
 build sycl_mutex: phony test/sycl_mutex
 
@@ -1246,70 +1317,77 @@ build _deps/cppitertools_repo-build/all: phony
 #############################################
 # Folder: /home/man/Documents/Bernoulli_MC/build/include
 
-build include/all: phony include/libCommon.a include/Sycl/all include/Graph/all
+build include/all: phony include/Sycl_Graph/all
 
 # =============================================================================
 
 #############################################
-# Folder: /home/man/Documents/Bernoulli_MC/build/include/Graph
+# Folder: /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph
 
-build include/Graph/all: phony
+build include/Sycl_Graph/all: phony include/Sycl_Graph/libCommon.a include/Sycl_Graph/Graph/all
 
 # =============================================================================
 
 #############################################
-# Folder: /home/man/Documents/Bernoulli_MC/build/include/Sycl
+# Folder: /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/Graph
 
-build include/Sycl/all: phony
+build include/Sycl_Graph/Graph/all: phony
 
 # =============================================================================
 
 #############################################
 # Folder: /home/man/Documents/Bernoulli_MC/build/static
 
-build static/all: phony static/DataFrame/all static/Eigen/all static/Network/all static/Sycl/all static/Math/all
+build static/all: phony static/Sycl_Graph/all
 
 # =============================================================================
 
 #############################################
-# Folder: /home/man/Documents/Bernoulli_MC/build/static/DataFrame
+# Folder: /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph
 
-build static/DataFrame/all: phony static/DataFrame/libDataFrame.a
-
-# =============================================================================
-
-#############################################
-# Folder: /home/man/Documents/Bernoulli_MC/build/static/Eigen
-
-build static/Eigen/all: phony static/Eigen/libSycl_Graph_Eigen.a
+build static/Sycl_Graph/all: phony static/Sycl_Graph/DataFrame/all static/Sycl_Graph/Eigen/all static/Sycl_Graph/Network/all static/Sycl_Graph/Sycl/all static/Sycl_Graph/Math/all
 
 # =============================================================================
 
 #############################################
-# Folder: /home/man/Documents/Bernoulli_MC/build/static/Math
+# Folder: /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/DataFrame
 
-build static/Math/all: phony static/Math/libMath.a
-
-# =============================================================================
-
-#############################################
-# Folder: /home/man/Documents/Bernoulli_MC/build/static/Network
-
-build static/Network/all: phony static/Network/Network
+build static/Sycl_Graph/DataFrame/all: phony static/Sycl_Graph/DataFrame/libDataFrame.a
 
 # =============================================================================
 
 #############################################
-# Folder: /home/man/Documents/Bernoulli_MC/build/static/Sycl
+# Folder: /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Eigen
 
-build static/Sycl/all: phony static/Sycl/Network/all
+build static/Sycl_Graph/Eigen/all: phony static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.a
 
 # =============================================================================
 
 #############################################
-# Folder: /home/man/Documents/Bernoulli_MC/build/static/Sycl/Network
+# Folder: /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Math
 
-build static/Sycl/Network/all: phony
+build static/Sycl_Graph/Math/all: phony static/Sycl_Graph/Math/libMath.a
+
+# =============================================================================
+
+#############################################
+# Folder: /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Network
+
+build static/Sycl_Graph/Network/all: phony static/Sycl_Graph/Network/Network
+
+# =============================================================================
+
+#############################################
+# Folder: /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl
+
+build static/Sycl_Graph/Sycl/all: phony static/Sycl_Graph/Sycl/Network/all
+
+# =============================================================================
+
+#############################################
+# Folder: /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl/Network
+
+build static/Sycl_Graph/Sycl/Network/all: phony
 
 # =============================================================================
 
@@ -1325,14 +1403,14 @@ build test/all: phony test/array_constraints test/sycl_mutex test/erdos_renyi_ge
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | /home/man/Documents/Bernoulli_MC/CMakeLists.txt /home/man/Documents/Bernoulli_MC/cmake/HIP_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Intel_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Sycl_executable.cmake /home/man/Documents/Bernoulli_MC/include/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/SYCL_Graph_Path_Config.cpp.in /home/man/Documents/Bernoulli_MC/include/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/DataFrame/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Eigen/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Math/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/test/CMakeLists.txt /usr/lib64/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib64/cmake/pybind11/pybind11Common.cmake /usr/lib64/cmake/pybind11/pybind11Config.cmake /usr/lib64/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib64/cmake/pybind11/pybind11Targets.cmake /usr/lib64/cmake/pybind11/pybind11Tools.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfig.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfigVersion.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfig.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakePackageConfigHelpers.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/Clang-C.cmake /usr/share/cmake/Modules/Compiler/Clang-CXX.cmake /usr/share/cmake/Modules/Compiler/Clang.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake/Modules/FindGit.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-C.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake /usr/share/cmake/Modules/WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles/3.24.3/CMakeCCompiler.cmake CMakeFiles/3.24.3/CMakeCXXCompiler.cmake CMakeFiles/3.24.3/CMakeSystem.cmake _deps/cppitertools_repo-src/CMakeLists.txt _deps/cppitertools_repo-src/cmake/dummy-config.cmake.in
+build build.ninja: RERUN_CMAKE | /home/man/Documents/Bernoulli_MC/CMakeLists.txt /home/man/Documents/Bernoulli_MC/cmake/HIP_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Intel_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Sycl_executable.cmake /home/man/Documents/Bernoulli_MC/include/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Sycl_Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Sycl_Graph/Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Sycl_Graph/path_config.hpp.in /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/DataFrame/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Eigen/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Math/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Sycl/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/test/CMakeLists.txt /opt/intel/oneapi/tbb/2021.7.0/lib/cmake/tbb/TBBConfig.cmake /opt/intel/oneapi/tbb/2021.7.0/lib/cmake/tbb/TBBConfigVersion.cmake /usr/lib64/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib64/cmake/pybind11/pybind11Common.cmake /usr/lib64/cmake/pybind11/pybind11Config.cmake /usr/lib64/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib64/cmake/pybind11/pybind11Targets.cmake /usr/lib64/cmake/pybind11/pybind11Tools.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfig.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakePackageConfigHelpers.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/GNU-C.cmake /usr/share/cmake/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake/Modules/FindGit.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake /usr/share/cmake/Modules/WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles/3.24.3/CMakeCCompiler.cmake CMakeFiles/3.24.3/CMakeCXXCompiler.cmake CMakeFiles/3.24.3/CMakeSystem.cmake _deps/cppitertools_repo-src/CMakeLists.txt _deps/cppitertools_repo-src/cmake/dummy-config.cmake.in
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /home/man/Documents/Bernoulli_MC/CMakeLists.txt /home/man/Documents/Bernoulli_MC/cmake/HIP_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Intel_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Sycl_executable.cmake /home/man/Documents/Bernoulli_MC/include/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/SYCL_Graph_Path_Config.cpp.in /home/man/Documents/Bernoulli_MC/include/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/DataFrame/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Eigen/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Math/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/test/CMakeLists.txt /usr/lib64/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib64/cmake/pybind11/pybind11Common.cmake /usr/lib64/cmake/pybind11/pybind11Config.cmake /usr/lib64/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib64/cmake/pybind11/pybind11Targets.cmake /usr/lib64/cmake/pybind11/pybind11Tools.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfig.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfigVersion.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfig.cmake /usr/local/lib/cmake/tbb-2021.7.0/TBBConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakePackageConfigHelpers.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/Clang-C.cmake /usr/share/cmake/Modules/Compiler/Clang-CXX.cmake /usr/share/cmake/Modules/Compiler/Clang.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake/Modules/FindGit.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-C.cmake /usr/share/cmake/Modules/Platform/Linux-Clang-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake /usr/share/cmake/Modules/WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles/3.24.3/CMakeCCompiler.cmake CMakeFiles/3.24.3/CMakeCXXCompiler.cmake CMakeFiles/3.24.3/CMakeSystem.cmake _deps/cppitertools_repo-src/CMakeLists.txt _deps/cppitertools_repo-src/cmake/dummy-config.cmake.in: phony
+build /home/man/Documents/Bernoulli_MC/CMakeLists.txt /home/man/Documents/Bernoulli_MC/cmake/HIP_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Intel_Sycl_config.cmake /home/man/Documents/Bernoulli_MC/cmake/Sycl_executable.cmake /home/man/Documents/Bernoulli_MC/include/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Sycl_Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Sycl_Graph/Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/include/Sycl_Graph/path_config.hpp.in /home/man/Documents/Bernoulli_MC/static/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/DataFrame/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Eigen/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Math/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Sycl/CMakeLists.txt /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Sycl/Network/CMakeLists.txt /home/man/Documents/Bernoulli_MC/test/CMakeLists.txt /opt/intel/oneapi/tbb/2021.7.0/lib/cmake/tbb/TBBConfig.cmake /opt/intel/oneapi/tbb/2021.7.0/lib/cmake/tbb/TBBConfigVersion.cmake /usr/lib64/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib64/cmake/pybind11/pybind11Common.cmake /usr/lib64/cmake/pybind11/pybind11Config.cmake /usr/lib64/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib64/cmake/pybind11/pybind11Targets.cmake /usr/lib64/cmake/pybind11/pybind11Tools.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfig.cmake /usr/local/lib/cmake/oneDPL-2021.7.1/oneDPLConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakePackageConfigHelpers.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/GNU-C.cmake /usr/share/cmake/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake/Modules/FindGit.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake /usr/share/cmake/Modules/WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles/3.24.3/CMakeCCompiler.cmake CMakeFiles/3.24.3/CMakeCXXCompiler.cmake CMakeFiles/3.24.3/CMakeSystem.cmake _deps/cppitertools_repo-src/CMakeLists.txt _deps/cppitertools_repo-src/cmake/dummy-config.cmake.in: phony
 
 
 #############################################

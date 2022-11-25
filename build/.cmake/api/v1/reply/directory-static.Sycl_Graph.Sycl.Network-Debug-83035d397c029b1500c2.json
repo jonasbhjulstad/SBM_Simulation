@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "static/Sycl_Graph/Sycl/Network",
+		"source" : "static/Sycl_Graph/Sycl/Network"
+	}
+}
