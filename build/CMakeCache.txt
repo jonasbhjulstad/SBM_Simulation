@@ -24,15 +24,7 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 CMAKE_BUILD_TYPE:STRING=Debug
 
 //No help, variable specified on the command line.
-CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++
-
-//A wrapper around 'ar' adding the appropriate '--plugin' option
-// for the GCC compiler
-CMAKE_CXX_COMPILER_AR:FILEPATH=/usr/bin/gcc-ar
-
-//A wrapper around 'ranlib' adding the appropriate '--plugin' option
-// for the GCC compiler
-CMAKE_CXX_COMPILER_RANLIB:FILEPATH=/usr/bin/gcc-ranlib
+CMAKE_CXX_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp
 
 //Flags used by the CXX compiler during all build types.
 CMAKE_CXX_FLAGS:STRING=
@@ -50,15 +42,7 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //No help, variable specified on the command line.
-CMAKE_C_COMPILER:FILEPATH=/usr/bin/gcc
-
-//A wrapper around 'ar' adding the appropriate '--plugin' option
-// for the GCC compiler
-CMAKE_C_COMPILER_AR:FILEPATH=/usr/bin/gcc-ar
-
-//A wrapper around 'ranlib' adding the appropriate '--plugin' option
-// for the GCC compiler
-CMAKE_C_COMPILER_RANLIB:FILEPATH=/usr/bin/gcc-ranlib
+CMAKE_C_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/latest/linux/bin/icx
 
 //Flags used by the C compiler during all build types.
 CMAKE_C_FLAGS:STRING=
@@ -252,11 +236,11 @@ FETCHCONTENT_UPDATES_DISCONNECTED_CPPITERTOOLS_REPO:BOOL=OFF
 //Git command line client
 GIT_EXECUTABLE:FILEPATH=/usr/bin/git
 
+//The directory containing a CMake configuration file for IntelDPCPP.
+IntelDPCPP_DIR:PATH=/opt/intel/oneapi/compiler/2022.2.0/linux/IntelDPCPP
+
 //Dependencies for the target
 Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
-
-//The directory containing a CMake configuration file for Metis.
-Metis_DIR:PATH=Metis_DIR-NOTFOUND
 
 //Arguments to supply to pkg-config
 PKG_CONFIG_ARGN:STRING=
@@ -274,6 +258,20 @@ PYBIND11_PYTHON_VERSION:STRING=3.9
 //Path to a library.
 PYTHON_LIBRARY:FILEPATH=/home/man/.pyenv/versions/3.9.13/lib/libpython3.9.so
 
+//SYCL flags for the compiler
+SYCL_FLAGS:STRING='--dpcpp -fsycl '
+
+//Path to a file.
+SYCL_INCLUDE_DIR:FILEPATH=/opt/intel/oneapi/compiler/2022.2.0/linux/include
+
+//SYCL Language version
+SYCL_LANGUAGE_VERSION:STRING=202001
+
+//Path to a file.
+SYCL_LIBRARY_DIR:FILEPATH=/opt/intel/oneapi/compiler/2022.2.0/linux/lib
+
+SYCL_PACKAGE_DIR:STRING=/opt/intel/oneapi/compiler/2022.2.0/linux
+
 //Value Computed by CMake
 Sycl_Graph_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build
 
@@ -288,6 +286,9 @@ Sycl_Graph_SOURCE_DIR:STATIC=/home/man/Documents/Bernoulli_MC
 
 //The directory containing a CMake configuration file for TBB.
 TBB_DIR:PATH=/opt/intel/oneapi/tbb/2021.7.0/lib/cmake/tbb
+
+//Path to a program.
+XIAR:FILEPATH=/opt/intel/oneapi/compiler/2022.2.0/linux/bin/intel64/xiar
 
 //Value Computed by CMake
 cppitertools_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build
@@ -335,10 +336,6 @@ CMAKE_CPACK_COMMAND:INTERNAL=/usr/bin/cpack
 CMAKE_CTEST_COMMAND:INTERNAL=/usr/bin/ctest
 //ADVANCED property for variable: CMAKE_CXX_COMPILER
 CMAKE_CXX_COMPILER-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_CXX_COMPILER_AR
-CMAKE_CXX_COMPILER_AR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_CXX_COMPILER_RANLIB
-CMAKE_CXX_COMPILER_RANLIB-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_FLAGS
 CMAKE_CXX_FLAGS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_FLAGS_DEBUG
@@ -351,10 +348,6 @@ CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_COMPILER
 CMAKE_C_COMPILER-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_C_COMPILER_AR
-CMAKE_C_COMPILER_AR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_C_COMPILER_RANLIB
-CMAKE_C_COMPILER_RANLIB-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_FLAGS
 CMAKE_C_FLAGS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_FLAGS_DEBUG
@@ -456,6 +449,8 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Details about finding IntelDPCPP
+FIND_PACKAGE_MESSAGE_DETAILS_IntelDPCPP:INTERNAL=[/opt/intel/oneapi/compiler/2022.2.0/linux/include][/opt/intel/oneapi/compiler/2022.2.0/linux/lib][--dpcpp -fsycl ][v202001()]
 //Details about finding PYTHON
 FIND_PACKAGE_MESSAGE_DETAILS_PYTHON:INTERNAL=/home/man/.pyenv/versions/3.9.13/bin/python33.9.13
 //Details about finding PkgConfig
@@ -466,8 +461,8 @@ FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/usr/bin/python3.10][cfound compo
 FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/home/man/.pyenv/versions/3.9.13/bin/python3][v3.9.13(3.9)]
 //ADVANCED property for variable: GIT_EXECUTABLE
 GIT_EXECUTABLE-ADVANCED:INTERNAL=1
-//Test HAS_FLTO
-HAS_FLTO:INTERNAL=1
+//Test HAS_INTEL_IPO
+HAS_INTEL_IPO:INTERNAL=1
 //ADVANCED property for variable: PKG_CONFIG_ARGN
 PKG_CONFIG_ARGN-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PKG_CONFIG_EXECUTABLE
@@ -491,6 +486,8 @@ SYCL_GRAPH_INCLUDE:INTERNAL=/home/man/Documents/Bernoulli_MC/include
 SYCL_GRAPH_INCLUDE_DIRS:INTERNAL=/home/man/Documents/Bernoulli_MC/include;/home/man/Documents/Bernoulli_MC/static
 //SYCL_GRAPH_LOG_DIR
 SYCL_GRAPH_LOG_DIR:INTERNAL=/home/man/Documents/Bernoulli_MC/log
+//ADVANCED property for variable: XIAR
+XIAR-ADVANCED:INTERNAL=1
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 _Python:INTERNAL=PYTHON
@@ -500,7 +497,7 @@ _Python3_EXECUTABLE:INTERNAL=/usr/bin/python3.10
 _Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;10;8;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages
 _Python3_INTERPRETER_SIGNATURE:INTERNAL=2e995cd2bd888af83868128ab4554325
 //Test _fsycl_option
-_fsycl_option:INTERNAL=
+_fsycl_option:INTERNAL=1
 //Directories where pybind11 and possibly Python headers are located
 pybind11_INCLUDE_DIRS:INTERNAL=/usr/include;/home/man/.pyenv/versions/3.9.13/include/python3.9
 

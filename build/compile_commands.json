@@ -1,37 +1,47 @@
 [
 {
   "directory": "/home/man/Documents/Bernoulli_MC/build",
-  "command": "/usr/bin/g++ -DSYCL_GRAPH_USE_INTEL -g -fPIC -fPIC -std=gnu++20 -o include/Sycl_Graph/CMakeFiles/Common.dir/path_config.cpp.o -c /home/man/Documents/Bernoulli_MC/include/Sycl_Graph/path_config.cpp",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL  --dpcpp -fsycl  -g -fPIC -fPIC -std=gnu++20 -o include/Sycl_Graph/CMakeFiles/Common.dir/path_config.cpp.o -c /home/man/Documents/Bernoulli_MC/include/Sycl_Graph/path_config.cpp",
   "file": "/home/man/Documents/Bernoulli_MC/include/Sycl_Graph/path_config.cpp"
 },
 {
   "directory": "/home/man/Documents/Bernoulli_MC/build",
-  "command": "/usr/bin/g++ -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -isystem /usr/local/include/eigen3 -g -fPIC -fPIC -std=gnu++20 -o static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o -c /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/DataFrame/DataFrame.cpp",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -isystem /usr/local/include/eigen3  --dpcpp -fsycl  -g -fPIC -fPIC -std=gnu++20 -o static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o -c /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/DataFrame/DataFrame.cpp",
   "file": "/home/man/Documents/Bernoulli_MC/static/Sycl_Graph/DataFrame/DataFrame.cpp"
 },
 {
   "directory": "/home/man/Documents/Bernoulli_MC/build",
-  "command": "/usr/bin/g++ -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -isystem /usr/local/include/eigen3 -g -fPIC -fPIC -std=gnu++20 -o static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o -c /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Eigen/Sycl_Graph_Eigen.cpp",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -isystem /usr/local/include/eigen3  --dpcpp -fsycl  -g -fPIC -fPIC -std=gnu++20 -o static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o -c /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Eigen/Sycl_Graph_Eigen.cpp",
   "file": "/home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Eigen/Sycl_Graph_Eigen.cpp"
 },
 {
   "directory": "/home/man/Documents/Bernoulli_MC/build",
-  "command": "/usr/bin/g++ -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -isystem /usr/local/include/eigen3 -g -fPIC -fPIC -std=gnu++20 -o static/Sycl_Graph/Math/CMakeFiles/Math.dir/math.cpp.o -c /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Math/math.cpp",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -isystem /usr/local/include/eigen3  --dpcpp -fsycl  -g -fPIC -fPIC -std=gnu++20 -o static/Sycl_Graph/Math/CMakeFiles/Math.dir/math.cpp.o -c /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Math/math.cpp",
   "file": "/home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Math/math.cpp"
 },
 {
   "directory": "/home/man/Documents/Bernoulli_MC/build",
-  "command": "/usr/bin/g++ -DONEDPL_USE_DPCPP_BACKEND=0 -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -g -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o -c /home/man/Documents/Bernoulli_MC/test/array_constraints.cpp",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include  --dpcpp -fsycl  -g -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o -c /home/man/Documents/Bernoulli_MC/test/array_constraints.cpp",
   "file": "/home/man/Documents/Bernoulli_MC/test/array_constraints.cpp"
 },
 {
   "directory": "/home/man/Documents/Bernoulli_MC/build",
-  "command": "/usr/bin/g++ -DONEDPL_USE_DPCPP_BACKEND=0 -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -g -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o -c /home/man/Documents/Bernoulli_MC/test/sycl_mutex.cpp",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include  --dpcpp -fsycl  -g -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o -c /home/man/Documents/Bernoulli_MC/test/sycl_mutex.cpp",
   "file": "/home/man/Documents/Bernoulli_MC/test/sycl_mutex.cpp"
 },
 {
   "directory": "/home/man/Documents/Bernoulli_MC/build",
-  "command": "/usr/bin/g++ -DONEDPL_USE_DPCPP_BACKEND=0 -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -g -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/erdos_renyi_gen.dir/erdos_renyi_gen.cpp.o -c /home/man/Documents/Bernoulli_MC/test/erdos_renyi_gen.cpp",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include  --dpcpp -fsycl  -g -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/erdos_renyi_gen.dir/erdos_renyi_gen.cpp.o -c /home/man/Documents/Bernoulli_MC/test/erdos_renyi_gen.cpp",
   "file": "/home/man/Documents/Bernoulli_MC/test/erdos_renyi_gen.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include  --dpcpp -fsycl  -g -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/sycl_device_info.dir/sycl_device_info.cpp.o -c /home/man/Documents/Bernoulli_MC/test/sycl_device_info.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/test/sycl_device_info.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include  --dpcpp -fsycl  -g -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/sycl_copy_profiling.dir/sycl_copy_profiling.cpp.o -c /home/man/Documents/Bernoulli_MC/test/sycl_copy_profiling.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/test/sycl_copy_profiling.cpp"
 }
 ]

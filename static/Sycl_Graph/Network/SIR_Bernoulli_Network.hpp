@@ -24,11 +24,11 @@ template <typename dType = float> struct SIR_Param {
   uint32_t N_I_min = 0;
 };
 
-namespace Fixed {
-template <typename V, typename E, uint32_t NV, uint32_t NE>
-using SIR_Graph = Sycl_Graph::Fixed::Graph<SIR_State, SIR_Edge, uint32_t, NV,
-                                            NE, size_t, std::array>;
-}
+// namespace Fixed {
+// template <typename V, typename E, uint32_t NV, uint32_t NE>
+// using SIR_Graph = Sycl_Graph::Fixed::Graph<SIR_State, SIR_Edge, uint32_t, NV,
+//                                             NE, size_t, std::array>;
+// }
 namespace Dynamic {
 template <typename T> using SIR_vector_t = std::vector<T, std::allocator<T>>;
 using SIR_Graph =

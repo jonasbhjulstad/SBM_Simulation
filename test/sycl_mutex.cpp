@@ -1,8 +1,8 @@
 #include <oneapi/dpl/execution>
 #include <oneapi/dpl/pstl/execution_defs.h>
-namespace sycl::property{
-    struct noinit{};
-}
+// namespace sycl::property{
+//     struct noinit{};
+// }
 #include <oneapi/dpl/execution>
 #include <oneapi/dpl/algorithm>
 #include <mutex>

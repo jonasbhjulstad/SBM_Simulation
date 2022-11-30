@@ -17,11 +17,14 @@ namespace Network_Models
     {
         Sycl_Graph::random::uniform_real_distribution d_ER;
         uint32_t N_edges = 0;
+        std::vector<typename Graph::Edge_t> edges;
+        edges.reserve(G.N_vertices * G.N_vertices);
+        std::vector<uint32_t> from;
         for (auto &&v_idx : iter::combinations(Sycl_Graph::range(0, G.NV_max), 2))
         {
             if (d_ER(rng) < p_ER)
             {
-                G.add(v_idx[0], v_idx[1]);
+                edges.push_back(Graph::Edge_t{v_idx[0], v_idx[1], {}});
                 N_edges++;
                 if (N_edges == G.NE_max)
                 {
@@ -30,6 +33,7 @@ namespace Network_Models
                 }
             }
         }
+        G.add(edges);
     }
 
     template <typename Graph, typename RNG, typename dType = float>
@@ -40,10 +44,9 @@ namespace Network_Models
         const typename Graph::Vertex_Prop_t &node_prop,
         RNG &rng)
     {
-        for (int i = 0; i < N_pop; i++)
-        {
-            G.add(i, node_prop);
-        }
+        auto vertex_ids = Sycl_Graph::range(0, N_pop);
+        std::vector<typename Graph::Vertex_Prop_t> vertex_props(N_pop, node_prop);
+        G.add(vertex_ids, vertex_props);
         random_connect(G, p_ER, rng);
     }
 }

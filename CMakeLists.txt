@@ -30,7 +30,7 @@ find_package(pybind11 CONFIG)
 find_package(Python3 3.9 REQUIRED)
 set(SYCL_GRAPH_USE_INTEL ON)
 set(SYCL_GRAPH_USE_AMD OFF)
-set(SYCL_GRAPH_USE_INTEL_SYCL OFF)
+set(SYCL_GRAPH_USE_INTEL_SYCL ON)
 set(SYCL_GRAPH_USE_HIPSYCL OFF)
 
 include(FetchContent)
