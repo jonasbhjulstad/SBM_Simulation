@@ -4,10 +4,10 @@
 #ifndef SYCL_GRAPH_SYCL_GRAPH_EXECUTION_HPP
 #define SYCL_GRAPH_SYCL_GRAPH_EXECUTION_HPP
 
-#include <pstl/glue_execution_defs.h>
 #ifdef SYCL_GRAPH_USE_INTEL_SYCL
-#include <oneapi/dpl/execution>
+#include <pstl/glue_execution_defs.h>
 #include <oneapi/dpl/algorithm>
+#include <oneapi/dpl/execution>
 #else
 #include <execution>
 #endif

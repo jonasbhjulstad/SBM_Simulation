@@ -1,6 +1,7 @@
 #ifndef GRAPH_SYCL_GRAPH_DYNAMIC_IMPL_HPP
 #define GRAPH_SYCL_GRAPH_DYNAMIC_IMPL_HPP
 #include "Graph_Types.hpp"
+#include <algorithm>
 namespace Sycl_Graph::Dynamic
 {
     // template <typename V, typename E, std::unsigned_integral uI_t>
@@ -61,20 +62,41 @@ namespace Sycl_Graph::Dynamic
             return res;
         }
 
-        bool add(const std::vector<Vertex_t>& edges)
+        // Vertices
+
+        bool add(const std::vector<Vertex_t> &new_vertices)
         {
-            if (N_vertices + edges.size() > NV_max)
+            if (N_vertices + vertices.size() > NV_max)
             {
                 return false;
             }
-            std::copy(edges.begin(), edges.end(), vertices.begin() + N_vertices);
+            std::copy(new_vertices.begin(), new_vertices.end(), vertices.begin() + N_vertices);
+            N_vertices += new_vertices.size();
             return true;
         }
 
+        bool add(const Vertex_t &vertex)
+        {
+            if (N_vertices + 1 > NV_max)
+            {
+                return false;
+            }
+            vertices[N_vertices] = vertex;
+            N_vertices += 1;
+            return true;
+        }
+        bool add(const uI_t &id, const V &v_data)
+        {
+            if (N_vertices == NV_max)
+                return false;
+            vertices[N_vertices] = Vertex_t{id, v_data};
+            N_vertices++;
+            return true;
+        }
 
         bool add(const std::vector<uI_t> &id, const std::vector<V> &v_data)
         {
-            if (N_vertices == NV_max)
+            if (N_vertices + id.size() > NV_max)
                 return false;
             for (int i = 0; i < id.size(); i++)
             {
@@ -84,10 +106,32 @@ namespace Sycl_Graph::Dynamic
             return true;
         }
 
+        // Edges
+
+        bool add(const std::vector<Edge_t> &new_edges)
+        {
+            if (N_edges + new_edges.size() > NE_max)
+            {
+                return false;
+            }
+            std::copy(new_edges.begin(), new_edges.end(), edges.begin() + N_edges);
+            N_edges += new_edges.size();
+            return true;
+        }
+
+        bool add(const uI_t &from, const uI_t &to, const E &e_data = E())
+        {
+            if (N_edges == NE_max)
+                return false;
+            edges[N_edges] = Edge_t{from, to, e_data};
+            N_edges++;
+            return true;
+        }
+
         bool add(const std::vector<uI_t> &from, const std::vector<uI_t> &to, const std::vector<E> &e_data = std::vector<E>())
         {
 
-            if (N_edges == NE_max)
+            if (N_edges + from.size() > NE_max)
                 return false;
             for (int i = 0; i < from.size(); i++)
             {
@@ -97,7 +141,7 @@ namespace Sycl_Graph::Dynamic
             return true;
         }
 
-        void assign(const std::vector<uI_t> &id, const std::vector<V> &v_data)
+        void assign(const uI_t &id, const V &v_data)
         {
             // find vertex with id
             auto it = std::find_if(vertices.begin(), vertices.end(),
@@ -109,7 +153,13 @@ namespace Sycl_Graph::Dynamic
             }
         }
 
-        void remove(const std::vector<uI_t> &id)
+        void assign(const std::vector<uI_t> &id, const std::vector<V> &v_data)
+        {
+            std::for_each(id.begin(), id.end(), [&](auto id)
+                          { assign(id, v_data[id]); });
+        }
+
+        void remove(const uI_t &id)
         {
             // find vertex with id
             auto it = std::find_if(vertices.begin(), vertices.end(),
@@ -120,6 +170,12 @@ namespace Sycl_Graph::Dynamic
                 it->id = Vertex_t::invalid_id;
                 N_vertices--;
             }
+        }
+
+        void remove(const std::vector<uI_t> &id)
+        {
+            std::for_each(id.begin(), id.end(), [&](auto id)
+                          { remove(id); });
         }
 
         void sort_vertices()
@@ -168,15 +224,28 @@ namespace Sycl_Graph::Dynamic
 
         const V &operator[](uI_t id) const { return get_vertex_prop(id); }
 
-        const Array_t<const Vertex_t *> neighbors(uI_t idx) const
+        Vertex_t get_neighbor(const Edge_t &e, uI_t idx) const
         {
-            Array_t<const Vertex_t *> neighbors(N_vertices);
+            if (e.to == idx)
+            {
+                return C.vertices[e.from];
+            }
+            else if (e.from == idx)
+            {
+                return C.vertices[e.to];
+            }
+            return Vertex_t{};
+        }
+
+        Array_t<Vertex_t> neighbors(uI_t idx) const
+        {
+            Array_t<Vertex_t> neighbors(N_vertices);
             std::for_each(C.edges.begin(), C.edges.end(), [&, N = 0](const auto e) mutable
                           {
       if (is_in_edge(e, idx)) {
-        const auto p_nv = get_neighbor(e, idx);
-        if (p_nv != nullptr) {
-          neighbors[N] = p_nv;
+        const auto nv = get_neighbor(e, idx);
+        if (nv.id != Vertex_t::invalid_id) {
+          neighbors[N] = nv;
           N++;
         }
       } });
@@ -191,9 +260,9 @@ namespace Sycl_Graph::Dynamic
         }
 
         template <typename... Args>
-        auto assign(Args &...args)
+        void assign(Args &...args)
         {
-            return C.assign(args...);
+            C.assign(args...);
         }
 
         template <typename... Args>
@@ -213,20 +282,16 @@ namespace Sycl_Graph::Dynamic
         {
             return C.vertices.end();
         }
-
-        auto get_neighbor(const Edge_t &e, uI_t idx) const
+        bool is_in_edge(const Edge_t &e, uI_t idx) const
         {
-            if (e.to == idx)
-            {
-                return &C.vertices[e.from];
-            }
-            else if (e.from == idx)
-            {
-                return &C.vertices[e.to];
-            }
-            return (uI_t)Vertex_t::invalid_id;
+            return is_valid_edge(e) && ((e.to == idx) || (e.from == idx));
+        }
+
+        bool is_valid_edge(const Edge_t &e) const
+        {
+            return (e.to != Vertex_t::invalid_id) && (e.from != Vertex_t::invalid_id);
         }
     };
-} // namespace Dynamic
+} // namespace Sycl_Graph::Dynamic
 
 #endif // GRAPH_SYCL_GRAPH_DYNAMIC_IMPL_HPP

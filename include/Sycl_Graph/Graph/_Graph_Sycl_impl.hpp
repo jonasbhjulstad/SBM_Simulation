@@ -4,6 +4,7 @@
 
 #ifndef SYCL_GRAPH_GRAPH_SYCL_HPP
 #define SYCL_GRAPH_GRAPH_SYCL_HPP
+#ifdef SYCL_GRAPH_USE_SYCL
 #include <Sycl_Graph/data_containers.hpp>
 #include <algorithm>
 #include <array>
@@ -15,7 +16,8 @@
 #include <type_traits>
 #include <utility>
 #include <iterator>
-#include <Sycl_Graph/execution.hpp>
+// #include <Sycl_Graph/execution.hpp>
+#include <type_traits>
 #include <CL/sycl.hpp>
 #include "Graph_Types.hpp"
 
@@ -24,7 +26,7 @@ namespace Sycl_Graph::Sycl
     template <typename V, typename E, std::unsigned_integral uI_t, uI_t NV, uI_t NE>
     struct GraphContainer
     {
-    GraphContainer(sycl::queue &q) : q(q)
+    GraphContainer(sycl::queue &q) : q(q), 
     {
     }
     GraphContainer(sycl::queue &q, const std::vector<Vertex<V, uI_t>> &vertices,
@@ -36,15 +38,15 @@ namespace Sycl_Graph::Sycl
       // compute_ev_capacities(q, N_vertices, N_edges, max_alloc);
     }
     sycl::queue &q;
-    sycl::buffer<Vertex<V, uI_t>, NV> vertex_buf;
-    sycl::buffer<Edge<E, uI_t>, NE> edge_buf;
-    sycl::buffer<Vertex<V, uI_t>, NE> scatter_buf;
-    // uI_t NV_max = std::numeric_limits<uI_t>::max();
-    // uI_t NE_max = std::numeric_limits<uI_t>::max();
+    sycl::buffer<Vertex<V, uI_t>, 1> vertex_buf;
+    sycl::buffer<Edge<E, uI_t>, 1> edge_buf;
+    sycl::buffer<Vertex<V, uI_t>, 1> scatter_buf;
     uI_t N_vertices;
     uI_t N_edges;
     using Vertex_t = Vertex<V, uI_t>;
     using Edge_t = Edge<E, uI_t>;
+    using Vertex_Prop_t = V;
+    using Edge_Prop_t = E;
 
     uI_t get_max_vertices()
     {
@@ -200,16 +202,21 @@ namespace Sycl_Graph::Sycl
   template <typename V, typename E, std::unsigned_integral uI_t, uI_t NV, uI_t NE>
   struct Graph
   {
-    Graph() = default;
-    Graph(const std::vector<Vertex<V, uI_t>> &vertices,
-          const std::vector<Edge<E, uI_t>> &edges, const sycl::property_list &props = {}) : C(vertices, edges, props) {}
+    using Container_t = GraphContainer<V, E, uI_t, NV, NE>;
+    using Vertex_t = typename Container_t::Vertex_t;
+    using Edge_t = typename Container_t::Edge_t;
+    using Vertex_Prop_t = typename Container_t::Vertex_Prop_t;
+    using Edge_Prop_t = typename Container_t::Edge_Prop_t;
+    Graph(sycl::queue& q): C(q){}
+    Graph(sycl::queue& q, const std::vector<Vertex<V, uI_t>> &vertices,
+          const std::vector<Edge<E, uI_t>> &edges, const sycl::property_list &props = {}) : C(q, vertices, edges, props) {}
     // Graph(GraphContainer<V, E, uI_t, NV, NE> &container) : container(container) {}
 
   private:
-    GraphContainer<V, E, uI_t, NV, NE> C;
+    Container_t C;
   };
 }
 
 
-
+#endif
 #endif // Sycl_Graph_hpp

@@ -32,6 +32,7 @@ set(SYCL_GRAPH_USE_INTEL ON)
 set(SYCL_GRAPH_USE_AMD OFF)
 set(SYCL_GRAPH_USE_INTEL_SYCL ON)
 set(SYCL_GRAPH_USE_HIPSYCL OFF)
+message(WARNING ${COMPILER_SUPPORTS_SYCL})
 
 include(FetchContent)
 FetchContent_Declare(
@@ -53,7 +54,7 @@ endif()
 if(${SYCL_GRAPH_USE_INTEL} OR ${SYCL_GRAPH_USE_AMD})
 add_compile_definitions(SYCL_GRAPH_USE_INTEL)
 find_package(TBB CONFIG REQUIRED)
-find_package(oneDPL REQUIRED)
+find_package(oneDPL CONFIG REQUIRED)
 set(ONEAPI_LIBRARIES TBB::tbb oneDPL)
 endif()
 

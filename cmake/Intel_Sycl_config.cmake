@@ -2,8 +2,7 @@ if(${SYCL_GRAPH_USE_INTEL_SYCL})
     # get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
     # get_property(importTargetsAfter DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
     find_package(IntelDPCPP REQUIRED HINTS "/opt/intel/oneapi/compiler/latest/linux/IntelDPCPP")
-    set(TBB_DIR "/opt/intel/oneapi/tbb/latest/lib/cmake/tbb
-/")
+    set(TBB_DIR "/opt/intel/oneapi/tbb/latest/lib/cmake/tbb/")
     # find_package(TBB REQUIRED)
 
     # find_package(oneDPL REQUIRED HINTS "/opt/intel/oneapi/dpl/2021.7.0/lib/cmake/oneDPL/")

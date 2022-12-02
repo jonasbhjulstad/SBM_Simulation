@@ -14,6 +14,9 @@ namespace Sycl_Graph
     template <typename D, std::unsigned_integral ID_t>
     struct Edge
     {
+        Edge() = default;
+        Edge(const D& data, ID_t to, ID_t from)
+            : data(data), to(to), from(from) {}
         D data;
         ID_t to = std::numeric_limits<ID_t>::max();
         ID_t from = std::numeric_limits<ID_t>::max();

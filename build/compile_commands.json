@@ -43,5 +43,10 @@
   "directory": "/home/man/Documents/Bernoulli_MC/build",
   "command": "/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include  --dpcpp -fsycl  -g -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/sycl_copy_profiling.dir/sycl_copy_profiling.cpp.o -c /home/man/Documents/Bernoulli_MC/test/sycl_copy_profiling.cpp",
   "file": "/home/man/Documents/Bernoulli_MC/test/sycl_copy_profiling.cpp"
+},
+{
+  "directory": "/home/man/Documents/Bernoulli_MC/build",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL -I/home/man/Documents/Bernoulli_MC/test/../include -I/home/man/Documents/Bernoulli_MC/include -I/home/man/Documents/Bernoulli_MC/static -I/home/man/Documents/Bernoulli_MC/static/.. -I/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.7.0/include -isystem /opt/intel/oneapi/dpl/2021.7.1/linux/include  --dpcpp -fsycl  -g -fPIE -fPIC -std=gnu++20 -o test/CMakeFiles/erdos_renyi_gen_sycl.dir/erdos_renyi_gen_sycl.cpp.o -c /home/man/Documents/Bernoulli_MC/test/erdos_renyi_gen_sycl.cpp",
+  "file": "/home/man/Documents/Bernoulli_MC/test/erdos_renyi_gen_sycl.cpp"
 }
 ]

@@ -1,11 +1,12 @@
 #include <Sycl_Graph/Graph/Graph.hpp>
-#include <Sycl_Graph/Network/SIR_Bernoulli_Network.hpp>
+#include <Sycl_Graph/Network/SIR_Bernoulli/SIR_Bernoulli_Network.hpp>
+#include <Sycl_Graph/Graph/Graph_Generation.hpp>
 #include <Sycl_Graph/random.hpp>
 int main()
 {
 
-    using namespace Network_Models::Dynamic;
-    using namespace Network_Models;
+    using namespace Sycl_Graph::Dynamic::Network_Models;
+    using namespace Sycl_Graph::Network_Models;
     size_t N_pop = 100;
     float p_ER = 0.1;
 
@@ -14,9 +15,9 @@ int main()
     SIR_Bernoulli_Network sir(G, 0.1, 0.1, rng);
     //generate sir_param
     size_t Nt = 100;
-    std::vector<SIR_Param<float>> sir_param(Nt);
+    std::vector<SIR_Bernoulli_Param<float>> sir_param(Nt);
     std::generate(sir_param.begin(), sir_param.end(), [&]() {
-        return SIR_Param<float>{0.1, 0.1, 100, 10};
+        return SIR_Bernoulli_Param<float>{0.1, 0.1, 100, 10};
     });
 
     generate_erdos_renyi(G, N_pop, p_ER, SIR_S, rng);

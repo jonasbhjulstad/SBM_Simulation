@@ -1,0 +1,190 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "static/Sycl_Graph/DataFrame/libDataFrame.a"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"target_link_libraries",
+			"add_compile_options",
+			"add_compile_definitions",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"static/Sycl_Graph/DataFrame/CMakeLists.txt",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 1,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 3,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 70,
+				"parent" : 3
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 55,
+				"parent" : 3
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 48,
+				"parent" : 3
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 52,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 2,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " --dpcpp -fsycl  -g -fPIC"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-fPIC"
+				},
+				{
+					"fragment" : "-std=gnu++20"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 5,
+					"define" : "SYCL_GRAPH_USE_INTEL"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "SYCL_GRAPH_USE_INTEL_SYCL"
+				},
+				{
+					"backtrace" : 7,
+					"define" : "SYCL_GRAPH_USE_SYCL"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 8,
+					"path" : "/home/man/Documents/Bernoulli_MC/include"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/home/man/Documents/Bernoulli_MC/static"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/home/man/Documents/Bernoulli_MC/static/.."
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "/usr/local/include/eigen3"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "20"
+			},
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "Common::@bc60b023a9ff46170abb"
+		}
+	],
+	"id" : "DataFrame::@e6268a3705f6c19c3b0f",
+	"name" : "DataFrame",
+	"nameOnDisk" : "libDataFrame.a",
+	"paths" : 
+	{
+		"build" : "static/Sycl_Graph/DataFrame",
+		"source" : "static/Sycl_Graph/DataFrame"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "static/Sycl_Graph/DataFrame/DataFrame.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "static/Sycl_Graph/DataFrame/DataFrame.hpp",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}

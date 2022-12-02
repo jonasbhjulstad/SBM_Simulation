@@ -23,6 +23,7 @@
 /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/CMakeFiles/install.dir
 /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/CMakeFiles/install/local.dir
 /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/CMakeFiles/install/strip.dir
+/home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/Graph/CMakeFiles/Sycl_Graph.dir
 /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/Graph/CMakeFiles/edit_cache.dir
 /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/Graph/CMakeFiles/rebuild_cache.dir
 /home/man/Documents/Bernoulli_MC/build/include/Sycl_Graph/Graph/CMakeFiles/list_install_components.dir
@@ -86,6 +87,7 @@
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/erdos_renyi_gen.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/sycl_device_info.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/sycl_copy_profiling.dir
+/home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/erdos_renyi_gen_sycl.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/edit_cache.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/rebuild_cache.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/list_install_components.dir

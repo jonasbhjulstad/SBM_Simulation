@@ -15,7 +15,7 @@
 namespace Network_Models
 {
     template <typename RNG, uint32_t Nt, uint32_t NV, uint32_t NE, typename dType = float>
-    struct Sycl_SIR_Bernoulli_Network : public Network<SIR_Param<>, 3, Nt, SIR_Bernoulli_Network<RNG, Nt, NV, NE>>
+    struct Sycl_SIR_Bernoulli_Network : public Network<SIR_Bernoulli_Param<>, 3, Nt, SIR_Bernoulli_Network<RNG, Nt, NV, NE>>
     {
         using Vertex_t = typename SIR_Graph<NV, NE>::Vertex_t;
         using Edge_t = typename SIR_Graph<NV, NE>::Edge_t;
@@ -46,7 +46,7 @@ namespace Network_Models
                             auto p_R0 = p0_acc[1];
                     Sycl_Graph::random::uniform_real_distribution<dType> d_I;
                     Sycl_Graph::random::uniform_real_distribution<dType> d_R;
-                    SIR_State state = d_I(rng_acc[i]) < p_I0 ? SIR_I : SIR_S;
+                    SIR_Individual_State state = d_I(rng_acc[i]) < p_I0 ? SIR_I : SIR_S;
                     state = d_R(rng_acc[i]) < p_R0 ? SIR_R : state;
                     G_acc[0].assign_vertex(state, i); }); });
             auto pop = population_count();
@@ -97,13 +97,13 @@ namespace Network_Models
                                 G.assign(it[0], (G[it[0]].data == SIR_I && d_R(rng) < p_R) ? SIR_R : G[it[0]].data); }); });
         }
 
-        bool terminate(const SIR_Param<> &p, const std::array<uint32_t, 3> &x)
+        bool terminate(const SIR_Bernoulli_Param<> &p, const std::array<uint32_t, 3> &x)
         {
             bool early_termination = ((t > p.Nt_min) && x[1] < p.N_I_min);
             return early_termination || (t >= Nt);
         }
 
-        void advance(const SIR_Param<> &p)
+        void advance(const SIR_Bernoulli_Param<> &p)
         {
             infection_step(p.p_I);
             recovery_step(p.p_R);
