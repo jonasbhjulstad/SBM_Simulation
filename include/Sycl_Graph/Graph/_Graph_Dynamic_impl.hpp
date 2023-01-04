@@ -15,8 +15,8 @@ namespace Sycl_Graph::Dynamic
               template <typename> typename Array_t>
     struct GraphContainer : public GraphContainerBase<GraphContainer<V, E, uI_t, Array_t>, V, E, uI_t>
     {
-        GraphContainer(uI_t NV_max, uI_t NE_max)
-            : NV_max(NV_max), NE_max(NE_max), vertices(NV_max), edges(NE_max) {}
+        GraphContainer(uI_t NV, uI_t NE)
+            : NV(NV), NE(NE), vertices(NV), edges(NE) {}
         using Base = GraphContainerBase<GraphContainer<V, E, uI_t, Array_t>, V, E, uI_t>;
 
         using Vertex_t = typename Base::Vertex_t;
@@ -28,16 +28,16 @@ namespace Sycl_Graph::Dynamic
         uI_t &N_edges = Base::N_edges;
         auto begin() { return std::begin(vertices); }
         auto end() { return std::begin(vertices) + N_vertices; }
-        uI_t NV_max, NE_max;
+        uI_t NV, NE;
 
         uI_t get_max_vertices()
         {
-            return NV_max;
+            return NV;
         }
 
         uI_t get_max_edges()
         {
-            return NE_max;
+            return NE;
         }
 
         std::vector<V> vertex_prop(const std::vector<uI_t> &ids)
@@ -66,7 +66,7 @@ namespace Sycl_Graph::Dynamic
 
         bool add(const std::vector<Vertex_t> &new_vertices)
         {
-            if (N_vertices + vertices.size() > NV_max)
+            if (N_vertices + vertices.size() > NV)
             {
                 return false;
             }
@@ -77,7 +77,7 @@ namespace Sycl_Graph::Dynamic
 
         bool add(const Vertex_t &vertex)
         {
-            if (N_vertices + 1 > NV_max)
+            if (N_vertices + 1 > NV)
             {
                 return false;
             }
@@ -87,7 +87,7 @@ namespace Sycl_Graph::Dynamic
         }
         bool add(const uI_t &id, const V &v_data)
         {
-            if (N_vertices == NV_max)
+            if (N_vertices == NV)
                 return false;
             vertices[N_vertices] = Vertex_t{id, v_data};
             N_vertices++;
@@ -96,11 +96,12 @@ namespace Sycl_Graph::Dynamic
 
         bool add(const std::vector<uI_t> &id, const std::vector<V> &v_data)
         {
-            if (N_vertices + id.size() > NV_max)
+            if (N_vertices + id.size() > NV)
                 return false;
             for (int i = 0; i < id.size(); i++)
             {
-                vertices[N_vertices] = Vertex_t{id[i], v_data[i]};
+                vertices[N_vertices].id = id[i];
+                vertices[N_vertices].data = v_data[i];
                 N_vertices++;
             }
             return true;
@@ -110,7 +111,7 @@ namespace Sycl_Graph::Dynamic
 
         bool add(const std::vector<Edge_t> &new_edges)
         {
-            if (N_edges + new_edges.size() > NE_max)
+            if (N_edges + new_edges.size() > NE)
             {
                 return false;
             }
@@ -121,7 +122,7 @@ namespace Sycl_Graph::Dynamic
 
         bool add(const uI_t &from, const uI_t &to, const E &e_data = E())
         {
-            if (N_edges == NE_max)
+            if (N_edges == NE)
                 return false;
             edges[N_edges] = Edge_t{from, to, e_data};
             N_edges++;
@@ -131,7 +132,7 @@ namespace Sycl_Graph::Dynamic
         bool add(const std::vector<uI_t> &from, const std::vector<uI_t> &to, const std::vector<E> &e_data = std::vector<E>())
         {
 
-            if (N_edges + from.size() > NE_max)
+            if (N_edges + from.size() > NE)
                 return false;
             for (int i = 0; i < from.size(); i++)
             {
@@ -207,8 +208,8 @@ namespace Sycl_Graph::Dynamic
     struct Graph
     {
         Graph() = default;
-        Graph(uI_t NV_max, uI_t NE_max)
-            : NV_max(NV_max), NE_max(NE_max), C(NV_max, NE_max) {}
+        Graph(uI_t NV, uI_t NE)
+            : NV(NV), NE(NE), C(NV, NE) {}
         Graph(const std::vector<Vertex<V, uI_t>> &vertices,
               const std::vector<Edge<E, uI_t>> &edges) : C(vertices, edges) {}
 
@@ -220,7 +221,7 @@ namespace Sycl_Graph::Dynamic
         Container_t C;
         uI_t &N_vertices = C.N_vertices;
         uI_t &N_edges = C.N_edges;
-        uI_t NV_max, NE_max;
+        uI_t NV, NE;
 
         const V &operator[](uI_t id) const { return get_vertex_prop(id); }
 

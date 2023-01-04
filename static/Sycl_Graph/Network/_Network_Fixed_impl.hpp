@@ -33,9 +33,11 @@ namespace Fixed
 
                 std::array<Trajectory, Nt + 1> trajectory;
                 uint32_t t = 0;
+                std::cout << "Simulating..." << std::endl;
                 trajectory[0] = population_count();
                 for (int i = 0; i < Nt; i++)
                 {
+                    std::cout << "t = " << i << std::endl;
                     advance(p_vec[i]);
                     trajectory[i + 1] = population_count();
                     if (terminate(p_vec[i], trajectory[i + 1]))

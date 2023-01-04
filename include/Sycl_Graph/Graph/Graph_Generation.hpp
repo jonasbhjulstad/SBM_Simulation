@@ -17,23 +17,29 @@ namespace Sycl_Graph::Dynamic::Network_Models
     {
         Sycl_Graph::random::uniform_real_distribution d_ER;
         uint32_t N_edges = 0;
-        std::vector<typename Graph::Edge_t> edges;
-        edges.reserve(G.N_vertices * G.N_vertices);
-        std::vector<uint32_t> from;
-        for (auto &&v_idx : iter::combinations(Sycl_Graph::range(0, G.NV_max), 2))
+        std::vector<typename Graph::uInt_t> from;
+        std::vector<typename Graph::uInt_t> to;
+        uint32_t N_edges_max = Sycl_Graph::n_choose_k(G.N_vertices, 2);
+
+        from.reserve(N_edges_max);
+        to.reserve(N_edges_max);
+        std::vector<typename Graph::Edge_Prop_t> edges(N_edges_max);
+        for (auto &&v_idx : iter::combinations(Sycl_Graph::range(0, G.NV), 2))
         {
             if (d_ER(rng) < p_ER)
             {
-                edges.push_back(typename Graph::Edge_t({}, v_idx[0], v_idx[1]));
+                from.push_back(v_idx[0]);
+                to.push_back(v_idx[1]);
+
                 N_edges++;
-                if (N_edges == G.NE_max)
+                if (N_edges == G.NE)
                 {
                     std::cout << "Warning: max edges reached" << std::endl;
                     return;
                 }
             }
         }
-        G.add(edges);
+        G.add(edges, from, to);
     }
 
     template <typename Graph, typename RNG, typename dType = float>

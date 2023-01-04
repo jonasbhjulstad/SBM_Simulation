@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 namespace Sycl_Graph::Network_Models {
-enum SIR_Individual_State { SIR_S = 0, SIR_I = 1, SIR_R = 2 };
+enum SIR_Individual_State: int { SIR_INDIVIDUAL_S = 0, SIR_INDIVIDUAL_I = 1, SIR_INDIVIDUAL_R = 2 };
 struct SIR_Edge {};
 template <typename dType = float> struct SIR_Bernoulli_Param {
   dType p_I = 0;

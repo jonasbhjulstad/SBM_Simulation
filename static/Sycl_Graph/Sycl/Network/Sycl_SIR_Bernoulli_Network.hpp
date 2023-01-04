@@ -46,8 +46,8 @@ namespace Network_Models
                             auto p_R0 = p0_acc[1];
                     Sycl_Graph::random::uniform_real_distribution<dType> d_I;
                     Sycl_Graph::random::uniform_real_distribution<dType> d_R;
-                    SIR_Individual_State state = d_I(rng_acc[i]) < p_I0 ? SIR_I : SIR_S;
-                    state = d_R(rng_acc[i]) < p_R0 ? SIR_R : state;
+                    SIR_Individual_State state = d_I(rng_acc[i]) < p_I0 ? SIR_INDIVIDUAL_I : SIR_INDIVIDUAL_S;
+                    state = d_R(rng_acc[i]) < p_R0 ? SIR_INDIVIDUAL_R : state;
                     G_acc[0].assign_vertex(state, i); }); });
             auto pop = population_count();
             std::cout << "Population count: " << pop[0] << ", " << pop[1] << ", " << pop[2] << std::endl;
@@ -73,13 +73,13 @@ namespace Network_Models
             h.parallel_for(sycl::range<1>{NV}, [=](sycl::id<1> it)
                            {
                 auto rng = rng_acc[it[0]];
-                if (G.get_vertex_prop(it[0]) == SIR_I)
+                if (G.get_vertex_prop(it[0]) == SIR_INDIVIDUAL_I)
                 {
                     for(const auto& v: G.neighbors(it[0]))
                     {
-                        if (G.get_vertex_prop(v) == SIR_S && d_I(rng) < p_I)
+                        if (G.get_vertex_prop(v) == SIR_INDIVIDUAL_S && d_I(rng) < p_I)
                         {
-                            G.assign_vertex(v, SIR_I);
+                            G.assign_vertex(v, SIR_INDIVIDUAL_I);
                         }
                     }
                 } }); });
@@ -94,7 +94,7 @@ namespace Network_Models
                 h.parallel_for<>(sycl::range<1>{NV}, [=](sycl::id<1> it)
                                  { 
                                 auto rng = rng_acc[it[0]];
-                                G.assign(it[0], (G[it[0]].data == SIR_I && d_R(rng) < p_R) ? SIR_R : G[it[0]].data); }); });
+                                G.assign(it[0], (G[it[0]].data == SIR_INDIVIDUAL_I && d_R(rng) < p_R) ? SIR_INDIVIDUAL_R : G[it[0]].data); }); });
         }
 
         bool terminate(const SIR_Bernoulli_Param<> &p, const std::array<uint32_t, 3> &x)
@@ -113,7 +113,7 @@ namespace Network_Models
         {
             for (const auto &v : G)
             {
-                G.assign(v.id, SIR_S);
+                G.assign(v.id, SIR_INDIVIDUAL_S);
             }
         }
 

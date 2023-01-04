@@ -38,11 +38,11 @@ struct SIR_Bernoulli_Network
     Sycl_Graph::random::uniform_real_distribution<dType> d_R;
     std::for_each(Sycl_Graph::execution::par_unseq,G.begin(), G.end(), [&](auto& v) {
       if (d_I(rng) < p_I0) {
-        v.data = SIR_I;
+        v.data = SIR_INDIVIDUAL_I;
       } else if (d_R(rng) < p_R0) {
-        v.data = SIR_R;
+        v.data = SIR_INDIVIDUAL_R;
       } else {
-        v.data = SIR_S;
+        v.data = SIR_INDIVIDUAL_S;
       }
     });
   }
@@ -62,15 +62,15 @@ struct SIR_Bernoulli_Network
     // print distance between G.begin() and G.end/()
     //  std::cout << std::distance(G.begin(), G.end()) << std::endl;
     std::for_each(Sycl_Graph::execution::seq,G.begin(), G.end(), [&](auto v0) {
-      if (v0.data == SIR_I) {
+      if (v0.data == SIR_INDIVIDUAL_I) {
         for (const auto v : G.neighbors(v0.id)) {
           if (v.id == SIR_Graph::Vertex_t::invalid_id)
             continue;
           bool trigger = d_I(rng) < p_I;
-          if (v.data == SIR_S && trigger) {
-            auto&& I = SIR_I;
+          if (v.data == SIR_INDIVIDUAL_S && trigger) {
+            auto&& I = SIR_INDIVIDUAL_I;
             G.assign(v.id,
-                     ((v.data == SIR_S) && (trigger)) ? I : v.data);
+                     ((v.data == SIR_INDIVIDUAL_S) && (trigger)) ? I : v.data);
           }
         };
       }
@@ -82,8 +82,8 @@ struct SIR_Bernoulli_Network
     Sycl_Graph::random::uniform_real_distribution<dType> d_R;
     std::for_each(Sycl_Graph::execution::par_unseq,G.begin(), G.end(),
                   [&](const auto &v) {
-                    bool recover_trigger = (v.data == SIR_I) && d_R(rng) < p_R;
-                    auto && R = SIR_R;
+                    bool recover_trigger = (v.data == SIR_INDIVIDUAL_I) && d_R(rng) < p_R;
+                    auto && R = SIR_INDIVIDUAL_R;
                     G.assign(v.id, (recover_trigger) ? R : v.data);
                   });
   }
@@ -99,7 +99,7 @@ struct SIR_Bernoulli_Network
   }
 
   void reset() {
-    std::for_each(G.begin(), G.end(), [&](auto v) { G.assign(v.id, SIR_S); });
+    std::for_each(G.begin(), G.end(), [&](auto v) { G.assign(v.id, SIR_INDIVIDUAL_S); });
   }
 
 private:
