@@ -19,7 +19,7 @@ namespace Sycl_Graph::Dynamic::Network_Models
         uint32_t N_edges = 0;
         std::vector<typename Graph::uInt_t> from;
         std::vector<typename Graph::uInt_t> to;
-        uint32_t N_edges_max = Sycl_Graph::n_choose_k(G.N_vertices, 2);
+        uint32_t N_edges_max = Sycl_Graph::n_choose_k(G.N_vertices(), 2);
 
         from.reserve(N_edges_max);
         to.reserve(N_edges_max);

@@ -15,5 +15,38 @@ namespace Sycl_Graph::random {
     using std::uniform_real_distribution;
     typedef mt19937_64 default_rng;
 #endif
+
+    template <typename T>
+    struct binomial_distribution {
+        binomial_distribution(T n, T p) : n(n), p(p) {}
+        T n;
+        T p;
+        T operator()(default_rng &rng) {
+            T count = 0;
+            for (T i = 0; i < n; i++) {
+                if (uniform_real_distribution<T>(0, 1)(rng) < p) {
+                    count++;
+                }
+            }
+            return count;
+        }
+        
+    };
+
+    template <typename T>
+    struct poisson_distribution {
+        poisson_distribution(T lambda) : lambda(lambda) {}
+        T lambda;
+        T operator()(default_rng &rng) {
+            T count = 0;
+            T p = 1;
+            T L = std::exp(-lambda);
+            while (p > L) {
+                p *= uniform_real_distribution<T>(0, 1)(rng);
+                count++;
+            }
+            return count - 1;
+        }
+    };
 }
 #endif

@@ -1,5 +1,0 @@
-# if (SYCL_GRAPH_USE_SYCL)
-# cmake_policy(SET CMP0079 NEW)
-# target_include_directories(Network INTERFACE ${SYCL_GRAPH_INCLUDE_DIRS})
-# target_link_libraries(Network INTERFACE Sycl_)
-# endif()

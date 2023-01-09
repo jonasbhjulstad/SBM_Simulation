@@ -1,5 +1,5 @@
 #include <Sycl_Graph/Graph/Graph.hpp>
-#include <Sycl_Graph/Network/SIR_Bernoulli/SIR_Bernoulli_Network.hpp>
+#include <Sycl_Graph/Network/SIR_Bernoulli/SIR_Bernoulli.hpp>
 #include <Sycl_Graph/Graph/Graph_Generation.hpp>
 #include <Sycl_Graph/random.hpp>
 #include <Sycl_Graph/Math/math.hpp>

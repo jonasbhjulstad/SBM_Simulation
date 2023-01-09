@@ -46,8 +46,6 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/DataFrame/cmake_install.cmake")
   include("/home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Eigen/cmake_install.cmake")
-  include("/home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Network/cmake_install.cmake")
-  include("/home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Sycl/cmake_install.cmake")
   include("/home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Math/cmake_install.cmake")
 
 endif()
