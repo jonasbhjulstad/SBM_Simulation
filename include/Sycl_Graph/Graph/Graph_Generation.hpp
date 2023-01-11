@@ -39,7 +39,7 @@ namespace Sycl_Graph::Dynamic::Network_Models
                 }
             }
         }
-        G.add(edges, from, to);
+        G.add_edge(to, from, edges);
     }
 
     template <typename Graph, typename RNG, typename dType = float>
@@ -52,7 +52,7 @@ namespace Sycl_Graph::Dynamic::Network_Models
     {
         auto vertex_ids = Sycl_Graph::range(0, N_pop);
         std::vector<typename Graph::Vertex_Prop_t> vertex_props(N_pop, node_prop);
-        assert(G.add(vertex_ids, vertex_props));
+        G.add_vertex(vertex_ids, vertex_props);
         random_connect(G, p_ER, rng);
     }
 }

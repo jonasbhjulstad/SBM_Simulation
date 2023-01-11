@@ -1,5 +1,5 @@
 #include <vector>
-#include <CL/sycl.hpp>
+#include <sycl/CL/sycl.hpp>
 #include <type_traits>
 
 struct Foo;

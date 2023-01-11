@@ -24,13 +24,13 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 CMAKE_BUILD_TYPE:STRING=Debug
 
 //No help, variable specified on the command line.
-CMAKE_CXX_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/latest/linux/bin/dpcpp
+CMAKE_CXX_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/latest/linux/bin/icpx
 
 //LLVM archiver
-CMAKE_CXX_COMPILER_AR:FILEPATH=/opt/intel/oneapi/compiler/2022.2.0/linux/bin-llvm/llvm-ar
+CMAKE_CXX_COMPILER_AR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/bin-llvm/llvm-ar
 
 //Generate index for LLVM archive
-CMAKE_CXX_COMPILER_RANLIB:FILEPATH=/opt/intel/oneapi/compiler/2022.2.0/linux/bin-llvm/llvm-ranlib
+CMAKE_CXX_COMPILER_RANLIB:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/bin-llvm/llvm-ranlib
 
 //Flags used by the CXX compiler during all build types.
 CMAKE_CXX_FLAGS:STRING=
@@ -51,10 +51,10 @@ CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 CMAKE_C_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/latest/linux/bin/icx
 
 //LLVM archiver
-CMAKE_C_COMPILER_AR:FILEPATH=/opt/intel/oneapi/compiler/2022.2.0/linux/bin-llvm/llvm-ar
+CMAKE_C_COMPILER_AR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/bin-llvm/llvm-ar
 
 //Generate index for LLVM archive
-CMAKE_C_COMPILER_RANLIB:FILEPATH=/opt/intel/oneapi/compiler/2022.2.0/linux/bin-llvm/llvm-ranlib
+CMAKE_C_COMPILER_RANLIB:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/bin-llvm/llvm-ranlib
 
 //Flags used by the C compiler during all build types.
 CMAKE_C_FLAGS:STRING=
@@ -249,7 +249,7 @@ FETCHCONTENT_UPDATES_DISCONNECTED_CPPITERTOOLS_REPO:BOOL=OFF
 GIT_EXECUTABLE:FILEPATH=/usr/bin/git
 
 //The directory containing a CMake configuration file for IntelDPCPP.
-IntelDPCPP_DIR:PATH=/opt/intel/oneapi/compiler/2022.2.0/linux/IntelDPCPP
+IntelDPCPP_DIR:PATH=/opt/intel/oneapi/compiler/2023.0.0/linux/IntelDPCPP
 
 //Dependencies for the target
 Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
@@ -271,18 +271,18 @@ PYBIND11_PYTHON_VERSION:STRING=3.9
 PYTHON_LIBRARY:FILEPATH=/home/man/.pyenv/versions/3.9.13/lib/libpython3.9.so
 
 //SYCL flags for the compiler
-SYCL_FLAGS:STRING='--dpcpp -fsycl '
+SYCL_FLAGS:STRING='-fsycl '
 
 //Path to a file.
-SYCL_INCLUDE_DIR:FILEPATH=/opt/intel/oneapi/compiler/2022.2.0/linux/include
+SYCL_INCLUDE_DIR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/include
 
 //SYCL Language version
 SYCL_LANGUAGE_VERSION:STRING=202001
 
 //Path to a file.
-SYCL_LIBRARY_DIR:FILEPATH=/opt/intel/oneapi/compiler/2022.2.0/linux/lib
+SYCL_LIBRARY_DIR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/lib
 
-SYCL_PACKAGE_DIR:STRING=/opt/intel/oneapi/compiler/2022.2.0/linux
+SYCL_PACKAGE_DIR:STRING=/opt/intel/oneapi/compiler/2023.0.0/linux
 
 //Value Computed by CMake
 Sycl_Graph_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build
@@ -297,7 +297,7 @@ Sycl_Graph_IS_TOP_LEVEL:STATIC=ON
 Sycl_Graph_SOURCE_DIR:STATIC=/home/man/Documents/Bernoulli_MC
 
 //The directory containing a CMake configuration file for TBB.
-TBB_DIR:PATH=/opt/intel/oneapi/tbb/2021.7.0/lib/cmake/tbb
+TBB_DIR:PATH=/opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb
 
 //Value Computed by CMake
 cppitertools_BINARY_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build
@@ -315,7 +315,7 @@ cppitertools_IS_TOP_LEVEL:STATIC=OFF
 cppitertools_SOURCE_DIR:STATIC=/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src
 
 //The directory containing a CMake configuration file for oneDPL.
-oneDPL_DIR:PATH=/usr/local/lib/cmake/oneDPL-2021.7.1
+oneDPL_DIR:PATH=/usr/local/lib/cmake/oneDPL-2022.0.0
 
 //The directory containing a CMake configuration file for pybind11.
 pybind11_DIR:PATH=/usr/lib/cmake/pybind11
@@ -467,7 +467,7 @@ CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding IntelDPCPP
-FIND_PACKAGE_MESSAGE_DETAILS_IntelDPCPP:INTERNAL=[/opt/intel/oneapi/compiler/2022.2.0/linux/include][/opt/intel/oneapi/compiler/2022.2.0/linux/lib][--dpcpp -fsycl ][v202001()]
+FIND_PACKAGE_MESSAGE_DETAILS_IntelDPCPP:INTERNAL=[/opt/intel/oneapi/compiler/2023.0.0/linux/include][/opt/intel/oneapi/compiler/2023.0.0/linux/lib][-fsycl ][v202001()]
 //Details about finding PYTHON
 FIND_PACKAGE_MESSAGE_DETAILS_PYTHON:INTERNAL=/home/man/.pyenv/versions/3.9.13/bin/python33.9.13
 //Details about finding PkgConfig

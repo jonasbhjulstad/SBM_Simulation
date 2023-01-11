@@ -20,7 +20,6 @@ namespace Sycl_Graph::Sycl
         {
             return static_cast<Derived *>(this)->population_count();
         }
-
         void advance(const Param &p) { static_cast<Derived *>(this)->advance(p); }
         void reset() { static_cast<Derived *>(this)->reset(); }
         bool terminate(const Param &p, const std::vector<uint32_t> &x)
@@ -31,8 +30,6 @@ namespace Sycl_Graph::Sycl
         std::vector<std::vector<uint32_t>>
         simulate(const std::vector<Param> &p_vec, uint32_t Nt, uint32_t Nt_min = 15)
         {
-
-        
             std::vector<std::vector<uint32_t>> trajectory;
             trajectory.resize(p_vec.size()+1);
             //reserve space for the trajectories
@@ -43,15 +40,6 @@ namespace Sycl_Graph::Sycl
             trajectory[0] = population_count();
             for (int i = 0; i < Nt; i++)
             {
-                //print trajectory
-                for (auto &x : trajectory)
-                {
-                    // for (auto &y : x)
-                    // {
-                    //     std::cout << y << " ";
-                    // }
-                    // std::cout << std::endl;
-                }
                 advance(p_vec[i]);
                 trajectory[i + 1] = population_count();
                 if (terminate(p_vec[i], trajectory[i + 1]))

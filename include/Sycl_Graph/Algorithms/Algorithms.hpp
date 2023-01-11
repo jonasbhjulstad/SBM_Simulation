@@ -1,13 +1,13 @@
 #ifndef SYCL_GRAPH_ALGORITHMS_HPP
 #define SYCL_GRAPH_ALGORITHMS_HPP
-#include <CL/sycl.hpp>
+#include <sycl/CL/sycl.hpp>
 #include <Sycl_Graph/Graph/Graph_Types.hpp>
 namespace Sycl_Graph::Sycl::algorithms
 {
-  void bitonic_sort(auto &acc, cl::sycl::handler &h)
+  void bitonic_sort(auto &acc, sycl::handler &h)
   {
     // parallel for
-    h.parallel_for<class bitonic_sort>(cl::sycl::range<1>(acc.size()), [=](cl::sycl::id<1> index)
+    h.parallel_for<class bitonic_sort>(sycl::range<1>(acc.size()), [=](sycl::id<1> index)
                                        {
       //get the index of the element to sort
       int i = index[0];
@@ -28,10 +28,10 @@ namespace Sycl_Graph::Sycl::algorithms
       } });
   }
 
-  void bitonic_sort(auto &acc, cl::sycl::handler &h, auto condition)
+  void bitonic_sort(auto &acc, sycl::handler &h, auto condition)
   {
     // parallel for
-    h.parallel_for<class bitonic_sort>(cl::sycl::range<1>(acc.size()), [=](cl::sycl::id<1> index)
+    h.parallel_for<class bitonic_sort>(sycl::range<1>(acc.size()), [=](sycl::id<1> index)
                                        {
       //get the index of the element to sort
       int i = index[0];

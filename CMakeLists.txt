@@ -34,6 +34,7 @@ set(SYCL_GRAPH_USE_INTEL_SYCL ON)
 set(SYCL_GRAPH_USE_HIPSYCL OFF)
 message(WARNING ${COMPILER_SUPPORTS_SYCL})
 
+
 include(FetchContent)
 FetchContent_Declare(
     cppitertools_repo
@@ -67,6 +68,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set -O0 for debug mode
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 add_compile_options("-fPIC")
 # add_compile_options("-fsanitize=address")
 # add_link_options("-fsanitize=address")
@@ -85,12 +88,13 @@ set(SYCL_GRAPH_LOG_DIR "${PROJECT_SOURCE_DIR}/log" CACHE INTERNAL "SYCL_GRAPH_LO
 set(SYCL_GRAPH_INCLUDE "${PROJECT_SOURCE_DIR}/include" CACHE INTERNAL "SYCL_GRAPH_INCLUDE")
 set(SYCL_GRAPH_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_SOURCE_DIR}/static" CACHE INTERNAL "SYCL_GRAPH_INCLUDE_DIRS")
 
-
+# message(WARNING ${SYCL_INCLUDE_DIR})
+include_directories(${SYCL_INCLUDE_DIR})
 add_subdirectory(include)
 add_subdirectory(static)
 set(SYCL_GRAPH_LIBRARIES ${LIBRARIES} DataFrame SYCL_GRAPH_Eigen)
 configure_file("${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.hpp.in" "${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.hpp")
 configure_file("${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.py.in" "${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.py")
 add_subdirectory(test)
-
+#include onedpl headers
 set(SYCL_GRAPH_COMMON_LIBS ${ONEAPI_LIBRARIES} ${HIPSYCL_LIBS})

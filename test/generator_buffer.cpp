@@ -1,5 +1,5 @@
 #include <oneapi/dpl/random>
-#include <CL/sycl.hpp>
+#include <sycl/CL/sycl.hpp>
 
 
 

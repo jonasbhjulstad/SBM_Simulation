@@ -3,14 +3,21 @@
 #ifdef SYCL_GRAPH_USE_SYCL
 #include "SIR_Bernoulli_Types.hpp"
 #include <stddef.h>
-#include <CL/sycl.hpp>
+#include <sycl/CL/sycl.hpp>
 #include <Sycl_Graph/Network/Network.hpp>
 #include <Sycl_Graph/random.hpp>
 #include <oneapi/dpl/algorithm>
 #include <utility>
+#include <type_traits>
+template <>
+struct sycl::is_device_copyable<Sycl_Graph::Network_Models::SIR_Edge> : std::true_type
+{
+};
+
+template <> 
+struct sycl::is_device_copyable<Sycl_Graph::Network_Models::SIR_Individual_State>: std::true_type {};
 namespace Sycl_Graph
 {
-
     namespace Sycl::Network_Models
     {
         // sycl::is_device_copyable_v<SIR_Individual_State> is_copyable_SIR_Invidual_State;
@@ -180,7 +187,7 @@ namespace Sycl_Graph
                     auto e_acc = G.get_edge_access<sycl::access::mode::read>(h);
                     auto sn_acc = sn_buf.get_access<sycl::access::mode::write>(h);
                     // parallel for
-                    h.parallel_for<class edge_validity>(cl::sycl::range<1>(e_acc.to.size()), [=](cl::sycl::id<1> index)
+                    h.parallel_for<class edge_validity>(sycl::range<1>(e_acc.to.size()), [=](sycl::id<1> index)
                                                        {
                         // get the index of the element to sort
                         int i = index[0];

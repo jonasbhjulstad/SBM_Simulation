@@ -2,7 +2,6 @@
 #define SYCL_GRAPH_Sycl_Graph_Math_HPP
 
 #include <Sycl_Graph/typedefs.hpp>
-
 namespace Sycl_Graph
 {
 

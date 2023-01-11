@@ -1,5 +1,5 @@
 #include <vector>
-#include <CL/sycl.hpp>
+#include <sycl/CL/sycl.hpp>
 #include <iostream>
 #include <algorithm>
 // include for assert
@@ -13,18 +13,18 @@ int main()
 
 
   //create a queue
-  cl::sycl::queue q;
+  sycl::queue q;
   {
   //create a buffer of 8 elements
-  cl::sycl::buffer<int, 1> buf(v.data(), cl::sycl::range<1>(v.size()));
+  sycl::buffer<int, 1> buf(v.data(), sycl::range<1>(v.size()));
 
   //create a command group to issue command to the queue
-  q.submit([&](cl::sycl::handler &cgh) {
+  q.submit([&](sycl::handler &cgh) {
     //create an accessor
-    auto acc = buf.get_access<cl::sycl::access::mode::read_write>(cgh);
+    auto acc = buf.get_access<sycl::access::mode::read_write>(cgh);
 
     //parallel for
-    cgh.parallel_for<class bitonic_sort>(cl::sycl::range<1>(v.size()), [=](cl::sycl::id<1> index) {
+    cgh.parallel_for<class bitonic_sort>(sycl::range<1>(v.size()), [=](sycl::id<1> index) {
       //get the index of the element to sort
       int i = index[0];
 

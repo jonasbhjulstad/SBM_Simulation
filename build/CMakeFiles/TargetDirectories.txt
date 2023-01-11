@@ -65,12 +65,12 @@
 /home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Math/CMakeFiles/install/strip.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/array_constraints.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/sycl_mutex.dir
-/home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/erdos_renyi_gen.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/bitonic_sort.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/sycl_device_info.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/sycl_copy_profiling.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/device_copy.dir
-/home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/edges_sort.dir
+/home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/SIR_Simulation.dir
+/home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/SIR_Metapopulation_Simulation.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/sycl_parallel_cond.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/sycl_kernel_emit.dir
 /home/man/Documents/Bernoulli_MC/build/test/CMakeFiles/edit_cache.dir

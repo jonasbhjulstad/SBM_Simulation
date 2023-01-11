@@ -19,7 +19,7 @@
 #include <iterator>
 // #include <Sycl_Graph/execution.hpp>
 #include <type_traits>
-#include <CL/sycl.hpp>
+#include <sycl/CL/sycl.hpp>
 #include "Graph_Types.hpp"
 #include "Graph_Types_Sycl.hpp"
 #include <Sycl_Graph/Algorithms/Algorithms.hpp>
@@ -33,16 +33,16 @@ namespace Sycl_Graph::Sycl
   {
     // create copy constructor
     Graph(Graph &other) = default;
-    Graph(cl::sycl::queue &q, uI_t NV, uI_t NE, const cl::sycl::property_list &props = {})
-        : q(q), vertex_buf(NV, props), edge_buf(NE, props)
+    Graph(sycl::queue &q, uI_t NV, uI_t NE, const sycl::property_list &props = {})
+        : q(q), vertex_buf(NV, q, props), edge_buf(NE, q, props)
     {
     }
 
-    Graph(cl::sycl::queue &q, const std::vector<Vertex<V, uI_t>>& vertices, const std::vector<Edge<E, uI_t>>& edges, const cl::sycl::property_list &props = {})
+    Graph(sycl::queue &q, const std::vector<Vertex<V, uI_t>>& vertices, const std::vector<Edge<E, uI_t>>& edges, const sycl::property_list &props = {})
         : Graph(q), vertex_buf(vertices, props), edge_buf(edges, props)
     {
     }
-    cl::sycl::queue &q;
+    sycl::queue &q;
     Vertex_Buffer<V, uI_t> vertex_buf;
     Edge_Buffer<E, uI_t> edge_buf;
     const uI_t& NV = vertex_buf.NV;
@@ -59,30 +59,30 @@ namespace Sycl_Graph::Sycl
     uI_t find(auto condition)
     {
       uI_t idx = Vertex_t::invalid_id;
-      cl::sycl::buffer<uI_t, 1> res_buf(&idx, 1);
-      q.submit([&](cl::sycl::handler &h)
+      sycl::buffer<uI_t, 1> res_buf(&idx, 1);
+      q.submit([&](sycl::handler &h)
                {
-        auto out = res_buf.template get_access<cl::sycl::access::mode::write>(h);
-        auto vertex_acc = vertex_buf.template get_access<cl::sycl::access::mode::read>(h);
+        auto out = res_buf.template get_access<sycl::access::mode::write>(h);
+        auto vertex_acc = vertex_buf.template get_access<sycl::access::mode::read>(h);
         find(out, vertex_acc, condition, h); });
     }
 
     uI_t find(auto &res_acc, auto &v_acc, auto condition, sycl::handler &h)
     {
-      h.parallel_for<class vertex_id_search>(cl::sycl::range<1>(v_acc.size()), [=](cl::sycl::id<1> id)
+      h.parallel_for<class vertex_id_search>(sycl::range<1>(v_acc.size()), [=](sycl::id<1> id)
                                              { if (condition(v_acc[id[0]])) res_acc[0] = id[0]; });
     }
 
 
     //perfect forward methods of buffers
 
-    template <cl::sycl::access::mode mode>
+    template <sycl::access::mode mode>
     auto get_vertex_access(sycl::handler &h)
     {
       return vertex_buf.template get_access<mode>(h);
     }
 
-    template <cl::sycl::access::mode mode>
+    template <sycl::access::mode mode>
     auto get_edge_access(sycl::handler &h)
     {
       return edge_buf.template get_access<mode>(h);

@@ -1,6 +1,6 @@
 #ifndef SYCL_GRAPH_SYCL_HPP
 #define SYCL_GRAPH_SYCL_HPP
-#include <CL/sycl.hpp>
+#include <sycl/CL/sycl.hpp>
 namespace Sycl_Graph
 {
 
