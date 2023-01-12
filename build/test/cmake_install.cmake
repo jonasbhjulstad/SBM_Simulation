@@ -1,4 +1,4 @@
-# Install script for directory: /home/man/Documents/Bernoulli_MC/test
+# Install script for directory: /home/man/Documents/Sycl_Graph/test
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

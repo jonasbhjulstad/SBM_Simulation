@@ -22,8 +22,8 @@ set_property(GLOBAL PROPERTY _CMAKE_FindGit_GIT_EXECUTABLE_VERSION
 include(ExternalProject)
 ExternalProject_Add(cppitertools_repo-populate
                      "UPDATE_DISCONNECTED" "False" "GIT_REPOSITORY" "https://github.com/ryanhaining/cppitertools.git" "GIT_TAG" "master"
-                    SOURCE_DIR          "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src"
-                    BINARY_DIR          "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build"
+                    SOURCE_DIR          "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src"
+                    BINARY_DIR          "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-build"
                     CONFIGURE_COMMAND   ""
                     BUILD_COMMAND       ""
                     INSTALL_COMMAND     ""

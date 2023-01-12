@@ -15,8 +15,6 @@ int main() {
   sycl::queue q;
   Sycl_Graph::random::default_rng rng;
   SIR_Metapopulation_Graph G(q, 101, 100000);
-  SIR_Metapopulation_Network(Graph_t & G, float E_I0, float std_I0, float E_R0,
-                             float std_R0, int seed = 777)
 
       SIR_Metapopulation_Network sir(G, 0.1, 0.001);
   // generate sir_param

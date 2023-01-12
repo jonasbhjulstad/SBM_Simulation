@@ -22,13 +22,11 @@
 #include <sycl/CL/sycl.hpp>
 #include "Graph_Types.hpp"
 #include "Graph_Types_Sycl.hpp"
-#include <Sycl_Graph/Algorithms/Algorithms.hpp>
-#include <Sycl_Graph/data_containers.hpp>
 
 namespace Sycl_Graph::Sycl
 {
   
-      template <typename V, typename E, std::unsigned_integral uI_t>
+  template <typename V, typename E, std::unsigned_integral uI_t>
   struct Graph
   {
     // create copy constructor
@@ -56,6 +54,8 @@ namespace Sycl_Graph::Sycl
     inline uI_t N_vertices() const {return vertex_buf.N_vertices;}
     inline uI_t N_edges() const {return edge_buf.N_edges;}
 
+
+    //find vertex index based on condition
     uI_t find(auto condition)
     {
       uI_t idx = Vertex_t::invalid_id;
@@ -65,12 +65,15 @@ namespace Sycl_Graph::Sycl
         auto out = res_buf.template get_access<sycl::access::mode::write>(h);
         auto vertex_acc = vertex_buf.template get_access<sycl::access::mode::read>(h);
         find(out, vertex_acc, condition, h); });
+      q.wait();
+      return idx;
     }
 
-    uI_t find(auto &res_acc, auto &v_acc, auto condition, sycl::handler &h)
+    void find(auto &res_acc, auto &v_acc, auto condition, sycl::handler &h)
     {
       h.parallel_for<class vertex_id_search>(sycl::range<1>(v_acc.size()), [=](sycl::id<1> id)
                                              { if (condition(v_acc[id[0]])) res_acc[0] = id[0]; });
+
     }
 
 

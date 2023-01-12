@@ -32,7 +32,6 @@ set(SYCL_GRAPH_USE_INTEL ON)
 set(SYCL_GRAPH_USE_AMD OFF)
 set(SYCL_GRAPH_USE_INTEL_SYCL ON)
 set(SYCL_GRAPH_USE_HIPSYCL OFF)
-message(WARNING ${COMPILER_SUPPORTS_SYCL})
 
 
 include(FetchContent)
@@ -69,15 +68,16 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set -O0 for debug mode
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
+add_compile_options("-O0")
 add_compile_options("-fPIC")
+add_compile_options("-Wdeprecated-declarations")
 # add_compile_options("-fsanitize=address")
 # add_link_options("-fsanitize=address")
 # add_compile_options("-lasan")
 include(FetchContent)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
+    add_compile_options("-stdlib=libstdc++")
 endif()
 
 

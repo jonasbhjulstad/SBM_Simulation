@@ -72,6 +72,11 @@ namespace Sycl_Graph
 
                 const float p_I0 = this->p_I0;
                 const float p_R0 = this->p_R0;
+                
+
+                //ensure that edges are pointing to data indices of vertices
+                G.edge_buf.positional_index_convert(G.vertex_buf);
+                
                 // generate seeds for
                 sycl::buffer<float, 1> p_I_buf(sycl::range<1>(G.N_vertices()));
                 sycl::buffer<float, 1> p_R_buf(sycl::range<1>(G.N_vertices()));

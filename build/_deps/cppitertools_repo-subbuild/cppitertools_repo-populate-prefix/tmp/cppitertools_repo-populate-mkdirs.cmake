@@ -4,19 +4,19 @@
 cmake_minimum_required(VERSION 3.5)
 
 file(MAKE_DIRECTORY
-  "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src"
-  "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build"
-  "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix"
-  "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/tmp"
-  "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/src/cppitertools_repo-populate-stamp"
-  "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/src"
-  "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/src/cppitertools_repo-populate-stamp"
+  "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src"
+  "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-build"
+  "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix"
+  "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/tmp"
+  "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/src/cppitertools_repo-populate-stamp"
+  "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/src"
+  "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/src/cppitertools_repo-populate-stamp"
 )
 
 set(configSubDirs )
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/src/cppitertools_repo-populate-stamp/${subDir}")
+    file(MAKE_DIRECTORY "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/src/cppitertools_repo-populate-stamp/${subDir}")
 endforeach()
 if(cfgdir)
-  file(MAKE_DIRECTORY "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/src/cppitertools_repo-populate-stamp${cfgdir}") # cfgdir has leading slash
+  file(MAKE_DIRECTORY "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-subbuild/cppitertools_repo-populate-prefix/src/cppitertools_repo-populate-stamp${cfgdir}") # cfgdir has leading slash
 endif()

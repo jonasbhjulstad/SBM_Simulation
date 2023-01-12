@@ -1,4 +1,4 @@
-# Install script for directory: /home/man/Documents/Bernoulli_MC/static/Sycl_Graph/Eigen
+# Install script for directory: /home/man/Documents/Sycl_Graph/static/Sycl_Graph/Eigen
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

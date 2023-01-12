@@ -18,6 +18,14 @@ namespace Sycl_Graph::Sycl
         sycl::accessor<uI_t, 1, Mode> from;
     };
 
+    enum Edge_Indexing
+    {
+        EDGE_INDEXING_ID,
+        EDGE_INDEXING_POSITION
+    };
+    template <typename V, std::unsigned_integral uI_t>
+    struct Vertex_Buffer;
+
     template <typename E, std::unsigned_integral uI_t>
     struct Edge_Buffer
     {
@@ -29,6 +37,8 @@ namespace Sycl_Graph::Sycl
         sycl::buffer<uI_t, 1> to_buf;
         sycl::buffer<uI_t, 1> from_buf;
         sycl::buffer<E, 1> data_buf;
+        Edge_Indexing index_type = EDGE_INDEXING_ID;
+
         static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
         Edge_Buffer(uI_t NE, sycl::queue &q, const sycl::property_list &props = {})
             : to_buf(sycl::range<1>(NE), props), from_buf(sycl::range<1>(NE), props), data_buf(sycl::range<1>(NE), props), NE(NE), q(q)
@@ -54,6 +64,8 @@ namespace Sycl_Graph::Sycl
                          host_buffer_copy(from_buf, edge_from, h);
                          host_buffer_copy(data_buf, edge_data, h); });
         }
+
+        uI_t size()const {return N_edges;}
         template <sycl::access::mode Mode>
         Edge_Accessor<E, uI_t, Mode> get_access(sycl::handler &h)
         {
@@ -85,6 +97,59 @@ namespace Sycl_Graph::Sycl
         }); });
             N_edges -= to.size();
         }
+
+        template <typename V>
+        void positional_index_convert(Vertex_Buffer<V, uI_t> &v_buf)
+        {
+            if (index_type == EDGE_INDEXING_POSITION)
+            {
+                return;
+            }
+            uI_t N_vertices = v_buf.size();
+            uI_t N_edges = this->size();
+            q.submit([&](sycl::handler &h)
+                     {
+                auto v_acc = v_buf.template get_access<sycl::access::mode::read>(h);
+                auto to_acc = to_buf.template get_access<sycl::access::mode::read_write>(h);
+                auto from_acc = from_buf.template get_access<sycl::access::mode::read_write>(h);
+
+                h.parallel_for(sycl::range<1>(N_edges), 
+                [=](sycl::id<1> id){
+                    for (int i = 0;i < N_vertices; i++)
+                    {
+                        if (to_acc[id] == v_acc.id[i])
+                        {
+                            to_acc[id] = i;
+                        }
+                        if (from_acc[id] == v_acc.id[i])
+                        {
+                            from_acc[id] = i;
+                        }
+                    }
+                }); });
+            index_type = EDGE_INDEXING_POSITION;
+        }
+
+        template <typename V>
+        void id_index_convert(Vertex_Buffer<V, uI_t> &v_buf)
+        {
+            if (index_type == EDGE_INDEXING_ID)
+            {
+                return;
+            }
+            q.submit([&](sycl::handler &h)
+                     {
+                auto v_acc = v_buf.get_access<sycl::access::mode::read>(h);
+                auto to_acc = to_buf.template get_access<sycl::access::mode::read_write>(h);
+                auto from_acc = from_buf.template get_access<sycl::access::mode::read_write>(h);
+
+                h.parallel_for(sycl::range<1>(to_acc.size()), 
+                [&](sycl::id<1> id){
+                    to_acc[id] = v_acc[to_acc[id]].id;
+                    from_acc[id] = v_acc[from_acc[id]].id;
+                }); });
+            index_type = EDGE_INDEXING_ID;
+        }
     };
     template <typename V, typename uI_t, sycl::access::mode mode>
     struct Vertex_Accessor
@@ -93,10 +158,16 @@ namespace Sycl_Graph::Sycl
             : data(v_buf, h, props), id(id_buf, h, props)
         {
         }
+        uI_t size() const { return data.size(); }
         sycl::accessor<V, 1, mode> data;
         sycl::accessor<uI_t, 1, mode> id;
     };
 
+    enum Vertex_Indexing
+    {
+        VERTEX_INDEX_ID,
+        VERTEX_INDEX_POSITION
+    };
     template <typename V, std::unsigned_integral uI_t>
     struct Vertex_Buffer
     {
@@ -107,6 +178,7 @@ namespace Sycl_Graph::Sycl
         sycl::buffer<uI_t, 1> id_buf;
         sycl::buffer<V, 1> data_buf;
         sycl::queue &q;
+
         Vertex_Buffer(uI_t NV, sycl::queue &q, const sycl::property_list &props = {})
             : id_buf(sycl::range<1>(NV), props), data_buf(sycl::range<1>(NV), props), NV(NV), q(q)
         {
@@ -125,7 +197,7 @@ namespace Sycl_Graph::Sycl
             host_buffer_copy(id_buf, ids, q);
             host_buffer_copy(data_buf, v_data, q);
         }
-
+        uI_t size(){return data_buf.size();};
         template <sycl::access::mode mode>
         Vertex_Accessor<V, uI_t, mode> get_access(sycl::handler &h)
         {
@@ -160,6 +232,7 @@ namespace Sycl_Graph::Sycl
             return result;
         }
 
+        template <Vertex_Indexing idx_type = VERTEX_INDEX_ID>
         void assign(const std::vector<uI_t> &id, const std::vector<V> &data)
         {
             q.submit([&](sycl::handler &h)

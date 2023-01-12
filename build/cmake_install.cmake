@@ -1,4 +1,4 @@
-# Install script for directory: /home/man/Documents/Bernoulli_MC
+# Install script for directory: /home/man/Documents/Sycl_Graph
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,10 +44,10 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build/cmake_install.cmake")
-  include("/home/man/Documents/Bernoulli_MC/build/include/cmake_install.cmake")
-  include("/home/man/Documents/Bernoulli_MC/build/static/cmake_install.cmake")
-  include("/home/man/Documents/Bernoulli_MC/build/test/cmake_install.cmake")
+  include("/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-build/cmake_install.cmake")
+  include("/home/man/Documents/Sycl_Graph/build/include/cmake_install.cmake")
+  include("/home/man/Documents/Sycl_Graph/build/static/cmake_install.cmake")
+  include("/home/man/Documents/Sycl_Graph/build/test/cmake_install.cmake")
 
 endif()
 
@@ -59,5 +59,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/man/Documents/Bernoulli_MC/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/man/Documents/Sycl_Graph/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

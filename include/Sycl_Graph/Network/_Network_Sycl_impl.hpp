@@ -5,6 +5,7 @@
 #include <random>
 #include <stddef.h>
 #include <vector>
+#include <limits>
 
 namespace Sycl_Graph::Sycl
 {
@@ -27,8 +28,9 @@ namespace Sycl_Graph::Sycl
             return static_cast<Derived *>(this)->terminate(p, x);
         }
 
+
         std::vector<std::vector<uint32_t>>
-        simulate(const std::vector<Param> &p_vec, uint32_t Nt, uint32_t Nt_min = 15)
+        simulate(const std::vector<Param> &p_vec, uint32_t Nt = std::numeric_limits<uint32_t>::max(), uint32_t Nt_min = 0)
         {
             std::vector<std::vector<uint32_t>> trajectory;
             trajectory.resize(p_vec.size()+1);

@@ -16,12 +16,12 @@ namespace Sycl_Graph::random {
     typedef mt19937_64 default_rng;
 #endif
 
-    template <typename T>
+    template <typename T, typename RNG = default_rng>
     struct binomial_distribution {
         binomial_distribution(T n, T p) : n(n), p(p) {}
         T n;
         T p;
-        T operator()(default_rng &rng) {
+        T operator()(RNG &rng) {
             T count = 0;
             for (T i = 0; i < n; i++) {
                 if (uniform_real_distribution<T>(0, 1)(rng) < p) {

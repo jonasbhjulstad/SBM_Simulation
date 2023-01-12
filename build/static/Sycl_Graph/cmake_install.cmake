@@ -1,4 +1,4 @@
-# Install script for directory: /home/man/Documents/Bernoulli_MC/static/Sycl_Graph
+# Install script for directory: /home/man/Documents/Sycl_Graph/static/Sycl_Graph
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,9 +44,9 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/DataFrame/cmake_install.cmake")
-  include("/home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Eigen/cmake_install.cmake")
-  include("/home/man/Documents/Bernoulli_MC/build/static/Sycl_Graph/Math/cmake_install.cmake")
+  include("/home/man/Documents/Sycl_Graph/build/static/Sycl_Graph/DataFrame/cmake_install.cmake")
+  include("/home/man/Documents/Sycl_Graph/build/static/Sycl_Graph/Eigen/cmake_install.cmake")
+  include("/home/man/Documents/Sycl_Graph/build/static/Sycl_Graph/Math/cmake_install.cmake")
 
 endif()
 

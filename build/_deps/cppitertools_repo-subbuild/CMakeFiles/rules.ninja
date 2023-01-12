@@ -23,7 +23,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-subbuild -B/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-subbuild
+  command = /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-subbuild -B/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-subbuild
   description = Re-running CMake...
   generator = 1
 

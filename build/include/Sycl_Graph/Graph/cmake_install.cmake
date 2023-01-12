@@ -1,4 +1,4 @@
-# Install script for directory: /home/man/Documents/Bernoulli_MC/include/Sycl_Graph/Graph
+# Install script for directory: /home/man/Documents/Sycl_Graph/include/Sycl_Graph/Graph
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

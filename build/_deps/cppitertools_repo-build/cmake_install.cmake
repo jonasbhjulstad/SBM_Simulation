@@ -1,4 +1,4 @@
-# Install script for directory: /home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src
+# Install script for directory: /home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -43,14 +43,14 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include/cppitertools" TYPE DIRECTORY FILES "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-src/.")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include/cppitertools" TYPE DIRECTORY FILES "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src/.")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/share/cppitertools/cppitertools-config.cmake")
     file(DIFFERENT _cmake_export_file_changed FILES
          "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/share/cppitertools/cppitertools-config.cmake"
-         "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build/CMakeFiles/Export/25ccff89503ed034064e7f358207d824/cppitertools-config.cmake")
+         "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-build/CMakeFiles/Export/25ccff89503ed034064e7f358207d824/cppitertools-config.cmake")
     if(_cmake_export_file_changed)
       file(GLOB _cmake_old_config_files "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/share/cppitertools/cppitertools-config-*.cmake")
       if(_cmake_old_config_files)
@@ -63,10 +63,10 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
     endif()
     unset(_cmake_export_file_changed)
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cppitertools" TYPE FILE FILES "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build/CMakeFiles/Export/25ccff89503ed034064e7f358207d824/cppitertools-config.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cppitertools" TYPE FILE FILES "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-build/CMakeFiles/Export/25ccff89503ed034064e7f358207d824/cppitertools-config.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cppitertools" TYPE FILE FILES "/home/man/Documents/Bernoulli_MC/build/_deps/cppitertools_repo-build/cppitertools-config-version.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/cppitertools" TYPE FILE FILES "/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-build/cppitertools-config-version.cmake")
 endif()
 
