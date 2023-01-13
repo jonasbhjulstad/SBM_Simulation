@@ -10,12 +10,29 @@ namespace Sycl_Graph::random {
 #ifdef SYCL_GRAPH_USE_INTEL_SYCL
     using default_rng = oneapi::dpl::ranlux48;
     using oneapi::dpl::uniform_real_distribution;
+
+
+    template <typename dType = float>
+    struct normal_distribution
+    {
+        normal_distribution(): normal_distribution(0,0){}
+        normal_distribution(dType mean): dist(mean){}
+        normal_distribution(dType mean, dType stddev): dist(mean, stddev){}
+        template <typename RNG>
+        float operator()(RNG &rng) {
+            return dist(rng);
+        }
+        void seed(unsigned int seed) {
+            dist.seed(seed);
+        }
+        private:
+        oneapi::dpl::normal_distribution<dType> dist;
+    };
 #else
     using std::mt19937_64;
     using std::uniform_real_distribution;
     typedef mt19937_64 default_rng;
 #endif
-
     template <typename T, typename RNG = default_rng>
     struct binomial_distribution {
         binomial_distribution(T n, T p) : n(n), p(p) {}

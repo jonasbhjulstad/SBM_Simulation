@@ -28,19 +28,19 @@ namespace Sycl_Graph
             Sycl_Graph::Sycl::Graph<SIR_Individual_State, SIR_Edge, uint32_t>;
 
         struct SIR_Bernoulli_Network
-            : public Network<SIR_Bernoulli_Param<>, SIR_Bernoulli_Network>
+            : public Network<SIR_Bernoulli_Network, std::vector<uint32_t>, SIR_Bernoulli_Temporal_Param<>>
         {
             using Graph_t = SIR_Graph;
             using Vertex_t = typename Graph_t::Vertex_t;
             using Edge_t = typename Graph_t::Edge_t;
-            using Base_t = Network<SIR_Bernoulli_Param<>, SIR_Bernoulli_Network>;
+            using Base_t = Network<SIR_Bernoulli_Network, std::vector<uint32_t>, SIR_Bernoulli_Temporal_Param<>>;
             const float p_I0;
             const float p_R0;
             const uint32_t t = 0;
             const uint32_t N_neighbors_max;
             sycl::buffer<int, 1> seed_buf;
             SIR_Bernoulli_Network(Graph_t &G, float p_I0, float p_R0, uint32_t N_neighbors_max = 1, int seed = 777)
-                : Base_t(3), q(G.q), G(G), p_I0(p_I0), p_R0(p_R0), N_neighbors_max(N_neighbors_max), seed_buf(sycl::range<1>(G.NV))
+                : q(G.q), G(G), p_I0(p_I0), p_R0(p_R0), N_neighbors_max(N_neighbors_max), seed_buf(sycl::range<1>(G.NV))
             {
                 assert(G.NV > 0);
                 // generate G.NV random numbers
@@ -286,13 +286,13 @@ namespace Sycl_Graph
                             } }); });
                 q.wait();
             }
-            void advance(const SIR_Bernoulli_Param<> &p)
+            void advance(const SIR_Bernoulli_Temporal_Param<> &p)
             {
                 infection_step(p.p_I);
                 recovery_step(p.p_R);
             }
 
-            bool terminate(const SIR_Bernoulli_Param<> &p, const std::vector<uint32_t> &x)
+            bool terminate(const std::vector<uint32_t> &x, const SIR_Bernoulli_Temporal_Param<> &p)
             {
                 bool early_termination = ((t > p.Nt_min) && (x[1] < p.N_I_min));
                 return early_termination;

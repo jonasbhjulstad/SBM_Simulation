@@ -77,6 +77,7 @@ namespace Sycl_Graph::Sycl
             host_buffer_add(to_buf, to, q, N_edges);
             host_buffer_add(from_buf, from, q, N_edges);
             host_buffer_add(data_buf, data, q, N_edges);
+
             N_edges += to.size();
         }
 

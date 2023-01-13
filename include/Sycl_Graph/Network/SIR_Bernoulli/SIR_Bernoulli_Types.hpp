@@ -5,7 +5,7 @@ namespace Sycl_Graph::Network_Models {
 enum SIR_Individual_State: uint8_t { SIR_INDIVIDUAL_S = 0, SIR_INDIVIDUAL_I = 1, SIR_INDIVIDUAL_R = 2 };
 struct SIR_Edge {};
 
-template <typename dType = float> struct SIR_Bernoulli_Param {
+template <typename dType = float> struct SIR_Bernoulli_Temporal_Param {
   dType p_I = 0;
   dType p_R = 0;
   uint32_t Nt_min = std::numeric_limits<uint32_t>::max();

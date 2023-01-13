@@ -11,7 +11,6 @@
 #include <limits>
 #include <map>
 #include <stdint.h>
-#include "statistical_typedefs.hpp"
 namespace Sycl_Graph {
 
 typedef Eigen::Matrix<float, -1, -1> Mat;

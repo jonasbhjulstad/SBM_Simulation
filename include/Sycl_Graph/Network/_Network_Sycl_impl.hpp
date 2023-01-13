@@ -12,46 +12,63 @@ namespace Sycl_Graph::Sycl
     namespace Network_Models
     {
     using namespace Sycl_Graph::Network_Models;
-    template <typename Param, class Derived>
+    template <class Derived, typename State, typename TemporalParam>
     struct Network
     {
-        Network(uint32_t Nx): Nx(Nx) {}
-        uint32_t Nx;
         std::vector<uint32_t> population_count()
         {
             return static_cast<Derived *>(this)->population_count();
         }
-        void advance(const Param &p) { static_cast<Derived *>(this)->advance(p); }
-        void reset() { static_cast<Derived *>(this)->reset(); }
-        bool terminate(const Param &p, const std::vector<uint32_t> &x)
+
+        void advance()
         {
-            return static_cast<Derived *>(this)->terminate(p, x);
+            static_cast<Derived *>(this)->advance();
         }
 
+        void read_state(){
+            static_cast<Derived *>(this)->read_state();
+        }
 
-        std::vector<std::vector<uint32_t>>
-        simulate(const std::vector<Param> &p_vec, uint32_t Nt = std::numeric_limits<uint32_t>::max(), uint32_t Nt_min = 0)
+        void advance(const TemporalParam tp)
         {
-            std::vector<std::vector<uint32_t>> trajectory;
-            trajectory.resize(p_vec.size()+1);
+            static_cast<Derived *>(this)->advance(tp);
+        }
+
+        State read_state(const TemporalParam tp){
+            return static_cast<Derived *>(this)->read_state(tp);
+        }
+
+        void reset() { static_cast<Derived *>(this)->reset(); }
+
+        //enable if Param is not void
+        bool terminate(const State &x, const TemporalParam tp = TemporalParam())
+        {
+            return static_cast<Derived *>(this)->terminate(x, tp);
+        }
+
+        std::vector<State>
+        simulate(uint32_t Nt = std::numeric_limits<uint32_t>::max(), uint32_t Nt_min = 0, const std::vector<TemporalParam> &tp = {})
+        {
+            std::vector<State> trajectory(Nt + 1);
             //reserve space for the trajectories
-            std::for_each(trajectory.begin(), trajectory.end(), [this](auto &x) {
-                x.resize(Nx);
-            });
             uint32_t t = 0;
-            trajectory[0] = population_count();
+            TemporalParam tp_i = (tp.size() > 0) ? tp[0] : TemporalParam();
+            trajectory[0] = read_state(tp_i);
             for (int i = 0; i < Nt; i++)
             {
-                advance(p_vec[i]);
-                trajectory[i + 1] = population_count();
-                if (terminate(p_vec[i], trajectory[i + 1]))
+                tp_i = (tp.size() > 0) ? tp[i] : TemporalParam();
+                advance(tp_i);
+                trajectory[i + 1] = read_state(tp[i+1]);
+                if (terminate(trajectory[i + 1], tp_i))
                 {
                     break;
                 }
             }
-            return Sycl_Graph::transpose(trajectory);
+            return trajectory;
         }
-    };
+
+
+    };    
 } // namespace Fixed
 } // namespace Network_Models
 #endif

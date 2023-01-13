@@ -19,15 +19,15 @@ int main()
     SIR_Bernoulli_Network sir(G, 0.1, 0.001);
     //generate sir_param
     size_t Nt = 100;
-    std::vector<SIR_Bernoulli_Param<float>> sir_param(Nt);
+    std::vector<SIR_Bernoulli_Temporal_Param<float>> sir_param(Nt);
     std::generate(sir_param.begin(), sir_param.end(), [&]() {
-        return SIR_Bernoulli_Param<float>{0.05, 0.01, 100, 10};
+        return SIR_Bernoulli_Temporal_Param<float>{0.05, 0.01, 100, 10};
     });
     std::cout << "Generating ER graph..." << std::endl;
     generate_erdos_renyi(G, N_pop, p_ER, SIR_INDIVIDUAL_S, rng);
     std::cout << "Initializing..." << std::endl;
     sir.initialize();
-    auto traj = sir.simulate(sir_param,Nt);
+    auto traj = sir.simulate(Nt, 0, sir_param);
     //print traj
     for (auto &x : traj) {
         for (auto &y : x) {

@@ -4,36 +4,39 @@
 #include <Sycl_Graph/Network/SIR_Metapopulation/SIR_Metapopulation.hpp>
 #include <Sycl_Graph/path_config.hpp>
 #include <Sycl_Graph/random.hpp>
+#include <algorithm>
 #include <filesystem>
-int main() {
+using namespace Sycl_Graph::random;
+std::vector<uint32_t> N_pop = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+std::vector<normal_distribution<float>> I0(N_pop.size());
+std::vector<normal_distribution<float>> R0(N_pop.size());
+std::vector<float> alpha(N_pop.size(), 0.1);
+std::vector<float> node_beta(N_pop.size(), 0.001);
+std::vector<float> edge_beta(N_pop.size(), 0.001);
+int main()
+{
+
+  std::transform(N_pop.begin(), N_pop.end(), I0.begin(), [](auto x)
+                 { return normal_distribution<float>(x * 0.1, x * 0.01); });
 
   using namespace Sycl_Graph::Sycl::Network_Models;
   using Sycl_Graph::Dynamic::Network_Models::generate_erdos_renyi;
   using namespace Sycl_Graph::Network_Models;
-  size_t N_pop = 100;
   float p_ER = 1;
   sycl::queue q;
+  int seed = 777;
+  uint32_t NV = 10;
   Sycl_Graph::random::default_rng rng;
-  SIR_Metapopulation_Graph G(q, 101, 100000);
-
-      SIR_Metapopulation_Network sir(G, 0.1, 0.001);
+  auto G = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER);
+  SIR_Metapopulation_Network<> sir(G, N_pop, I0, R0, alpha, node_beta, edge_beta, seed);
   // generate sir_param
   size_t Nt = 100;
-  std::vector<SIR_Metapopulation_Param<float>> sir_param(Nt);
-  std::generate(sir_param.begin(), sir_param.end(), [&]() {
-    return SIR_Metapopulation_Param<float>{0.05, 0.01, 100, 10};
-  });
-  std::cout << "Generating ER graph..." << std::endl;
-  generate_erdos_renyi(G, N_pop, p_ER, SIR_INDIVIDUAL_S, rng);
-  std::cout << "Initializing..." << std::endl;
   sir.initialize();
-  auto traj = sir.simulate(sir_param, Nt);
+  auto traj = sir.simulate(Nt);
   // print traj
-  for (auto &x : traj) {
-    for (auto &y : x) {
-      std::cout << y << " ";
-    }
-    std::cout << std::endl;
+  for (auto &x : traj)
+  {
+    std::cout << x.S << ", " << x.I << ", " << x.R << std::endl;
   }
 
   // write to file
@@ -41,13 +44,10 @@ int main() {
   std::filesystem::create_directory(
       std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/");
   file.open(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/traj.csv");
-  auto traj_T = Sycl_Graph::transpose(traj);
 
-  for (auto &x : traj_T) {
-    for (auto &y : x) {
-      file << y << ",";
-    }
-    file << std::endl;
+  for (auto &x : traj)
+  {
+    file << x.S << ", " << x.I << ", " << x.R << "\n";
   }
   file.close();
 }
