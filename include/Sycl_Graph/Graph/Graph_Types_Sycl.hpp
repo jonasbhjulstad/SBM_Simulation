@@ -205,7 +205,7 @@ namespace Sycl_Graph::Sycl
             return Vertex_Accessor<V, uI_t, mode>(data_buf, id_buf, h);
         }
 
-        void add(const std::vector<uI_t> &ids, const std::vector<V> &v_data)
+        void add(const std::vector<uI_t> &ids, const std::vector<V> &v_data = {})
         {
             host_buffer_add(id_buf, ids, q);
             host_buffer_add(data_buf, v_data, q);

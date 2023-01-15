@@ -1379,7 +1379,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "/opt/intel/oneapi/compiler/2023.0.0/linux/IntelDPCPP"
+			"value" : "/opt/intel/oneapi/compiler/latest/linux/IntelDPCPP"
 		},
 		{
 			"name" : "Math_LIB_DEPENDS",
@@ -1687,7 +1687,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "202001"
+			"value" : ""
 		},
 		{
 			"name" : "SYCL_LIBRARY_DIR",
@@ -1771,7 +1771,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "/opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb"
+			"value" : "/usr/local/lib/cmake/tbb-2021.7.1"
 		},
 		{
 			"name" : "_CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED",

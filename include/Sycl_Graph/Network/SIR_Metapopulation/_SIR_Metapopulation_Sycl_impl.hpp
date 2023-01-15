@@ -117,8 +117,10 @@ namespace Sycl_Graph
         // total population stored in susceptible state
         float N_pop = v.data[id].state.S;
         SIR_Metapopulation_State v_i;
-        v_i.I = I0_dist_acc[id](rng_acc[id]) * N_pop;
-        v_i.R = R0_dist_acc[id](rng_acc[id]) * N_pop;
+        // v_i.I = I0_dist_acc[id](rng_acc[id]) * N_pop;
+        // v_i.R = R0_dist_acc[id](rng_acc[id]) * N_pop;
+        v_i.I = 100;
+        v_i.R = 0;
         v_i.S = std::max({N_pop_acc[id] - v_i.I - v_i.R, 0.f});
         v.data[id].state = v_i;
       }); });
@@ -226,7 +228,10 @@ namespace Sycl_Graph
 
     }
 
-
+    bool terminate(SIR_Metapopulation_State x, const SIR_Metapopulation_Temporal_Param tp)
+    {
+      return false;
+    }
     private:
 
 
@@ -242,7 +247,7 @@ namespace Sycl_Graph
                  {
       auto v_acc = G.get_vertex_access<sycl::access::mode::read>(h);
       auto v_inf_acc = v_inf_buf.template get_access<sycl::access::mode::read_write>(h);
-      auto rng_acc = rng_buf.get_access<sycl::access::mode::read_write>(h);
+      auto rng_acc = rng_buf.template get_access<sycl::access::mode::read_write>(h);
       h.parallel_for(sycl::range<1>(G.N_edges()), [=](sycl::id<1> id) {
         
 
@@ -267,7 +272,7 @@ namespace Sycl_Graph
                  {
       auto v_acc = G.get_vertex_access<sycl::access::mode::read_write>(h);
       auto e_acc = G.get_edge_access<sycl::access::mode::read>(h);
-      auto rng_acc = rng_buf.get_access<sycl::access::mode::read_write>(h);
+      auto rng_acc = rng_buf.template get_access<sycl::access::mode::read_write>(h);
       auto e_inf_acc = e_inf_buf.template get_access<sycl::access::mode::write>(h);
       h.parallel_for(sycl::range<1>(N_edges), [=](sycl::id<1> id) {
         
@@ -299,7 +304,7 @@ namespace Sycl_Graph
                  {
       auto v_acc = G.get_vertex_access<sycl::access::mode::read>(h);
       auto v_rec_acc = v_rec_buf.template get_access<sycl::access::mode::read_write>(h);
-      auto rng_acc = rng_buf.get_access<sycl::access::mode::read_write>(h);
+      auto rng_acc = rng_buf.template get_access<sycl::access::mode::read_write>(h);
       h.parallel_for(sycl::range<1>(G.N_edges()), [=](sycl::id<1> id) {
         
 
@@ -309,7 +314,7 @@ namespace Sycl_Graph
 
         // Delta_R = bin(I, p_R)
         Sycl_Graph::random::binomial_distribution<float, RNG> d_R(v_acc.data[id].state.I, p_R);
-        auto N_recovered = d_I(rng_acc[id]);
+        auto N_recovered = d_R(rng_acc[id]);
         v_rec_acc[id] = N_recovered;
       }); });
 
@@ -334,10 +339,6 @@ namespace Sycl_Graph
       }
 
 
-      bool terminate(SIR_Metapopulation_State x, const SIR_Metapopulation_Temporal_Param tp)
-      {
-        return false;
-      }
 
       void reset()
       {

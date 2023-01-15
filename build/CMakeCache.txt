@@ -249,7 +249,7 @@ FETCHCONTENT_UPDATES_DISCONNECTED_CPPITERTOOLS_REPO:BOOL=OFF
 GIT_EXECUTABLE:FILEPATH=/usr/bin/git
 
 //The directory containing a CMake configuration file for IntelDPCPP.
-IntelDPCPP_DIR:PATH=/opt/intel/oneapi/compiler/2023.0.0/linux/IntelDPCPP
+IntelDPCPP_DIR:PATH=/opt/intel/oneapi/compiler/latest/linux/IntelDPCPP
 
 //Dependencies for the target
 Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
@@ -277,7 +277,7 @@ SYCL_FLAGS:STRING='-fsycl '
 SYCL_INCLUDE_DIR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/include
 
 //SYCL Language version
-SYCL_LANGUAGE_VERSION:STRING=202001
+SYCL_LANGUAGE_VERSION:STRING=
 
 //Path to a file.
 SYCL_LIBRARY_DIR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/lib
@@ -297,7 +297,7 @@ Sycl_Graph_IS_TOP_LEVEL:STATIC=ON
 Sycl_Graph_SOURCE_DIR:STATIC=/home/man/Documents/Sycl_Graph
 
 //The directory containing a CMake configuration file for TBB.
-TBB_DIR:PATH=/opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb
+TBB_DIR:PATH=/usr/local/lib/cmake/tbb-2021.7.1
 
 //Value Computed by CMake
 cppitertools_BINARY_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-build

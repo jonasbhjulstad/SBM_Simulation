@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <filesystem>
 using namespace Sycl_Graph::random;
-std::vector<uint32_t> N_pop = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+std::vector<uint32_t> N_pop = std::vector<uint32_t>(3, 1000);
 std::vector<normal_distribution<float>> I0(N_pop.size());
 std::vector<normal_distribution<float>> R0(N_pop.size());
 std::vector<float> alpha(N_pop.size(), 0.1);
@@ -25,7 +25,7 @@ int main()
   float p_ER = 1;
   sycl::queue q;
   int seed = 777;
-  uint32_t NV = 10;
+  uint32_t NV = 3;
   Sycl_Graph::random::default_rng rng;
   auto G = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER);
   SIR_Metapopulation_Network<> sir(G, N_pop, I0, R0, alpha, node_beta, edge_beta, seed);

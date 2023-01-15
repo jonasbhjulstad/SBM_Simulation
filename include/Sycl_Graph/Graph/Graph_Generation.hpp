@@ -21,7 +21,7 @@ namespace Sycl_Graph::Dynamic::Network_Models
         uint32_t N_edges = 0;
         std::vector<typename Graph::uInt_t> from;
         std::vector<typename Graph::uInt_t> to;
-        uint32_t N_edges_max = Sycl_Graph::n_choose_k(G.N_vertices(), 2);
+        uint32_t N_edges_max = G.NE;
 
         from.reserve(N_edges_max);
         to.reserve(N_edges_max);
@@ -52,8 +52,11 @@ namespace Sycl_Graph::Dynamic::Network_Models
         RNG rng = std::mt19937(std::random_device()()),
         uint32_t NE = 0)
     {
-        NE = NE == 0 ? 1.2*Sycl_Graph::n_choose_k(NV, 2) : NE;
+        NE = NE == 0 ? 2*Sycl_Graph::n_choose_k(NV, 2) : NE;
+
+
         Graph G(q, NV, NE);
+        G.add_vertex(Sycl_Graph::range(0, NV));
         random_connect(G, p_ER, rng);
         return G;
     }

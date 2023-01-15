@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "test/SIR_Metapopulation_Simulation"
+			"path" : "test/bitonic_sort"
 		}
 	],
 	"backtrace" : 2,
@@ -33,7 +33,7 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 19,
+				"line" : 13,
 				"parent" : 0
 			},
 			{
@@ -190,7 +190,7 @@
 				{
 					"backtrace" : 3,
 					"isSystem" : true,
-					"path" : "/opt/intel/oneapi/tbb/2021.8.0/include"
+					"path" : "/opt/intel/oneapi/tbb/2021.7.1/include"
 				},
 				{
 					"backtrace" : 3,
@@ -232,7 +232,7 @@
 			"id" : "Math::@1de3897dffd712de3f93"
 		}
 	],
-	"id" : "SIR_Metapopulation_Simulation::@36f028580bb02cc8272a",
+	"id" : "bitonic_sort::@36f028580bb02cc8272a",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -246,13 +246,17 @@
 				"role" : "flags"
 			},
 			{
+				"fragment" : "-Wl,-rpath,/opt/intel/oneapi/tbb/2021.7.1/lib/intel64/gcc4.8",
+				"role" : "libraries"
+			},
+			{
 				"backtrace" : 3,
 				"fragment" : "static/Sycl_Graph/Math/libMath.a",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 3,
-				"fragment" : "/opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12",
+				"fragment" : "/opt/intel/oneapi/tbb/2021.7.1/lib/intel64/gcc4.8/libtbb_debug.so.12",
 				"role" : "libraries"
 			},
 			{
@@ -268,8 +272,8 @@
 		],
 		"language" : "CXX"
 	},
-	"name" : "SIR_Metapopulation_Simulation",
-	"nameOnDisk" : "SIR_Metapopulation_Simulation",
+	"name" : "bitonic_sort",
+	"nameOnDisk" : "bitonic_sort",
 	"paths" : 
 	{
 		"build" : "test",
@@ -290,7 +294,7 @@
 		{
 			"backtrace" : 2,
 			"compileGroupIndex" : 0,
-			"path" : "test/SIR_Metapopulation_Simulation.cpp",
+			"path" : "test/bitonic_sort.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

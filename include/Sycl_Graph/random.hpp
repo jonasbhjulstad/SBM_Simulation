@@ -22,6 +22,13 @@ namespace Sycl_Graph::random {
         float operator()(RNG &rng) {
             return dist(rng);
         }
+
+        void mean(dType mean) {
+            dist.mean(mean);
+        }
+        void stddev(dType stddev) {
+            dist.stddev(stddev);
+        }
         void seed(unsigned int seed) {
             dist.seed(seed);
         }
@@ -35,13 +42,14 @@ namespace Sycl_Graph::random {
 #endif
     template <typename T, typename RNG = default_rng>
     struct binomial_distribution {
-        binomial_distribution(T n, T p) : n(n), p(p) {}
+        binomial_distribution(T n, T p) : n(n), p(p), dist(0,1) {}
+        uniform_real_distribution<T> dist;
         T n;
         T p;
         T operator()(RNG &rng) {
             T count = 0;
             for (T i = 0; i < n; i++) {
-                if (uniform_real_distribution<T>(0, 1)(rng) < p) {
+                if (dist(rng) < p) {
                     count++;
                 }
             }

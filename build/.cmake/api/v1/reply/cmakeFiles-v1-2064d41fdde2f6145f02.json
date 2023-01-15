@@ -274,11 +274,11 @@
 		},
 		{
 			"isExternal" : true,
-			"path" : "/opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb/TBBConfigVersion.cmake"
+			"path" : "/usr/local/lib/cmake/tbb-2021.7.1/TBBConfigVersion.cmake"
 		},
 		{
 			"isExternal" : true,
-			"path" : "/opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb/TBBConfig.cmake"
+			"path" : "/usr/local/lib/cmake/tbb-2021.7.1/TBBConfig.cmake"
 		},
 		{
 			"isExternal" : true,
@@ -295,11 +295,11 @@
 		},
 		{
 			"isExternal" : true,
-			"path" : "/opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb/TBBConfigVersion.cmake"
+			"path" : "/usr/local/lib/cmake/tbb-2021.7.1/TBBConfigVersion.cmake"
 		},
 		{
 			"isExternal" : true,
-			"path" : "/opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb/TBBConfig.cmake"
+			"path" : "/usr/local/lib/cmake/tbb-2021.7.1/TBBConfig.cmake"
 		},
 		{
 			"path" : "cmake/HIP_Sycl_config.cmake"
@@ -309,7 +309,7 @@
 		},
 		{
 			"isExternal" : true,
-			"path" : "/opt/intel/oneapi/compiler/2023.0.0/linux/IntelDPCPP/IntelDPCPPConfig.cmake"
+			"path" : "/opt/intel/oneapi/compiler/latest/linux/IntelDPCPP/IntelDPCPPConfig.cmake"
 		},
 		{
 			"isCMake" : true,
