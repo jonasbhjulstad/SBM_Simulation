@@ -1,0 +1,3 @@
+/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/CMakeFiles/tinymt_repo-populate.dir
+/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/CMakeFiles/edit_cache.dir
+/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/CMakeFiles/rebuild_cache.dir

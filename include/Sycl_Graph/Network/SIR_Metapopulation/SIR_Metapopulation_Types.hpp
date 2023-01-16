@@ -8,9 +8,31 @@ struct SIR_Metapopulation_State
   SIR_Metapopulation_State() = default;
   SIR_Metapopulation_State(float S): S(S), I(0), R(0) {}
   SIR_Metapopulation_State(float S, float I, float R): S(S), I(I), R(R) {}
-  float S;
-  float I;
-  float R;
+
+  //create default operator+=
+  SIR_Metapopulation_State& operator+=(const SIR_Metapopulation_State &other)
+  {
+    S += other.S;
+    I += other.I;
+    R += other.R;
+    return *this;
+  }
+
+  SIR_Metapopulation_State& operator-=(const SIR_Metapopulation_State &other)
+  {
+    S -= other.S;
+    I -= other.I;
+    R -= other.R;
+    return *this;
+  }
+
+  SIR_Metapopulation_State operator+(const SIR_Metapopulation_State &other) const
+  {
+    return SIR_Metapopulation_State(S + other.S, I + other.I, R + other.R);
+  }
+  float S = 0.f;
+  float I = 0.f;
+  float R = 0.f;
 };
 struct SIR_Metapopulation_Param
 {

@@ -1,3 +1,5 @@
+
+#define SYCL_DEVICE_FILTER host
 #include <Sycl_Graph/Graph/Graph.hpp>
 #include <Sycl_Graph/Graph/Graph_Generation.hpp>
 #include <Sycl_Graph/Math/math.hpp>
@@ -6,15 +8,18 @@
 #include <Sycl_Graph/random.hpp>
 #include <algorithm>
 #include <filesystem>
+
 using namespace Sycl_Graph::random;
-std::vector<uint32_t> N_pop = std::vector<uint32_t>(3, 1000);
+static constexpr size_t NV = 1;
+std::vector<uint32_t> N_pop = std::vector<uint32_t>(NV, 1000);
 std::vector<normal_distribution<float>> I0(N_pop.size());
 std::vector<normal_distribution<float>> R0(N_pop.size());
-std::vector<float> alpha(N_pop.size(), 0.1);
-std::vector<float> node_beta(N_pop.size(), 0.001);
-std::vector<float> edge_beta(N_pop.size(), 0.001);
+std::vector<float> alpha(N_pop.size(), 0.01);
+std::vector<float> node_beta(N_pop.size(), 0.1);
+std::vector<float> edge_beta(N_pop.size(), 0.1);
 int main()
 {
+
 
   std::transform(N_pop.begin(), N_pop.end(), I0.begin(), [](auto x)
                  { return normal_distribution<float>(x * 0.1, x * 0.01); });
@@ -23,9 +28,8 @@ int main()
   using Sycl_Graph::Dynamic::Network_Models::generate_erdos_renyi;
   using namespace Sycl_Graph::Network_Models;
   float p_ER = 1;
-  sycl::queue q;
+  sycl::queue q{ sycl::gpu_selector()};
   int seed = 777;
-  uint32_t NV = 3;
   Sycl_Graph::random::default_rng rng;
   auto G = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER);
   SIR_Metapopulation_Network<> sir(G, N_pop, I0, R0, alpha, node_beta, edge_beta, seed);
@@ -40,10 +44,9 @@ int main()
   }
 
   // write to file
-  std::ofstream file;
   std::filesystem::create_directory(
       std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/");
-  file.open(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/traj.csv");
+  std::ofstream file(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/traj.csv");
 
   for (auto &x : traj)
   {

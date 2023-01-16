@@ -1,8 +1,10 @@
 #ifndef SYCL_GRAPH_SIR_BERNOULLI_TYPES_HPP
 #define SYCL_GRAPH_SIR_BERNOULLI_TYPES_HPP
+#include "sycl/aliases.hpp"
 #include <stdint.h>
+#include <sycl/CL/sycl.hpp>
 namespace Sycl_Graph::Network_Models {
-enum SIR_Individual_State: uint8_t { SIR_INDIVIDUAL_S = 0, SIR_INDIVIDUAL_I = 1, SIR_INDIVIDUAL_R = 2 };
+enum SIR_Individual_State: int { SIR_INDIVIDUAL_S = 0, SIR_INDIVIDUAL_I = 1, SIR_INDIVIDUAL_R = 2 };
 struct SIR_Edge {};
 
 template <typename dType = float> struct SIR_Bernoulli_Temporal_Param {

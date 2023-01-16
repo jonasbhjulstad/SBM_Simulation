@@ -27,7 +27,7 @@ int main()
     generate_erdos_renyi(G, N_pop, p_ER, SIR_INDIVIDUAL_S, rng);
     std::cout << "Initializing..." << std::endl;
     sir.initialize();
-    auto traj = sir.simulate(Nt, 0, sir_param);
+    auto traj = sir.simulate(Nt, sir_param);
     //print traj
     for (auto &x : traj) {
         for (auto &y : x) {

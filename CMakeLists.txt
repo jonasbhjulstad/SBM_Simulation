@@ -44,6 +44,16 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(cppitertools_repo)
 
+
+FetchContent_Declare(
+    tinymt_repo
+    GIT_REPOSITORY https://github.com/tueda/tinymt-cpp.git
+    GIT_TAG master
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+)
+FetchContent_MakeAvailable(tinymt_repo)
+
 if(${SYCL_GRAPH_USE_INTEL_SYCL})
 add_compile_definitions(SYCL_GRAPH_USE_INTEL_SYCL)
 endif()
@@ -70,6 +80,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set -O0 for debug mode
 add_compile_options("-O0")
 add_compile_options("-fPIC")
+# add_compile_options("-fsycl-targets=spir64-gen")
 #suppress warnings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Rno-debug-disables-optimization")
 # add_compile_options("-fsanitize=address")
@@ -88,6 +99,8 @@ set(SYCL_GRAPH_DATA_DIR "${PROJECT_SOURCE_DIR}/data" CACHE INTERNAL "SYCL_GRAPH_
 set(SYCL_GRAPH_LOG_DIR "${PROJECT_SOURCE_DIR}/log" CACHE INTERNAL "SYCL_GRAPH_LOG_DIR")
 set(SYCL_GRAPH_INCLUDE "${PROJECT_SOURCE_DIR}/include" CACHE INTERNAL "SYCL_GRAPH_INCLUDE")
 set(SYCL_GRAPH_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_SOURCE_DIR}/static" CACHE INTERNAL "SYCL_GRAPH_INCLUDE_DIRS")
+#create directory data/SIR_sim
+file(MAKE_DIRECTORY ${SYCL_GRAPH_DATA_DIR}/SIR_sim)
 
 # message(WARNING ${SYCL_INCLUDE_DIR})
 include_directories(${SYCL_INCLUDE_DIR})

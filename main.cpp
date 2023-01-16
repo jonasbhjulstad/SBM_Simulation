@@ -1,7 +1,10 @@
-template <template <typename> typename T, typename D>
-struct Foo
-{
-    T<D> data;
-};
+#include <iostream>
+#include <random>
+#include <chrono>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+#include <cmath>
 
-int main()
+//implement a mersenne twister engine
+//https://en.wikipedia.org/wiki/Mersenne_Twister

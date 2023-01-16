@@ -47,12 +47,15 @@ namespace Sycl_Graph::Sycl
         }
 
         std::vector<State>
-        simulate(uint32_t Nt = std::numeric_limits<uint32_t>::max(), uint32_t Nt_min = 0, const std::vector<TemporalParam> &tp = {})
+        simulate(uint32_t Nt = std::numeric_limits<uint32_t>::max(), std::vector<TemporalParam> tp = {})
         {
             std::vector<State> trajectory(Nt + 1);
+            if (tp.size() < Nt+1)
+                tp.resize(Nt+1);
             //reserve space for the trajectories
             uint32_t t = 0;
-            TemporalParam tp_i = (tp.size() > 0) ? tp[0] : TemporalParam();
+
+            TemporalParam tp_i = tp[0];
             trajectory[0] = read_state(tp_i);
             for (int i = 0; i < Nt; i++)
             {

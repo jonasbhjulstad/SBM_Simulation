@@ -239,17 +239,31 @@ FETCHCONTENT_QUIET:BOOL=ON
 // for cppitertools_repo
 FETCHCONTENT_SOURCE_DIR_CPPITERTOOLS_REPO:PATH=
 
+//When not empty, overrides where to find pre-populated content
+// for tinymt-repo
+FETCHCONTENT_SOURCE_DIR_TINYMT-REPO:PATH=
+
+//When not empty, overrides where to find pre-populated content
+// for tinymt_repo
+FETCHCONTENT_SOURCE_DIR_TINYMT_REPO:PATH=
+
 //Enables UPDATE_DISCONNECTED behavior for all content population
 FETCHCONTENT_UPDATES_DISCONNECTED:BOOL=OFF
 
 //Enables UPDATE_DISCONNECTED behavior just for population of cppitertools_repo
 FETCHCONTENT_UPDATES_DISCONNECTED_CPPITERTOOLS_REPO:BOOL=OFF
 
+//Enables UPDATE_DISCONNECTED behavior just for population of tinymt-repo
+FETCHCONTENT_UPDATES_DISCONNECTED_TINYMT-REPO:BOOL=OFF
+
+//Enables UPDATE_DISCONNECTED behavior just for population of tinymt_repo
+FETCHCONTENT_UPDATES_DISCONNECTED_TINYMT_REPO:BOOL=OFF
+
 //Git command line client
 GIT_EXECUTABLE:FILEPATH=/usr/bin/git
 
 //The directory containing a CMake configuration file for IntelDPCPP.
-IntelDPCPP_DIR:PATH=/opt/intel/oneapi/compiler/latest/linux/IntelDPCPP
+IntelDPCPP_DIR:PATH=/opt/intel/oneapi/compiler/2023.0.0/linux/IntelDPCPP
 
 //Dependencies for the target
 Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
@@ -277,7 +291,7 @@ SYCL_FLAGS:STRING='-fsycl '
 SYCL_INCLUDE_DIR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/include
 
 //SYCL Language version
-SYCL_LANGUAGE_VERSION:STRING=
+SYCL_LANGUAGE_VERSION:STRING=202001
 
 //Path to a file.
 SYCL_LIBRARY_DIR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/lib
@@ -297,7 +311,7 @@ Sycl_Graph_IS_TOP_LEVEL:STATIC=ON
 Sycl_Graph_SOURCE_DIR:STATIC=/home/man/Documents/Sycl_Graph
 
 //The directory containing a CMake configuration file for TBB.
-TBB_DIR:PATH=/usr/local/lib/cmake/tbb-2021.7.1
+TBB_DIR:PATH=/opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb
 
 //Value Computed by CMake
 cppitertools_BINARY_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-build
@@ -315,10 +329,19 @@ cppitertools_IS_TOP_LEVEL:STATIC=OFF
 cppitertools_SOURCE_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src
 
 //The directory containing a CMake configuration file for oneDPL.
-oneDPL_DIR:PATH=/usr/local/lib/cmake/oneDPL-2021.7.2
+oneDPL_DIR:PATH=/usr/local/lib/cmake/oneDPL-2022.0.0
 
 //The directory containing a CMake configuration file for pybind11.
 pybind11_DIR:PATH=/usr/lib/cmake/pybind11
+
+//Value Computed by CMake
+tinymt_BINARY_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-build
+
+//Value Computed by CMake
+tinymt_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+tinymt_SOURCE_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src
 
 
 ########################
@@ -423,7 +446,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=11
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=12
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
