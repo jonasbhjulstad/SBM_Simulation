@@ -49,6 +49,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/home/man/Documents/Sycl_Graph/build/include/cmake_install.cmake")
   include("/home/man/Documents/Sycl_Graph/build/static/cmake_install.cmake")
   include("/home/man/Documents/Sycl_Graph/build/test/cmake_install.cmake")
+  include("/home/man/Documents/Sycl_Graph/build/Executables/cmake_install.cmake")
 
 endif()
 

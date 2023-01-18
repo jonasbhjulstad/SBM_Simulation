@@ -1,1 +1,1 @@
-../../build/test/SIR_Metapopulation_Simulation
+../../build/Executables/Simulations/SIR_Metapopulation_Simulation

@@ -69,8 +69,7 @@ namespace Sycl_Graph::Sycl
             }
             return trajectory;
         }
-
-
+        
     };    
 } // namespace Fixed
 } // namespace Network_Models

@@ -62,7 +62,7 @@ add_compile_options(${SYCL_COMPILE_OPTIONS})
 include(cmake/HIP_Sycl_config.cmake)
 include(cmake/Intel_Sycl_config.cmake)
 include(cmake/Sycl_executable.cmake)
-
+include(cmake/custom_executable.cmake)
 include(cmake/external_packages.cmake)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -99,5 +99,6 @@ set(SYCL_GRAPH_LIBRARIES ${LIBRARIES} DataFrame SYCL_GRAPH_Eigen)
 configure_file("${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.hpp.in" "${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.hpp")
 configure_file("${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.py.in" "${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.py")
 add_subdirectory(test)
+add_subdirectory(Executables)
 #include onedpl headers
 set(SYCL_GRAPH_COMMON_LIBS ${ONEAPI_LIBRARIES} ${HIPSYCL_LIBS})

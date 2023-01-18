@@ -49,6 +49,7 @@ namespace Sycl_Graph::Sycl
     using Vertex_Prop_t = V;
     using Edge_Prop_t = E;
     using uInt_t = uI_t;
+    using Graph_t = Graph<V, E, uI_t>;
     static constexpr auto invalid_id = std::numeric_limits<uI_t>::max();
     inline uI_t N_vertices() const {return vertex_buf.N_vertices;}
     inline uI_t N_edges() const {return edge_buf.N_edges;}
@@ -77,9 +78,14 @@ namespace Sycl_Graph::Sycl
 
     }
 
-
-    //perfect forward methods of buffers
-
+    Graph_t operator+(Graph_t& other)
+    {
+      Graph G = Graph_t(q, NV + other.NV, NE + other.NE);
+      G.vertex_buf = vertex_buf + other.vertex_buf;
+      G.edge_buf = edge_buf + other.edge_buf;
+      return G;
+    }
+    
     template <sycl::access::mode mode>
     auto get_vertex_access(sycl::handler &h)
     {
@@ -150,6 +156,29 @@ namespace Sycl_Graph::Sycl
     std::vector<E> get_edge_data(Args &&... args)
     {
       return edge_buf.get_data(std::forward<Args>(args)...);
+    }
+
+    //file I/O
+    void write_edgelist(std::string filename, std::string delimiter = ",")
+    {
+      auto edges = edge_buf.get_edges();
+      std::ofstream file(filename);
+      for (auto e : edges)
+      {
+        file << e.src << delimiter << e.dst << delimiter << e.data << "\n";
+      }
+      file.close();
+    }
+
+    void write_vertexlist(std::string filename, std::string delimiter = ",")
+    {
+      auto vertices = vertex_buf.get_vertices();
+      std::ofstream file(filename);
+      for (auto v : vertices)
+      {
+        file << v.id << delimiter << v.data << "\n";
+      }      
+      file.close();
     }
 
   };

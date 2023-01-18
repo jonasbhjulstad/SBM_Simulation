@@ -193,25 +193,6 @@ rule CXX_EXECUTABLE_LINKER__SIR_Simulation_Debug
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__SIR_Metapopulation_Simulation_Debug
-  depfile = $DEP_FILE
-  deps = gcc
-  command = /opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
-  description = Building CXX object $out
-
-
-#############################################
-# Rule for linking CXX executable.
-
-rule CXX_EXECUTABLE_LINKER__SIR_Metapopulation_Simulation_Debug
-  command = $PRE_LINK && /opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
-  description = Linking CXX executable $TARGET_FILE
-  restat = $RESTAT
-
-
-#############################################
-# Rule for compiling CXX files.
-
 rule CXX_COMPILER__sycl_parallel_cond_Debug
   depfile = $DEP_FILE
   deps = gcc
@@ -299,6 +280,44 @@ rule CXX_COMPILER__distributions_Debug
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__distributions_Debug
+  command = $PRE_LINK && /opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  description = Linking CXX executable $TARGET_FILE
+  restat = $RESTAT
+
+
+#############################################
+# Rule for compiling CXX files.
+
+rule CXX_COMPILER__graph_merge_simulation_Debug
+  depfile = $DEP_FILE
+  deps = gcc
+  command = /opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building CXX object $out
+
+
+#############################################
+# Rule for linking CXX executable.
+
+rule CXX_EXECUTABLE_LINKER__graph_merge_simulation_Debug
+  command = $PRE_LINK && /opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  description = Linking CXX executable $TARGET_FILE
+  restat = $RESTAT
+
+
+#############################################
+# Rule for compiling CXX files.
+
+rule CXX_COMPILER__SIR_Metapopulation_Simulation_Debug
+  depfile = $DEP_FILE
+  deps = gcc
+  command = /opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  description = Building CXX object $out
+
+
+#############################################
+# Rule for linking CXX executable.
+
+rule CXX_EXECUTABLE_LINKER__SIR_Metapopulation_Simulation_Debug
   command = $PRE_LINK && /opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT

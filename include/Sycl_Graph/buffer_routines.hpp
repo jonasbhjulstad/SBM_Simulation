@@ -16,7 +16,7 @@ namespace Sycl_Graph
     class host_buffer_copy_kernel;
 
     template <typename T, typename uI_t = uint32_t>
-    inline void host_buffer_add(sycl::buffer<T, 1> &buf, const std::vector<T> &vec, sycl::queue &q, uI_t offset = 0)
+    void host_buffer_add(sycl::buffer<T, 1> &buf, const std::vector<T> &vec, sycl::queue &q, uI_t offset = 0)
     {
         if (vec.size() == 0)
         {
@@ -38,6 +38,67 @@ namespace Sycl_Graph
         //submit with kernel_name
         }
     }
+
+    template <typename T, typename uI_t = uint32_t>
+    void device_buffer_add(sycl::buffer<T, 1>& dest_buf, sycl::buffer<T, 1> src_buf, sycl::queue& q, uI_t offset = 0)
+    {
+        if (src_buf.get_count() == 0)
+        {
+            return;
+        }
+        if constexpr (sizeof(T) > 0)
+        {
+            q.submit([&](sycl::handler& h)
+                {
+                    auto src_acc = src_buf.template get_access<sycl::access::mode::read>(h);
+                    auto dest_acc = dest_buf.template get_access<sycl::access::mode::write>(h);
+                    h.parallel_for<host_buffer_copy_kernel<T>>(src_buf.get_count(), [=](sycl::id<1> i)
+                        {
+                            dest_acc[i + offset] = src_acc[i];
+                        });
+                });
+        }
+    }
+    template <typename T>
+    sycl::buffer<T, 1> buffer_resize(sycl::buffer<T, 1> &buf, sycl::queue &q, size_t new_size)
+    {
+        sycl::buffer<T, 1> new_buf(new_size, q);
+        q.submit([&](sycl::handler &h)
+                 {
+            auto acc = buf.template get_access<sycl::access::mode::read>(h);
+            auto new_acc = new_buf.template get_access<sycl::access::mode::write>(h);
+            h.parallel_for(acc.size(), [=](sycl::id<1> i)
+                           { new_acc[i] = acc[i]; });
+        });
+        return new_buf;
+    }
+
+    template <typename T, typename uI_t = uint32_t>
+    sycl::buffer<T, 1> device_buffer_combine(sycl::buffer<T, 1> buf0, sycl::buffer<T, 1> buf1, uI_t size0 = 0, uI_t size1 = 0)
+    {
+        if (size0 == 0)
+        {
+            size0 = buf0.get_count();
+        }
+        if (size1 == 0)
+        {
+            size1 = buf1.get_count();
+        }
+        sycl::buffer<T, 1> new_buf(size0 + size1);
+        sycl::queue q;
+        q.submit([&](sycl::handler &h)
+                 {
+            auto acc0 = buf0.template get_access<sycl::access::mode::read>(h);
+            auto acc1 = buf1.template get_access<sycl::access::mode::read>(h);
+            auto new_acc = new_buf.template get_access<sycl::access::mode::write>(h);
+            h.parallel_for(size0, [=](sycl::id<1> i)
+                           { new_acc[i] = acc0[i]; });
+            h.parallel_for(size1, [=](sycl::id<1> i)
+                           { new_acc[i + size0] = acc1[i]; });
+        });
+        return new_buf;
+    }
+
 
     template <typename T, typename uI_t = uint32_t>
     inline void host_buffer_add(std::vector<sycl::buffer<T, 1> &> &bufs, const std::vector<const std::vector<T> &> &vecs, sycl::queue &q, const std::vector<uI_t> &offsets)
