@@ -7,6 +7,7 @@ set(CMAKE_CXX_COMPILER_WORKS ON)
 SET(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 set(CMAKE_C_COMPILER_FORCED ON)
+set(SYCL_HEADER_INCLUDE_DIR "/opt/intel/oneapi/compiler/latest/linux/include/sycl")
 if(WIN32)
     set(PYTHON_EXECUTABLE "C:\\Users\\jonas\\anaconda3\\envs\\Network_MPC\\python.exe")
 else()
@@ -15,6 +16,7 @@ else()
     set(PYTHON_LIBS "/home/man/.pyenv/versions/3.9.13/libs/python3.9")
     set(Python3_ROOT_DIR "/home/man/.pyenv/versions/3.9.13/")
 endif()
+# find_package(IntelDPCPP REQUIRED HINTS "/opt/intel/oneapi/compiler/latest/linux/IntelDPCPP")
 find_package(PkgConfig)
 list(APPEND CMAKE_MODULE_PATH "/home/arch/Downloads/cmake-checks-cache/CMakeChecksCache/")
 find_package(Eigen3 REQUIRED)
@@ -28,59 +30,48 @@ set(PYBIND11_PYTHON_VERSION "3.9")
 find_package(pybind11 CONFIG)
 # find_package(PythonLibs REQUIRED)
 find_package(Python3 3.9 REQUIRED)
-set(SYCL_GRAPH_USE_INTEL ON)
-set(SYCL_GRAPH_USE_AMD OFF)
-set(SYCL_GRAPH_USE_INTEL_SYCL ON)
-set(SYCL_GRAPH_USE_HIPSYCL OFF)
+find_package(Tracy QUIET)
+option(SYCL_GRAPH_USE_CUDA "Use CUDA" ON)
+set(SYCL_CUDA_TARGET "")
+option(SYCL_GRAPH_USE_INTEL "Use Intel" OFF)
+option(SYCL_GRAPH_USE_HIPSYCL "Use HIPSYCL" OFF)
+option(SYCL_GRAPH_USE_ONEAPI "Use OneAPI" OFF)
 
-
-include(FetchContent)
-FetchContent_Declare(
-    cppitertools_repo
-    GIT_REPOSITORY https://github.com/ryanhaining/cppitertools.git
-    GIT_TAG master
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-)
-FetchContent_MakeAvailable(cppitertools_repo)
-
-
-FetchContent_Declare(
-    tinymt_repo
-    GIT_REPOSITORY https://github.com/tueda/tinymt-cpp.git
-    GIT_TAG master
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-)
-FetchContent_MakeAvailable(tinymt_repo)
-
-if(${SYCL_GRAPH_USE_INTEL_SYCL})
-add_compile_definitions(SYCL_GRAPH_USE_INTEL_SYCL)
+if(${SYCL_GRAPH_USE_ONEAPI})
+add_compile_definitions(SYCL_GRAPH_USE_ONEAPI)
 endif()
-if (${SYCL_GRAPH_USE_INTEL_SYCL} OR ${SYCL_GRAPH_USE_HIPSYCL})
-    set(SYCL_GRAPH_USE_SYCL ON)
-    add_compile_definitions(SYCL_GRAPH_USE_SYCL)
-endif()
-if(${SYCL_GRAPH_USE_INTEL} OR ${SYCL_GRAPH_USE_AMD})
+if(${SYCL_GRAPH_USE_INTEL})
 add_compile_definitions(SYCL_GRAPH_USE_INTEL)
+endif()
+
+if(${SYCL_GRAPH_USE_ONEAPI})
 find_package(TBB CONFIG REQUIRED)
 find_package(oneDPL CONFIG REQUIRED)
 set(ONEAPI_LIBRARIES TBB::tbb oneDPL)
 endif()
 
+if(${SYCL_GRAPH_USE_CUDA})
+    # set(SYCL_COMPILE_OPTIONS ${SYCL_COMPILE_OPTIONS} -fsycl-targets=nvptx64-nvidia-cuda)
+    add_compile_options(-fsycl-targets=nvptx64-nvidia-cuda)
+    # set(SYCL_COMPILE_OPTIONS "-Xsycl-target-backend=nvptx64-nvidia-cuda --cuda-gpu-arch=sm_60")
+    
+endif()
+
+add_compile_options(${SYCL_COMPILE_OPTIONS})
+
 include(cmake/HIP_Sycl_config.cmake)
 include(cmake/Intel_Sycl_config.cmake)
 include(cmake/Sycl_executable.cmake)
 
+include(cmake/external_packages.cmake)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# set -O0 for debug mode
 add_compile_options("-O0")
 add_compile_options("-fPIC")
-# add_compile_options("-fsycl-targets=spir64-gen")
+add_compile_options("-fsycl")
 #suppress warnings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Rno-debug-disables-optimization")
 # add_compile_options("-fsanitize=address")
@@ -93,12 +84,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 
-set(COMMON_LIBRARIES "Common")
-
 set(SYCL_GRAPH_DATA_DIR "${PROJECT_SOURCE_DIR}/data" CACHE INTERNAL "SYCL_GRAPH_DATA_DIR")
 set(SYCL_GRAPH_LOG_DIR "${PROJECT_SOURCE_DIR}/log" CACHE INTERNAL "SYCL_GRAPH_LOG_DIR")
 set(SYCL_GRAPH_INCLUDE "${PROJECT_SOURCE_DIR}/include" CACHE INTERNAL "SYCL_GRAPH_INCLUDE")
-set(SYCL_GRAPH_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_SOURCE_DIR}/static" CACHE INTERNAL "SYCL_GRAPH_INCLUDE_DIRS")
+set(SYCL_GRAPH_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_SOURCE_DIR}/static;${SYCL_HEADERS_INCLUDE_DIR}" CACHE INTERNAL "SYCL_GRAPH_INCLUDE_DIRS")
 #create directory data/SIR_sim
 file(MAKE_DIRECTORY ${SYCL_GRAPH_DATA_DIR}/SIR_sim)
 

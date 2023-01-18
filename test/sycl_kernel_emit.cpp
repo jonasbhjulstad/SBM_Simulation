@@ -1,4 +1,4 @@
-#include <sycl/CL/sycl.hpp>
+#include <CL/sycl.hpp>
 #include <iostream>
 
 int main()

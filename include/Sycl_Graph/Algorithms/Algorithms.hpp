@@ -1,6 +1,6 @@
 #ifndef SYCL_GRAPH_ALGORITHMS_HPP
 #define SYCL_GRAPH_ALGORITHMS_HPP
-#include <sycl/CL/sycl.hpp>
+#include <CL/sycl.hpp>
 #include <Sycl_Graph/Graph/Graph_Types.hpp>
 namespace Sycl_Graph::Sycl::algorithms
 {

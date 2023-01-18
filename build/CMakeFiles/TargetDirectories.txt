@@ -69,8 +69,6 @@
 /home/man/Documents/Sycl_Graph/build/static/Sycl_Graph/Math/CMakeFiles/install.dir
 /home/man/Documents/Sycl_Graph/build/static/Sycl_Graph/Math/CMakeFiles/install/local.dir
 /home/man/Documents/Sycl_Graph/build/static/Sycl_Graph/Math/CMakeFiles/install/strip.dir
-/home/man/Documents/Sycl_Graph/build/test/CMakeFiles/array_constraints.dir
-/home/man/Documents/Sycl_Graph/build/test/CMakeFiles/sycl_mutex.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/bitonic_sort.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/sycl_device_info.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/sycl_copy_profiling.dir
@@ -79,7 +77,6 @@
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/SIR_Metapopulation_Simulation.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/sycl_parallel_cond.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/sycl_kernel_emit.dir
-/home/man/Documents/Sycl_Graph/build/test/CMakeFiles/kernel_bundles.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/tinymt_kernel.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/gpu_rng.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/distributions.dir

@@ -1,4 +1,4 @@
-#include <sycl/CL/sycl.hpp>
+#include <CL/sycl.hpp>
 
 
 int main()
@@ -21,5 +21,7 @@ int main()
     //print in microseconds
     std::cout << "Time to copy: " << (e.get_profiling_info<sycl::info::event_profiling::command_end>() - e.get_profiling_info<sycl::info::event_profiling::command_start>()) / 1000 << " us" << std::endl;
     std::cout << "ms: " << (e.get_profiling_info<sycl::info::event_profiling::command_end>() - e.get_profiling_info<sycl::info::event_profiling::command_start>()) / 1000 / 1000 << " ms" << std::endl;
+    //get opencl context
+    auto cl_context = q.get_context().get();
     return 0;
 }

@@ -1,6 +1,6 @@
 #ifndef SYCL_GRAPH_BUFFER_ROUTINES_HPP
 #define SYCL_GRAPH_BUFFER_ROUTINES_HPP
-#include <sycl/CL/sycl.hpp>
+#include <CL/sycl.hpp>
 #include <vector>
 #include <string>
 namespace Sycl_Graph
@@ -15,7 +15,7 @@ namespace Sycl_Graph
     template <typename T>
     class host_buffer_copy_kernel;
 
-    template <typename T, std::unsigned_integral uI_t = uint32_t>
+    template <typename T, typename uI_t = uint32_t>
     inline void host_buffer_add(sycl::buffer<T, 1> &buf, const std::vector<T> &vec, sycl::queue &q, uI_t offset = 0)
     {
         if (vec.size() == 0)
@@ -39,7 +39,7 @@ namespace Sycl_Graph
         }
     }
 
-    template <typename T, std::unsigned_integral uI_t = uint32_t>
+    template <typename T, typename uI_t = uint32_t>
     inline void host_buffer_add(std::vector<sycl::buffer<T, 1> &> &bufs, const std::vector<const std::vector<T> &> &vecs, sycl::queue &q, const std::vector<uI_t> &offsets)
     {
         for (uI_t i = 0; i < vecs.size(); ++i)

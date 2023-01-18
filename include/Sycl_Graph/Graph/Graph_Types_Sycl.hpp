@@ -2,7 +2,7 @@
 
 #ifndef Sycl_Graph_Graph_Types_Sycl_hpp
 #define Sycl_Graph_Graph_Types_Sycl_hpp
-#include <sycl/CL/sycl.hpp>
+#include <CL/sycl.hpp>
 #include <Sycl_Graph/buffer_routines.hpp>
 namespace Sycl_Graph::Sycl
 {
@@ -23,10 +23,10 @@ namespace Sycl_Graph::Sycl
         EDGE_INDEXING_ID,
         EDGE_INDEXING_POSITION
     };
-    template <typename V, std::unsigned_integral uI_t>
+    template <typename V, typename uI_t>
     struct Vertex_Buffer;
 
-    template <typename E, std::unsigned_integral uI_t>
+    template <typename E, typename uI_t>
     struct Edge_Buffer
     {
         // current number of edges
@@ -151,6 +151,10 @@ namespace Sycl_Graph::Sycl
                 }); });
             index_type = EDGE_INDEXING_ID;
         }
+        size_t byte_size()
+        {
+            return to_buf.get_count() * sizeof(uI_t) + from_buf.get_count() * sizeof(uI_t) + data_buf.get_count() * sizeof(E);
+        }
     };
     template <typename V, typename uI_t, sycl::access::mode mode>
     struct Vertex_Accessor
@@ -169,7 +173,7 @@ namespace Sycl_Graph::Sycl
         VERTEX_INDEX_ID,
         VERTEX_INDEX_POSITION
     };
-    template <typename V, std::unsigned_integral uI_t>
+    template <typename V, typename uI_t>
     struct Vertex_Buffer
     {
         static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
@@ -263,6 +267,11 @@ namespace Sycl_Graph::Sycl
           }
         }); });
             N_vertices -= id.size();
+        }
+
+        size_t byte_size()
+        {
+            return data_buf.get_size() + id_buf.get_size();
         }
     };
 

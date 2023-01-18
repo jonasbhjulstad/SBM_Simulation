@@ -108,7 +108,7 @@ build install/strip: phony CMakeFiles/install/strip.util
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# /home/man/Documents/Sycl_Graph/CMakeLists.txt
+# /home/man/Documents/Sycl_Graph/cmake/external_packages.cmake
 # =============================================================================
 
 
@@ -179,7 +179,7 @@ build _deps/cppitertools_repo-build/install/strip: phony _deps/cppitertools_repo
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
-# /home/man/Documents/Sycl_Graph/CMakeLists.txt
+# /home/man/Documents/Sycl_Graph/cmake/external_packages.cmake
 # =============================================================================
 
 
@@ -334,12 +334,12 @@ build include/install/strip: phony include/CMakeFiles/install/strip.util
 build cmake_object_order_depends_target_Common: phony || include/Sycl_Graph/CMakeFiles/Common.dir
 
 build include/Sycl_Graph/CMakeFiles/Common.dir/path_config.cpp.o: CXX_COMPILER__Common_Debug /home/man/Documents/Sycl_Graph/include/Sycl_Graph/path_config.cpp || cmake_object_order_depends_target_Common
-  DEFINES = -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = include/Sycl_Graph/CMakeFiles/Common.dir/path_config.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIC -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIC -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
   OBJECT_DIR = include/Sycl_Graph/CMakeFiles/Common.dir
   OBJECT_FILE_DIR = include/Sycl_Graph/CMakeFiles/Common.dir
+  TARGET_COMPILE_PDB = include/Sycl_Graph/CMakeFiles/Common.dir/Common.pdb
+  TARGET_PDB = include/Sycl_Graph/libCommon.pdb
 
 
 # =============================================================================
@@ -350,12 +350,13 @@ build include/Sycl_Graph/CMakeFiles/Common.dir/path_config.cpp.o: CXX_COMPILER__
 # Link the static library include/Sycl_Graph/libCommon.a
 
 build include/Sycl_Graph/libCommon.a: CXX_STATIC_LIBRARY_LINKER__Common_Debug include/Sycl_Graph/CMakeFiles/Common.dir/path_config.cpp.o
-  LANGUAGE_COMPILE_FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LANGUAGE_COMPILE_FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
   OBJECT_DIR = include/Sycl_Graph/CMakeFiles/Common.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = include/Sycl_Graph/CMakeFiles/Common.dir/Common.pdb
   TARGET_FILE = include/Sycl_Graph/libCommon.a
-  TARGET_PDB = Common.a.dbg
+  TARGET_PDB = include/Sycl_Graph/libCommon.pdb
 
 
 #############################################
@@ -657,12 +658,13 @@ build static/Sycl_Graph/install/strip: phony static/Sycl_Graph/CMakeFiles/instal
 build cmake_object_order_depends_target_DataFrame: phony || cmake_object_order_depends_target_Common
 
 build static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o: CXX_COMPILER__DataFrame_Debug /home/man/Documents/Sycl_Graph/static/Sycl_Graph/DataFrame/DataFrame.cpp || cmake_object_order_depends_target_DataFrame
-  DEFINES = -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIC -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -isystem /usr/local/include/eigen3
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIC -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -isystem /usr/local/include/eigen3
   OBJECT_DIR = static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir
   OBJECT_FILE_DIR = static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir
+  TARGET_COMPILE_PDB = static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.pdb
+  TARGET_PDB = static/Sycl_Graph/DataFrame/libDataFrame.pdb
 
 
 # =============================================================================
@@ -673,12 +675,13 @@ build static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o: CXX_
 # Link the static library static/Sycl_Graph/DataFrame/libDataFrame.a
 
 build static/Sycl_Graph/DataFrame/libDataFrame.a: CXX_STATIC_LIBRARY_LINKER__DataFrame_Debug static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.cpp.o || include/Sycl_Graph/libCommon.a
-  LANGUAGE_COMPILE_FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LANGUAGE_COMPILE_FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
   OBJECT_DIR = static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/DataFrame.pdb
   TARGET_FILE = static/Sycl_Graph/DataFrame/libDataFrame.a
-  TARGET_PDB = DataFrame.a.dbg
+  TARGET_PDB = static/Sycl_Graph/DataFrame/libDataFrame.pdb
 
 
 #############################################
@@ -761,12 +764,13 @@ build static/Sycl_Graph/DataFrame/install/strip: phony static/Sycl_Graph/DataFra
 build cmake_object_order_depends_target_Sycl_Graph_Eigen: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame include/Sycl_Graph/Graph/Sycl_Graph
 
 build static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o: CXX_COMPILER__Sycl_Graph_Eigen_Debug /home/man/Documents/Sycl_Graph/static/Sycl_Graph/Eigen/Sycl_Graph_Eigen.cpp || cmake_object_order_depends_target_Sycl_Graph_Eigen
-  DEFINES = -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIC -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -isystem /usr/local/include/eigen3
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIC -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -isystem /usr/local/include/eigen3
   OBJECT_DIR = static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
   OBJECT_FILE_DIR = static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
+  TARGET_COMPILE_PDB = static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.pdb
+  TARGET_PDB = static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.pdb
 
 
 # =============================================================================
@@ -777,12 +781,13 @@ build static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.c
 # Link the static library static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.a
 
 build static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.a: CXX_STATIC_LIBRARY_LINKER__Sycl_Graph_Eigen_Debug static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a
-  LANGUAGE_COMPILE_FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LANGUAGE_COMPILE_FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
   OBJECT_DIR = static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.pdb
   TARGET_FILE = static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.a
-  TARGET_PDB = Sycl_Graph_Eigen.a.dbg
+  TARGET_PDB = static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.pdb
 
 
 #############################################
@@ -865,12 +870,13 @@ build static/Sycl_Graph/Eigen/install/strip: phony static/Sycl_Graph/Eigen/CMake
 build cmake_object_order_depends_target_Math: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame include/Sycl_Graph/Graph/Sycl_Graph
 
 build static/Sycl_Graph/Math/CMakeFiles/Math.dir/math.cpp.o: CXX_COMPILER__Math_Debug /home/man/Documents/Sycl_Graph/static/Sycl_Graph/Math/math.cpp || cmake_object_order_depends_target_Math
-  DEFINES = -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = static/Sycl_Graph/Math/CMakeFiles/Math.dir/math.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIC -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -isystem /usr/local/include/eigen3
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIC -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -isystem /usr/local/include/eigen3
   OBJECT_DIR = static/Sycl_Graph/Math/CMakeFiles/Math.dir
   OBJECT_FILE_DIR = static/Sycl_Graph/Math/CMakeFiles/Math.dir
+  TARGET_COMPILE_PDB = static/Sycl_Graph/Math/CMakeFiles/Math.dir/Math.pdb
+  TARGET_PDB = static/Sycl_Graph/Math/libMath.pdb
 
 
 # =============================================================================
@@ -881,12 +887,13 @@ build static/Sycl_Graph/Math/CMakeFiles/Math.dir/math.cpp.o: CXX_COMPILER__Math_
 # Link the static library static/Sycl_Graph/Math/libMath.a
 
 build static/Sycl_Graph/Math/libMath.a: CXX_STATIC_LIBRARY_LINKER__Math_Debug static/Sycl_Graph/Math/CMakeFiles/Math.dir/math.cpp.o || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a
-  LANGUAGE_COMPILE_FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LANGUAGE_COMPILE_FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
   OBJECT_DIR = static/Sycl_Graph/Math/CMakeFiles/Math.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = static/Sycl_Graph/Math/CMakeFiles/Math.dir/Math.pdb
   TARGET_FILE = static/Sycl_Graph/Math/libMath.a
-  TARGET_PDB = Math.a.dbg
+  TARGET_PDB = static/Sycl_Graph/Math/libMath.pdb
 
 
 #############################################
@@ -960,74 +967,6 @@ build static/Sycl_Graph/Math/install/strip: phony static/Sycl_Graph/Math/CMakeFi
 # =============================================================================
 
 # =============================================================================
-# Object build statements for EXECUTABLE target array_constraints
-
-
-#############################################
-# Order-only phony target for array_constraints
-
-build cmake_object_order_depends_target_array_constraints: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
-
-build test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o: CXX_COMPILER__array_constraints_Debug /home/man/Documents/Sycl_Graph/test/array_constraints.cpp || cmake_object_order_depends_target_array_constraints
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
-  DEP_FILE = test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
-  OBJECT_DIR = test/CMakeFiles/array_constraints.dir
-  OBJECT_FILE_DIR = test/CMakeFiles/array_constraints.dir
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target array_constraints
-
-
-#############################################
-# Link the executable test/array_constraints
-
-build test/array_constraints: CXX_EXECUTABLE_LINKER__array_constraints_Debug test/CMakeFiles/array_constraints.dir/array_constraints.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
-  OBJECT_DIR = test/CMakeFiles/array_constraints.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = test/array_constraints
-  TARGET_PDB = array_constraints.dbg
-
-# =============================================================================
-# Object build statements for EXECUTABLE target sycl_mutex
-
-
-#############################################
-# Order-only phony target for sycl_mutex
-
-build cmake_object_order_depends_target_sycl_mutex: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
-
-build test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o: CXX_COMPILER__sycl_mutex_Debug /home/man/Documents/Sycl_Graph/test/sycl_mutex.cpp || cmake_object_order_depends_target_sycl_mutex
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
-  DEP_FILE = test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
-  OBJECT_DIR = test/CMakeFiles/sycl_mutex.dir
-  OBJECT_FILE_DIR = test/CMakeFiles/sycl_mutex.dir
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target sycl_mutex
-
-
-#############################################
-# Link the executable test/sycl_mutex
-
-build test/sycl_mutex: CXX_EXECUTABLE_LINKER__sycl_mutex_Debug test/CMakeFiles/sycl_mutex.dir/sycl_mutex.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
-  OBJECT_DIR = test/CMakeFiles/sycl_mutex.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = test/sycl_mutex
-  TARGET_PDB = sycl_mutex.dbg
-
-# =============================================================================
 # Object build statements for EXECUTABLE target bitonic_sort
 
 
@@ -1037,12 +976,13 @@ build test/sycl_mutex: CXX_EXECUTABLE_LINKER__sycl_mutex_Debug test/CMakeFiles/s
 build cmake_object_order_depends_target_bitonic_sort: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
 
 build test/CMakeFiles/bitonic_sort.dir/bitonic_sort.cpp.o: CXX_COMPILER__bitonic_sort_Debug /home/man/Documents/Sycl_Graph/test/bitonic_sort.cpp || cmake_object_order_depends_target_bitonic_sort
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = test/CMakeFiles/bitonic_sort.dir/bitonic_sort.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/bitonic_sort.dir
   OBJECT_FILE_DIR = test/CMakeFiles/bitonic_sort.dir
+  TARGET_COMPILE_PDB = test/CMakeFiles/bitonic_sort.dir/
+  TARGET_PDB = test/bitonic_sort.pdb
 
 
 # =============================================================================
@@ -1052,14 +992,15 @@ build test/CMakeFiles/bitonic_sort.dir/bitonic_sort.cpp.o: CXX_COMPILER__bitonic
 #############################################
 # Link the executable test/bitonic_sort
 
-build test/bitonic_sort: CXX_EXECUTABLE_LINKER__bitonic_sort_Debug test/CMakeFiles/bitonic_sort.dir/bitonic_sort.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
+build test/bitonic_sort: CXX_EXECUTABLE_LINKER__bitonic_sort_Debug test/CMakeFiles/bitonic_sort.dir/bitonic_sort.cpp.o | static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/bitonic_sort.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = test/CMakeFiles/bitonic_sort.dir/
   TARGET_FILE = test/bitonic_sort
-  TARGET_PDB = bitonic_sort.dbg
+  TARGET_PDB = test/bitonic_sort.pdb
 
 # =============================================================================
 # Object build statements for EXECUTABLE target sycl_device_info
@@ -1071,12 +1012,13 @@ build test/bitonic_sort: CXX_EXECUTABLE_LINKER__bitonic_sort_Debug test/CMakeFil
 build cmake_object_order_depends_target_sycl_device_info: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
 
 build test/CMakeFiles/sycl_device_info.dir/sycl_device_info.cpp.o: CXX_COMPILER__sycl_device_info_Debug /home/man/Documents/Sycl_Graph/test/sycl_device_info.cpp || cmake_object_order_depends_target_sycl_device_info
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = test/CMakeFiles/sycl_device_info.dir/sycl_device_info.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/sycl_device_info.dir
   OBJECT_FILE_DIR = test/CMakeFiles/sycl_device_info.dir
+  TARGET_COMPILE_PDB = test/CMakeFiles/sycl_device_info.dir/
+  TARGET_PDB = test/sycl_device_info.pdb
 
 
 # =============================================================================
@@ -1086,14 +1028,15 @@ build test/CMakeFiles/sycl_device_info.dir/sycl_device_info.cpp.o: CXX_COMPILER_
 #############################################
 # Link the executable test/sycl_device_info
 
-build test/sycl_device_info: CXX_EXECUTABLE_LINKER__sycl_device_info_Debug test/CMakeFiles/sycl_device_info.dir/sycl_device_info.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
+build test/sycl_device_info: CXX_EXECUTABLE_LINKER__sycl_device_info_Debug test/CMakeFiles/sycl_device_info.dir/sycl_device_info.cpp.o | static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/sycl_device_info.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = test/CMakeFiles/sycl_device_info.dir/
   TARGET_FILE = test/sycl_device_info
-  TARGET_PDB = sycl_device_info.dbg
+  TARGET_PDB = test/sycl_device_info.pdb
 
 # =============================================================================
 # Object build statements for EXECUTABLE target sycl_copy_profiling
@@ -1105,12 +1048,13 @@ build test/sycl_device_info: CXX_EXECUTABLE_LINKER__sycl_device_info_Debug test/
 build cmake_object_order_depends_target_sycl_copy_profiling: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
 
 build test/CMakeFiles/sycl_copy_profiling.dir/sycl_copy_profiling.cpp.o: CXX_COMPILER__sycl_copy_profiling_Debug /home/man/Documents/Sycl_Graph/test/sycl_copy_profiling.cpp || cmake_object_order_depends_target_sycl_copy_profiling
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = test/CMakeFiles/sycl_copy_profiling.dir/sycl_copy_profiling.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/sycl_copy_profiling.dir
   OBJECT_FILE_DIR = test/CMakeFiles/sycl_copy_profiling.dir
+  TARGET_COMPILE_PDB = test/CMakeFiles/sycl_copy_profiling.dir/
+  TARGET_PDB = test/sycl_copy_profiling.pdb
 
 
 # =============================================================================
@@ -1120,14 +1064,15 @@ build test/CMakeFiles/sycl_copy_profiling.dir/sycl_copy_profiling.cpp.o: CXX_COM
 #############################################
 # Link the executable test/sycl_copy_profiling
 
-build test/sycl_copy_profiling: CXX_EXECUTABLE_LINKER__sycl_copy_profiling_Debug test/CMakeFiles/sycl_copy_profiling.dir/sycl_copy_profiling.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
+build test/sycl_copy_profiling: CXX_EXECUTABLE_LINKER__sycl_copy_profiling_Debug test/CMakeFiles/sycl_copy_profiling.dir/sycl_copy_profiling.cpp.o | static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/sycl_copy_profiling.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = test/CMakeFiles/sycl_copy_profiling.dir/
   TARGET_FILE = test/sycl_copy_profiling
-  TARGET_PDB = sycl_copy_profiling.dbg
+  TARGET_PDB = test/sycl_copy_profiling.pdb
 
 # =============================================================================
 # Object build statements for EXECUTABLE target device_copy
@@ -1139,12 +1084,13 @@ build test/sycl_copy_profiling: CXX_EXECUTABLE_LINKER__sycl_copy_profiling_Debug
 build cmake_object_order_depends_target_device_copy: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
 
 build test/CMakeFiles/device_copy.dir/device_copy.cpp.o: CXX_COMPILER__device_copy_Debug /home/man/Documents/Sycl_Graph/test/device_copy.cpp || cmake_object_order_depends_target_device_copy
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = test/CMakeFiles/device_copy.dir/device_copy.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/device_copy.dir
   OBJECT_FILE_DIR = test/CMakeFiles/device_copy.dir
+  TARGET_COMPILE_PDB = test/CMakeFiles/device_copy.dir/
+  TARGET_PDB = test/device_copy.pdb
 
 
 # =============================================================================
@@ -1154,14 +1100,15 @@ build test/CMakeFiles/device_copy.dir/device_copy.cpp.o: CXX_COMPILER__device_co
 #############################################
 # Link the executable test/device_copy
 
-build test/device_copy: CXX_EXECUTABLE_LINKER__device_copy_Debug test/CMakeFiles/device_copy.dir/device_copy.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
+build test/device_copy: CXX_EXECUTABLE_LINKER__device_copy_Debug test/CMakeFiles/device_copy.dir/device_copy.cpp.o | static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/device_copy.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = test/CMakeFiles/device_copy.dir/
   TARGET_FILE = test/device_copy
-  TARGET_PDB = device_copy.dbg
+  TARGET_PDB = test/device_copy.pdb
 
 # =============================================================================
 # Object build statements for EXECUTABLE target SIR_Simulation
@@ -1173,12 +1120,13 @@ build test/device_copy: CXX_EXECUTABLE_LINKER__device_copy_Debug test/CMakeFiles
 build cmake_object_order_depends_target_SIR_Simulation: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
 
 build test/CMakeFiles/SIR_Simulation.dir/SIR_Simulation.cpp.o: CXX_COMPILER__SIR_Simulation_Debug /home/man/Documents/Sycl_Graph/test/SIR_Simulation.cpp || cmake_object_order_depends_target_SIR_Simulation
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = test/CMakeFiles/SIR_Simulation.dir/SIR_Simulation.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/SIR_Simulation.dir
   OBJECT_FILE_DIR = test/CMakeFiles/SIR_Simulation.dir
+  TARGET_COMPILE_PDB = test/CMakeFiles/SIR_Simulation.dir/
+  TARGET_PDB = test/SIR_Simulation.pdb
 
 
 # =============================================================================
@@ -1188,14 +1136,15 @@ build test/CMakeFiles/SIR_Simulation.dir/SIR_Simulation.cpp.o: CXX_COMPILER__SIR
 #############################################
 # Link the executable test/SIR_Simulation
 
-build test/SIR_Simulation: CXX_EXECUTABLE_LINKER__SIR_Simulation_Debug test/CMakeFiles/SIR_Simulation.dir/SIR_Simulation.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
+build test/SIR_Simulation: CXX_EXECUTABLE_LINKER__SIR_Simulation_Debug test/CMakeFiles/SIR_Simulation.dir/SIR_Simulation.cpp.o | static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/SIR_Simulation.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = test/CMakeFiles/SIR_Simulation.dir/
   TARGET_FILE = test/SIR_Simulation
-  TARGET_PDB = SIR_Simulation.dbg
+  TARGET_PDB = test/SIR_Simulation.pdb
 
 # =============================================================================
 # Object build statements for EXECUTABLE target SIR_Metapopulation_Simulation
@@ -1207,12 +1156,13 @@ build test/SIR_Simulation: CXX_EXECUTABLE_LINKER__SIR_Simulation_Debug test/CMak
 build cmake_object_order_depends_target_SIR_Metapopulation_Simulation: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
 
 build test/CMakeFiles/SIR_Metapopulation_Simulation.dir/SIR_Metapopulation_Simulation.cpp.o: CXX_COMPILER__SIR_Metapopulation_Simulation_Debug /home/man/Documents/Sycl_Graph/test/SIR_Metapopulation_Simulation.cpp || cmake_object_order_depends_target_SIR_Metapopulation_Simulation
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = test/CMakeFiles/SIR_Metapopulation_Simulation.dir/SIR_Metapopulation_Simulation.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/SIR_Metapopulation_Simulation.dir
   OBJECT_FILE_DIR = test/CMakeFiles/SIR_Metapopulation_Simulation.dir
+  TARGET_COMPILE_PDB = test/CMakeFiles/SIR_Metapopulation_Simulation.dir/
+  TARGET_PDB = test/SIR_Metapopulation_Simulation.pdb
 
 
 # =============================================================================
@@ -1222,14 +1172,15 @@ build test/CMakeFiles/SIR_Metapopulation_Simulation.dir/SIR_Metapopulation_Simul
 #############################################
 # Link the executable test/SIR_Metapopulation_Simulation
 
-build test/SIR_Metapopulation_Simulation: CXX_EXECUTABLE_LINKER__SIR_Metapopulation_Simulation_Debug test/CMakeFiles/SIR_Metapopulation_Simulation.dir/SIR_Metapopulation_Simulation.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
+build test/SIR_Metapopulation_Simulation: CXX_EXECUTABLE_LINKER__SIR_Metapopulation_Simulation_Debug test/CMakeFiles/SIR_Metapopulation_Simulation.dir/SIR_Metapopulation_Simulation.cpp.o | static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/SIR_Metapopulation_Simulation.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = test/CMakeFiles/SIR_Metapopulation_Simulation.dir/
   TARGET_FILE = test/SIR_Metapopulation_Simulation
-  TARGET_PDB = SIR_Metapopulation_Simulation.dbg
+  TARGET_PDB = test/SIR_Metapopulation_Simulation.pdb
 
 # =============================================================================
 # Object build statements for EXECUTABLE target sycl_parallel_cond
@@ -1241,12 +1192,13 @@ build test/SIR_Metapopulation_Simulation: CXX_EXECUTABLE_LINKER__SIR_Metapopulat
 build cmake_object_order_depends_target_sycl_parallel_cond: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
 
 build test/CMakeFiles/sycl_parallel_cond.dir/sycl_parallel_cond.cpp.o: CXX_COMPILER__sycl_parallel_cond_Debug /home/man/Documents/Sycl_Graph/test/sycl_parallel_cond.cpp || cmake_object_order_depends_target_sycl_parallel_cond
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = test/CMakeFiles/sycl_parallel_cond.dir/sycl_parallel_cond.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/sycl_parallel_cond.dir
   OBJECT_FILE_DIR = test/CMakeFiles/sycl_parallel_cond.dir
+  TARGET_COMPILE_PDB = test/CMakeFiles/sycl_parallel_cond.dir/
+  TARGET_PDB = test/sycl_parallel_cond.pdb
 
 
 # =============================================================================
@@ -1256,14 +1208,15 @@ build test/CMakeFiles/sycl_parallel_cond.dir/sycl_parallel_cond.cpp.o: CXX_COMPI
 #############################################
 # Link the executable test/sycl_parallel_cond
 
-build test/sycl_parallel_cond: CXX_EXECUTABLE_LINKER__sycl_parallel_cond_Debug test/CMakeFiles/sycl_parallel_cond.dir/sycl_parallel_cond.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
+build test/sycl_parallel_cond: CXX_EXECUTABLE_LINKER__sycl_parallel_cond_Debug test/CMakeFiles/sycl_parallel_cond.dir/sycl_parallel_cond.cpp.o | static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/sycl_parallel_cond.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = test/CMakeFiles/sycl_parallel_cond.dir/
   TARGET_FILE = test/sycl_parallel_cond
-  TARGET_PDB = sycl_parallel_cond.dbg
+  TARGET_PDB = test/sycl_parallel_cond.pdb
 
 # =============================================================================
 # Object build statements for EXECUTABLE target sycl_kernel_emit
@@ -1275,12 +1228,13 @@ build test/sycl_parallel_cond: CXX_EXECUTABLE_LINKER__sycl_parallel_cond_Debug t
 build cmake_object_order_depends_target_sycl_kernel_emit: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
 
 build test/CMakeFiles/sycl_kernel_emit.dir/sycl_kernel_emit.cpp.o: CXX_COMPILER__sycl_kernel_emit_Debug /home/man/Documents/Sycl_Graph/test/sycl_kernel_emit.cpp || cmake_object_order_depends_target_sycl_kernel_emit
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = test/CMakeFiles/sycl_kernel_emit.dir/sycl_kernel_emit.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/sycl_kernel_emit.dir
   OBJECT_FILE_DIR = test/CMakeFiles/sycl_kernel_emit.dir
+  TARGET_COMPILE_PDB = test/CMakeFiles/sycl_kernel_emit.dir/
+  TARGET_PDB = test/sycl_kernel_emit.pdb
 
 
 # =============================================================================
@@ -1290,48 +1244,15 @@ build test/CMakeFiles/sycl_kernel_emit.dir/sycl_kernel_emit.cpp.o: CXX_COMPILER_
 #############################################
 # Link the executable test/sycl_kernel_emit
 
-build test/sycl_kernel_emit: CXX_EXECUTABLE_LINKER__sycl_kernel_emit_Debug test/CMakeFiles/sycl_kernel_emit.dir/sycl_kernel_emit.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
+build test/sycl_kernel_emit: CXX_EXECUTABLE_LINKER__sycl_kernel_emit_Debug test/CMakeFiles/sycl_kernel_emit.dir/sycl_kernel_emit.cpp.o | static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/sycl_kernel_emit.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = test/CMakeFiles/sycl_kernel_emit.dir/
   TARGET_FILE = test/sycl_kernel_emit
-  TARGET_PDB = sycl_kernel_emit.dbg
-
-# =============================================================================
-# Object build statements for EXECUTABLE target kernel_bundles
-
-
-#############################################
-# Order-only phony target for kernel_bundles
-
-build cmake_object_order_depends_target_kernel_bundles: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
-
-build test/CMakeFiles/kernel_bundles.dir/kernel_bundles.cpp.o: CXX_COMPILER__kernel_bundles_Debug /home/man/Documents/Sycl_Graph/test/kernel_bundles.cpp || cmake_object_order_depends_target_kernel_bundles
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
-  DEP_FILE = test/CMakeFiles/kernel_bundles.dir/kernel_bundles.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
-  OBJECT_DIR = test/CMakeFiles/kernel_bundles.dir
-  OBJECT_FILE_DIR = test/CMakeFiles/kernel_bundles.dir
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target kernel_bundles
-
-
-#############################################
-# Link the executable test/kernel_bundles
-
-build test/kernel_bundles: CXX_EXECUTABLE_LINKER__kernel_bundles_Debug test/CMakeFiles/kernel_bundles.dir/kernel_bundles.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
-  OBJECT_DIR = test/CMakeFiles/kernel_bundles.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = test/kernel_bundles
-  TARGET_PDB = kernel_bundles.dbg
+  TARGET_PDB = test/sycl_kernel_emit.pdb
 
 # =============================================================================
 # Object build statements for EXECUTABLE target tinymt_kernel
@@ -1343,12 +1264,13 @@ build test/kernel_bundles: CXX_EXECUTABLE_LINKER__kernel_bundles_Debug test/CMak
 build cmake_object_order_depends_target_tinymt_kernel: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
 
 build test/CMakeFiles/tinymt_kernel.dir/tinymt_kernel.cpp.o: CXX_COMPILER__tinymt_kernel_Debug /home/man/Documents/Sycl_Graph/test/tinymt_kernel.cpp || cmake_object_order_depends_target_tinymt_kernel
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = test/CMakeFiles/tinymt_kernel.dir/tinymt_kernel.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/tinymt_kernel.dir
   OBJECT_FILE_DIR = test/CMakeFiles/tinymt_kernel.dir
+  TARGET_COMPILE_PDB = test/CMakeFiles/tinymt_kernel.dir/
+  TARGET_PDB = test/tinymt_kernel.pdb
 
 
 # =============================================================================
@@ -1358,14 +1280,15 @@ build test/CMakeFiles/tinymt_kernel.dir/tinymt_kernel.cpp.o: CXX_COMPILER__tinym
 #############################################
 # Link the executable test/tinymt_kernel
 
-build test/tinymt_kernel: CXX_EXECUTABLE_LINKER__tinymt_kernel_Debug test/CMakeFiles/tinymt_kernel.dir/tinymt_kernel.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
+build test/tinymt_kernel: CXX_EXECUTABLE_LINKER__tinymt_kernel_Debug test/CMakeFiles/tinymt_kernel.dir/tinymt_kernel.cpp.o | static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/tinymt_kernel.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = test/CMakeFiles/tinymt_kernel.dir/
   TARGET_FILE = test/tinymt_kernel
-  TARGET_PDB = tinymt_kernel.dbg
+  TARGET_PDB = test/tinymt_kernel.pdb
 
 # =============================================================================
 # Object build statements for EXECUTABLE target gpu_rng
@@ -1377,12 +1300,13 @@ build test/tinymt_kernel: CXX_EXECUTABLE_LINKER__tinymt_kernel_Debug test/CMakeF
 build cmake_object_order_depends_target_gpu_rng: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
 
 build test/CMakeFiles/gpu_rng.dir/gpu_rng.cpp.o: CXX_COMPILER__gpu_rng_Debug /home/man/Documents/Sycl_Graph/test/gpu_rng.cpp || cmake_object_order_depends_target_gpu_rng
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = test/CMakeFiles/gpu_rng.dir/gpu_rng.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/gpu_rng.dir
   OBJECT_FILE_DIR = test/CMakeFiles/gpu_rng.dir
+  TARGET_COMPILE_PDB = test/CMakeFiles/gpu_rng.dir/
+  TARGET_PDB = test/gpu_rng.pdb
 
 
 # =============================================================================
@@ -1392,14 +1316,15 @@ build test/CMakeFiles/gpu_rng.dir/gpu_rng.cpp.o: CXX_COMPILER__gpu_rng_Debug /ho
 #############################################
 # Link the executable test/gpu_rng
 
-build test/gpu_rng: CXX_EXECUTABLE_LINKER__gpu_rng_Debug test/CMakeFiles/gpu_rng.dir/gpu_rng.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
+build test/gpu_rng: CXX_EXECUTABLE_LINKER__gpu_rng_Debug test/CMakeFiles/gpu_rng.dir/gpu_rng.cpp.o | static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/gpu_rng.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = test/CMakeFiles/gpu_rng.dir/
   TARGET_FILE = test/gpu_rng
-  TARGET_PDB = gpu_rng.dbg
+  TARGET_PDB = test/gpu_rng.pdb
 
 # =============================================================================
 # Object build statements for EXECUTABLE target distributions
@@ -1411,12 +1336,13 @@ build test/gpu_rng: CXX_EXECUTABLE_LINKER__gpu_rng_Debug test/CMakeFiles/gpu_rng
 build cmake_object_order_depends_target_distributions: phony || cmake_object_order_depends_target_Common cmake_object_order_depends_target_DataFrame cmake_object_order_depends_target_Math include/Sycl_Graph/Graph/Sycl_Graph
 
 build test/CMakeFiles/distributions.dir/distributions.cpp.o: CXX_COMPILER__distributions_Debug /home/man/Documents/Sycl_Graph/test/distributions.cpp || cmake_object_order_depends_target_distributions
-  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -DSYCL_GRAPH_USE_INTEL -DSYCL_GRAPH_USE_INTEL_SYCL -DSYCL_GRAPH_USE_SYCL
   DEP_FILE = test/CMakeFiles/distributions.dir/distributions.cpp.o.d
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -O0 -fPIC -std=gnu++20
-  INCLUDES = -I/opt/intel/oneapi/compiler/2023.0.0/linux/include -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/home/man/Documents/Sycl_Graph/static/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3 -isystem /opt/intel/oneapi/tbb/2021.8.0/include -isystem /opt/intel/oneapi/dpl/2022.0.0/linux/include
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g -fPIE -fsycl-targets=nvptx64-nvidia-cuda -O0 -fPIC -fsycl -std=gnu++20
+  INCLUDES = -I/home/man/Documents/Sycl_Graph/test/../include -I/home/man/Documents/Sycl_Graph/include -I/home/man/Documents/Sycl_Graph/static -I/.. -I/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/local/include/eigen3
   OBJECT_DIR = test/CMakeFiles/distributions.dir
   OBJECT_FILE_DIR = test/CMakeFiles/distributions.dir
+  TARGET_COMPILE_PDB = test/CMakeFiles/distributions.dir/
+  TARGET_PDB = test/distributions.pdb
 
 
 # =============================================================================
@@ -1426,14 +1352,15 @@ build test/CMakeFiles/distributions.dir/distributions.cpp.o: CXX_COMPILER__distr
 #############################################
 # Link the executable test/distributions
 
-build test/distributions: CXX_EXECUTABLE_LINKER__distributions_Debug test/CMakeFiles/distributions.dir/distributions.cpp.o | static/Sycl_Graph/Math/libMath.a /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12 static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
-  FLAGS = -fsycl  -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
-  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  /opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8/libtbb_debug.so.12  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
+build test/distributions: CXX_EXECUTABLE_LINKER__distributions_Debug test/CMakeFiles/distributions.dir/distributions.cpp.o | static/Sycl_Graph/Math/libMath.a static/Sycl_Graph/DataFrame/libDataFrame.a include/Sycl_Graph/libCommon.a || include/Sycl_Graph/Graph/Sycl_Graph include/Sycl_Graph/libCommon.a static/Sycl_Graph/DataFrame/libDataFrame.a static/Sycl_Graph/Math/libMath.a
+  FLAGS = -Wno-deprecated-declarations -Rno-debug-disables-optimization -g
+  LINK_LIBRARIES = static/Sycl_Graph/Math/libMath.a  static/Sycl_Graph/DataFrame/libDataFrame.a  include/Sycl_Graph/libCommon.a
   OBJECT_DIR = test/CMakeFiles/distributions.dir
   POST_BUILD = :
   PRE_LINK = :
+  TARGET_COMPILE_PDB = test/CMakeFiles/distributions.dir/
   TARGET_FILE = test/distributions
-  TARGET_PDB = distributions.dbg
+  TARGET_PDB = test/distributions.pdb
 
 
 #############################################
@@ -1518,8 +1445,6 @@ build Sycl_Graph: phony include/Sycl_Graph/Graph/Sycl_Graph
 
 build Sycl_Graph_Eigen: phony static/Sycl_Graph/Eigen/libSycl_Graph_Eigen.a
 
-build array_constraints: phony test/array_constraints
-
 build bitonic_sort: phony test/bitonic_sort
 
 build device_copy: phony test/device_copy
@@ -1527,8 +1452,6 @@ build device_copy: phony test/device_copy
 build distributions: phony test/distributions
 
 build gpu_rng: phony test/gpu_rng
-
-build kernel_bundles: phony test/kernel_bundles
 
 build libCommon.a: phony include/Sycl_Graph/libCommon.a
 
@@ -1543,8 +1466,6 @@ build sycl_copy_profiling: phony test/sycl_copy_profiling
 build sycl_device_info: phony test/sycl_device_info
 
 build sycl_kernel_emit: phony test/sycl_kernel_emit
-
-build sycl_mutex: phony test/sycl_mutex
 
 build sycl_parallel_cond: phony test/sycl_parallel_cond
 
@@ -1635,7 +1556,7 @@ build static/Sycl_Graph/Math/all: phony static/Sycl_Graph/Math/libMath.a
 #############################################
 # Folder: /home/man/Documents/Sycl_Graph/build/test
 
-build test/all: phony test/array_constraints test/sycl_mutex test/bitonic_sort test/sycl_device_info test/sycl_copy_profiling test/device_copy test/SIR_Simulation test/SIR_Metapopulation_Simulation test/sycl_parallel_cond test/sycl_kernel_emit test/kernel_bundles test/tinymt_kernel test/gpu_rng test/distributions
+build test/all: phony test/bitonic_sort test/sycl_device_info test/sycl_copy_profiling test/device_copy test/SIR_Simulation test/SIR_Metapopulation_Simulation test/sycl_parallel_cond test/sycl_kernel_emit test/tinymt_kernel test/gpu_rng test/distributions
 
 # =============================================================================
 # Built-in targets
@@ -1644,14 +1565,14 @@ build test/all: phony test/array_constraints test/sycl_mutex test/bitonic_sort t
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | /home/man/Documents/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/cmake/HIP_Sycl_config.cmake /home/man/Documents/Sycl_Graph/cmake/Intel_Sycl_config.cmake /home/man/Documents/Sycl_Graph/cmake/Sycl_executable.cmake /home/man/Documents/Sycl_Graph/include/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/path_config.hpp.in /home/man/Documents/Sycl_Graph/include/Sycl_Graph/path_config.py.in /home/man/Documents/Sycl_Graph/static/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/DataFrame/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/Eigen/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/Math/CMakeLists.txt /home/man/Documents/Sycl_Graph/test/CMakeLists.txt /opt/intel/oneapi/compiler/2023.0.0/linux/IntelDPCPP/IntelDPCPPConfig.cmake /opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb/TBBConfig.cmake /opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb/TBBConfigVersion.cmake /usr/lib/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib/cmake/pybind11/pybind11Common.cmake /usr/lib/cmake/pybind11/pybind11Config.cmake /usr/lib/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib/cmake/pybind11/pybind11Targets.cmake /usr/lib/cmake/pybind11/pybind11Tools.cmake /usr/local/lib/cmake/oneDPL-2022.0.0/oneDPLConfig.cmake /usr/local/lib/cmake/oneDPL-2022.0.0/oneDPLConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakePackageConfigHelpers.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-C.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-CXX.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake/Modules/FindGit.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM-C.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake /usr/share/cmake/Modules/WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles/3.25.1/CMakeCCompiler.cmake CMakeFiles/3.25.1/CMakeCXXCompiler.cmake CMakeFiles/3.25.1/CMakeSystem.cmake _deps/cppitertools_repo-src/CMakeLists.txt _deps/cppitertools_repo-src/cmake/dummy-config.cmake.in _deps/tinymt_repo-src/CMakeLists.txt
+build build.ninja: RERUN_CMAKE | /home/man/Documents/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/cmake/HIP_Sycl_config.cmake /home/man/Documents/Sycl_Graph/cmake/Intel_Sycl_config.cmake /home/man/Documents/Sycl_Graph/cmake/Sycl_executable.cmake /home/man/Documents/Sycl_Graph/cmake/external_packages.cmake /home/man/Documents/Sycl_Graph/include/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/path_config.hpp.in /home/man/Documents/Sycl_Graph/include/Sycl_Graph/path_config.py.in /home/man/Documents/Sycl_Graph/static/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/DataFrame/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/Eigen/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/Math/CMakeLists.txt /home/man/Documents/Sycl_Graph/test/CMakeLists.txt /usr/lib/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib/cmake/pybind11/pybind11Common.cmake /usr/lib/cmake/pybind11/pybind11Config.cmake /usr/lib/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib/cmake/pybind11/pybind11Targets.cmake /usr/lib/cmake/pybind11/pybind11Tools.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /usr/share/cmake/Modules/CMakeCCompiler.cmake.in /usr/share/cmake/Modules/CMakeCCompilerABI.c /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXCompiler.cmake.in /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeCompilerIdDetection.cmake /usr/share/cmake/Modules/CMakeDetermineCCompiler.cmake /usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake /usr/share/cmake/Modules/CMakeDetermineCompileFeatures.cmake /usr/share/cmake/Modules/CMakeDetermineCompiler.cmake /usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake /usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake /usr/share/cmake/Modules/CMakeDetermineSystem.cmake /usr/share/cmake/Modules/CMakeFindBinUtils.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakeNinjaFindMake.cmake /usr/share/cmake/Modules/CMakePackageConfigHelpers.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeParseImplicitIncludeInfo.cmake /usr/share/cmake/Modules/CMakeParseImplicitLinkInfo.cmake /usr/share/cmake/Modules/CMakeParseLibraryArchitecture.cmake /usr/share/cmake/Modules/CMakeSystem.cmake.in /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CMakeTestCCompiler.cmake /usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake /usr/share/cmake/Modules/CMakeTestCompilerCommon.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/ADSP-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/ARMCC-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/ARMClang-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/AppleClang-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Borland-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/Clang-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /usr/share/cmake/Modules/Compiler/Comeau-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Cray-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/GHS-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/GNU-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/HP-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/HP-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/IAR-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /usr/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake /usr/share/cmake/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Intel-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-C.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-CXX.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-FindBinUtils.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM.cmake /usr/share/cmake/Modules/Compiler/LCC-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/MSVC-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/NVHPC-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/PGI-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/PathScale-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/SCO-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/TI-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Tasking-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Watcom-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/XL-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/XL-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/zOS-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake/Modules/FindGit.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Internal/FeatureTesting.cmake /usr/share/cmake/Modules/Platform/Linux-Determine-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM-C.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake /usr/share/cmake/Modules/WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles/3.25.1/CMakeCCompiler.cmake CMakeFiles/3.25.1/CMakeCXXCompiler.cmake CMakeFiles/3.25.1/CMakeSystem.cmake _deps/cppitertools_repo-src/CMakeLists.txt _deps/cppitertools_repo-src/cmake/dummy-config.cmake.in _deps/tinymt_repo-src/CMakeLists.txt
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /home/man/Documents/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/cmake/HIP_Sycl_config.cmake /home/man/Documents/Sycl_Graph/cmake/Intel_Sycl_config.cmake /home/man/Documents/Sycl_Graph/cmake/Sycl_executable.cmake /home/man/Documents/Sycl_Graph/include/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/path_config.hpp.in /home/man/Documents/Sycl_Graph/include/Sycl_Graph/path_config.py.in /home/man/Documents/Sycl_Graph/static/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/DataFrame/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/Eigen/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/Math/CMakeLists.txt /home/man/Documents/Sycl_Graph/test/CMakeLists.txt /opt/intel/oneapi/compiler/2023.0.0/linux/IntelDPCPP/IntelDPCPPConfig.cmake /opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb/TBBConfig.cmake /opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb/TBBConfigVersion.cmake /usr/lib/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib/cmake/pybind11/pybind11Common.cmake /usr/lib/cmake/pybind11/pybind11Config.cmake /usr/lib/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib/cmake/pybind11/pybind11Targets.cmake /usr/lib/cmake/pybind11/pybind11Tools.cmake /usr/local/lib/cmake/oneDPL-2022.0.0/oneDPLConfig.cmake /usr/local/lib/cmake/oneDPL-2022.0.0/oneDPLConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakePackageConfigHelpers.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-C.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-CXX.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake/Modules/FindGit.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM-C.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake /usr/share/cmake/Modules/WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles/3.25.1/CMakeCCompiler.cmake CMakeFiles/3.25.1/CMakeCXXCompiler.cmake CMakeFiles/3.25.1/CMakeSystem.cmake _deps/cppitertools_repo-src/CMakeLists.txt _deps/cppitertools_repo-src/cmake/dummy-config.cmake.in _deps/tinymt_repo-src/CMakeLists.txt: phony
+build /home/man/Documents/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/cmake/HIP_Sycl_config.cmake /home/man/Documents/Sycl_Graph/cmake/Intel_Sycl_config.cmake /home/man/Documents/Sycl_Graph/cmake/Sycl_executable.cmake /home/man/Documents/Sycl_Graph/cmake/external_packages.cmake /home/man/Documents/Sycl_Graph/include/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/include/Sycl_Graph/path_config.hpp.in /home/man/Documents/Sycl_Graph/include/Sycl_Graph/path_config.py.in /home/man/Documents/Sycl_Graph/static/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/DataFrame/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/Eigen/CMakeLists.txt /home/man/Documents/Sycl_Graph/static/Sycl_Graph/Math/CMakeLists.txt /home/man/Documents/Sycl_Graph/test/CMakeLists.txt /usr/lib/cmake/pybind11/FindPythonLibsNew.cmake /usr/lib/cmake/pybind11/pybind11Common.cmake /usr/lib/cmake/pybind11/pybind11Config.cmake /usr/lib/cmake/pybind11/pybind11ConfigVersion.cmake /usr/lib/cmake/pybind11/pybind11Targets.cmake /usr/lib/cmake/pybind11/pybind11Tools.cmake /usr/local/share/eigen3/cmake/Eigen3Config.cmake /usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake /usr/local/share/eigen3/cmake/Eigen3Targets.cmake /usr/share/cmake/Modules/BasicConfigVersion-SameMajorVersion.cmake.in /usr/share/cmake/Modules/CMakeCCompiler.cmake.in /usr/share/cmake/Modules/CMakeCCompilerABI.c /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXCompiler.cmake.in /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeCompilerIdDetection.cmake /usr/share/cmake/Modules/CMakeDetermineCCompiler.cmake /usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake /usr/share/cmake/Modules/CMakeDetermineCompileFeatures.cmake /usr/share/cmake/Modules/CMakeDetermineCompiler.cmake /usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake /usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake /usr/share/cmake/Modules/CMakeDetermineSystem.cmake /usr/share/cmake/Modules/CMakeFindBinUtils.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakeNinjaFindMake.cmake /usr/share/cmake/Modules/CMakePackageConfigHelpers.cmake /usr/share/cmake/Modules/CMakeParseArguments.cmake /usr/share/cmake/Modules/CMakeParseImplicitIncludeInfo.cmake /usr/share/cmake/Modules/CMakeParseImplicitLinkInfo.cmake /usr/share/cmake/Modules/CMakeParseLibraryArchitecture.cmake /usr/share/cmake/Modules/CMakeSystem.cmake.in /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/CMakeTestCCompiler.cmake /usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake /usr/share/cmake/Modules/CMakeTestCompilerCommon.cmake /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake/Modules/Compiler/ADSP-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/ARMCC-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/ARMClang-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/AppleClang-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Borland-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/Clang-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /usr/share/cmake/Modules/Compiler/Comeau-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Cray-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/GHS-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/GNU-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/HP-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/HP-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/IAR-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /usr/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake /usr/share/cmake/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Intel-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-C.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-CXX.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM-FindBinUtils.cmake /usr/share/cmake/Modules/Compiler/IntelLLVM.cmake /usr/share/cmake/Modules/Compiler/LCC-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/MSVC-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/NVHPC-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/PGI-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/PathScale-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/SCO-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/TI-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Tasking-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/Watcom-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/XL-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/XL-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/zOS-C-DetermineCompiler.cmake /usr/share/cmake/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake /usr/share/cmake/Modules/FetchContent.cmake /usr/share/cmake/Modules/FetchContent/CMakeLists.cmake.in /usr/share/cmake/Modules/FindGit.cmake /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake/Modules/FindPackageMessage.cmake /usr/share/cmake/Modules/FindPkgConfig.cmake /usr/share/cmake/Modules/FindPython/Support.cmake /usr/share/cmake/Modules/FindPython3.cmake /usr/share/cmake/Modules/FindPythonInterp.cmake /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake/Modules/Internal/FeatureTesting.cmake /usr/share/cmake/Modules/Platform/Linux-Determine-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM-C.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-IntelLLVM.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake /usr/share/cmake/Modules/WriteBasicConfigVersionFile.cmake CMakeCache.txt CMakeFiles/3.25.1/CMakeCCompiler.cmake CMakeFiles/3.25.1/CMakeCXXCompiler.cmake CMakeFiles/3.25.1/CMakeSystem.cmake _deps/cppitertools_repo-src/CMakeLists.txt _deps/cppitertools_repo-src/cmake/dummy-config.cmake.in _deps/tinymt_repo-src/CMakeLists.txt: phony
 
 
 #############################################

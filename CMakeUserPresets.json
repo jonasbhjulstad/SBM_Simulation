@@ -1,0 +1,95 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+      "major": 3,
+      "minor": 23,
+      "patch": 0
+    },
+    "include": [
+      "otherThings.json",
+      "moreThings.json"
+    ],
+    "configurePresets": [
+      {
+        "name": "Arch-Intel",
+        "displayName": "Arch-Intel",
+        "description": "Default build using Intel-Oneapi Arch",
+        "generator": "Ninja",
+        "binaryDir": "${sourceDir}/build/",
+        "cacheVariables": {
+          "SYCL_GRAPH_USE_ONEAPI": {
+            "type": "BOOL",
+            "value": "ON"
+          },
+          "SYCL_GRAPH_USE_INTEL": { 
+          "type": "BOOL",
+          "value": "ON"}
+        },
+        "environment": {
+        },
+        }
+      },
+      {
+        "name": "Arch-CUDA-sm_60",
+        "displayName": "Cuda-Configuration for Arch with sm_60-compatible architecture",
+        "generator": "Ninja",
+        "binaryDir": "${sourceDir}/build/",
+        "cacheVariables": {
+            "SYCL_GRAPH_USE_CUDA": "ON",
+            "SYCL_GRAPH_USE_INTEL": "OFF",
+            "SYCL_GRAPH_USE_ONEAPI": "OFF"
+        }
+      }
+    ],
+    "buildPresets": [
+      {
+        "name": "default",
+        "configurePreset": "default"
+      }
+    ],
+    "testPresets": [
+      {
+        "name": "default",
+        "configurePreset": "default",
+        "output": {"outputOnFailure": true},
+        "execution": {"noTestsAction": "error", "stopOnFailure": true}
+      }
+    ],
+    "packagePresets": [
+      {
+        "name": "default",
+        "configurePreset": "default",
+        "generators": [
+          "TGZ"
+        ]
+      }
+    ],
+    "workflowPresets": [
+      {
+        "name": "default",
+        "steps": [
+          {
+            "type": "configure",
+            "name": "default"
+          },
+          {
+            "type": "build",
+            "name": "default"
+          },
+          {
+            "type": "test",
+            "name": "default"
+          },
+          {
+            "type": "package",
+            "name": "default"
+          }
+        ]
+      }
+    ],
+    "vendor": {
+      "example.com/ExampleIDE/1.0": {
+        "autoFormat": false
+      }
+    }
+  }

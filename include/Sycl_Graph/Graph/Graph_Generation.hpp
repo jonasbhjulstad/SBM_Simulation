@@ -7,7 +7,7 @@
 
 #include <itertools.hpp>
 #include <memory>
-#include <sycl/CL/sycl.hpp>
+#include <CL/sycl.hpp>
 #include <Sycl_Graph/random.hpp>
 #include <Sycl_Graph/Math/math.hpp>
 #include <random>

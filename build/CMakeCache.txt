@@ -23,8 +23,8 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 //No help, variable specified on the command line.
 CMAKE_BUILD_TYPE:STRING=Debug
 
-//No help, variable specified on the command line.
-CMAKE_CXX_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/latest/linux/bin/icpx
+//CXX compiler
+CMAKE_CXX_COMPILER:STRING=/opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++
 
 //LLVM archiver
 CMAKE_CXX_COMPILER_AR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/bin-llvm/llvm-ar
@@ -47,8 +47,8 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 //Flags used by the CXX compiler during RELWITHDEBINFO builds.
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
-//No help, variable specified on the command line.
-CMAKE_C_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/latest/linux/bin/icx
+//C compiler
+CMAKE_C_COMPILER:STRING=/opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang
 
 //LLVM archiver
 CMAKE_C_COMPILER_AR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/bin-llvm/llvm-ar
@@ -240,10 +240,6 @@ FETCHCONTENT_QUIET:BOOL=ON
 FETCHCONTENT_SOURCE_DIR_CPPITERTOOLS_REPO:PATH=
 
 //When not empty, overrides where to find pre-populated content
-// for tinymt-repo
-FETCHCONTENT_SOURCE_DIR_TINYMT-REPO:PATH=
-
-//When not empty, overrides where to find pre-populated content
 // for tinymt_repo
 FETCHCONTENT_SOURCE_DIR_TINYMT_REPO:PATH=
 
@@ -253,17 +249,11 @@ FETCHCONTENT_UPDATES_DISCONNECTED:BOOL=OFF
 //Enables UPDATE_DISCONNECTED behavior just for population of cppitertools_repo
 FETCHCONTENT_UPDATES_DISCONNECTED_CPPITERTOOLS_REPO:BOOL=OFF
 
-//Enables UPDATE_DISCONNECTED behavior just for population of tinymt-repo
-FETCHCONTENT_UPDATES_DISCONNECTED_TINYMT-REPO:BOOL=OFF
-
 //Enables UPDATE_DISCONNECTED behavior just for population of tinymt_repo
 FETCHCONTENT_UPDATES_DISCONNECTED_TINYMT_REPO:BOOL=OFF
 
 //Git command line client
 GIT_EXECUTABLE:FILEPATH=/usr/bin/git
-
-//The directory containing a CMake configuration file for IntelDPCPP.
-IntelDPCPP_DIR:PATH=/opt/intel/oneapi/compiler/2023.0.0/linux/IntelDPCPP
 
 //Dependencies for the target
 Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
@@ -284,19 +274,17 @@ PYBIND11_PYTHON_VERSION:STRING=3.9
 //Path to a library.
 PYTHON_LIBRARY:FILEPATH=/home/man/.pyenv/versions/3.9.13/lib/libpython3.9.so
 
-//SYCL flags for the compiler
-SYCL_FLAGS:STRING='-fsycl '
+//Use CUDA
+SYCL_GRAPH_USE_CUDA:BOOL=ON
 
-//Path to a file.
-SYCL_INCLUDE_DIR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/include
+//Use HIPSYCL
+SYCL_GRAPH_USE_HIPSYCL:BOOL=OFF
 
-//SYCL Language version
-SYCL_LANGUAGE_VERSION:STRING=202001
+//Use Intel
+SYCL_GRAPH_USE_INTEL:BOOL=OFF
 
-//Path to a file.
-SYCL_LIBRARY_DIR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/lib
-
-SYCL_PACKAGE_DIR:STRING=/opt/intel/oneapi/compiler/2023.0.0/linux
+//Use OneAPI
+SYCL_GRAPH_USE_ONEAPI:BOOL=OFF
 
 //Value Computed by CMake
 Sycl_Graph_BINARY_DIR:STATIC=/home/man/Documents/Sycl_Graph/build
@@ -310,8 +298,8 @@ Sycl_Graph_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 Sycl_Graph_SOURCE_DIR:STATIC=/home/man/Documents/Sycl_Graph
 
-//The directory containing a CMake configuration file for TBB.
-TBB_DIR:PATH=/opt/intel/oneapi/tbb/2021.8.0/lib/cmake/tbb
+//The directory containing a CMake configuration file for Tracy.
+Tracy_DIR:PATH=Tracy_DIR-NOTFOUND
 
 //Value Computed by CMake
 cppitertools_BINARY_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-build
@@ -327,9 +315,6 @@ cppitertools_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
 cppitertools_SOURCE_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools_repo-src
-
-//The directory containing a CMake configuration file for oneDPL.
-oneDPL_DIR:PATH=/usr/local/lib/cmake/oneDPL-2022.0.0
 
 //The directory containing a CMake configuration file for pybind11.
 pybind11_DIR:PATH=/usr/lib/cmake/pybind11
@@ -489,8 +474,6 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
-//Details about finding IntelDPCPP
-FIND_PACKAGE_MESSAGE_DETAILS_IntelDPCPP:INTERNAL=[/opt/intel/oneapi/compiler/2023.0.0/linux/include][/opt/intel/oneapi/compiler/2023.0.0/linux/lib][-fsycl ][v202001()]
 //Details about finding PYTHON
 FIND_PACKAGE_MESSAGE_DETAILS_PYTHON:INTERNAL=/home/man/.pyenv/versions/3.9.13/bin/python33.9.13
 //Details about finding PkgConfig
@@ -523,7 +506,7 @@ SYCL_GRAPH_DATA_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/data
 //SYCL_GRAPH_INCLUDE
 SYCL_GRAPH_INCLUDE:INTERNAL=/home/man/Documents/Sycl_Graph/include
 //SYCL_GRAPH_INCLUDE_DIRS
-SYCL_GRAPH_INCLUDE_DIRS:INTERNAL=/home/man/Documents/Sycl_Graph/include;/home/man/Documents/Sycl_Graph/static
+SYCL_GRAPH_INCLUDE_DIRS:INTERNAL=/home/man/Documents/Sycl_Graph/include;/home/man/Documents/Sycl_Graph/static;
 //SYCL_GRAPH_LOG_DIR
 SYCL_GRAPH_LOG_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/log
 //linker supports push/pop state
@@ -538,12 +521,8 @@ _Python3_EXECUTABLE:INTERNAL=/usr/bin/python3.10
 //Python3 Properties
 _Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;10;8;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages
 _Python3_INTERPRETER_SIGNATURE:INTERNAL=2e995cd2bd888af83868128ab4554325
-//Interpreter reason failure
-_Python3_Interpreter_REASON_FAILURE:INTERNAL=
 //NumPy reason failure
 _Python3_NumPy_REASON_FAILURE:INTERNAL=
-//Test _fsycl_option
-_fsycl_option:INTERNAL=1
 //Directories where pybind11 and possibly Python headers are located
 pybind11_INCLUDE_DIRS:INTERNAL=/usr/include;/home/man/.pyenv/versions/3.9.13/include/python3.9
 

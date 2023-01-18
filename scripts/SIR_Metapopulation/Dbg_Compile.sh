@@ -1,0 +1,2 @@
+clang++ -g -fsycl -fsycl-targets=nvptx64-nvidia-cuda -I../../include -I../../build/_deps/cppitertools_repo-src/ -I../../build/_deps/tinymt_repo-src/include -I../../static -I/usr/include/eigen3 ../../test/SIR_Metapopulation_Simulation.cpp ../../build/static/Sycl_Graph/Math/CMakeFiles/Math.dir/math.cpp.o -o ../../build/test/SIR_Metapopulation_Simulation -Wdeprecated-declarations -lTracy
+#../../build/test/SIR_Metapopulation_Simulation

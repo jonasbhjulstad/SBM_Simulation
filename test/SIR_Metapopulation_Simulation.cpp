@@ -1,5 +1,4 @@
 
-#define SYCL_DEVICE_FILTER host
 #include <Sycl_Graph/Graph/Graph.hpp>
 #include <Sycl_Graph/Graph/Graph_Generation.hpp>
 #include <Sycl_Graph/Math/math.hpp>
@@ -10,7 +9,7 @@
 #include <filesystem>
 
 using namespace Sycl_Graph::random;
-static constexpr size_t NV = 1;
+static constexpr size_t NV = 100;
 std::vector<uint32_t> N_pop = std::vector<uint32_t>(NV, 1000);
 std::vector<normal_distribution<float>> I0(N_pop.size());
 std::vector<normal_distribution<float>> R0(N_pop.size());
@@ -27,8 +26,9 @@ int main()
   using namespace Sycl_Graph::Sycl::Network_Models;
   using Sycl_Graph::Dynamic::Network_Models::generate_erdos_renyi;
   using namespace Sycl_Graph::Network_Models;
-  float p_ER = 1;
-  sycl::queue q{ sycl::gpu_selector()};
+  float p_ER = 0.5;
+  //create profiling queue
+  sycl::queue q(sycl::gpu_selector(), sycl::property::queue::enable_profiling{});
   int seed = 777;
   Sycl_Graph::random::default_rng rng;
   auto G = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER);

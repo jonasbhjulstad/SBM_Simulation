@@ -1,5 +1,5 @@
 //include sycl
-#include <sycl/CL/sycl.hpp>
+#include <CL/sycl.hpp>
 
 int main()
 {
@@ -8,7 +8,7 @@ int main()
     auto local_mem_size = sycl::device().get_info<sycl::info::device::local_mem_size>() / 1024;
     std::cout << "Global memory size: " << global_mem_size << " Mb" << std::endl;
     std::cout << "Local memory size: " << local_mem_size << " Kb" << std::endl;
-    
+
     
     return 0;
 

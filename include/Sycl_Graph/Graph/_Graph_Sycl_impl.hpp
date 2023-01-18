@@ -4,7 +4,6 @@
 
 #ifndef SYCL_GRAPH_GRAPH_SYCL_HPP
 #define SYCL_GRAPH_GRAPH_SYCL_HPP
-#ifdef SYCL_GRAPH_USE_SYCL
 #include <algorithm>
 #include <numeric>
 #include <array>
@@ -19,14 +18,14 @@
 #include <iterator>
 // #include <Sycl_Graph/execution.hpp>
 #include <type_traits>
-#include <sycl/CL/sycl.hpp>
+#include <CL/sycl.hpp>
 #include "Graph_Types.hpp"
 #include "Graph_Types_Sycl.hpp"
 
 namespace Sycl_Graph::Sycl
 {
   
-  template <typename V, typename E, std::unsigned_integral uI_t>
+  template <typename V, typename E, typename uI_t>
   struct Graph
   {
     // create copy constructor
@@ -56,7 +55,8 @@ namespace Sycl_Graph::Sycl
 
 
     //find vertex index based on condition
-    uI_t find(auto condition)
+    template <typename T>
+    uI_t find(T condition)
     {
       uI_t idx = Vertex_t::invalid_id;
       sycl::buffer<uI_t, 1> res_buf(&idx, 1);
@@ -69,7 +69,8 @@ namespace Sycl_Graph::Sycl
       return idx;
     }
 
-    void find(auto &res_acc, auto &v_acc, auto condition, sycl::handler &h)
+    template <typename T0, typename T1, typename T2>
+    void find(T0 &res_acc, T1 &v_acc, T2 condition, sycl::handler &h)
     {
       h.parallel_for<class vertex_id_search>(sycl::range<1>(v_acc.size()), [=](sycl::id<1> id)
                                              { if (condition(v_acc[id[0]])) res_acc[0] = id[0]; });
@@ -155,4 +156,3 @@ namespace Sycl_Graph::Sycl
 }
 
 #endif
-#endif // Sycl_Graph_hpp

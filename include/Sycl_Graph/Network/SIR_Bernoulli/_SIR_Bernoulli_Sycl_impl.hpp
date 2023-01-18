@@ -1,12 +1,13 @@
 #ifndef SIR_Bernoulli_SYCL_IMPL_HPP
 #define SIR_Bernoulli_SYCL_IMPL_HPP
-#ifdef SYCL_GRAPH_USE_SYCL
 #include "SIR_Bernoulli_Types.hpp"
 #include <stddef.h>
-#include <sycl/CL/sycl.hpp>
+#include <CL/sycl.hpp>
 #include <Sycl_Graph/Network/Network.hpp>
 #include <Sycl_Graph/random.hpp>
+#ifdef SYCL_GRAPH_USE_ONEAPI
 #include <oneapi/dpl/algorithm>
+#endif
 #include <utility>
 #include <type_traits>
 template <>
@@ -316,5 +317,4 @@ namespace Sycl_Graph
         };
     } // namespace Sycl
 } // namespace Network_Models
-#endif
 #endif

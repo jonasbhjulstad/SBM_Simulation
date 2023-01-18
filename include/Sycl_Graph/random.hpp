@@ -1,13 +1,14 @@
 #ifndef SYCL_GRAPH_RANDOM_HPP
 #define SYCL_GRAPH_RANDOM_HPP
 
-#ifdef SYCL_GRAPH_USE_INTEL_SYCL
+#ifdef SYCL_GRAPH_USE_ONEAPI
 #include<oneapi/dpl/random>
+#else
 #include <random>
 #include <tinymt/tinymt.h>
 #endif
 namespace Sycl_Graph::random {
-#ifdef SYCL_GRAPH_USE_INTEL_SYCL
+#ifdef SYCL_GRAPH_USE_ONEAPI
     #ifdef cl_khr_fp64
     using oneapi::dpl::uniform_real_distribution;
     using oneapi::dpl::bernoulli_distribution;
@@ -15,7 +16,8 @@ namespace Sycl_Graph::random {
     using default_rng = oneapi::dpl::minstd_rand;
     #else
     using default_rng = tinymt::tinymt32;
-
+    #endif
+#else
     template <typename dType = float>
     struct uniform_real_distribution
     {
@@ -47,32 +49,17 @@ namespace Sycl_Graph::random {
     template <typename dType = float>
     struct normal_distribution
     {
-        normal_distribution(): normal_distribution(0,0){}
-        normal_distribution(dType mean): dist(mean){}
-        normal_distribution(dType mean, dType stddev): dist(mean, stddev){}
-        template <typename RNG>
+        normal_distribution() = default;
+        normal_distribution(dType mean, dType stddev): mean(mean), stddev(stddev){}
+        dType mean = 0; dType stddev = 1;
+        template <typename RNG = tinymt::tinymt32>
         float operator()(RNG &rng) {
-            return dist(rng);
+            auto val = rng();
+            //convert val to random uniform float
+            dType uniform = (val / (dType)rng.max());
+            return std::sqrt(-2 * std::log(uniform)) * std::cos(2 * M_PIf * uniform) * stddev + mean;
         }
-
-        void mean(dType mean) {
-            dist.mean(mean);
-        }
-        void stddev(dType stddev) {
-            dist.stddev(stddev);
-        }
-        void seed(unsigned int seed) {
-            dist.seed(seed);
-        }
-        private:
-        oneapi::dpl::normal_distribution<dType> dist;
     };
-    #endif
-#else
-    using std::mt19937_64;
-    using std::uniform_real_distribution;
-    typedef mt19937_64 default_rng;
-#endif
     template <typename T = float>
     struct binomial_distribution {
         binomial_distribution(T n, T p) : n(n), dist(p) {}
@@ -99,7 +86,8 @@ namespace Sycl_Graph::random {
     struct poisson_distribution {
         poisson_distribution(T lambda) : lambda(lambda) {}
         T lambda;
-        T operator()(default_rng &rng) {
+        template <typename RNG = tinymt::tinymt32>
+        T operator()(RNG &rng) {
             T count = 0;
             T p = 1;
             T L = std::exp(-lambda);
@@ -110,5 +98,8 @@ namespace Sycl_Graph::random {
             return count - 1;
         }
     };
+    typedef tinymt::tinymt32 default_rng;
+#endif
+
 }
 #endif

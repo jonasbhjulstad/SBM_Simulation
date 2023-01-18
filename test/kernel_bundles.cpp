@@ -1,4 +1,4 @@
-#include <sycl/CL/sycl.hpp>
+#include <CL/sycl.hpp>
 #include <iostream>
 #include <chrono>
 int main()
@@ -25,8 +25,9 @@ int main()
     }
 
     auto t1 = high_resolution_clock::now();
+    //convert t1 -t0 to ms
 
-    std::cout << "time consumption: " << t1 - t0 << std::endl;
+    
 
     auto ctx = q.get_context();
 

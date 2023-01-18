@@ -4,7 +4,7 @@
 #include <vector>
 namespace Sycl_Graph
 {
-    template <typename D, std::unsigned_integral ID_t>
+    template <typename D, typename ID_t>
     struct Vertex
     {
         Vertex() = default;
@@ -14,7 +14,7 @@ namespace Sycl_Graph
         D data;
     };
 
-    template <typename D, std::unsigned_integral ID_t>
+    template <typename D, typename ID_t>
     struct Edge
     {
         Edge(const D& data, ID_t to, ID_t from)

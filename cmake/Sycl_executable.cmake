@@ -1,7 +1,7 @@
-if (SYCL_GRAPH_USE_INTEL_SYCL)
+if (SYCL_GRAPH_USE_ONEAPI)
 
 function(target_link_sycl name)
-target_compile_definitions(${name} PRIVATE SYCL_GRAPH_USE_INTEL_SYCL)
+target_compile_definitions(${name} PRIVATE SYCL_GRAPH_USE_ONEAPI)
 target_compile_definitions(${name} PRIVATE ${SPIR_FORMAT})
 target_compile_options(${name} PRIVATE "-fsycl")
 target_compile_definitions(${name} PRIVATE SYCL_GRAPH_USE_SYCL)

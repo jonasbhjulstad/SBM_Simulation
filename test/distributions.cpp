@@ -1,5 +1,5 @@
 #include "tinymt/tinymt.h"
-#include <sycl/CL/sycl.hpp>
+#include <CL/sycl.hpp>
 #include <Sycl_Graph/random.hpp>
 #include <iostream>
 #include <random>
