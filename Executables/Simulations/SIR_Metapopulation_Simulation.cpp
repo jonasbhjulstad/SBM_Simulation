@@ -1,4 +1,3 @@
-
 #include <Sycl_Graph/Graph/Graph.hpp>
 #include <Sycl_Graph/Graph/Graph_Generation.hpp>
 #include <Sycl_Graph/Math/math.hpp>

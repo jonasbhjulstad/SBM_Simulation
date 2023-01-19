@@ -1,0 +1,375 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						5,
+						10,
+						11
+					],
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "_deps/tinymt_repo-build",
+					"jsonFile" : "directory-_deps.tinymt_repo-build-Debug-b14bf915b4d80cf2d12d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "build/_deps/tinymt_repo-src"
+				},
+				{
+					"build" : "include",
+					"childIndexes" : 
+					[
+						3
+					],
+					"jsonFile" : "directory-include-Debug-7ead17b99bffc88b66bb.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include"
+				},
+				{
+					"build" : "include/Sycl_Graph",
+					"childIndexes" : 
+					[
+						4
+					],
+					"jsonFile" : "directory-include.Sycl_Graph-Debug-bf1a9679f617e2b02a14.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "include/Sycl_Graph",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "include/Sycl_Graph/Graph",
+					"jsonFile" : "directory-include.Sycl_Graph.Graph-Debug-21f060b6852d9b843551.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 0,
+					"source" : "include/Sycl_Graph/Graph",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "static",
+					"childIndexes" : 
+					[
+						6
+					],
+					"jsonFile" : "directory-static-Debug-6fd93e04ae97ed3bad43.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "static"
+				},
+				{
+					"build" : "static/Sycl_Graph",
+					"childIndexes" : 
+					[
+						7,
+						8,
+						9
+					],
+					"jsonFile" : "directory-static.Sycl_Graph-Debug-cd83923dbf7c730f731e.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 5,
+					"projectIndex" : 0,
+					"source" : "static/Sycl_Graph"
+				},
+				{
+					"build" : "static/Sycl_Graph/DataFrame",
+					"jsonFile" : "directory-static.Sycl_Graph.DataFrame-Debug-123a08f668294c6159e9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 0,
+					"source" : "static/Sycl_Graph/DataFrame",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "static/Sycl_Graph/Eigen",
+					"jsonFile" : "directory-static.Sycl_Graph.Eigen-Debug-bbf081593e99aac31372.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 0,
+					"source" : "static/Sycl_Graph/Eigen",
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"build" : "static/Sycl_Graph/Math",
+					"jsonFile" : "directory-static.Sycl_Graph.Math-Debug-6206f47f552201ebc040.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 0,
+					"source" : "static/Sycl_Graph/Math",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "test",
+					"jsonFile" : "directory-test-Debug-451c0598f41488bb20b9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "test",
+					"targetIndexes" : 
+					[
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					]
+				},
+				{
+					"build" : "Executables",
+					"childIndexes" : 
+					[
+						12,
+						13
+					],
+					"jsonFile" : "directory-Executables-Debug-3e47aa7495a3028be397.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "Executables"
+				},
+				{
+					"build" : "Executables/Simulations",
+					"jsonFile" : "directory-Executables.Simulations-Debug-39f57b25e04438d75ca5.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 11,
+					"projectIndex" : 0,
+					"source" : "Executables/Simulations",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "Executables/Dataset_Graph_Generation",
+					"jsonFile" : "directory-Executables.Dataset_Graph_Generation-Debug-66b47a27a621babdc988.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"parentIndex" : 11,
+					"projectIndex" : 0,
+					"source" : "Executables/Dataset_Graph_Generation"
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13
+					],
+					"name" : "Sycl_Graph",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "tinymt",
+					"parentIndex" : 0
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 3,
+					"id" : "Common::@bc60b023a9ff46170abb",
+					"jsonFile" : "target-Common-Debug-edf71a4ed98ea04765d4.json",
+					"name" : "Common",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 7,
+					"id" : "DataFrame::@e6268a3705f6c19c3b0f",
+					"jsonFile" : "target-DataFrame-Debug-261cf2607eebbe9579f6.json",
+					"name" : "DataFrame",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 9,
+					"id" : "Math::@1de3897dffd712de3f93",
+					"jsonFile" : "target-Math-Debug-c4d0f11d6fcdb5fc3281.json",
+					"name" : "Math",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 12,
+					"id" : "SIR_Metapopulation_Simulation::@442d6d67c71a9743636b",
+					"jsonFile" : "target-SIR_Metapopulation_Simulation-Debug-4406db2cb2d7312535fe.json",
+					"name" : "SIR_Metapopulation_Simulation",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "Sycl_Graph::@0ce120c8ff34024f8e40",
+					"jsonFile" : "target-Sycl_Graph-Debug-d82d6c61673a25b6dd68.json",
+					"name" : "Sycl_Graph",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 8,
+					"id" : "Sycl_Graph_Eigen::@45330b98ea1c5a45e6cb",
+					"jsonFile" : "target-Sycl_Graph_Eigen-Debug-e578a65dc1caf1022468.json",
+					"name" : "Sycl_Graph_Eigen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "graph_merge_simulation::@36f028580bb02cc8272a",
+					"jsonFile" : "target-graph_merge_simulation-Debug-7037b8bcf8cc65ad344f.json",
+					"name" : "graph_merge_simulation",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "itertools_vec_comb::@36f028580bb02cc8272a",
+					"jsonFile" : "target-itertools_vec_comb-Debug-d7befcbbceaf377956d5.json",
+					"name" : "itertools_vec_comb",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "sycl_copy_profiling::@36f028580bb02cc8272a",
+					"jsonFile" : "target-sycl_copy_profiling-Debug-84c9821c2e0531457262.json",
+					"name" : "sycl_copy_profiling",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "sycl_device_info::@36f028580bb02cc8272a",
+					"jsonFile" : "target-sycl_device_info-Debug-97a722f52b13ecca1f31.json",
+					"name" : "sycl_device_info",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "sycl_kernel_emit::@36f028580bb02cc8272a",
+					"jsonFile" : "target-sycl_kernel_emit-Debug-3bae8cf793ccbfa63114.json",
+					"name" : "sycl_kernel_emit",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "tinymt_kernel::@36f028580bb02cc8272a",
+					"jsonFile" : "target-tinymt_kernel-Debug-ce125a5a0ec9a623e6b3.json",
+					"name" : "tinymt_kernel",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/man/Documents/Sycl_Graph/build",
+		"source" : "/home/man/Documents/Sycl_Graph"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

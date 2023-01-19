@@ -35,13 +35,17 @@ int main()
   const std::vector<uint32_t> G1_ids = Sycl_Graph::range(NV, 2 * NV);
   auto G0 = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER, G0_ids);
   auto G1 = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER, G1_ids);
-  auto G = G0 + G1;
 
-  std::filesystem::create_directory(SYCL_GRAPH::SYCL_GRAPH_DATA_DIR + std::string("/Edgelists"));
+  std::cout << G0.N_vertices() << std::endl;
+  std::cout << G1.N_vertices() << std::endl;
+  std::cout << G.N_vertices() << std::endl;
+  std::cout << G.N_edges() << std::endl;
 
-  G.write_edgelist(SYCL_GRAPH::SYCL_GRAPH_DATA_DIR + std::string("/Edgelists/merge_graph.csv"));
-  random_connect(G, G0_ids, G1_ids, p_ER, rng);
+  std::filesystem::create_directory(Sycl_Graph::SYCL_GRAPH_DATA_DIR + std::string("/Edgelists"));
 
-  SIR_Metapopulation_Network<> sir0(G, N_pop, I0, R0, alpha, node_beta, edge_beta, seed);
+  auto G = Sycl_Graph::Dynamic::Network_Models::random_connect(G, G0_ids, G1_ids, p_ER, rng);
+
+  G.write_edgelist(Sycl_Graph::SYCL_GRAPH_DATA_DIR + std::string("/Edgelists/merge_graph.csv"));
+  
 
 }

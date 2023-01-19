@@ -5,10 +5,10 @@
 #ifndef SYCL_GRAPH_GRAPH_GENERATION_HPP
 #define SYCL_GRAPH_GRAPH_GENERATION_HPP
 
-#include "_Graph_Generation_Sycl_impl.hpp"
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Math/math.hpp>
 #include <Sycl_Graph/random.hpp>
+#include <Sycl_Graph/Graph/Graph.hpp>
 #include <itertools.hpp>
 #include <memory>
 #include <random>
@@ -56,10 +56,11 @@ void random_connect(Graph &G, const std::vector<uI_t> &from_IDs,
   std::vector<typename Graph::Edge_Prop_t> edges(N_edges_max);
 
   // itertools get all combinations of from_IDs and to_IDs
-  for (auto &&v_idx : iter::combinations(from_IDs, to_IDs)) {
+  
+  for (auto &&[from_id, to_id] : iter::product(from_IDs, to_IDs)) {
     if (d_ER(rng) < p_ER) {
-      from.push_back(v_idx[0]);
-      to.push_back(v_idx[1]);
+      from.push_back(from_id);
+      to.push_back(to_id);
 
       N_edges++;
       if (N_edges == N_edges_max) {
@@ -84,6 +85,8 @@ Graph generate_erdos_renyi(sycl::queue &q, uint32_t NV, dType p_ER,
   random_connect(G, p_ER, rng);
   return G;
 }
+
+
 
 } // namespace Sycl_Graph::Dynamic::Network_Models
 #endif // FROLS_GRAPH_GENERATION_HPP

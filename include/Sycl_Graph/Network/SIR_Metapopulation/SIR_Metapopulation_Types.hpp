@@ -2,6 +2,8 @@
 #define SYCL_GRAPH_SIR_METAPOPULATION_TYPES_HPP
 #include <stdint.h>
 #include <array>
+#include <ostream>
+#include <limits>
 namespace Sycl_Graph::Network_Models {
 struct SIR_Metapopulation_State
 {
@@ -33,11 +35,21 @@ struct SIR_Metapopulation_State
   float S = 0.f;
   float I = 0.f;
   float R = 0.f;
+  friend std::ostream& operator<<(std::ostream& os, const SIR_Metapopulation_State& state)
+  {
+    os << state.S << " " << state.I << " " << state.R;
+    return os;
+  }
 };
 struct SIR_Metapopulation_Param
 {
   float beta = 0;
   float alpha = 0;
+  friend std::ostream& operator<<(std::ostream& os, const SIR_Metapopulation_Param& param)
+  {
+    os << param.beta << " " << param.alpha;
+    return os;
+  }
 };
 
 struct SIR_Metapopulation_Node_Param
@@ -48,6 +60,11 @@ struct SIR_Metapopulation_Node_Param
     float std_R0 = 0.01;
     float alpha = 0.05;
     float beta = 0.01;
+    friend std::ostream& operator<<(std::ostream& os, const SIR_Metapopulation_Node_Param& param)
+    {
+      os << param.E_I0 << " " << param.std_I0 << " " << param.E_R0 << " " << param.std_R0 << " " << param.alpha << " " << param.beta;
+      return os;
+    }
 };
 
 
@@ -56,6 +73,11 @@ struct SIR_Metapopulation_Temporal_Param
 {
   uint32_t Nt_min = std::numeric_limits<uint32_t>::max();
   uint32_t N_I_min = 0;
+  friend std::ostream& operator<<(std::ostream& os, const SIR_Metapopulation_Temporal_Param& param)
+  {
+    os << param.Nt_min << " " << param.N_I_min;
+    return os;
+  }
 };
 
 
