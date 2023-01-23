@@ -38,14 +38,14 @@ int main()
 
   std::cout << G0.N_vertices() << std::endl;
   std::cout << G1.N_vertices() << std::endl;
-  std::cout << G.N_vertices() << std::endl;
-  std::cout << G.N_edges() << std::endl;
+  // std::cout << G.N_vertices() << std::endl;
+  // std::cout << G.N_edges() << std::endl;
 
-  std::filesystem::create_directory(Sycl_Graph::SYCL_GRAPH_DATA_DIR + std::string("/Edgelists"));
+  // std::filesystem::create_directory(Sycl_Graph::SYCL_GRAPH_DATA_DIR + std::string("/Edgelists"));
 
-  auto G = Sycl_Graph::Dynamic::Network_Models::random_connect(G, G0_ids, G1_ids, p_ER, rng);
+  // auto G = Sycl_Graph::Dynamic::Network_Models::random_connect(G, G0_ids, G1_ids, p_ER, rng);
 
-  G.write_edgelist(Sycl_Graph::SYCL_GRAPH_DATA_DIR + std::string("/Edgelists/merge_graph.csv"));
+  // G.write_edgelist(Sycl_Graph::SYCL_GRAPH_DATA_DIR + std::string("/Edgelists/merge_graph.csv"));
   
 
 }

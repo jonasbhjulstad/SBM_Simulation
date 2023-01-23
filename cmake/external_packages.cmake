@@ -1,6 +1,6 @@
 include(FetchContent)
 
-find_package(cppitertools CONFIG QUIET)
+find_package(cppitertools CONFIG REQUIRED)
 
 
 FetchContent_Declare(
@@ -11,6 +11,8 @@ FetchContent_Declare(
     BUILD_COMMAND ""
 )
 FetchContent_MakeAvailable(tinymt_repo)
-
 include(FindThreads)
 find_package(Tracy CONFIG REQUIRED)
+
+#boost graph library
+find_package(Boost REQUIRED COMPONENTS graph)

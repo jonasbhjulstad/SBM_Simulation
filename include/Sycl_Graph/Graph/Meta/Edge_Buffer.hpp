@@ -1,7 +1,7 @@
 #ifndef SYCL_GRAPH_META_EDGE_BUFFER_HPP
 #define SYCL_GRAPH_META_EDGE_BUFFER_HPP
 #include <Sycl_Graph/Graph/Graph_Types.hpp>
-#include <Sycl_Graph/Graph/Edge_Buffer.hpp>
+#include <Sycl_Graph/Graph/Meta/Edge_Buffer.hpp>
 #include <vector>
 namespace Sycl_Graph::Meta
 {

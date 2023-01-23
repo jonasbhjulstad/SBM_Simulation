@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "static/Sycl_Graph/Math",
+		"source" : "static/Sycl_Graph/Math"
+	}
+}

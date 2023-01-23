@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/CMakeFiles/tinymt_repo-populate"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/CMakeFiles/tinymt_repo-populate.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/CMakeFiles/tinymt_repo-populate-complete.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/tinymt_repo-populate-prefix/src/tinymt_repo-populate-stamp/tinymt_repo-populate-build.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/tinymt_repo-populate-prefix/src/tinymt_repo-populate-stamp/tinymt_repo-populate-configure.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/tinymt_repo-populate-prefix/src/tinymt_repo-populate-stamp/tinymt_repo-populate-download.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/tinymt_repo-populate-prefix/src/tinymt_repo-populate-stamp/tinymt_repo-populate-install.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/tinymt_repo-populate-prefix/src/tinymt_repo-populate-stamp/tinymt_repo-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/tinymt_repo-populate-prefix/src/tinymt_repo-populate-stamp/tinymt_repo-populate-patch.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/tinymt_repo-populate-prefix/src/tinymt_repo-populate-stamp/tinymt_repo-populate-test.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-subbuild/tinymt_repo-populate-prefix/src/tinymt_repo-populate-stamp/tinymt_repo-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"tinymt_repo-populate"
+		],
+		"name" : "tinymt_repo-populate"
+	}
+}

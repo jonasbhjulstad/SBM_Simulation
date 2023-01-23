@@ -4,7 +4,7 @@
 #include <Sycl_Graph/Tracy_Config.hpp>
 #define SYCL_FLOAT_PRECISION 32
 #include "SIR_Metapopulation_Types.hpp"
-#include <Sycl_Graph/Graph/Graph.hpp>
+#include <Sycl_Graph/Graph/Sycl/Graph.hpp>
 #include <Sycl_Graph/Network/Network.hpp>
 #include <Sycl_Graph/random.hpp>
 #ifdef SYCL_GRAPH_USE_ONEAPI

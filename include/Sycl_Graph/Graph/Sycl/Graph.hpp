@@ -2,8 +2,8 @@
 // Created by arch on 9/29/22.
 //
 
-#ifndef SYCL_GRAPH_GRAPH_HPP
-#define SYCL_GRAPH_GRAPH_HPP
+#ifndef SYCL_GRAPH_SYCL_GRAPH_HPP
+#define SYCL_GRAPH_SYCL_GRAPH_HPP
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -19,8 +19,9 @@
 #include <utility>
 // #include <Sycl_Graph/execution.hpp>
 #include <CL/sycl.hpp>
-#include <Sycl_Graph/Graph/Edge_Buffer.hpp>
-#include <Sycl_Graph/Graph/Vertex_Buffer.hpp>
+#include <Sycl_Graph/Graph/Sycl/Edge_Buffer.hpp>
+#include <Sycl_Graph/Graph/Sycl/Vertex_Buffer.hpp>
+#include <Sycl_Graph/Graph/Meta/Graph.hpp>
 #include <type_traits>
 namespace Sycl_Graph::Sycl {
 
@@ -81,100 +82,6 @@ uI_t N_vertices() const {
                                            });
   }
 
-  Graph_t &operator=(Graph_t &other) {
-    vertex_buf = other.vertex_buf;
-    edge_buf = other.edge_buf;
-    return *this;
-  }
-  template <sycl::access::mode mode> auto get_vertex_access(sycl::handler &h) {
-    return vertex_buf.template get_access<mode>(h);
-  }
-
-  template <sycl::access::mode mode> auto get_edge_access(sycl::handler &h) {
-    return edge_buf.template get_access<mode>(h);
-  }
-
-  template <typename... Args> void add_vertex(Args &&...args) {
-    vertex_buf.add(std::forward<Args>(args)...);
-  }
-
-  template <typename... Args> void add_edge(Args &&...args) {
-    edge_buf.add(std::forward<Args>(args)...);
-  }
-
-  template <typename... Args> void remove_vertex(Args &&...args) {
-    vertex_buf.remove(std::forward<Args>(args)...);
-  }
-
-  template <typename... Args> void remove_edge(Args &&...args) {
-    edge_buf.remove(std::forward<Args>(args)...);
-  }
-
-  template <typename... Args> void assign_vertex(Args &&...args) {
-    vertex_buf.assign(std::forward<Args>(args)...);
-  }
-
-  template <typename... Args> void assign_edge(Args &&...args) {
-    edge_buf.assign(std::forward<Args>(args)...);
-  }
-
-  template <typename... Args> V get_vertex(Args &&...args) {
-    return vertex_buf.get_data(std::forward<Args>(args)...);
-  }
-
-  template <typename... Args> E get_edge(Args &&...args) {
-    return edge_buf.get_data(std::forward<Args>(args)...);
-  }
-
-  template <typename... Args> std::vector<V> get_vertex_data(Args &&...args) {
-    return vertex_buf.get_data(std::forward<Args>(args)...);
-  }
-
-  template <typename... Args> std::vector<E> get_edge_data(Args &&...args) {
-    return edge_buf.get_data(std::forward<Args>(args)...);
-  }
-
-  // file I/O
-  void write_edgelist(std::string filename, std::string delimiter = ",",
-                      bool edges_only = true) {
-    auto edges = edge_buf.get_edges();
-    std::ofstream file(filename);
-    file << "Graph_ID" << delimiter <<  "to" << delimiter << "from";
-    if (!edges_only) {
-      file << delimiter << "data";
-    }
-    file << "\n";
-
-    write_edgelist(file, delimiter, edges_only);
-    file.close();
-  }
-
-  void write_edgelist(std::ofstream& file, std::string delimiter = ",",
-                      bool edges_only = true) {
-    auto edges = edge_buf.get_edges();
-    for (auto e : edges) {
-      file << Graph_ID << delimiter << e.to << delimiter << e.from;
-      if (!edges_only) {
-        file << delimiter << e.data;
-      }
-      file << "\n";
-    }
-  }
-
-  void write_vertexlist(std::string filename, std::string delimiter = ",") {
-    auto vertices = vertex_buf.get_vertices();
-    std::ofstream file(filename);
-    file << "Graph_ID" << delimiter << "id" << delimiter << "data" << "\n";
-    write_vertexlist(file, delimiter);
-    file.close();
-  }
-
-  void write_vertexlist(std::ofstream& file, std::string delimiter = ",") {
-    auto vertices = vertex_buf.get_vertices();
-    for (auto v : vertices) {
-      file << Graph_ID << delimiter << v.id << delimiter << v.data << "\n";
-    }
-  }
 };
 } // namespace Sycl_Graph::Sycl
 
