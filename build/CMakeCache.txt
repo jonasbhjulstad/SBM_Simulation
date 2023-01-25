@@ -304,7 +304,7 @@ SYCL_GRAPH_USE_ONEAPI:BOOL=OFF
 Sycl_Graph_BINARY_DIR:STATIC=/home/man/Documents/Sycl_Graph/build
 
 //Dependencies for the target
-Sycl_Graph_Eigen_LIB_DEPENDS:STATIC=general;DataFrame;
+Sycl_Graph_Eigen_LIB_DEPENDS:STATIC=general;Eigen3::Eigen;general;DataFrame;
 
 //Value Computed by CMake
 Sycl_Graph_IS_TOP_LEVEL:STATIC=ON
@@ -371,9 +371,6 @@ cppitertools_DIR:PATH=/home/man/Documents/Sycl_Graph/vcpkg/installed/x64-linux/s
 //The directory containing a CMake configuration file for pybind11.
 pybind11_DIR:PATH=/usr/lib/cmake/pybind11
 
-//The directory containing a CMake configuration file for stan.
-stan_DIR:PATH=stan_DIR-NOTFOUND
-
 //Value Computed by CMake
 tinymt_BINARY_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-build
 
@@ -409,7 +406,7 @@ CMAKE_CACHE_MAJOR_VERSION:INTERNAL=3
 //Minor version of cmake used to create the current loaded cache
 CMAKE_CACHE_MINOR_VERSION:INTERNAL=25
 //Patch version of cmake used to create the current loaded cache
-CMAKE_CACHE_PATCH_VERSION:INTERNAL=1
+CMAKE_CACHE_PATCH_VERSION:INTERNAL=2
 //Path to CMake executable.
 CMAKE_COMMAND:INTERNAL=/usr/bin/cmake
 //Path to cpack program executable.
@@ -548,7 +545,7 @@ FIND_PACKAGE_MESSAGE_DETAILS_PYTHON:INTERNAL=/home/man/.pyenv/versions/3.9.13/bi
 //Details about finding PkgConfig
 FIND_PACKAGE_MESSAGE_DETAILS_PkgConfig:INTERNAL=[/usr/bin/pkg-config][v1.8.0()]
 //Details about finding Python3
-FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.8(3.9)]
+FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.9(3.9)]
 //Details about finding PythonInterp
 FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/home/man/.pyenv/versions/3.9.13/bin/python3][v3.9.13(3.9)]
 //Details about finding Threads
