@@ -1,4 +1,4 @@
-#include <Sycl_Graph/Graph/Graph.hpp>
+#include <Sycl_Graph/Graph/Sycl/Graph.hpp>
 #include <Sycl_Graph/Network/SIR_Bernoulli/SIR_Bernoulli.hpp>
 #include <Sycl_Graph/Graph/Graph_Generation.hpp>
 #include <Sycl_Graph/random.hpp>
@@ -7,7 +7,7 @@ int main()
 {
 
     using namespace Sycl_Graph::Dynamic::Network_Models;
-    using namespace Sycl_Graph::Network_Models;
+    using namespace Sycl_Graph::Sycl::Network_Models;
     size_t N_pop = 100;
     float p_ER = 0.1;
 

@@ -1,0 +1,16 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/eigen-src/unsupported/test/openglsupport.cpp"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"BuildUnsupported"
+		],
+		"name" : "openglsupport"
+	}
+}

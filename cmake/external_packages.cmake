@@ -1,18 +1,33 @@
-include(FetchContent)
+include(cmake/CPM.cmake)
 
-find_package(cppitertools CONFIG REQUIRED)
-
-
-FetchContent_Declare(
-    tinymt_repo
-    GIT_REPOSITORY https://github.com/tueda/tinymt-cpp.git
+CPMFindPackage(
+    NAME Static_RNG
+    GITHUB_REPOSITORY jonasbhjulstad/Static_RNG
     GIT_TAG master
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
+    OPTIONS
+    "CMAKE_ARGS -DENABLE_SYCL=ON"
 )
-FetchContent_MakeAvailable(tinymt_repo)
+set(cppitertools_INSTALL_CMAKE_DIR share)
+CPMFindPackage(
+    NAME cppitertools
+    GITHUB_REPOSITORY ryanhaining/cppitertools
+    GIT_TAG master
+)
 include(FindThreads)
-find_package(Tracy CONFIG REQUIRED)
+CPMFindPackage(
+    NAME Tracy
+    GITHUB_REPOSITORY wolfpId/tracy
+    GIT_TAG master
+)
+
+CPMFindPackage(
+    NAME Eigen3
+    GITHUB_REPOSITORY libigl/eigen
+    GIT_TAG master
+    OPTIONS
+    "QUIET ON"
+)
+
 
 #boost graph library
 find_package(Boost REQUIRED COMPONENTS graph)

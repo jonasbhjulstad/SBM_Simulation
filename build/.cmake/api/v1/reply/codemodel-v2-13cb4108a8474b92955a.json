@@ -1,0 +1,697 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						4,
+						5,
+						8,
+						13,
+						14
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "_deps/static_rng-build",
+					"childIndexes" : 
+					[
+						2,
+						3
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-_deps.static_rng-build-Debug-1cd0174b7c1893c5c9a3.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "build/_deps/static_rng-src",
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						21,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						33
+					]
+				},
+				{
+					"build" : "_deps/tinymt_repo-build",
+					"jsonFile" : "directory-_deps.tinymt_repo-build-Debug-b14bf915b4d80cf2d12d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 2,
+					"source" : "build/_deps/tinymt_repo-src"
+				},
+				{
+					"build" : "_deps/static_rng-build/test",
+					"jsonFile" : "directory-_deps.static_rng-build.test-Debug-2da2b7b7c5cd31326002.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "build/_deps/static_rng-src/test",
+					"targetIndexes" : 
+					[
+						39
+					]
+				},
+				{
+					"build" : "_deps/cppitertools-build",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-_deps.cppitertools-build-Debug-663ba33d89cdae1080f1.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 3,
+					"source" : "build/_deps/cppitertools-src"
+				},
+				{
+					"build" : "include",
+					"childIndexes" : 
+					[
+						6
+					],
+					"jsonFile" : "directory-include-Debug-7ead17b99bffc88b66bb.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "include"
+				},
+				{
+					"build" : "include/Sycl_Graph",
+					"childIndexes" : 
+					[
+						7
+					],
+					"jsonFile" : "directory-include.Sycl_Graph-Debug-bf1a9679f617e2b02a14.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 5,
+					"projectIndex" : 0,
+					"source" : "include/Sycl_Graph",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "include/Sycl_Graph/Graph",
+					"jsonFile" : "directory-include.Sycl_Graph.Graph-Debug-21f060b6852d9b843551.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 6,
+					"projectIndex" : 0,
+					"source" : "include/Sycl_Graph/Graph"
+				},
+				{
+					"build" : "static",
+					"childIndexes" : 
+					[
+						9
+					],
+					"jsonFile" : "directory-static-Debug-6fd93e04ae97ed3bad43.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "static"
+				},
+				{
+					"build" : "static/Sycl_Graph",
+					"childIndexes" : 
+					[
+						10,
+						11,
+						12
+					],
+					"jsonFile" : "directory-static.Sycl_Graph-Debug-cd83923dbf7c730f731e.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 8,
+					"projectIndex" : 0,
+					"source" : "static/Sycl_Graph"
+				},
+				{
+					"build" : "static/Sycl_Graph/DataFrame",
+					"jsonFile" : "directory-static.Sycl_Graph.DataFrame-Debug-123a08f668294c6159e9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 9,
+					"projectIndex" : 0,
+					"source" : "static/Sycl_Graph/DataFrame",
+					"targetIndexes" : 
+					[
+						10
+					]
+				},
+				{
+					"build" : "static/Sycl_Graph/Eigen",
+					"jsonFile" : "directory-static.Sycl_Graph.Eigen-Debug-bbf081593e99aac31372.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 9,
+					"projectIndex" : 0,
+					"source" : "static/Sycl_Graph/Eigen",
+					"targetIndexes" : 
+					[
+						32
+					]
+				},
+				{
+					"build" : "static/Sycl_Graph/Math",
+					"jsonFile" : "directory-static.Sycl_Graph.Math-Debug-6206f47f552201ebc040.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 9,
+					"projectIndex" : 0,
+					"source" : "static/Sycl_Graph/Math",
+					"targetIndexes" : 
+					[
+						20
+					]
+				},
+				{
+					"build" : "test",
+					"jsonFile" : "directory-test-Debug-451c0598f41488bb20b9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "test",
+					"targetIndexes" : 
+					[
+						34,
+						35,
+						36,
+						37,
+						38
+					]
+				},
+				{
+					"build" : "Executables",
+					"childIndexes" : 
+					[
+						15,
+						16
+					],
+					"jsonFile" : "directory-Executables-Debug-3e47aa7495a3028be397.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "Executables"
+				},
+				{
+					"build" : "Executables/Simulations",
+					"jsonFile" : "directory-Executables.Simulations-Debug-39f57b25e04438d75ca5.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 14,
+					"projectIndex" : 0,
+					"source" : "Executables/Simulations",
+					"targetIndexes" : 
+					[
+						31
+					]
+				},
+				{
+					"build" : "Executables/Dataset_Graph_Generation",
+					"jsonFile" : "directory-Executables.Dataset_Graph_Generation-Debug-66b47a27a621babdc988.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 14,
+					"projectIndex" : 0,
+					"source" : "Executables/Dataset_Graph_Generation"
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						3
+					],
+					"directoryIndexes" : 
+					[
+						0,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16
+					],
+					"name" : "Sycl_Graph",
+					"targetIndexes" : 
+					[
+						0,
+						10,
+						20,
+						31,
+						32,
+						34,
+						35,
+						36,
+						37,
+						38
+					]
+				},
+				{
+					"childIndexes" : 
+					[
+						2
+					],
+					"directoryIndexes" : 
+					[
+						1,
+						3
+					],
+					"name" : "Static_RNG",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						21,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						33,
+						39
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						2
+					],
+					"name" : "tinymt",
+					"parentIndex" : 1
+				},
+				{
+					"directoryIndexes" : 
+					[
+						4
+					],
+					"name" : "cppitertools",
+					"parentIndex" : 0
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 6,
+					"id" : "Common::@bc60b023a9ff46170abb",
+					"jsonFile" : "target-Common-Debug-0c57c5de10a5f9fe3553.json",
+					"name" : "Common",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "Continuous::@6a258888480d9430e8cf",
+					"jsonFile" : "target-Continuous-Debug-312f174d806134bb16c2.json",
+					"name" : "Continuous",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ContinuousBuild::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ContinuousBuild-Debug-43f60abb5a7461c97a57.json",
+					"name" : "ContinuousBuild",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ContinuousConfigure::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ContinuousConfigure-Debug-ceab1c5d257096a1f8a5.json",
+					"name" : "ContinuousConfigure",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ContinuousCoverage::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ContinuousCoverage-Debug-e8d614f3a76392ef42f0.json",
+					"name" : "ContinuousCoverage",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ContinuousMemCheck::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ContinuousMemCheck-Debug-0a03e1421e6a10e9f23e.json",
+					"name" : "ContinuousMemCheck",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ContinuousStart::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ContinuousStart-Debug-41cd1e8e4aafa2bc5fee.json",
+					"name" : "ContinuousStart",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ContinuousSubmit::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ContinuousSubmit-Debug-114b958ab8eacf204022.json",
+					"name" : "ContinuousSubmit",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ContinuousTest::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ContinuousTest-Debug-767a5f6ebe2bb2bcf66d.json",
+					"name" : "ContinuousTest",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ContinuousUpdate::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ContinuousUpdate-Debug-f2e45fb0086c645aedba.json",
+					"name" : "ContinuousUpdate",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "DataFrame::@e6268a3705f6c19c3b0f",
+					"jsonFile" : "target-DataFrame-Debug-021ed35d6b804d79552b.json",
+					"name" : "DataFrame",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "Experimental::@6a258888480d9430e8cf",
+					"jsonFile" : "target-Experimental-Debug-a6a0f966261c069d53d6.json",
+					"name" : "Experimental",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ExperimentalBuild::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ExperimentalBuild-Debug-cb6b2f73235f9cf9808b.json",
+					"name" : "ExperimentalBuild",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ExperimentalConfigure::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ExperimentalConfigure-Debug-f01223a250cc7e7a2575.json",
+					"name" : "ExperimentalConfigure",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ExperimentalCoverage::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ExperimentalCoverage-Debug-0ef2f00b1edadde3816f.json",
+					"name" : "ExperimentalCoverage",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ExperimentalMemCheck::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ExperimentalMemCheck-Debug-95f514baef7e1855580d.json",
+					"name" : "ExperimentalMemCheck",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ExperimentalStart::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ExperimentalStart-Debug-1c92ab32b0209fb51b05.json",
+					"name" : "ExperimentalStart",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ExperimentalSubmit::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ExperimentalSubmit-Debug-c2e2c6a8e62be92b941c.json",
+					"name" : "ExperimentalSubmit",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ExperimentalTest::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ExperimentalTest-Debug-f01690d1094b150f301d.json",
+					"name" : "ExperimentalTest",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ExperimentalUpdate::@6a258888480d9430e8cf",
+					"jsonFile" : "target-ExperimentalUpdate-Debug-84face171b39c014433e.json",
+					"name" : "ExperimentalUpdate",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 12,
+					"id" : "Math::@1de3897dffd712de3f93",
+					"jsonFile" : "target-Math-Debug-b930b3a5b0e02b66ee4e.json",
+					"name" : "Math",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "Nightly::@6a258888480d9430e8cf",
+					"jsonFile" : "target-Nightly-Debug-1dd8012e785a4f8cd90b.json",
+					"name" : "Nightly",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "NightlyBuild::@6a258888480d9430e8cf",
+					"jsonFile" : "target-NightlyBuild-Debug-14d15ece6bf02c906d0b.json",
+					"name" : "NightlyBuild",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "NightlyConfigure::@6a258888480d9430e8cf",
+					"jsonFile" : "target-NightlyConfigure-Debug-e56e603b89336381cd56.json",
+					"name" : "NightlyConfigure",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "NightlyCoverage::@6a258888480d9430e8cf",
+					"jsonFile" : "target-NightlyCoverage-Debug-ec8a0a89d7610ab0545f.json",
+					"name" : "NightlyCoverage",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "NightlyMemCheck::@6a258888480d9430e8cf",
+					"jsonFile" : "target-NightlyMemCheck-Debug-cd12bbbab5cdff9f9d84.json",
+					"name" : "NightlyMemCheck",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "NightlyMemoryCheck::@6a258888480d9430e8cf",
+					"jsonFile" : "target-NightlyMemoryCheck-Debug-9f9f33d9efec9255659e.json",
+					"name" : "NightlyMemoryCheck",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "NightlyStart::@6a258888480d9430e8cf",
+					"jsonFile" : "target-NightlyStart-Debug-dd1a634251f2f92b45f6.json",
+					"name" : "NightlyStart",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "NightlySubmit::@6a258888480d9430e8cf",
+					"jsonFile" : "target-NightlySubmit-Debug-6da0b58c27eb3baa7e2b.json",
+					"name" : "NightlySubmit",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "NightlyTest::@6a258888480d9430e8cf",
+					"jsonFile" : "target-NightlyTest-Debug-03fbc047e162a54ddfcf.json",
+					"name" : "NightlyTest",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "NightlyUpdate::@6a258888480d9430e8cf",
+					"jsonFile" : "target-NightlyUpdate-Debug-37ab29516b986aa83d68.json",
+					"name" : "NightlyUpdate",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 15,
+					"id" : "SIR_Simulation::@442d6d67c71a9743636b",
+					"jsonFile" : "target-SIR_Simulation-Debug-068ae48ab0be6977765d.json",
+					"name" : "SIR_Simulation",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "Sycl_Graph_Eigen::@45330b98ea1c5a45e6cb",
+					"jsonFile" : "target-Sycl_Graph_Eigen-Debug-cf0f234f34311191363b.json",
+					"name" : "Sycl_Graph_Eigen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "docs::@6a258888480d9430e8cf",
+					"jsonFile" : "target-docs-Debug-dca6a9d3b96603462052.json",
+					"name" : "docs",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 13,
+					"id" : "itertools_vec_comb::@36f028580bb02cc8272a",
+					"jsonFile" : "target-itertools_vec_comb-Debug-a054995279aab6f9510b.json",
+					"name" : "itertools_vec_comb",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 13,
+					"id" : "sycl_copy_profiling::@36f028580bb02cc8272a",
+					"jsonFile" : "target-sycl_copy_profiling-Debug-38fc09270f2c0930f050.json",
+					"name" : "sycl_copy_profiling",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 13,
+					"id" : "sycl_device_info::@36f028580bb02cc8272a",
+					"jsonFile" : "target-sycl_device_info-Debug-08829bbeb5fc2d86c168.json",
+					"name" : "sycl_device_info",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 13,
+					"id" : "sycl_kernel_emit::@36f028580bb02cc8272a",
+					"jsonFile" : "target-sycl_kernel_emit-Debug-39f6d44af0b3612b6675.json",
+					"name" : "sycl_kernel_emit",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 13,
+					"id" : "tinymt_kernel::@36f028580bb02cc8272a",
+					"jsonFile" : "target-tinymt_kernel-Debug-433c2fe66e289514488c.json",
+					"name" : "tinymt_kernel",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "uniform::@44ef9fbcac32993eab95",
+					"jsonFile" : "target-uniform-Debug-97a50cfea3fbd7dd618f.json",
+					"name" : "uniform",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/man/Documents/Sycl_Graph/build",
+		"source" : "/home/man/Documents/Sycl_Graph"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

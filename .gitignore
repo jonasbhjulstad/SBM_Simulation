@@ -1,4 +1,6 @@
-Cpp/.vscode/c_cpp_properties.json
-Cpp/.vscode/launch.json
-Cpp/.vscode/settings.json
-Cpp/.vscode/tasks.json
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/settings.json
+.vscode/tasks.json
+vcpkg/
+data/

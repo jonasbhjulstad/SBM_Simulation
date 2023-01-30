@@ -1,0 +1,1 @@
+/usr/bin/f95 -g CMakeFiles/dblat1.dir/dblat1.f.o -o dblat1  -Wl,-rpath,/home/man/Documents/Sycl_Graph/build/_deps/eigen-build/blas ../libeigen_blas.so 

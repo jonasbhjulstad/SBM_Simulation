@@ -8,7 +8,7 @@ int main()
     //test tinymt32 in kernel
 
     //create queue on gpu
-    sycl::queue q(sycl::gpu_selector{});
+    sycl::queue q(sycl::gpu_selector_v);
 
     sycl::buffer<float, 1> buf(sycl::range<1>(2));
 

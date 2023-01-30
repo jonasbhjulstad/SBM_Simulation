@@ -1,1 +1,2 @@
-add_custom_executable(SIR_Metapopulation_Simulation)
+# add_custom_executable(SIR_Metapopulation_Simulation)
+add_custom_executable(SIR_Simulation)

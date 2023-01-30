@@ -1,4 +1,27 @@
 {
     "C_Cpp.default.configurationProvider": "go2sh.cmake-integration",
-    "cmake.sourceDirectory": "${workspaceFolder}/Cpp"
+    "cmake.sourceDirectory": "${workspaceFolder}/.",
+    "files.associations": {
+        "array": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "vector": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "span": "cpp",
+        "regex": "cpp",
+        "valarray": "cpp",
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "*.inc": "cpp",
+        "limits": "cpp"
+    }
 }

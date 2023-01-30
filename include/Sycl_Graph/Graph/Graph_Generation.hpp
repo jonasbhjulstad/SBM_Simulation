@@ -8,7 +8,7 @@
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Math/math.hpp>
 #include <Sycl_Graph/random.hpp>
-#include <Sycl_Graph/Graph/Graph.hpp>
+#include <Sycl_Graph/Graph/Graph_Base.hpp>
 #include <itertools.hpp>
 #include <memory>
 #include <random>

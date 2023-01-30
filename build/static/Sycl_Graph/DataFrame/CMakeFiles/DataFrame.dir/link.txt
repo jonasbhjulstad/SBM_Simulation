@@ -1,0 +1,2 @@
+/usr/bin/ar qc libDataFrame.a CMakeFiles/DataFrame.dir/DataFrame.cpp.o
+/usr/bin/ranlib libDataFrame.a

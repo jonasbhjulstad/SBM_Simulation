@@ -34,6 +34,11 @@ namespace Sycl_Graph
         {
             return static_cast<const Derived*>(this)->size();
         }
+
+        void add(const V* data)
+        {
+            static_cast<Derived*>(this)->add(data);
+        }
         void add(const V* data)
         {
             static_cast<Derived*>(this)->add(data);

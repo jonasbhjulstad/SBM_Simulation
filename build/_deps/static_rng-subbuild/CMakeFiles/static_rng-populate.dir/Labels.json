@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-subbuild/CMakeFiles/static_rng-populate"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-subbuild/CMakeFiles/static_rng-populate.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-subbuild/CMakeFiles/static_rng-populate-complete.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-subbuild/static_rng-populate-prefix/src/static_rng-populate-stamp/static_rng-populate-build.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-subbuild/static_rng-populate-prefix/src/static_rng-populate-stamp/static_rng-populate-configure.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-subbuild/static_rng-populate-prefix/src/static_rng-populate-stamp/static_rng-populate-download.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-subbuild/static_rng-populate-prefix/src/static_rng-populate-stamp/static_rng-populate-install.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-subbuild/static_rng-populate-prefix/src/static_rng-populate-stamp/static_rng-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-subbuild/static_rng-populate-prefix/src/static_rng-populate-stamp/static_rng-populate-patch.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-subbuild/static_rng-populate-prefix/src/static_rng-populate-stamp/static_rng-populate-test.rule"
+		},
+		{
+			"file" : "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-subbuild/static_rng-populate-prefix/src/static_rng-populate-stamp/static_rng-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"static_rng-populate"
+		],
+		"name" : "static_rng-populate"
+	}
+}

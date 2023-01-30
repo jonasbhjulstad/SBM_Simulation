@@ -1,0 +1,1 @@
+/usr/bin/f95 -g CMakeFiles/zblat2.dir/zblat2.f.o -o zblat2  -Wl,-rpath,/home/man/Documents/Sycl_Graph/build/_deps/eigen-build/blas ../libeigen_blas.so 

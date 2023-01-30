@@ -1,0 +1,83 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"build/_deps/cppitertools-src/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 48,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 52,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 57,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "include/cppitertools",
+			"paths" : 
+			[
+				"build/_deps/cppitertools-src/."
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "share/cppitertools",
+			"exportName" : "cppitertools-targets",
+			"exportTargets" : 
+			[
+				{
+					"id" : "cppitertools::@847e53b9b78617e72066",
+					"index" : 0
+				}
+			],
+			"paths" : 
+			[
+				"_deps/cppitertools-build/CMakeFiles/Export/25ccff89503ed034064e7f358207d824/cppitertools-config.cmake"
+			],
+			"type" : "export"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "share/cppitertools",
+			"paths" : 
+			[
+				"build/_deps/cppitertools-build/cppitertools-config-version.cmake"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "_deps/cppitertools-build",
+		"source" : "build/_deps/cppitertools-src"
+	}
+}

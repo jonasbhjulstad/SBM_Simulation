@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Network/Network.hpp>
+#include <Sycl_Graph/Graph/Sycl/Graph.hpp>
 #include <Sycl_Graph/random.hpp>
 #ifdef SYCL_GRAPH_USE_ONEAPI
 #include <oneapi/dpl/algorithm>
@@ -38,10 +39,9 @@ namespace Sycl_Graph
             const float p_I0;
             const float p_R0;
             const uint32_t t = 0;
-            const uint32_t N_neighbors_max;
             sycl::buffer<int, 1> seed_buf;
-            SIR_Bernoulli_Network(Graph_t &G, float p_I0, float p_R0, uint32_t N_neighbors_max = 1, int seed = 777)
-                : q(G.q), G(G), p_I0(p_I0), p_R0(p_R0), N_neighbors_max(N_neighbors_max), seed_buf(sycl::range<1>(G.NV))
+            SIR_Bernoulli_Network(Graph_t &G, float p_I0, float p_R0, int seed = 777)
+                : q(G.q), G(G), p_I0(p_I0), p_R0(p_R0), seed_buf(sycl::range<1>(G.NV))
             {
                 assert(G.NV > 0);
                 // generate G.NV random numbers
