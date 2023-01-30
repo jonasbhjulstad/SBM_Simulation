@@ -4,13 +4,7 @@
 #include <Sycl_Graph/Graph/Graph_Types.hpp>
 #include <Sycl_Graph/Graph/Meta/Graph.hpp>
 #include <array>
-#include <boost/graph/graph_selectors.hpp>
-#include <boost/variant.hpp>
-#include <boost/graph/graph_utility.hpp>
-#include <boost/graph/graph_traits.hpp>
-#include <boost/graph/adj_list_serialize.hpp>
-#include <boost/property_map/function_property_map.hpp>
-#include <boost/property_map/transform_value_property_map.hpp>
+#include <concepts>
 namespace Sycl_Graph {
 template <typename V, typename E, typename uI_t, typename DV, typename DE>
 struct Graph_Base {
@@ -130,11 +124,6 @@ struct Graph_Base {
     }
   }
 };
-
-namespace _detail {
-template <typename...> struct Typelist {};
-
-} // namespace _detail
 
 
 
