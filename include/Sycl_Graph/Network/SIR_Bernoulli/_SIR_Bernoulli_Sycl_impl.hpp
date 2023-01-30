@@ -5,7 +5,7 @@
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Network/Network.hpp>
 #include <Sycl_Graph/Graph/Sycl/Graph.hpp>
-#include <Sycl_Graph/random.hpp>
+#include <Static_RNG/distributions.hpp>
 #ifdef SYCL_GRAPH_USE_ONEAPI
 #include <oneapi/dpl/algorithm>
 #endif
@@ -41,23 +41,23 @@ namespace Sycl_Graph
             const uint32_t t = 0;
             sycl::buffer<int, 1> seed_buf;
             SIR_Bernoulli_Network(Graph_t &G, float p_I0, float p_R0, int seed = 777)
-                : q(G.q), G(G), p_I0(p_I0), p_R0(p_R0), seed_buf(sycl::range<1>(G.NV))
+                : q(G.q), G(G), p_I0(p_I0), p_R0(p_R0), seed_buf(sycl::range<1>(G.N_vertices()))
             {
-                assert(G.NV > 0);
-                // generate G.NV random numbers
+                assert(G.N_vertices() > 0);
+                // generate G.N_vertices() random numbers
                 // create rng
                 std::mt19937 rng(seed);
                 std::uniform_int_distribution<int> dist(0, 1000000);
-                std::vector<int> seeds(G.NV);
+                std::vector<int> seeds(G.N_vertices());
                 std::generate(seeds.begin(), seeds.end(), [&]()
                               { return dist(rng); });
                 // copy seeds to buffer
-                sycl::buffer<int, 1> seeds_buf(seeds.data(), sycl::range<1>(G.NV));
+                sycl::buffer<int, 1> seeds_buf(seeds.data(), sycl::range<1>(G.N_vertices()));
                 q.submit([&](sycl::handler &h)
                          {
                         auto seeds = seeds_buf.get_access<sycl::access::mode::read>(h);
                         auto seed = seed_buf.get_access<sycl::access::mode::write>(h);
-                        h.parallel_for(sycl::range<1>(G.NV), [=](sycl::id<1> i) {
+                        h.parallel_for(sycl::range<1>(G.N_vertices()), [=](sycl::id<1> i) {
                             seed[i] = seeds[i];
                         }); });
             }
@@ -91,9 +91,9 @@ namespace Sycl_Graph
                     auto p_R = p_R_buf.get_access<sycl::access::mode::write>(h);
                     auto v_acc = G.get_vertex_access<sycl::access::mode::write>(h);
                     h.parallel_for(sycl::range<1>(G.N_vertices()), [=](sycl::id<1> i) {
-                    Sycl_Graph::random::uniform_real_distribution<float> d_I;
-                    Sycl_Graph::random::uniform_real_distribution<float> d_R;
-                    Sycl_Graph::random::default_rng rng(seed[i]);
+                    Static_RNG::distributions::uniform_real_distribution<float> d_I;
+                    Static_RNG::distributions::uniform_real_distribution<float> d_R;
+                    Static_RNG::distributions::default_rng rng(seed[i]);
 
                     if(d_I(rng) < p_I0)
                         {
@@ -110,7 +110,7 @@ namespace Sycl_Graph
                 }); });
             }
 
-            std::vector<uint32_t> population_count()
+            std::vector<uint32_t> read_state(const SIR_Bernoulli_Temporal_Param<>& tp)
             {
                 std::vector<uint32_t> count(3, 0);
                 sycl::buffer<uint32_t, 1> count_buf(count.data(), sycl::range<1>(3));
@@ -250,8 +250,8 @@ namespace Sycl_Graph
                     sycl::stream out(1024, 256, h);
                     h.parallel_for(sycl::range<1>(sn_ids_acc.size()), [=](sycl::id<1> id)
                     {
-                        Sycl_Graph::random::default_rng rng(seed_acc[id]);
-                        Sycl_Graph::random::uniform_real_distribution<float> d_R(0, 1);
+                        Static_RNG::distributions::default_rng rng(seed_acc[id]);
+                        Static_RNG::distributions::uniform_real_distribution<float> d_R(0, 1);
                         if (v_acc.data[sn_ids_acc[id[0]]] == SIR_INDIVIDUAL_S)
                         {
                             if (d_R(rng) < p_I)
@@ -275,9 +275,9 @@ namespace Sycl_Graph
                     //  auto nv = neighbors_buf.get_access<sycl::access::mode::read_write>(h);
                     h.parallel_for(sycl::range<1>(G.N_vertices()), [=](sycl::id<1> id)
                                    {
-                        Sycl_Graph::random::default_rng rng(seed_acc[id]);
+                        Static_RNG::distributions::default_rng rng(seed_acc[id]);
                         seed_acc[id]++;
-                        Sycl_Graph::random::uniform_real_distribution<float> d_R(0, 1);
+                        Static_RNG::distributions::uniform_real_distribution<float> d_R(0, 1);
                             if(v_acc.data[id] == SIR_INDIVIDUAL_I)
                             {
                                 if(d_R(rng) < p_R)

@@ -1,1 +1,0 @@
-/opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++ -O3 -Wall -rdynamic CMakeFiles/uniform.dir/uniform.cpp.o -o uniform 

@@ -5,9 +5,17 @@
 #include <vector>
 namespace Sycl_Graph {
 template <typename T>
-inline void host_buffer_copy(sycl::buffer<T, 1> &buf, const std::vector<T> &vec,
-                             sycl::handler &h) {
-  h.parallel_for(vec.size(), [=](sycl::id<1> i) { buf[i] = vec[i]; });
+inline void host_buffer_copy(sycl::queue& q, sycl::buffer<T, 1> &buf, const std::vector<T> &vec) 
+{
+  if(vec.size() == 0) {
+    return;
+  }
+  sycl::buffer<T, 1> tmp_buf(vec.data(), sycl::range<1>(vec.size()));
+  q.submit([&](sycl::handler &h) {
+    auto acc = buf.template get_access<sycl::access::mode::write>(h);
+    auto tmp_acc = tmp_buf.template get_access<sycl::access::mode::read>(h);
+    h.parallel_for(vec.size(), [=](sycl::id<1> i) { acc[i] = tmp_acc[i]; });
+  });
 }
 
 template <typename T> class host_buffer_copy_kernel;
@@ -49,9 +57,9 @@ void device_buffer_add(sycl::buffer<T, 1> &dest_buf, sycl::buffer<T, 1> src_buf,
   }
 }
 template <typename T>
-sycl::buffer<T, 1> buffer_resize(sycl::buffer<T, 1> &buf, sycl::queue &q,
+sycl::buffer<T, 1> buffer_resize(sycl::queue& q, sycl::buffer<T, 1> &buf,
                                  size_t new_size) {
-  sycl::buffer<T, 1> new_buf(new_size, q);
+  sycl::buffer<T, 1> new_buf(new_size);
   q.submit([&](sycl::handler &h) {
     auto acc = buf.template get_access<sycl::access::mode::read>(h);
     auto new_acc = new_buf.template get_access<sycl::access::mode::write>(h);

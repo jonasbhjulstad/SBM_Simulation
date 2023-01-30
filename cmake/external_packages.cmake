@@ -16,7 +16,7 @@ CPMFindPackage(
 include(FindThreads)
 CPMFindPackage(
     NAME Tracy
-    GITHUB_REPOSITORY wolfpId/tracy
+    GITHUB_REPOSITORY wolfpld/tracy
     GIT_TAG master
 )
 

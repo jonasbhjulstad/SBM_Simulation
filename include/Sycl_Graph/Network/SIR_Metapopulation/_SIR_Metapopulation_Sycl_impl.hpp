@@ -6,7 +6,7 @@
 #include "SIR_Metapopulation_Types.hpp"
 #include <Sycl_Graph/Graph/Sycl/Graph.hpp>
 #include <Sycl_Graph/Network/Network.hpp>
-#include <Sycl_Graph/random.hpp>
+#include <Static_RNG/distributions.hpp>
 #ifdef SYCL_GRAPH_USE_ONEAPI
 #include <oneapi/dpl/algorithm>
 #include <oneapi/dpl/internal/random_impl/uniform_real_distribution.h>
@@ -43,7 +43,7 @@ float compute_infection_probability(float beta, float N_I, float N, float dt,
 // sycl::is_device_copyable_v<SIR_Metapopulation_State>
 // is_copyable_SIR_Invidual_State;
 using namespace Sycl_Graph::Network_Models;
-using namespace Sycl_Graph::random;
+using namespace Static_RNG::distributions;
 template <typename T> using SIR_vector_t = std::vector<T, std::allocator<T>>;
 struct SIR_Metapopulation_Node {
   SIR_Metapopulation_State state;
@@ -58,7 +58,7 @@ struct SIR_Metapopulation_Temporal_Param {
 using SIR_Metapopulation_Graph =
     Sycl_Graph::Sycl::Graph<SIR_Metapopulation_Node, SIR_Metapopulation_Param,
                             uint32_t>;
-template <typename RNG = Sycl_Graph::random::default_rng>
+template <typename RNG = Static_RNG::distributions::default_rng>
 struct SIR_Metapopulation_Network
     : public Network<SIR_Metapopulation_Network<RNG>, SIR_Metapopulation_State,
                      SIR_Metapopulation_Temporal_Param> {
@@ -100,9 +100,9 @@ struct SIR_Metapopulation_Network
                              const std::vector<float> &edge_beta,
                              int seed = 777)
       : q(G.q), G(G), N_pop(N_pop), I0_dist(I0), R0_dist(R0),
-        rng_buf(sycl::range<1>(std::max({G.NV, G.NE}))), alpha_0(alpha),
+        rng_buf(sycl::range<1>(std::max({G.N_vertices(), G.N_edges()}))), alpha_0(alpha),
         node_beta_0(node_beta), edge_beta_0(edge_beta) {
-    if (G.NE > 0)
+    if (G.N_edges() > 0)
       generate_seeds(seed);
 #ifdef SYCL_GRAPH_DEBUG
     construction_debug_report();
@@ -180,7 +180,7 @@ struct SIR_Metapopulation_Network
   void set_edge_beta(const std::vector<float> &beta) {
     ZoneScoped;
 
-    if (G.NE == 0) {
+    if (G.N_edges() == 0) {
       std::cout << "Warning: Unable to set edge beta, graph has no edges."
                 << std::endl;
       return;
@@ -200,7 +200,7 @@ struct SIR_Metapopulation_Network
                      const std::vector<uint32_t> &from_idx) {
     ZoneScoped;
 
-    if (G.NE == 0) {
+    if (G.N_edges() == 0) {
       std::cout << "Warning: Unable to set edge beta, graph has no edges."
                 << std::endl;
       return;
@@ -293,7 +293,7 @@ private:
         auto N_pop = S + I + R;
 
         auto p_I = compute_infection_probability(beta, I, N_pop, dt);
-        Sycl_Graph::random::binomial_distribution<float> d_I(
+        Static_RNG::distributions::binomial_distribution<float> d_I(
             v_acc.data[id].state.S, p_I);
         v_inf_acc[id] = d_I(rng_acc[id]);
       });
@@ -327,7 +327,7 @@ private:
           // p_I = 1 - exp(-beta*c*I/N_pop*dt)
           auto p_I = compute_infection_probability(beta, I, N_pop, dt);
           // float p_I = 0.1f;
-          Sycl_Graph::random::binomial_distribution d_I(v_acc.data[id].state.S,
+          Static_RNG::distributions::binomial_distribution d_I(v_acc.data[id].state.S,
                                                         p_I);
 
           auto N_infected = d_I(rng_acc[id]);
@@ -356,7 +356,7 @@ private:
         auto I = v_acc.data[id].state.I;
 
         // Delta_R = bin(I, p_R)
-        Sycl_Graph::random::binomial_distribution<float> d_R(
+        Static_RNG::distributions::binomial_distribution<float> d_R(
             v_acc.data[id].state.I, p_R);
         auto N_recovered = d_R(rng_acc[id]);
         v_rec_acc[id] = N_recovered;
@@ -386,7 +386,7 @@ private:
       });
     });
     q.wait();
-    if (G.NE > 0) {
+    if (G.N_edges() > 0) {
       q.submit([&](sycl::handler &h) {
         auto v_acc = G.get_vertex_access<sycl::access::mode::read_write>(h);
         auto e_acc = G.get_edge_access<sycl::access::mode::read>(h);
@@ -421,16 +421,16 @@ private:
    void generate_seeds(int seed) {
   ZoneScoped;
     // generate seeds
-    std::vector<int> seeds(G.NE);
+    std::vector<int> seeds(G.N_edges());
     // random device
     // mt19937 generator
     std::mt19937_64 gen(seed);
     std::generate(seeds.begin(), seeds.end(), gen);
-    sycl::buffer<int, 1> seed_buf(seeds.data(), sycl::range<1>(G.NE));
+    sycl::buffer<int, 1> seed_buf(seeds.data(), sycl::range<1>(G.N_edges()));
     q.submit([&](sycl::handler &h) {
       auto seed_acc = seed_buf.template get_access<sycl::access::mode::read>(h);
       auto rng_acc = rng_buf.template get_access<sycl::access::mode::write>(h);
-      h.parallel_for(sycl::range<1>(G.NE),
+      h.parallel_for(sycl::range<1>(G.N_edges()),
                      [=](sycl::id<1> id) { rng_acc[id].seed(seed_acc[id]); });
     });
   }

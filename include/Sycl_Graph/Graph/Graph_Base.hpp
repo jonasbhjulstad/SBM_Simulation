@@ -14,8 +14,9 @@
 namespace Sycl_Graph {
 template <typename V, typename E, typename uI_t, typename DV, typename DE>
 struct Graph_Base {
-  Vertex_Buffer_Base<V, uI_t, DV> vertex_buf;
-  Edge_Buffer_Base<E, uI_t, DE> edge_buf;
+  Graph_Base(Vertex_Buffer_Base<V, uI_t, DV>& vertex_buf, Edge_Buffer_Base<E, uI_t, DE>& edge_buf) : vertex_buf(vertex_buf), edge_buf(edge_buf) {}
+  Vertex_Buffer_Base<V, uI_t, DV>& vertex_buf;
+  Edge_Buffer_Base<E, uI_t, DE>& edge_buf;
   uI_t Graph_ID = 0;
   using Vertex_t = Vertex<V, uI_t>;
   using Edge_t = Edge<E, uI_t>;

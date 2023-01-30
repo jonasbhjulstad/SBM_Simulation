@@ -34,11 +34,8 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 //No help, variable specified on the command line.
 CMAKE_BUILD_TYPE:STRING=Debug
 
-//Enable/Disable color output during build.
-CMAKE_COLOR_MAKEFILE:BOOL=ON
-
 //No help, variable specified on the command line.
-CMAKE_CXX_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++
+CMAKE_CXX_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/latest/linux/bin/icpx
 
 //LLVM archiver
 CMAKE_CXX_COMPILER_AR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/bin-llvm/llvm-ar
@@ -62,7 +59,7 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //No help, variable specified on the command line.
-CMAKE_C_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang
+CMAKE_C_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/latest/linux/bin/icx
 
 //LLVM archiver
 CMAKE_C_COMPILER_AR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/bin-llvm/llvm-ar
@@ -163,8 +160,8 @@ CMAKE_INSTALL_SYSCONFDIR:PATH=etc
 //Path to a program.
 CMAKE_LINKER:FILEPATH=/usr/bin/ld
 
-//Path to a program.
-CMAKE_MAKE_PROGRAM:FILEPATH=/usr/bin/make
+//Program used to build from build.ninja files.
+CMAKE_MAKE_PROGRAM:FILEPATH=/usr/bin/ninja
 
 //Flags used by the linker during the creation of modules during
 // all build types.
@@ -281,9 +278,6 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
-//No help, variable specified on the command line.
-CMAKE_environmentSetupScript_COMPILER:FILEPATH=/home/man/Documents/Sycl_Graph/scripts/setvars.sh
-
 //Path to the coverage program that CTest uses for performing coverage
 // inspection
 COVERAGE_COMMAND:FILEPATH=/usr/bin/gcov
@@ -385,6 +379,9 @@ DOXYGEN_EXECUTABLE:FILEPATH=/usr/bin/doxygen
 //Dependencies for the target
 DataFrame_LIB_DEPENDS:STATIC=general;Common;
 
+//Enable Precompiled Headers
+ENABLE_PRECOMPILED_HEADERS:BOOL=OFF
+
 //The directory containing a CMake configuration file for Eigen3.
 Eigen3_DIR:PATH=/usr/local/share/eigen3/cmake
 
@@ -410,6 +407,10 @@ FETCHCONTENT_SOURCE_DIR_STATIC_RNG:PATH=
 // for tinymt_repo
 FETCHCONTENT_SOURCE_DIR_TINYMT_REPO:PATH=
 
+//When not empty, overrides where to find pre-populated content
+// for Tracy
+FETCHCONTENT_SOURCE_DIR_TRACY:PATH=
+
 //Enables UPDATE_DISCONNECTED behavior for all content population
 FETCHCONTENT_UPDATES_DISCONNECTED:BOOL=OFF
 
@@ -422,6 +423,9 @@ FETCHCONTENT_UPDATES_DISCONNECTED_STATIC_RNG:BOOL=OFF
 //Enables UPDATE_DISCONNECTED behavior just for population of tinymt_repo
 FETCHCONTENT_UPDATES_DISCONNECTED_TINYMT_REPO:BOOL=OFF
 
+//Enables UPDATE_DISCONNECTED behavior just for population of Tracy
+FETCHCONTENT_UPDATES_DISCONNECTED_TRACY:BOOL=OFF
+
 //Path to a program.
 GITCOMMAND:FILEPATH=/usr/bin/git
 
@@ -429,16 +433,16 @@ GITCOMMAND:FILEPATH=/usr/bin/git
 GIT_EXECUTABLE:FILEPATH=/usr/bin/git
 
 //Command to build the project
-MAKECOMMAND:STRING=/usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
+MAKECOMMAND:STRING=/usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}"
 
 //Path to the memory checking command, used for memory error detection.
-MEMORYCHECK_COMMAND:FILEPATH=/opt/cuda/bin/cuda-memcheck
+MEMORYCHECK_COMMAND:FILEPATH=/usr/bin/valgrind
 
 //File that contains suppressions for the memory checker
 MEMORYCHECK_SUPPRESSIONS_FILE:FILEPATH=
 
 //Dependencies for the target
-Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
+Math_LIB_DEPENDS:STATIC=general;Common;
 
 //Overwrite cached values read from Python library (classic search).
 // Turn off if cross-compiling and manually setting these values.
@@ -460,7 +464,7 @@ SYCL_GRAPH_USE_CUDA:BOOL=ON
 SYCL_GRAPH_USE_HIPSYCL:BOOL=OFF
 
 //Use Intel
-SYCL_GRAPH_USE_INTEL:BOOL=OFF
+SYCL_GRAPH_USE_INTEL:BOOL=ON
 
 //Use OneAPI
 SYCL_GRAPH_USE_ONEAPI:BOOL=OFF
@@ -489,12 +493,88 @@ Sycl_Graph_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 Sycl_Graph_SOURCE_DIR:STATIC=/home/man/Documents/Sycl_Graph
 
+//Enfore callstack collection for tracy regions
+TRACY_CALLSTACK:BOOL=OFF
+
+//Enable delayed initialization of the library (init on first call)
+TRACY_DELAYED_INIT:BOOL=OFF
+
+//Enable profiling
 TRACY_ENABLE:BOOL=ON
 
+//Enable fibers support
+TRACY_FIBERS:BOOL=OFF
+
+//Enable the manual lifetime management of the profile
+TRACY_MANUAL_LIFETIME:BOOL=OFF
+
+//Disable client discovery by broadcast to local network
+TRACY_NO_BROADCAST:BOOL=OFF
+
+//Disable all callstack related functionality
+TRACY_NO_CALLSTACK:BOOL=OFF
+
+//Disables the inline functions in callstacks
+TRACY_NO_CALLSTACK_INLINES:BOOL=OFF
+
+//Disable collection of source code
+TRACY_NO_CODE_TRANSFER:BOOL=OFF
+
+//Disable capture of context switches
+TRACY_NO_CONTEXT_SWITCH:BOOL=OFF
+
+//Disable crash handling
+TRACY_NO_CRASH_HANDLER:BOOL=OFF
+
+//Client executable does not exit until all profile data is sent
+// to server
+TRACY_NO_EXIT:BOOL=OFF
+
+//Disable the frame image support and its thread
+TRACY_NO_FRAME_IMAGE:BOOL=OFF
+
+//Disable call stack sampling
+TRACY_NO_SAMPLING:BOOL=OFF
+
+//Disable systrace sampling
+TRACY_NO_SYSTEM_TRACING:BOOL=OFF
+
+//Disable zone validation for C API
+TRACY_NO_VERIFY:BOOL=OFF
+
+//Disable capture of hardware Vsync events
+TRACY_NO_VSYNC_CAPTURE:BOOL=OFF
+
+//Tracy will only accept connections on IPv4 addresses (disable
+// IPv6)
+TRACY_ONLY_IPV4:BOOL=OFF
+
+//Only listen on the localhost interface
+TRACY_ONLY_LOCALHOST:BOOL=OFF
+
+//On-demand profiling
 TRACY_ON_DEMAND:BOOL=ON
 
+//Whether to build Tracy as a static library
+TRACY_STATIC:BOOL=ON
+
+//Use lower resolution timers
+TRACY_TIMER_FALLBACK:BOOL=OFF
+
+//Dependencies for the target
+TracyClient_LIB_DEPENDS:STATIC=general;dl;
+
+//Value Computed by CMake
+Tracy_BINARY_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/tracy-build
+
 //The directory containing a CMake configuration file for Tracy.
-Tracy_DIR:PATH=/usr/share/Tracy
+Tracy_DIR:PATH=Tracy_DIR-NOTFOUND
+
+//Value Computed by CMake
+Tracy_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+Tracy_SOURCE_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/tracy-src
 
 //The directory containing a CMake configuration file for boost_graph.
 boost_graph_DIR:PATH=/usr/lib/cmake/boost_graph-1.80.0
@@ -554,8 +634,6 @@ CMAKE_CACHE_MAJOR_VERSION:INTERNAL=3
 CMAKE_CACHE_MINOR_VERSION:INTERNAL=25
 //Patch version of cmake used to create the current loaded cache
 CMAKE_CACHE_PATCH_VERSION:INTERNAL=2
-//ADVANCED property for variable: CMAKE_COLOR_MAKEFILE
-CMAKE_COLOR_MAKEFILE-ADVANCED:INTERNAL=1
 //Path to CMake executable.
 CMAKE_COMMAND:INTERNAL=/usr/bin/cmake
 //Path to cpack program executable.
@@ -612,10 +690,12 @@ CMAKE_EXE_LINKER_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
 CMAKE_EXE_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO
 CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_EXPORT_COMPILE_COMMANDS
+CMAKE_EXPORT_COMPILE_COMMANDS-ADVANCED:INTERNAL=1
 //Name of external makefile project generator.
 CMAKE_EXTRA_GENERATOR:INTERNAL=
 //Name of generator.
-CMAKE_GENERATOR:INTERNAL=Unix Makefiles
+CMAKE_GENERATOR:INTERNAL=Ninja
 //Generator instance identifier.
 CMAKE_GENERATOR_INSTANCE:INTERNAL=
 //Name of generator platform.
@@ -678,7 +758,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=17
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=18
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -769,6 +849,8 @@ CPM_PACKAGE_LOCK_FILE:INTERNAL=/home/man/Documents/Sycl_Graph/build/cpm-package-
 CPM_PACKAGE_Static_RNG_BINARY_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/build/_deps/static_rng-build
 CPM_PACKAGE_Static_RNG_SOURCE_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/build/_deps/static_rng-src
 CPM_PACKAGE_Static_RNG_VERSION:INTERNAL=
+CPM_PACKAGE_Tracy_BINARY_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/build/_deps/tracy-build
+CPM_PACKAGE_Tracy_SOURCE_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/build/_deps/tracy-src
 CPM_PACKAGE_Tracy_VERSION:INTERNAL=
 CPM_PACKAGE_cppitertools_BINARY_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools-build
 CPM_PACKAGE_cppitertools_SOURCE_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools-src

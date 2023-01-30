@@ -68,6 +68,15 @@
 /home/man/Documents/Sycl_Graph/build/_deps/cppitertools-build/CMakeFiles/install.dir
 /home/man/Documents/Sycl_Graph/build/_deps/cppitertools-build/CMakeFiles/install/local.dir
 /home/man/Documents/Sycl_Graph/build/_deps/cppitertools-build/CMakeFiles/install/strip.dir
+/home/man/Documents/Sycl_Graph/build/_deps/tracy-build/CMakeFiles/TracyClient.dir
+/home/man/Documents/Sycl_Graph/build/_deps/tracy-build/CMakeFiles/package.dir
+/home/man/Documents/Sycl_Graph/build/_deps/tracy-build/CMakeFiles/package_source.dir
+/home/man/Documents/Sycl_Graph/build/_deps/tracy-build/CMakeFiles/edit_cache.dir
+/home/man/Documents/Sycl_Graph/build/_deps/tracy-build/CMakeFiles/rebuild_cache.dir
+/home/man/Documents/Sycl_Graph/build/_deps/tracy-build/CMakeFiles/list_install_components.dir
+/home/man/Documents/Sycl_Graph/build/_deps/tracy-build/CMakeFiles/install.dir
+/home/man/Documents/Sycl_Graph/build/_deps/tracy-build/CMakeFiles/install/local.dir
+/home/man/Documents/Sycl_Graph/build/_deps/tracy-build/CMakeFiles/install/strip.dir
 /home/man/Documents/Sycl_Graph/build/include/CMakeFiles/package.dir
 /home/man/Documents/Sycl_Graph/build/include/CMakeFiles/package_source.dir
 /home/man/Documents/Sycl_Graph/build/include/CMakeFiles/edit_cache.dir
@@ -141,6 +150,7 @@
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/sycl_kernel_emit.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/tinymt_kernel.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/itertools_vec_comb.dir
+/home/man/Documents/Sycl_Graph/build/test/CMakeFiles/vertex_buffer.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/package.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/package_source.dir
 /home/man/Documents/Sycl_Graph/build/test/CMakeFiles/edit_cache.dir

@@ -1,7 +1,7 @@
 #include <Sycl_Graph/Graph/Graph_Base.hpp>
 #include <Sycl_Graph/Network/SIR_Bernoulli/SIR_Bernoulli.hpp>
 #include <Sycl_Graph/Graph/Graph_Generation.hpp>
-#include <Sycl_Graph/random.hpp>
+#include <Static_RNG/distributions.hpp>
 #include <Sycl_Graph/Math/math.hpp>
 #include <Sycl_Graph/path_config.hpp>
 #include <filesystem>
@@ -14,7 +14,7 @@ int main()
     size_t N_pop = 100;
     float p_ER = 1;
     sycl::queue q;
-    Sycl_Graph::random::default_rng rng;
+    Static_RNG::distributions::default_rng rng;
     // SIR_Graph G(q, 101, 100000);
     //generate sir_param
     size_t Nt = 100;

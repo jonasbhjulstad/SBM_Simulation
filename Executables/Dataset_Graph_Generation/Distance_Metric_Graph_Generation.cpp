@@ -3,7 +3,7 @@
 #include <Sycl_Graph/Graph/Graph_Generation.hpp>
 #include <Sycl_Graph/Math/math.hpp>
 #include <Sycl_Graph/path_config.hpp>
-#include <Sycl_Graph/random.hpp>
+#include <Static_RNG/distributions.hpp>
 #include <algorithm>
 #include <filesystem>
 
@@ -19,9 +19,9 @@ int main()
   using namespace Sycl_Graph::Network_Models;
   float p_ER = 0.5;
   //create profiling queue
-  sycl::queue q(sycl::gpu_selector(), sycl::property::queue::enable_profiling{});
+  sycl::queue q(sycl::gpu_selector_v, sycl::property::queue::enable_profiling{});
   int seed = 777;
-  Sycl_Graph::random::default_rng rng;
+  Static_RNG::distributions::default_rng rng;
   auto G = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER);
   SIR_Metapopulation_Network<> sir(G, N_pop, I0, R0, alpha, node_beta, edge_beta, seed);
   // generate sir_param

@@ -1,2 +1,0 @@
-/usr/bin/ar qc libtinymt.a "CMakeFiles/tinymt.dir/__/tinymt_repo-src/tinymt/tinymt32.c.o" "CMakeFiles/tinymt.dir/__/tinymt_repo-src/tinymt/tinymt64.c.o"
-/usr/bin/ranlib libtinymt.a
