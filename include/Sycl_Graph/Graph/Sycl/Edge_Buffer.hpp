@@ -33,8 +33,6 @@ struct Edge_ID_Pair
 
 };
 
-class Void_Edge_t{};
-
 template <typename E, typename uI_t> struct Edge_Buffer: public Edge_Buffer_Base<E, uI_t, Edge_Buffer<E, uI_t>>
  {
   // current number of edges

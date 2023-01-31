@@ -42,3 +42,10 @@ if(NOT DEFINED CMAKE_OBJDUMP)
   set(CMAKE_OBJDUMP "/usr/bin/objdump")
 endif()
 
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for each subdirectory.
+  include("/home/man/Documents/Sycl_Graph/build/include/Sycl_Graph/Graph/Dynamic/cmake_install.cmake")
+  include("/home/man/Documents/Sycl_Graph/build/include/Sycl_Graph/Graph/Sycl/cmake_install.cmake")
+
+endif()
+

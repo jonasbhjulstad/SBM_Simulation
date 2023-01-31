@@ -36,6 +36,7 @@ set(SYCL_CUDA_FLAGS -fsycl-targets=spir64_x86_64,nvptx64-nvidia-cuda -Xsycl-targ
 
 include(cmake/external_packages.cmake)
 include(cmake/custom_executable.cmake)
+include(cmake/ccache.cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -60,3 +61,27 @@ configure_file("${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.hpp.in" "${
 configure_file("${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.py.in" "${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.py")
 add_subdirectory(test)
 add_subdirectory(Executables)
+
+# Doxygen
+
+# look for Doxygen package
+find_package(Doxygen)
+
+if (DOXYGEN_FOUND)
+    # set input and output files
+    set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs_doxygen/Doxyfile.in)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.out)
+
+    # request to configure the file
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    message("Doxygen build started")
+
+    # Note: do not put "ALL" - this builds docs together with application EVERY TIME!
+    add_custom_target( docs
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM )
+else (DOXYGEN_FOUND)
+  message("Doxygen need to be installed to generate the doxygen documentation")
+endif (DOXYGEN_FOUND)

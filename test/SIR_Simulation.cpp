@@ -9,7 +9,7 @@ int main()
 {
 
     using namespace Sycl_Graph::Sycl::Network_Models;
-    using Sycl_Graph::Dynamic::Network_Models::generate_erdos_renyi;
+    using Sycl_Graph_Dynamic::Network_Models::generate_erdos_renyi;
     using namespace Sycl_Graph::Network_Models;
     size_t N_pop = 100;
     float p_ER = 1;
@@ -38,8 +38,8 @@ int main()
 
     //write to file
     std::ofstream file;
-    std::filesystem::create_directory(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/");
-    file.open(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/traj.csv");
+    std::filesystem::create_directory(std::string(Sycl_Graph_Sycl_GRAPH_DATA_DIR) + "/SIR_sim/");
+    file.open(std::string(Sycl_Graph_Sycl_GRAPH_DATA_DIR) + "/SIR_sim/traj.csv");
     auto traj_T = Sycl_Graph::transpose(traj);
 
     for (auto &x : traj_T) {

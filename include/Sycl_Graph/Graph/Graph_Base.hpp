@@ -2,7 +2,7 @@
 #define SYCL_GRAPH_GRAPH_HPP
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Graph/Graph_Types.hpp>
-#include <Sycl_Graph/Graph/Meta/Graph.hpp>
+#include <Sycl_Graph/Graph/Dynamic/Graph.hpp>
 #include <array>
 #include <concepts>
 namespace Sycl_Graph {
@@ -162,10 +162,6 @@ struct Labeled_Graph<uI_t, _detail::Typelist<Vs...>, _detail::Typelist<Es...>,
   Labeled_Graph(const std::vector<Vertex<Vs, uI_t>> &...vertices,
                 const std::vector<Edge<Es, uI_t>> &...edges)
       : vertex_bufs{vertices...}, edge_bufs{edges...} {}
-
-  
-  
-
 
 };
 

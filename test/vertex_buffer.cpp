@@ -10,7 +10,7 @@ int main()
     auto v = Sycl_Graph::make_vertices(Sycl_Graph::range(0, 100), Sycl_Graph::range(0,100));
     Graph<int, Void_Edge_t, int> G(q, v);
 
-    Sycl_Graph::Sycl::Vertex_Buffer<int, int>* pv = &G.vertex_buf;
+    Sycl_Graph_Sycl::Vertex_Buffer<int, int>* pv = &G.vertex_buf;
     // G.add_vertex(data, indices);
     auto a = sizeof(Sycl_Graph::Vertex_Buffer_Base<int, int, Vertex_Buffer<int, int>>);
     auto b = sizeof(Vertex_Buffer<int, int>);
