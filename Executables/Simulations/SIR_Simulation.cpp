@@ -16,7 +16,7 @@ int main()
   double p_R0 = 0.1;
 
 
-  using Sycl_Graph_Dynamic::Network_Models::generate_erdos_renyi;
+  using Sycl_Graph::Dynamic::Network_Models::generate_erdos_renyi;
   using namespace Sycl_Graph::Sycl::Network_Models;
   float p_ER = 0.5;
   // create profiling queue
@@ -40,8 +40,8 @@ int main()
 
   // write to file
   std::filesystem::create_directory(
-      std::string(Sycl_Graph_Sycl_GRAPH_DATA_DIR) + "/SIR_sim/");
-  std::ofstream file(std::string(Sycl_Graph_Sycl_GRAPH_DATA_DIR) + "/SIR_sim/traj.csv");
+      std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/");
+  std::ofstream file(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/traj.csv");
 
   for (auto &x : traj)
   {

@@ -15,7 +15,7 @@ int main()
                  { return normal_distribution<float>(x * 0.1, x * 0.01); });
 
   using namespace Sycl_Graph::Sycl::Network_Models;
-  using Sycl_Graph_Dynamic::Network_Models::generate_erdos_renyi;
+  using Sycl_Graph::Dynamic::Network_Models::generate_erdos_renyi;
   using namespace Sycl_Graph::Network_Models;
   float p_ER = 0.5;
   //create profiling queue

@@ -14,6 +14,9 @@
 # EXTERNAL cache entries
 ########################
 
+//Build Python docstrings
+BUILD_PYTHON_DOCSTRINGS:BOOL=ON
+
 //Build the testing tree.
 BUILD_TESTING:BOOL=ON
 
@@ -435,6 +438,9 @@ GITCOMMAND:FILEPATH=/usr/bin/git
 //Git command line client
 GIT_EXECUTABLE:FILEPATH=/usr/bin/git
 
+//The directory containing a CMake configuration file for IntelDPCPP.
+IntelDPCPP_DIR:PATH=/opt/intel/oneapi/compiler/2023.0.0/linux/IntelDPCPP
+
 //Command to build the project
 MAKECOMMAND:STRING=/usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}"
 
@@ -444,8 +450,17 @@ MEMORYCHECK_COMMAND:FILEPATH=/usr/bin/valgrind
 //File that contains suppressions for the memory checker
 MEMORYCHECK_SUPPRESSIONS_FILE:FILEPATH=
 
+//Path to a program.
+MKDOC_PYTHON:FILEPATH=MKDOC_PYTHON-NOTFOUND
+
 //Dependencies for the target
 Math_LIB_DEPENDS:STATIC=general;Common;
+
+//Arguments to supply to pkg-config
+PKG_CONFIG_ARGN:STRING=
+
+//pkg-config executable
+PKG_CONFIG_EXECUTABLE:FILEPATH=/usr/bin/pkg-config
 
 //Overwrite cached values read from Python library (classic search).
 // Turn off if cross-compiling and manually setting these values.
@@ -460,6 +475,9 @@ PYTHON_LIBRARY:FILEPATH=/home/man/.pyenv/versions/3.9.13/lib/libpython3.9.so
 //Name of the computer/site where compile is being run
 SITE:STRING=man
 
+//SYCL flags for the compiler
+SYCL_FLAGS:STRING='-fsycl '
+
 //Use CUDA
 SYCL_GRAPH_USE_CUDA:BOOL=ON
 
@@ -471,6 +489,17 @@ SYCL_GRAPH_USE_INTEL:BOOL=ON
 
 //Use OneAPI
 SYCL_GRAPH_USE_ONEAPI:BOOL=OFF
+
+//Path to a file.
+SYCL_INCLUDE_DIR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/include
+
+//SYCL Language version
+SYCL_LANGUAGE_VERSION:STRING=202001
+
+//Path to a file.
+SYCL_LIBRARY_DIR:FILEPATH=/opt/intel/oneapi/compiler/2023.0.0/linux/lib
+
+SYCL_PACKAGE_DIR:STRING=/opt/intel/oneapi/compiler/2023.0.0/linux
 
 //Value Computed by CMake
 Static_RNG_BINARY_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/static_rng-build
@@ -693,8 +722,6 @@ CMAKE_EXE_LINKER_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
 CMAKE_EXE_LINKER_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO
 CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: CMAKE_EXPORT_COMPILE_COMMANDS
-CMAKE_EXPORT_COMPILE_COMMANDS-ADVANCED:INTERNAL=1
 //Name of external makefile project generator.
 CMAKE_EXTRA_GENERATOR:INTERNAL=
 //Name of generator.
@@ -761,7 +788,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=20
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=21
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -846,7 +873,7 @@ CPM_DRY_RUN:INTERNAL=OFF
 CPM_FILE:INTERNAL=/home/man/Documents/Sycl_Graph/build/cmake/CPM_0.36.0.cmake
 CPM_INDENT:INTERNAL=CPM:
 CPM_MODULE_PATH:INTERNAL=/home/man/Documents/Sycl_Graph/build/CPM_modules
-CPM_PACKAGES:INTERNAL=Static_RNG;cppitertools;Tracy;Eigen3
+CPM_PACKAGES:INTERNAL=Static_RNG;pybind11;cppitertools;Tracy;Eigen3
 CPM_PACKAGE_Eigen3_VERSION:INTERNAL=3.4.0
 CPM_PACKAGE_LOCK_FILE:INTERNAL=/home/man/Documents/Sycl_Graph/build/cpm-package-lock.cmake
 CPM_PACKAGE_Static_RNG_BINARY_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/build/_deps/static_rng-build
@@ -858,6 +885,7 @@ CPM_PACKAGE_Tracy_VERSION:INTERNAL=
 CPM_PACKAGE_cppitertools_BINARY_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools-build
 CPM_PACKAGE_cppitertools_SOURCE_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools-src
 CPM_PACKAGE_cppitertools_VERSION:INTERNAL=
+CPM_PACKAGE_pybind11_VERSION:INTERNAL=2.10.3
 CPM_VERSION:INTERNAL=0.36.0
 //ADVANCED property for variable: CTEST_SUBMIT_RETRY_COUNT
 CTEST_SUBMIT_RETRY_COUNT-ADVANCED:INTERNAL=1
@@ -873,8 +901,12 @@ DOXYGEN_EXECUTABLE-ADVANCED:INTERNAL=1
 FIND_PACKAGE_MESSAGE_DETAILS_Boost:INTERNAL=[/usr/lib/cmake/Boost-1.80.0/BoostConfig.cmake][cfound components: graph ][v1.80.0()]
 //Details about finding Doxygen
 FIND_PACKAGE_MESSAGE_DETAILS_Doxygen:INTERNAL=[/usr/bin/doxygen][cfound components: doxygen dot ][v1.9.6()]
+//Details about finding IntelDPCPP
+FIND_PACKAGE_MESSAGE_DETAILS_IntelDPCPP:INTERNAL=[/opt/intel/oneapi/compiler/2023.0.0/linux/include][/opt/intel/oneapi/compiler/2023.0.0/linux/lib][-fsycl ][v202001()]
 //Details about finding PYTHON
 FIND_PACKAGE_MESSAGE_DETAILS_PYTHON:INTERNAL=/home/man/.pyenv/versions/3.9.13/bin/python33.9.13
+//Details about finding Python
+FIND_PACKAGE_MESSAGE_DETAILS_Python:INTERNAL=[/usr/bin/python3.10][/usr/include/python3.10][/usr/lib/libpython3.10.so][cfound components: Interpreter Development Development.Module Development.Embed ][v3.10.9()]
 //Details about finding Python3
 FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.9(3.9)]
 //Details about finding PythonInterp
@@ -893,6 +925,10 @@ MAKECOMMAND-ADVANCED:INTERNAL=1
 MEMORYCHECK_COMMAND-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: MEMORYCHECK_SUPPRESSIONS_FILE
 MEMORYCHECK_SUPPRESSIONS_FILE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: PKG_CONFIG_ARGN
+PKG_CONFIG_ARGN-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: PKG_CONFIG_EXECUTABLE
+PKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1
 PYTHON_INCLUDE_DIRS:INTERNAL=/home/man/.pyenv/versions/3.9.13/include/python3.9
 PYTHON_IS_DEBUG:INTERNAL=0
 PYTHON_LIBRARIES:INTERNAL=/home/man/.pyenv/versions/3.9.13/lib/libpython3.9.so
@@ -933,6 +969,23 @@ _Python3_INTERPRETER_SIGNATURE:INTERNAL=2e995cd2bd888af83868128ab4554325
 _Python3_Interpreter_REASON_FAILURE:INTERNAL=
 //NumPy reason failure
 _Python3_NumPy_REASON_FAILURE:INTERNAL=
+//Compiler reason failure
+_Python_Compiler_REASON_FAILURE:INTERNAL=
+_Python_DEVELOPMENT_EMBED_SIGNATURE:INTERNAL=ae662ec966721bb3d3ae2a58c8bf15bd
+_Python_DEVELOPMENT_MODULE_SIGNATURE:INTERNAL=4bc14a0ea6a21ea267e38aa660e9b54b
+//Path to a program.
+_Python_EXECUTABLE:INTERNAL=/usr/bin/python3.10
+//Path to a file.
+_Python_INCLUDE_DIR:INTERNAL=/usr/include/python3.10
+//Python Properties
+_Python_INTERPRETER_PROPERTIES:INTERNAL=Python;3;10;9;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages
+_Python_INTERPRETER_SIGNATURE:INTERNAL=b91b4035ecb3bb3f5760d35922531bcd
+//Interpreter reason failure
+_Python_Interpreter_REASON_FAILURE:INTERNAL=
+//Path to a library.
+_Python_LIBRARY_RELEASE:INTERNAL=/usr/lib/libpython3.10.so
+//NumPy reason failure
+_Python_NumPy_REASON_FAILURE:INTERNAL=
 //ADVANCED property for variable: boost_graph_DIR
 boost_graph_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: boost_headers_DIR

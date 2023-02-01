@@ -27,7 +27,7 @@ namespace Sycl_Graph
         template <typename T>
         using SIR_vector_t = std::vector<T, std::allocator<T>>;
         using SIR_Graph =
-            Sycl_Graph_Sycl::Graph<SIR_Individual_State, SIR_Edge, uint32_t>;
+            Sycl_Graph::Sycl::Graph<SIR_Individual_State, SIR_Edge, uint32_t>;
 
         struct SIR_Bernoulli_Network
             : public Network<SIR_Bernoulli_Network, std::vector<uint32_t>, SIR_Bernoulli_Temporal_Param<>>

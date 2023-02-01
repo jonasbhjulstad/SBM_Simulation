@@ -9,7 +9,7 @@ int main()
 {
 
     using namespace Sycl_Graph::Sycl::Network_Models;
-    using Sycl_Graph_Dynamic::Network_Models::generate_erdos_renyi;
+    using Sycl_Graph::Dynamic::Network_Models::generate_erdos_renyi;
     using namespace Sycl_Graph::Network_Models;
     size_t N_pop = 100;
     float p_ER = 1;

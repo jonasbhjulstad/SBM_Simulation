@@ -5,8 +5,13 @@ CPMFindPackage(
     GITHUB_REPOSITORY jonasbhjulstad/Static_RNG
     GIT_TAG master
     OPTIONS
-    "CMAKE_ARGS -DENABLE_SYCL=ON"
+    #pass cmake options to Static_RNG
+    ENABLE_SYCL OFF
+    BUILD_PYTHON_BINDERS OFF
+    BUILD_DOCS OFF
 )
+
+
 set(cppitertools_INSTALL_CMAKE_DIR share)
 CPMFindPackage(
     NAME cppitertools
@@ -27,7 +32,6 @@ CPMFindPackage(
     OPTIONS
     "QUIET ON"
 )
-
 
 #boost graph library
 find_package(Boost REQUIRED COMPONENTS graph)

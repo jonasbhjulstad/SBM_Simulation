@@ -6,6 +6,7 @@
 #include "SIR_Metapopulation_Types.hpp"
 #include <Sycl_Graph/Graph/Sycl/Graph.hpp>
 #include <Sycl_Graph/Network/Network.hpp>
+#include <Sycl_Graph/Math/math.hpp>
 #include <Static_RNG/distributions.hpp>
 #ifdef SYCL_GRAPH_USE_ONEAPI
 #include <oneapi/dpl/algorithm>
@@ -56,7 +57,7 @@ struct SIR_Metapopulation_Temporal_Param {
 };
 
 using SIR_Metapopulation_Graph =
-    Sycl_Graph_Sycl::Graph<SIR_Metapopulation_Node, SIR_Metapopulation_Param,
+    Sycl_Graph::Sycl::Graph<SIR_Metapopulation_Node, SIR_Metapopulation_Param,
                             uint32_t>;
 template <typename RNG = Static_RNG::distributions::default_rng>
 struct SIR_Metapopulation_Network
@@ -123,17 +124,7 @@ struct SIR_Metapopulation_Network
           R0_dist.template get_access<sycl::access::mode::read_write>(h);
       h.parallel_for(sycl::range<1>(G.N_vertices()), [=](sycl::id<1> id) {
         // total population stored in susceptible state
-        float N_pop = v.data[id].state.S;
-        SIR_Metapopulation_State v_i;
-        // v_i.I = I0_dist_acc[id](rng_acc[id]) * N_pop;
-        // v_i.R = R0_dist_acc[id](rng_acc[id]) * N_pop;
-        v_i.I = 100;
-        v_i.R = 0;
-        v_i.S = std::max({N_pop_acc[id] - v_i.I - v_i.R, 0.f});
-        v.data[id].state = v_i;
-      });
-    });
-    set_alpha(alpha_0);
+        float N_pop = v.data[id].stateSYCL_GRAPH_
     set_node_beta(node_beta_0);
     set_edge_beta(edge_beta_0);
   }
