@@ -23,16 +23,6 @@ namespace Sycl_Graph {
         return res;
     }
 
-
-
-    std::vector<uint32_t> range(uint32_t start, uint32_t end) {
-        std::vector<uint32_t> res(end - start);
-        for (uint32_t i = start; i < end; i++) {
-            res[i - start] = i;
-        }
-        return res;
-    }
-
     std::vector<uint32_t> filtered_range(const std::vector<uint32_t> &filter_idx, uint32_t min, uint32_t max) {
         auto full_range = range(min, max);
         std::vector<uint32_t> res;

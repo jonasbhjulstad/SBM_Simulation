@@ -4,11 +4,11 @@
 #include <Sycl_Graph/Math/math.hpp>
 #include <Sycl_Graph/Network/SIR_Metapopulation/SIR_Metapopulation.hpp>
 #include <Sycl_Graph/path_config.hpp>
-#include <Sycl_Graph/random.hpp>
+#include <Static_RNG/distributions.hpp>
 #include <algorithm>
 #include <filesystem>
 
-using namespace Sycl_Graph::random;
+using namespace Static_RNG::distributions;
 static constexpr size_t NV = 100;
 std::vector<uint32_t> N_pop = std::vector<uint32_t>(NV, 1000);
 std::vector<normal_distribution<float>> I0(N_pop.size());
@@ -24,13 +24,13 @@ int main()
                  { return normal_distribution<float>(x * 0.1, x * 0.01); });
 
   using namespace Sycl_Graph::Sycl::Network_Models;
-  using Sycl_Graph::Dynamic::Network_Models::generate_erdos_renyi;
+  using Sycl_Graph_Dynamic::Network_Models::generate_erdos_renyi;
   using namespace Sycl_Graph::Network_Models;
   float p_ER = 0.5;
   //create profiling queue
-  sycl::queue q(sycl::gpu_selector(), sycl::property::queue::enable_profiling{});
+  sycl::queue q(sycl::gpu_selector_v, sycl::property::queue::enable_profiling{});
   int seed = 777;
-  Sycl_Graph::random::default_rng rng;
+  Static_RNG::distributions::default_rng rng;
   const std::vector<uint32_t> G0_ids = Sycl_Graph::range(0, NV);
   const std::vector<uint32_t> G1_ids = Sycl_Graph::range(NV, 2 * NV);
   auto G0 = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER, G0_ids);
@@ -41,11 +41,11 @@ int main()
   // std::cout << G.N_vertices() << std::endl;
   // std::cout << G.N_edges() << std::endl;
 
-  // std::filesystem::create_directory(Sycl_Graph::SYCL_GRAPH_DATA_DIR + std::string("/Edgelists"));
+  // std::filesystem::create_directory(Sycl_Graph_Sycl_GRAPH_DATA_DIR + std::string("/Edgelists"));
 
-  // auto G = Sycl_Graph::Dynamic::Network_Models::random_connect(G, G0_ids, G1_ids, p_ER, rng);
+  // auto G = Sycl_Graph_Dynamic::Network_Models::random_connect(G, G0_ids, G1_ids, p_ER, rng);
 
-  // G.write_edgelist(Sycl_Graph::SYCL_GRAPH_DATA_DIR + std::string("/Edgelists/merge_graph.csv"));
+  // G.write_edgelist(Sycl_Graph_Sycl_GRAPH_DATA_DIR + std::string("/Edgelists/merge_graph.csv"));
   
 
 }

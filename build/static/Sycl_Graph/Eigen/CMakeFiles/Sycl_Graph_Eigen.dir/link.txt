@@ -1,2 +1,0 @@
-/usr/bin/ar qc libSycl_Graph_Eigen.a CMakeFiles/Sycl_Graph_Eigen.dir/Sycl_Graph_Eigen.cpp.o
-/usr/bin/ranlib libSycl_Graph_Eigen.a

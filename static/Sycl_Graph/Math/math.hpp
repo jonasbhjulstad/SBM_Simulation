@@ -2,6 +2,7 @@
 #define SYCL_GRAPH_Sycl_Graph_Math_HPP
 
 #include <Sycl_Graph/typedefs.hpp>
+#include <algorithm>
 namespace Sycl_Graph
 {
 
@@ -24,30 +25,38 @@ namespace Sycl_Graph
         }
         return res;
     }
-    std::vector<uint32_t> range(uint32_t start, uint32_t end);
-
-    template <typename T>
-    inline Vec monomial_powers(const Mat &X, const T &powers)
+    template <typename T = uint32_t>
+    std::vector<T> range(T start, T end)
     {
-        Vec result(X.rows());
-        result.setConstant(1);
-        for (int i = 0; i < powers.size(); i++)
+        std::vector<T> res(end - start);
+        for (T i = start; i < end; i++)
         {
-            result = result.array() * X.col(i).array().pow(powers[i]);
+            res[i - start] = i;
         }
-        return result;
+        return res;
     }
+    // template <typename T>
+    // inline Vec monomial_powers(const Mat &X, const T &powers)
+    // {
+    //     Vec result(X.rows());
+    //     result.setConstant(1);
+    //     for (int i = 0; i < powers.size(); i++)
+    //     {
+    //         result = result.array() * X.col(i).array().pow(powers[i]);
+    //     }
+    //     return result;
+    // }
 
-    template <typename T>
-    inline float monomial_power(const Vec &x, const T &powers)
-    {
-        float result = 1;
-        for (int i = 0; i < powers.size(); i++)
-        {
-            result *= pow(x(i), powers[i]);
-        }
-        return result;
-    }
+    // template <typename T>
+    // inline float monomial_power(const Vec &x, const T &powers)
+    // {
+    //     float result = 1;
+    //     for (int i = 0; i < powers.size(); i++)
+    //     {
+    //         result *= pow(x(i), powers[i]);
+    //     }
+    //     return result;
+    // }
 
     template <typename T>
     inline std::vector<std::pair<T, T>> zip(const std::vector<T> &a, const std::vector<T> &b)
@@ -77,7 +86,7 @@ namespace Sycl_Graph
     template <typename T>
     inline std::vector<std::vector<T>> transpose(const std::vector<std::vector<T>> &vec)
     {
-        //transpose vector
+        // transpose vector
         std::vector<std::vector<T>> res(vec[0].size());
         for (int i = 0; i < vec[0].size(); i++)
         {
@@ -88,7 +97,6 @@ namespace Sycl_Graph
             }
         }
         return res;
-
     }
 
     template <typename T, std::size_t N0, std::size_t N1>

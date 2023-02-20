@@ -9,6 +9,14 @@
 
 namespace Sycl_Graph {
 
+    std::string path_dirname(const std::string &fname)
+    {
+        size_t pos = fname.find_last_of("\\/");
+        return (std::string::npos == pos)
+            ? ""
+            : fname.substr(0, pos);
+    }
+
     void DataFrame::assign(const std::string &col_name, const Vec &vec) {
         assign(col_name, std::vector<float>(vec.data(), vec.data() + vec.rows()));
     }

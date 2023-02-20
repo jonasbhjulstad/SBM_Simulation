@@ -4,7 +4,7 @@
 int main()
 {
     //enable profiling
-    sycl::queue q(sycl::gpu_selector(), sycl::property::queue::enable_profiling{});
+    sycl::queue q(sycl::gpu_selector_v, sycl::property::queue::enable_profiling{});
     constexpr size_t N_elements = 100000000;
     //test sycl copy profiling
     sycl::buffer<int, 1> buf(N_elements);

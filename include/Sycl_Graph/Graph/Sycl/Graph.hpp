@@ -30,19 +30,18 @@ namespace Sycl_Graph::Sycl
   struct Graph : public Sycl_Graph::Graph_Base<V, E, uI_t, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>>
 
   {
+    using Base_t = Sycl_Graph::Graph_Base<V, E, uI_t, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>>;
     // create copy constructor
     Graph(sycl::queue &q, uI_t NV, uI_t NE, const sycl::property_list &props = {})
-        : q(q), vertex_buf(NV, q, props), edge_buf(NE, q, props) {}
+        : q(q), vertex_buf(q, NV, props), edge_buf(q, NE, props), Base_t(vertex_buf, edge_buf) {}
 
     Graph(sycl::queue &q, const std::vector<Vertex<V, uI_t>> &vertices,
-          const std::vector<Edge<E, uI_t>> &edges,
+          const std::vector<Edge<E, uI_t>> &edges = {},
           const sycl::property_list &props = {})
-        : Graph(q), vertex_buf(vertices, props), edge_buf(edges, props) {}
+        : vertex_buf(q, vertices, props), edge_buf(q, edges, props), q(q), Base_t(vertex_buf, edge_buf) {}
     sycl::queue &q;
     Vertex_Buffer<V, uI_t> vertex_buf;
     Edge_Buffer<E, uI_t> edge_buf;
-    const uI_t &NV = vertex_buf.NV;
-    const uI_t &NE = edge_buf.NE;
     uI_t Graph_ID = 0;
     using Vertex_t = Vertex<V, uI_t>;
     using Edge_t = Edge<E, uI_t>;
@@ -53,11 +52,11 @@ namespace Sycl_Graph::Sycl
     static constexpr auto invalid_id = std::numeric_limits<uI_t>::max();
     uI_t N_vertices() const
     {
-      return vertex_buf.N_vertices;
+      return vertex_buf.size();
     }
     uI_t N_edges() const
     {
-      return edge_buf.N_edges;
+      return edge_buf.size();
     }
 
     void resize(uI_t NV_new, uI_t NE_new)

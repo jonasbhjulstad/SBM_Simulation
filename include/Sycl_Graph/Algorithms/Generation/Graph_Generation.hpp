@@ -8,7 +8,7 @@
 #include <Sycl_Graph/Graph/constraints.hpp>
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Math/math.hpp>
-#include <Sycl_Graph/random.hpp>
+#include <Static_RNG/distributions.hpp>
 #include <Sycl_Graph/Graph/Graph_Base.hpp>
 #include <itertools.hpp>
 #include <memory>
@@ -18,28 +18,28 @@
 namespace Sycl_Graph::Dynamic::Network_Models {
 template <Graph_type Graph, Static_RNG::rng_type, std::floating_point dType = float>
 void random_connect(Graph &G, dType p_ER, RNG &rng) {
-  Sycl_Graph::random::uniform_real_distribution d_ER;
+  Static_RNG::distributions::uniform_real_distribution d_ER;
   uint32_t N_edges = 0;
   std::vector<typename Graph::uInt_t> from;
   std::vector<typename Graph::uInt_t> to;
-  uint32_t N_edges_max = G.NE;
+  uint32_t N_edges_max = G.N_edges();
 
   from.reserve(N_edges_max);
   to.reserve(N_edges_max);
-  std::vector<typename Graph::Edge_Prop_t> edges(N_edges_max);
-  for (auto &&v_idx : iter::combinations(Sycl_Graph::range(0, G.NV), 2)) {
+  // std::vector<typename Graph::Edge_Prop_t> edges(N_edges_max);
+  for (auto &&v_idx : iter::combinations(Sycl_Graph::range<uint32_t>(0, G.N_vertices()), 2)) {
     if (d_ER(rng) < p_ER) {
       from.push_back(v_idx[0]);
       to.push_back(v_idx[1]);
 
       N_edges++;
-      if (N_edges == G.NE) {
+      if (N_edges == G.N_edges()) {
         std::cout << "Warning: max edges reached" << std::endl;
         return;
       }
     }
   }
-  G.add_edge(to, from, edges);
+  G.add_edge(to, from);
 }
 
 template <Graph_type Graph, Static_RNG::rng_type, std::floating_point dType = float,
@@ -47,11 +47,11 @@ template <Graph_type Graph, Static_RNG::rng_type, std::floating_point dType = fl
 void random_connect(Graph &G, const std::vector<uI_t> &from_IDs,
                      const std::vector<uI_t> &to_IDs, dType p_ER,
                      RNG rng = std::mt19937(std::random_device()())) {
-  Sycl_Graph::random::uniform_real_distribution d_ER;
+  Static_RNG::distributions::uniform_real_distribution d_ER;
   uint32_t N_edges = 0;
   std::vector<typename Graph::uInt_t> from;
   std::vector<typename Graph::uInt_t> to;
-  uint32_t N_edges_max = G.NE - G.N_edges();
+  uint32_t N_edges_max = G.N_edges() - G.N_edges();
   from.reserve(N_edges_max);
   to.reserve(N_edges_max);
   std::vector<typename Graph::Edge_Prop_t> edges(N_edges_max);
@@ -80,9 +80,9 @@ Graph generate_erdos_renyi(sycl::queue &q, uI_t NV, dType p_ER,
                            uint32_t NE = 0) {
   NE = NE == 0 ? 2 * Sycl_Graph::n_choose_k(NV, 2) : NE;
 
-  ids = ids.size() > 0 ? ids : Sycl_Graph::range(0, NV);
-  Graph G(q, NV, NE);
-  G.add_vertex(Sycl_Graph::range(0, NV));
+  ids = ids.size() > 0 ? ids : Sycl_Graph::range<uint32_t>(0, NV);
+  Graph G(q, NV+1, NE);
+  G.add_vertex(ids);
   random_connect(G, p_ER, rng);
   return G;
 }

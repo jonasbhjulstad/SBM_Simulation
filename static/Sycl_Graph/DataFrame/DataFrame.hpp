@@ -1,13 +1,14 @@
 #ifndef FROLS_DATAFRAME_HPP
 #define FROLS_DATAFRAME_HPP
-#include <Sycl_Graph/path_config.hpp>
-#include <Sycl_Graph/typedefs.hpp>
+#include <Eigen/Dense>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace Sycl_Graph {
+    using Vec = Eigen::VectorXf;
+    using Mat = Eigen::MatrixXf;
     class DataFrameStack;
 
     class DataFrame {

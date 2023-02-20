@@ -46,6 +46,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/man/Documents/Sycl_Graph/build/_deps/static_rng-build/cmake_install.cmake")
   include("/home/man/Documents/Sycl_Graph/build/_deps/cppitertools-build/cmake_install.cmake")
+  include("/home/man/Documents/Sycl_Graph/build/_deps/tracy-build/cmake_install.cmake")
   include("/home/man/Documents/Sycl_Graph/build/include/cmake_install.cmake")
   include("/home/man/Documents/Sycl_Graph/build/static/cmake_install.cmake")
   include("/home/man/Documents/Sycl_Graph/build/test/cmake_install.cmake")

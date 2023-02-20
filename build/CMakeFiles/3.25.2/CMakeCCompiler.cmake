@@ -1,4 +1,4 @@
-set(CMAKE_C_COMPILER "/opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang")
+set(CMAKE_C_COMPILER "/opt/intel/oneapi/compiler/latest/linux/bin/icx")
 set(CMAKE_C_COMPILER_ARG1 "")
 set(CMAKE_C_COMPILER_ID "IntelLLVM")
 set(CMAKE_C_COMPILER_VERSION "2023.0.0")
@@ -66,7 +66,7 @@ endif()
 
 
 
-set(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES "/opt/intel/oneapi/tbb/2021.8.0/include;/opt/intel/oneapi/mpi/2021.7.1/include;/opt/intel/oneapi/dpl/2022.0.0/linux/include;/opt/intel/oneapi/dnnl/2023.0.0/cpu_dpcpp_gpu_dpcpp/include;/opt/intel/oneapi/dev-utilities/2021.8.0/include;/opt/intel/oneapi/ccl/2021.7.1/include/cpu_gpu_dpcpp;/opt/intel/oneapi/compiler/2023.0.0/linux/lib/clang/16.0.0/include;/usr/local/include;/usr/include")
-set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "gcc;gcc_s;gcc;gcc_s;c;gcc;gcc_s")
-set(CMAKE_C_IMPLICIT_LINK_DIRECTORIES "/usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1;/usr/lib64;/lib64;/opt/intel/oneapi/compiler/2023.0.0/linux/lib;/lib;/usr/lib;/opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8;/opt/intel/oneapi/mpi/2021.7.1/libfabric/lib;/opt/intel/oneapi/mpi/2021.7.1/lib/release;/opt/intel/oneapi/mpi/2021.7.1/lib;/opt/intel/oneapi/dnnl/2023.0.0/cpu_dpcpp_gpu_dpcpp/lib;/opt/intel/oneapi/compiler/2023.0.0/linux/compiler/lib/intel64_lin;/opt/intel/oneapi/ccl/2021.7.1/lib/cpu_gpu_dpcpp")
+set(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES "/opt/intel/oneapi/vpl/2022.2.0/include;/opt/intel/oneapi/tbb/2021.8.0/include;/opt/intel/oneapi/mpi/2021.7.0/include;/opt/intel/oneapi/mkl/2022.2.0/include;/opt/intel/oneapi/dpl/2022.0.0/linux/include;/opt/intel/oneapi/dev-utilities/2021.8.0/include;/opt/intel/oneapi/ccl/2021.7.0/include/cpu_gpu_dpcpp;/opt/intel/oneapi/compiler/2023.0.0/linux/compiler/include;/opt/intel/oneapi/compiler/2023.0.0/linux/lib/clang/16.0.0/include;/usr/local/include;/usr/include")
+set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "svml;irng;imf;m;gcc;gcc_s;irc;dl;gcc;gcc_s;c;gcc;gcc_s;irc_s")
+set(CMAKE_C_IMPLICIT_LINK_DIRECTORIES "/opt/intel/oneapi/compiler/2023.0.0/linux/compiler/lib/intel64_lin;/opt/intel/oneapi/compiler/2023.0.0/linux/lib;/usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1;/usr/lib64;/lib64;/lib;/usr/lib;/opt/intel/oneapi/vpl/2022.2.0/lib;/opt/intel/oneapi/tbb/2021.8.0/lib/intel64/gcc4.8;/opt/intel/oneapi/mpi/2021.7.0/libfabric/lib;/opt/intel/oneapi/mpi/2021.7.0/lib/release;/opt/intel/oneapi/mpi/2021.7.0/lib;/opt/intel/oneapi/mkl/2022.2.0/lib/intel64;/opt/intel/oneapi/ccl/2021.7.0/lib/cpu_gpu_dpcpp")
 set(CMAKE_C_IMPLICIT_LINK_FRAMEWORK_DIRECTORIES "")

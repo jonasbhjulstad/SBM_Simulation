@@ -43,18 +43,19 @@ template <typename E, std::unsigned_integer uI_t> struct Edge_Buffer: public Edg
   sycl::buffer<uI_t, 1> to_buf;
   sycl::buffer<uI_t, 1> from_buf;
   sycl::buffer<E, 1> data_buf;
+
   Edge_Indexing index_type = EDGE_INDEXING_ID;
 
   static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
-  Edge_Buffer(uI_t NE, sycl::queue &q, const sycl::property_list &props = {})
+  Edge_Buffer(sycl::queue &q, uI_t NE, const sycl::property_list &props = {})
       : to_buf(sycl::range<1>(NE), props), from_buf(sycl::range<1>(NE), props),
         data_buf(sycl::range<1>(NE), props), NE(NE), q(q) {}
 
-  Edge_Buffer(const std::vector<Edge<E, uI_t>> &edges, sycl::queue &q,
+  Edge_Buffer(sycl::queue &q, const std::vector<Edge<E, uI_t>> &edges,
               const sycl::property_list &props = {})
       : to_buf(sycl::range<1>(edges.size()), props),
         from_buf(sycl::range<1>(edges.size()), props),
-        data_buf(sycl::range<1>(edges.size()), props), NE(edges.size()) {
+        data_buf(sycl::range<1>(edges.size()), props), NE(edges.size()), q(q){
     // split edges into to/from and data
     std::vector<uI_t> edge_to(edges.size());
     std::vector<uI_t> edge_from(edges.size());
@@ -64,11 +65,9 @@ template <typename E, std::unsigned_integer uI_t> struct Edge_Buffer: public Edg
       edge_from[i] = edges[i].from;
       edge_data[i] = edges[i].data;
     }
-    q.submit([&](sycl::handler &h) {
-      host_buffer_copy(to_buf, edge_to, h);
-      host_buffer_copy(from_buf, edge_from, h);
-      host_buffer_copy(data_buf, edge_data, h);
-    });
+      host_buffer_copy(q, to_buf, edge_to);
+      host_buffer_copy(q, from_buf, edge_from);
+      host_buffer_copy(q, data_buf, edge_data);
   }
 
   uI_t size() const { return N_edges; }

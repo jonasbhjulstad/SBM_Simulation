@@ -21,19 +21,18 @@ template <typename V, std::unsigned_integer uI_t> struct Vertex_Buffer : public 
 static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
 
   uI_t N_vertices = 0;
-  const uI_t NV;
   sycl::buffer<uI_t, 1> id_buf;
   sycl::buffer<V, 1> data_buf;
   sycl::queue &q;
 
-  Vertex_Buffer(uI_t NV, sycl::queue &q, const sycl::property_list &props = {})
-      : id_buf(sycl::range<1>(NV), props), data_buf(sycl::range<1>(NV), props),
-        NV(NV), q(q) {}
 
-  Vertex_Buffer(const std::vector<Vertex<V, uI_t>> &vertices, sycl::queue &q,
+  Vertex_Buffer(sycl::queue &q, uI_t NV, const sycl::property_list &props = {})
+      : id_buf(sycl::range<1>(NV), props), data_buf(sycl::range<1>(NV), props), q(q) {}
+
+  Vertex_Buffer(sycl::queue &q, const std::vector<Vertex<V, uI_t>> &vertices,
                 const sycl::property_list &props = {})
       : id_buf(sycl::range<1>(vertices.size()), props),
-        data_buf(sycl::range<1>(vertices.size()), props), NV(vertices.size()),
+        data_buf(sycl::range<1>(vertices.size()), props),
         q(q) {
     std::vector<uI_t> ids(vertices.size());
     std::vector<V> v_data(vertices.size());
@@ -41,10 +40,9 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
       ids[i] = vertices[i].id;
       v_data[i] = vertices[i].data;
     }
-    host_buffer_copy(id_buf, ids, q);
-    host_buffer_copy(data_buf, v_data, q);
+    add(ids, v_data);
   }
-  uI_t size() { return data_buf.size(); };
+  uI_t size() const { return data_buf.size(); };
   template <sycl::access::mode mode>
   Vertex_Accessor<V, uI_t, mode> get_access(sycl::handler &h) {
     return Vertex_Accessor<V, uI_t, mode>(data_buf, id_buf, h);
@@ -53,13 +51,18 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
   void resize(uI_t new_size) 
   {
     N_vertices = (N_vertices > new_size) ? N_vertices : new_size;
-    buffer_resize(id_buf, new_size, q);
-    buffer_resize(data_buf, new_size, q);
+    buffer_resize(q, id_buf, new_size);
+    buffer_resize(q, data_buf, new_size);
   }
 
   void add(const std::vector<uI_t> &ids, const std::vector<V> &v_data = {}) {
+    std::vector<V> data = (v_data.size() == 0) ? std::vector<V>(ids.size()) : v_data;
+    if(N_vertices + ids.size() > data_buf.size())
+    {
+      resize(N_vertices + ids.size());
+    }
+    host_buffer_add(data_buf, data, q);
     host_buffer_add(id_buf, ids, q);
-    host_buffer_add(data_buf, v_data, q);
     N_vertices += ids.size();
   }
 
@@ -67,7 +70,7 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
     std::vector<uI_t> ids;
     ids.reserve(N_vertices);
     auto id_acc = id_buf.template get_access<sycl::access::mode::read>();
-    for (uI_t i = 0; i < NV; ++i) {
+    for (uI_t i = 0; i < id_buf.size(); ++i) {
       if (id_acc[i] != invalid_id) {
         ids.push_back(id_acc[i]);
       }
@@ -100,7 +103,7 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
     auto id_acc = id_buf.template get_access<sycl::access::mode::read>();
     auto v_acc = data_buf.template get_access<sycl::access::mode::read>();
     uI_t i = 0;
-    for (uI_t j = 0; j < NV; ++j) {
+    for (uI_t j = 0; j < id_buf.size(); ++j) {
       if (id_acc[j] != invalid_id) {
         result[i].id = id_acc[j];
         result[i].data = v_acc[j];
