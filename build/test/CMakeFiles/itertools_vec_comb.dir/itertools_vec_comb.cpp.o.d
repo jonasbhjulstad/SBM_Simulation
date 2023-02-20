@@ -13,8 +13,7 @@ test/CMakeFiles/itertools_vec_comb.dir/itertools_vec_comb.cpp.o: \
   /usr/include/gnu/stubs-64.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/x86_64-pc-linux-gnu/bits/cpu_defines.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/pstl/pstl_config.h \
-  /opt/intel/oneapi/tbb/2021.8.0/env/../include/tbb/tbb.h \
-  /usr/include/assert.h \
+  /usr/include/tbb/tbb.h /usr/include/assert.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/functional \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/bits/stl_function.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/bits/move.h \

@@ -12,7 +12,7 @@ inline void host_buffer_copy(sycl::buffer<T, 1> &buf, const std::vector<T> &vec,
 
 template <typename T> class host_buffer_copy_kernel;
 
-template <typename T, typename uI_t = uint32_t>
+template <typename T, std::unsigned_integer uI_t = uint32_t>
 void host_buffer_add(sycl::buffer<T, 1> &buf, const std::vector<T> &vec,
                      sycl::queue &q, uI_t offset = 0) {
   if (vec.size() == 0) {
@@ -31,7 +31,7 @@ void host_buffer_add(sycl::buffer<T, 1> &buf, const std::vector<T> &vec,
   }
 }
 
-template <typename T, typename uI_t = uint32_t>
+template <typename T, std::unsigned_integer uI_t = uint32_t>
 void device_buffer_add(sycl::buffer<T, 1> &dest_buf, sycl::buffer<T, 1> src_buf,
                        sycl::queue &q, uI_t offset = 0) {
   if (src_buf.get_count() == 0) {
@@ -60,7 +60,7 @@ sycl::buffer<T, 1> buffer_resize(sycl::buffer<T, 1> &buf, sycl::queue &q,
   return new_buf;
 }
 
-template <typename T, typename uI_t = uint32_t>
+template <typename T, std::unsigned_integer uI_t = uint32_t>
 sycl::buffer<T, 1>
 device_buffer_combine(sycl::queue &q, sycl::buffer<T, 1> buf0,
                       sycl::buffer<T, 1> buf1, uI_t size0 = 0, uI_t size1 = 0) {
@@ -84,7 +84,7 @@ device_buffer_combine(sycl::queue &q, sycl::buffer<T, 1> buf0,
   return new_buf;
 }
 
-template <typename T, typename uI_t = uint32_t>
+template <typename T, std::unsigned_integer uI_t = uint32_t>
 inline void host_buffer_add(std::vector<sycl::buffer<T, 1> &> &bufs,
                             const std::vector<const std::vector<T> &> &vecs,
                             sycl::queue &q, const std::vector<uI_t> &offsets) {

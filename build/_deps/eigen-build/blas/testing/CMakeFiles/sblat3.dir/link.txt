@@ -1,1 +1,0 @@
-/usr/bin/f95 -g CMakeFiles/sblat3.dir/sblat3.f.o -o sblat3  -Wl,-rpath,/home/man/Documents/Sycl_Graph/build/_deps/eigen-build/blas ../libeigen_blas.so 

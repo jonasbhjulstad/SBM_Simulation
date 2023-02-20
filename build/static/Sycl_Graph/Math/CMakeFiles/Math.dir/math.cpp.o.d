@@ -12,7 +12,7 @@ static/Sycl_Graph/Math/CMakeFiles/Math.dir/math.cpp.o: \
   /usr/include/gnu/stubs-64.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/x86_64-pc-linux-gnu/bits/cpu_defines.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/pstl/pstl_config.h \
-  /opt/intel/oneapi/tbb/2021.8.0/env/../include/tbb/tbb.h \
+  /usr/include/tbb/tbb.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/bits/cpp_type_traits.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/ext/type_traits.h \
   /usr/include/math.h /usr/include/bits/libc-header-start.h \

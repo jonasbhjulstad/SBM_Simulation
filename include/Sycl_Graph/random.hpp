@@ -24,7 +24,7 @@ namespace Sycl_Graph::random {
         uniform_real_distribution() = default;
         uniform_real_distribution(dType a, dType b): a(a), b(b){}
         dType a = 0; dType b = 1;
-        template <typename RNG = tinymt::tinymt32>
+        template <Static_RNG::rng_type = tinymt::tinymt32>
         float operator()(RNG &rng) {
             auto val = rng();
             //convert val to random uniform float
@@ -38,7 +38,7 @@ namespace Sycl_Graph::random {
     {
         bernoulli_distribution(dType p): p(p){}
         dType p = 0;
-        template <typename RNG = tinymt::tinymt32>
+        template <Static_RNG::rng_type = tinymt::tinymt32>
         float operator()(RNG &rng) {
             auto val = rng();
             float uniform = (val / (dType)rng.max());
@@ -52,7 +52,7 @@ namespace Sycl_Graph::random {
         normal_distribution() = default;
         normal_distribution(dType mean, dType stddev): mean(mean), stddev(stddev){}
         dType mean = 0; dType stddev = 1;
-        template <typename RNG = tinymt::tinymt32>
+        template <Static_RNG::rng_type = tinymt::tinymt32>
         float operator()(RNG &rng) {
             auto val = rng();
             //convert val to random uniform float
@@ -65,7 +65,7 @@ namespace Sycl_Graph::random {
         binomial_distribution(T n, T p) : n(n), dist(p) {}
         bernoulli_distribution<T> dist;
         T n;
-        template <typename RNG = tinymt::tinymt32>
+        template <Static_RNG::rng_type = tinymt::tinymt32>
         T operator()(RNG &rng) {
             T count = 0;
             for (T i = 0; i < n; i++) {
@@ -86,7 +86,7 @@ namespace Sycl_Graph::random {
     struct poisson_distribution {
         poisson_distribution(T lambda) : lambda(lambda) {}
         T lambda;
-        template <typename RNG = tinymt::tinymt32>
+        template <Static_RNG::rng_type = tinymt::tinymt32>
         T operator()(RNG &rng) {
             T count = 0;
             T p = 1;

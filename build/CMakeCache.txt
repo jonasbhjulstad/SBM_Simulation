@@ -14,11 +14,20 @@
 # EXTERNAL cache entries
 ########################
 
+//Build documentation
+BUILD_DOCS:BOOL=ON
+
+//Build Python Bindings
+BUILD_PYTHON_BINDERS:BOOL=ON
+
+//Build Python docstrings
+BUILD_PYTHON_DOCSTRINGS:BOOL=ON
+
 //Build the testing tree.
 BUILD_TESTING:BOOL=ON
 
 //The directory containing a CMake configuration file for Boost.
-Boost_DIR:PATH=/usr/lib/cmake/Boost-1.80.0
+Boost_DIR:PATH=/usr/lib/cmake/Boost-1.81.0
 
 Boost_GRAPH_LIBRARY_RELEASE:STRING=/usr/lib/libboost_graph.so.1.80.0
 
@@ -437,6 +446,9 @@ MEMORYCHECK_COMMAND:FILEPATH=/opt/cuda/bin/cuda-memcheck
 //File that contains suppressions for the memory checker
 MEMORYCHECK_SUPPRESSIONS_FILE:FILEPATH=
 
+//Path to a program.
+MKDOC_PYTHON:FILEPATH=MKDOC_PYTHON-NOTFOUND
+
 //Dependencies for the target
 Math_LIB_DEPENDS:STATIC=general;Common;general;DataFrame;
 
@@ -452,6 +464,12 @@ PYTHON_LIBRARY:FILEPATH=/home/man/.pyenv/versions/3.9.13/lib/libpython3.9.so
 
 //Name of the computer/site where compile is being run
 SITE:STRING=man
+
+//Enable packaging
+STATIC_RNG_ENABLE_PACKAGING:BOOL=ON
+
+//Enable Python bindings
+STATIC_RNG_ENABLE_PYTHON:BOOL=ON
 
 //Use CUDA
 SYCL_GRAPH_USE_CUDA:BOOL=ON
@@ -497,13 +515,13 @@ TRACY_ON_DEMAND:BOOL=ON
 Tracy_DIR:PATH=/usr/share/Tracy
 
 //The directory containing a CMake configuration file for boost_graph.
-boost_graph_DIR:PATH=/usr/lib/cmake/boost_graph-1.80.0
+boost_graph_DIR:PATH=/usr/lib/cmake/boost_graph-1.81.0
 
 //The directory containing a CMake configuration file for boost_headers.
-boost_headers_DIR:PATH=/usr/lib/cmake/boost_headers-1.80.0
+boost_headers_DIR:PATH=/usr/lib/cmake/boost_headers-1.81.0
 
 //The directory containing a CMake configuration file for boost_regex.
-boost_regex_DIR:PATH=/usr/lib/cmake/boost_regex-1.80.0
+boost_regex_DIR:PATH=/usr/lib/cmake/boost_regex-1.81.0
 
 //Value Computed by CMake
 cppitertools_BINARY_DIR:STATIC=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools-build
@@ -773,6 +791,7 @@ CPM_PACKAGE_Tracy_VERSION:INTERNAL=
 CPM_PACKAGE_cppitertools_BINARY_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools-build
 CPM_PACKAGE_cppitertools_SOURCE_DIR:INTERNAL=/home/man/Documents/Sycl_Graph/build/_deps/cppitertools-src
 CPM_PACKAGE_cppitertools_VERSION:INTERNAL=
+CPM_PACKAGE_pybind11_VERSION:INTERNAL=2.10.3
 CPM_VERSION:INTERNAL=0.36.0
 //ADVANCED property for variable: CTEST_SUBMIT_RETRY_COUNT
 CTEST_SUBMIT_RETRY_COUNT-ADVANCED:INTERNAL=1
@@ -785,13 +804,15 @@ DOXYGEN_DOT_EXECUTABLE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: DOXYGEN_EXECUTABLE
 DOXYGEN_EXECUTABLE-ADVANCED:INTERNAL=1
 //Details about finding Boost
-FIND_PACKAGE_MESSAGE_DETAILS_Boost:INTERNAL=[/usr/lib/cmake/Boost-1.80.0/BoostConfig.cmake][cfound components: graph ][v1.80.0()]
+FIND_PACKAGE_MESSAGE_DETAILS_Boost:INTERNAL=[/usr/lib/cmake/Boost-1.81.0/BoostConfig.cmake][cfound components: graph ][v1.81.0()]
 //Details about finding Doxygen
 FIND_PACKAGE_MESSAGE_DETAILS_Doxygen:INTERNAL=[/usr/bin/doxygen][cfound components: doxygen dot ][v1.9.6()]
 //Details about finding PYTHON
 FIND_PACKAGE_MESSAGE_DETAILS_PYTHON:INTERNAL=/home/man/.pyenv/versions/3.9.13/bin/python33.9.13
+//Details about finding Python
+FIND_PACKAGE_MESSAGE_DETAILS_Python:INTERNAL=[/usr/bin/python3.10][/usr/include/python3.10][/usr/lib/libpython3.10.so][cfound components: Interpreter Development Development.Module Development.Embed ][v3.10.9()]
 //Details about finding Python3
-FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/usr/bin/python3.10][cfound components: Interpreter ][v3.10.9(3.9)]
+FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/usr/bin/python3.10][/usr/include/python3.10][/usr/lib/libpython3.10.so][cfound components: Interpreter Development Development.Module Development.Embed ][v3.10.9()]
 //Details about finding PythonInterp
 FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/home/man/.pyenv/versions/3.9.13/bin/python3][v3.9.13(3.9)]
 //Details about finding Threads
@@ -837,17 +858,37 @@ _GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/usr/local
 _Python:INTERNAL=PYTHON
 //Compiler reason failure
 _Python3_Compiler_REASON_FAILURE:INTERNAL=
-//Development reason failure
-_Python3_Development_REASON_FAILURE:INTERNAL=
-//Path to a program.
+_Python3_DEVELOPMENT_EMBED_SIGNATURE:INTERNAL=00a258fa9c45642326a7a14f64ebb872
+_Python3_DEVELOPMENT_MODULE_SIGNATURE:INTERNAL=ccf47bf2a1a8665d35582ac5fb1b09aa
 _Python3_EXECUTABLE:INTERNAL=/usr/bin/python3.10
+//Path to a file.
+_Python3_INCLUDE_DIR:INTERNAL=/usr/include/python3.10
 //Python3 Properties
 _Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;10;9;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages
 _Python3_INTERPRETER_SIGNATURE:INTERNAL=2e995cd2bd888af83868128ab4554325
 //Interpreter reason failure
 _Python3_Interpreter_REASON_FAILURE:INTERNAL=
+//Path to a library.
+_Python3_LIBRARY_RELEASE:INTERNAL=/usr/lib/libpython3.10.so
 //NumPy reason failure
 _Python3_NumPy_REASON_FAILURE:INTERNAL=
+//Compiler reason failure
+_Python_Compiler_REASON_FAILURE:INTERNAL=
+_Python_DEVELOPMENT_EMBED_SIGNATURE:INTERNAL=ae662ec966721bb3d3ae2a58c8bf15bd
+_Python_DEVELOPMENT_MODULE_SIGNATURE:INTERNAL=4bc14a0ea6a21ea267e38aa660e9b54b
+//Path to a program.
+_Python_EXECUTABLE:INTERNAL=/usr/bin/python3.10
+//Path to a file.
+_Python_INCLUDE_DIR:INTERNAL=/usr/include/python3.10
+//Python Properties
+_Python_INTERPRETER_PROPERTIES:INTERNAL=Python;3;10;9;64;;cpython-310-x86_64-linux-gnu;/usr/lib/python3.10;/usr/lib/python3.10;/usr/lib/python3.10/site-packages;/usr/lib/python3.10/site-packages
+_Python_INTERPRETER_SIGNATURE:INTERNAL=b91b4035ecb3bb3f5760d35922531bcd
+//Interpreter reason failure
+_Python_Interpreter_REASON_FAILURE:INTERNAL=
+//Path to a library.
+_Python_LIBRARY_RELEASE:INTERNAL=/usr/lib/libpython3.10.so
+//NumPy reason failure
+_Python_NumPy_REASON_FAILURE:INTERNAL=
 //ADVANCED property for variable: boost_graph_DIR
 boost_graph_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: boost_headers_DIR

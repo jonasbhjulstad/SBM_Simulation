@@ -10,7 +10,7 @@ include/Sycl_Graph/CMakeFiles/Common.dir/path_config.cpp.o: \
   /usr/include/gnu/stubs-64.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/x86_64-pc-linux-gnu/bits/cpu_defines.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/pstl/pstl_config.h \
-  /opt/intel/oneapi/tbb/2021.8.0/env/../include/tbb/tbb.h \
+  /usr/include/tbb/tbb.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/bits/stringfwd.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/bits/memoryfwd.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/bits/char_traits.h \

@@ -4,7 +4,7 @@
 #include <Sycl_Graph/Graph/Graph_Types.hpp>
 namespace Sycl_Graph::Meta
 {
-    template <typename V, typename uI_t>
+    template <typename V, std::unsigned_integer uI_t>
     struct Vertex_Buffer: public Vertex_Buffer_Base<V, uI_t, Vertex_Buffer<V, uI_t>>
     {
         std::vector<Vertex<V*, uI_t>> vertices;

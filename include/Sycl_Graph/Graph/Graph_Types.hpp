@@ -27,7 +27,7 @@ namespace Sycl_Graph
         ID_t from = invalid_id;
     };
 
-    template <typename V, typename uI_t, typename Derived>
+    template <typename V, std::unsigned_integer uI_t, typename Derived>
     struct Vertex_Buffer_Base
     {
         uI_t size() const
@@ -53,7 +53,7 @@ namespace Sycl_Graph
         }
     };
 
-    template <typename E, typename uI_t, typename Derived>
+    template <typename E, std::unsigned_integer uI_t, typename Derived>
     struct Edge_Buffer_Base
     {
         uI_t size() const

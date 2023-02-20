@@ -5,7 +5,7 @@
 #include <vector>
 namespace Sycl_Graph::Meta
 {
-    template <typename E, typename uI_t>
+    template <typename E, std::unsigned_integer uI_t>
     struct Edge_Buffer: public Edge_Buffer_Base<E, uI_t, Edge_Buffer<E, uI_t>>
     {
         std::vector<Edge<E*, uI_t>> edges; 

@@ -10,8 +10,10 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.25.2/CMakeSystem.cmake"
   "CMakeLists.txt"
   "cppitertools-populate-prefix/tmp/cppitertools-populate-mkdirs.cmake"
+  "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake"
   "/usr/share/cmake/Modules/CMakeGenericSystem.cmake"
   "/usr/share/cmake/Modules/CMakeInitializeConfigs.cmake"
+  "/usr/share/cmake/Modules/CMakeSystem.cmake.in"
   "/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake"
   "/usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake"
   "/usr/share/cmake/Modules/ExternalProject.cmake"
@@ -32,6 +34,7 @@ set(CMAKE_MAKEFILE_OUTPUTS
 
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
+  "CMakeFiles/3.25.2/CMakeSystem.cmake"
   "cppitertools-populate-prefix/tmp/cppitertools-populate-mkdirs.cmake"
   "cppitertools-populate-prefix/tmp/cppitertools-populate-gitclone.cmake"
   "cppitertools-populate-prefix/src/cppitertools-populate-stamp/cppitertools-populate-gitinfo.txt"

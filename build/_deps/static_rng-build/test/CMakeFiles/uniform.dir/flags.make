@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/man/Documents/Sycl_Graph/build/_deps/static_rng-src/include -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include
 
-CXX_FLAGS = -O3 -Wall -fPIE -std=gnu++17
+CXX_FLAGS = -O3 -Wall -fPIE -std=gnu++20
 

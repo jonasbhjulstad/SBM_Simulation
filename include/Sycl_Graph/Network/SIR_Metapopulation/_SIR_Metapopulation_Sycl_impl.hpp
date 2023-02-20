@@ -58,7 +58,7 @@ struct SIR_Metapopulation_Temporal_Param {
 using SIR_Metapopulation_Graph =
     Sycl_Graph::Sycl::Graph<SIR_Metapopulation_Node, SIR_Metapopulation_Param,
                             uint32_t>;
-template <typename RNG = Sycl_Graph::random::default_rng>
+template <Static_RNG::rng_type = Sycl_Graph::random::default_rng>
 struct SIR_Metapopulation_Network
     : public Network<SIR_Metapopulation_Network<RNG>, SIR_Metapopulation_State,
                      SIR_Metapopulation_Temporal_Param> {

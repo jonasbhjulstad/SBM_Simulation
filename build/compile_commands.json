@@ -1,7 +1,12 @@
 [
 {
+  "directory": "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-build",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++ -DBinder_EXPORTS -I/home/man/Documents/Sycl_Graph/build/_deps/static_rng-src/include -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -isystem /usr/include/python3.10 -O3 -Wall -fPIC -fvisibility-inlines-hidden -std=gnu++20 -o CMakeFiles/Binder.dir/binders/random.cpp.o -c /home/man/Documents/Sycl_Graph/build/_deps/static_rng-src/binders/random.cpp",
+  "file": "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-src/binders/random.cpp"
+},
+{
   "directory": "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-build/test",
-  "command": "/opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++  -I/home/man/Documents/Sycl_Graph/build/_deps/static_rng-src/include -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -O3 -Wall -fPIE -std=gnu++17 -o CMakeFiles/uniform.dir/uniform.cpp.o -c /home/man/Documents/Sycl_Graph/build/_deps/static_rng-src/test/uniform.cpp",
+  "command": "/opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++  -I/home/man/Documents/Sycl_Graph/build/_deps/static_rng-src/include -I/home/man/Documents/Sycl_Graph/build/_deps/tinymt_repo-src/include -O3 -Wall -fPIE -std=gnu++20 -o CMakeFiles/uniform.dir/uniform.cpp.o -c /home/man/Documents/Sycl_Graph/build/_deps/static_rng-src/test/uniform.cpp",
   "file": "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-src/test/uniform.cpp"
 },
 {

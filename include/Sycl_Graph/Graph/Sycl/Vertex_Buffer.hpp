@@ -4,7 +4,7 @@
 #include <Sycl_Graph/Graph/Graph_Types.hpp>
 #include <Sycl_Graph/buffer_routines.hpp>
 namespace Sycl_Graph::Sycl {
-template <typename V, typename uI_t, sycl::access::mode mode>
+template <typename V, std::unsigned_integer uI_t, sycl::access::mode mode>
 struct Vertex_Accessor {
   Vertex_Accessor(sycl::buffer<V, 1> &v_buf, sycl::buffer<uI_t, 1> &id_buf,
                   sycl::handler &h, sycl::property_list props = {})
@@ -17,7 +17,7 @@ struct Vertex_Accessor {
 enum Vertex_Indexing { VERTEX_INDEX_ID, VERTEX_INDEX_POSITION };
 
 
-template <typename V, typename uI_t> struct Vertex_Buffer : public Vertex_Buffer_Base<V, uI_t, Vertex_Buffer<V, uI_t>>{
+template <typename V, std::unsigned_integer uI_t> struct Vertex_Buffer : public Vertex_Buffer_Base<V, uI_t, Vertex_Buffer<V, uI_t>>{
 static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
 
   uI_t N_vertices = 0;

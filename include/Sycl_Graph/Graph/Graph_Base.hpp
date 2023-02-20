@@ -12,7 +12,7 @@
 #include <boost/property_map/function_property_map.hpp>
 #include <boost/property_map/transform_value_property_map.hpp>
 namespace Sycl_Graph {
-template <typename V, typename E, typename uI_t, typename DV, typename DE>
+template <typename V, typename E, std::unsigned_integer uI_t, typename DV, typename DE>
 struct Graph_Base {
   Vertex_Buffer_Base<V, uI_t, DV> vertex_buf;
   Edge_Buffer_Base<E, uI_t, DE> edge_buf;
@@ -130,48 +130,50 @@ struct Graph_Base {
   }
 };
 
-namespace _detail {
-template <typename...> struct Typelist {};
-
-} // namespace _detail
 
 
+// namespace _detail {
+// template <typename...> struct Typelist {};
 
-template <typename uI_t, typename V_LABEL_TYPES, typename E_LABEL_TYPES,
-          typename DV_LABEL_TYPES, typename DE_LABEL_TYPES>
-struct Labeled_Graph;
-
-template <typename uI_t, typename... Vs, typename... Es, typename... DVs,
-          typename... DEs>
-struct Labeled_Graph<uI_t, _detail::Typelist<Vs...>, _detail::Typelist<Es...>,
-                     _detail::Typelist<DVs...>, _detail::Typelist<DEs...>> {
-  // get number of types of Vs
-  static constexpr auto N_LABELS_V = sizeof...(Vs);
-  // get number of types of Es
-  static constexpr auto N_LABELS_E = sizeof...(Es);
-
-  static constexpr auto V_LABELS =
-      std::array<const char *, N_LABELS_V>{typeid(Vs).name()...};
-  static constexpr auto E_LABELS =
-      std::array<const char *, N_LABELS_E>{typeid(Es).name()...};
-
-  // create N_LABELS_V Vertex_Buffers
-  std::array<Vertex_Buffer_Base<Vs..., uI_t, DVs...>, N_LABELS_V> vertex_bufs;
-  // create N_LABELS_E Edge_Buffers
-  std::array<Edge_Buffer_Base<Es..., uI_t, DEs...>, N_LABELS_E> edge_bufs;
-
-  using Graph_t = Labeled_Graph<uI_t, _detail::Typelist<Vs...>,
-                                _detail::Typelist<Es...>,
-                                _detail::Typelist<DVs...>,
-                                _detail::Typelist<DEs...>>;
-
-  using Vertex_t = boost::variant<Vertex<Vs, uI_t>...>;
-  using Edge_t = boost::variant<Edge<Es, uI_t>...>;
+// } 
 
 
-  Labeled_Graph(const std::vector<Vertex<Vs, uI_t>> &...vertices,
-                const std::vector<Edge<Es, uI_t>> &...edges)
-      : vertex_bufs{vertices...}, edge_bufs{edges...} {}
+
+// template <std::unsigned_integer uI_t, typename V_LABEL_TYPES, typename E_LABEL_TYPES,
+//           typename DV_LABEL_TYPES, typename DE_LABEL_TYPES>
+// struct Labeled_Graph;
+
+// template <std::unsigned_integer uI_t, typename... Vs, typename... Es, typename... DVs,
+//           typename... DEs>
+// struct Labeled_Graph<uI_t, _detail::Typelist<Vs...>, _detail::Typelist<Es...>,
+//                      _detail::Typelist<DVs...>, _detail::Typelist<DEs...>> {
+//   // get number of types of Vs
+//   static constexpr auto N_LABELS_V = sizeof...(Vs);
+//   // get number of types of Es
+//   static constexpr auto N_LABELS_E = sizeof...(Es);
+
+//   static constexpr auto V_LABELS =
+//       std::array<const char *, N_LABELS_V>{typeid(Vs).name()...};
+//   static constexpr auto E_LABELS =
+//       std::array<const char *, N_LABELS_E>{typeid(Es).name()...};
+
+//   // create N_LABELS_V Vertex_Buffers
+//   std::array<Vertex_Buffer_Base<Vs..., uI_t, DVs...>, N_LABELS_V> vertex_bufs;
+//   // create N_LABELS_E Edge_Buffers
+//   std::array<Edge_Buffer_Base<Es..., uI_t, DEs...>, N_LABELS_E> edge_bufs;
+
+//   using Graph_t = Labeled_Graph<uI_t, _detail::Typelist<Vs...>,
+//                                 _detail::Typelist<Es...>,
+//                                 _detail::Typelist<DVs...>,
+//                                 _detail::Typelist<DEs...>>;
+
+//   using Vertex_t = boost::variant<Vertex<Vs, uI_t>...>;
+//   using Edge_t = boost::variant<Edge<Es, uI_t>...>;
+
+
+//   Labeled_Graph(const std::vector<Vertex<Vs, uI_t>> &...vertices,
+//                 const std::vector<Edge<Es, uI_t>> &...edges)
+//       : vertex_bufs{vertices...}, edge_bufs{edges...} {}
 
   
   

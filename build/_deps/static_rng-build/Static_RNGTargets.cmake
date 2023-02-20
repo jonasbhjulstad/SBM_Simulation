@@ -23,7 +23,7 @@ endif()
 set(_cmake_targets_defined "")
 set(_cmake_targets_not_defined "")
 set(_cmake_expected_targets "")
-foreach(_cmake_expected_target IN ITEMS Static_RNG::Random Static_RNG::tinymt)
+foreach(_cmake_expected_target IN ITEMS Static_RNG::Static_RNG Static_RNG::tinymt)
   list(APPEND _cmake_expected_targets "${_cmake_expected_target}")
   if(TARGET "${_cmake_expected_target}")
     list(APPEND _cmake_targets_defined "${_cmake_expected_target}")
@@ -50,10 +50,10 @@ unset(_cmake_targets_not_defined)
 unset(_cmake_expected_targets)
 
 
-# Create imported target Static_RNG::Random
-add_library(Static_RNG::Random INTERFACE IMPORTED)
+# Create imported target Static_RNG::Static_RNG
+add_library(Static_RNG::Static_RNG INTERFACE IMPORTED)
 
-set_target_properties(Static_RNG::Random PROPERTIES
+set_target_properties(Static_RNG::Static_RNG PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-src/include"
   INTERFACE_LINK_LIBRARIES "Static_RNG::tinymt"
 )

@@ -546,6 +546,19 @@ ContinuousSubmit/fast:
 .PHONY : ContinuousSubmit/fast
 
 #=============================================================================
+# Target rules for targets named Binder
+
+# Build rule for target.
+Binder: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Binder
+.PHONY : Binder
+
+# fast build rule for target.
+Binder/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/static_rng-build/CMakeFiles/Binder.dir/build.make _deps/static_rng-build/CMakeFiles/Binder.dir/build
+.PHONY : Binder/fast
+
+#=============================================================================
 # Target rules for targets named docs
 
 # Build rule for target.
@@ -744,6 +757,7 @@ help:
 	@echo "... NightlyTest"
 	@echo "... NightlyUpdate"
 	@echo "... docs"
+	@echo "... Binder"
 	@echo "... Common"
 	@echo "... DataFrame"
 	@echo "... Math"
