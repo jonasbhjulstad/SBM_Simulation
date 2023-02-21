@@ -4,16 +4,18 @@
 
 namespace Sycl_Graph
 {
-    concept Vertex_type = requires
+    template <typename T>
+    concept Vertex_type = requires(T)
     {
-        typename Vertex::ID_t;
-        typename Vertex::Data_t;
+        typename T::ID_t;
+        typename T::Data_t;
     };
 
-    concept Edge_type = requires
+    template <typename T>
+    concept Edge_type = requires(T)
     {
-        typename Edge::ID_t;
-        typename Edge::Data_t;
+        typename T::ID_t;
+        typename T::Data_t;
     };
 
     template <typename T>

@@ -588,18 +588,18 @@ Binder/fast:
 .PHONY : Binder/fast
 
 # Convenience name for target.
-_deps/static_rng-build/CMakeFiles/docs.dir/rule:
-	cd /home/man/Documents/Sycl_Graph/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/static_rng-build/CMakeFiles/docs.dir/rule
-.PHONY : _deps/static_rng-build/CMakeFiles/docs.dir/rule
+_deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/rule:
+	cd /home/man/Documents/Sycl_Graph/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/rule
+.PHONY : _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/rule
 
 # Convenience name for target.
-docs: _deps/static_rng-build/CMakeFiles/docs.dir/rule
-.PHONY : docs
+Static_RNG_docs: _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/rule
+.PHONY : Static_RNG_docs
 
 # fast build rule for target.
-docs/fast:
-	cd /home/man/Documents/Sycl_Graph/build && $(MAKE) $(MAKESILENT) -f _deps/static_rng-build/CMakeFiles/docs.dir/build.make _deps/static_rng-build/CMakeFiles/docs.dir/build
-.PHONY : docs/fast
+Static_RNG_docs/fast:
+	cd /home/man/Documents/Sycl_Graph/build && $(MAKE) $(MAKESILENT) -f _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/build.make _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/build
+.PHONY : Static_RNG_docs/fast
 
 binders/random.o: binders/random.cpp.o
 .PHONY : binders/random.o
@@ -667,7 +667,7 @@ help:
 	@echo "... NightlySubmit"
 	@echo "... NightlyTest"
 	@echo "... NightlyUpdate"
-	@echo "... docs"
+	@echo "... Static_RNG_docs"
 	@echo "... Binder"
 	@echo "... binders/random.o"
 	@echo "... binders/random.i"

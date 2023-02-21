@@ -53,13 +53,7 @@ unset(_cmake_expected_targets)
 # Create imported target Static_RNG::Static_RNG
 add_library(Static_RNG::Static_RNG INTERFACE IMPORTED)
 
-<<<<<<< HEAD
 set_target_properties(Static_RNG::Static_RNG PROPERTIES
-=======
-set_target_properties(Static_RNG::Random PROPERTIES
-  INTERFACE_COMPILE_DEFINITIONS "STATIC_RNG_ENABLE_SYCL"
-  INTERFACE_COMPILE_OPTIONS "-fsycl"
->>>>>>> 91d3e036c5389d2c0f22ce10c91c3fd58e099bff
   INTERFACE_INCLUDE_DIRECTORIES "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-src/include"
   INTERFACE_LINK_LIBRARIES "Static_RNG::tinymt"
 )

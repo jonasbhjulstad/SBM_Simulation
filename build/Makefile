@@ -182,6 +182,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named Sycl_Graph_docs
+
+# Build rule for target.
+Sycl_Graph_docs: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Sycl_Graph_docs
+.PHONY : Sycl_Graph_docs
+
+# fast build rule for target.
+Sycl_Graph_docs/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Sycl_Graph_docs.dir/build.make CMakeFiles/Sycl_Graph_docs.dir/build
+.PHONY : Sycl_Graph_docs/fast
+
+#=============================================================================
 # Target rules for targets named Experimental
 
 # Build rule for target.
@@ -559,17 +572,17 @@ Binder/fast:
 .PHONY : Binder/fast
 
 #=============================================================================
-# Target rules for targets named docs
+# Target rules for targets named Static_RNG_docs
 
 # Build rule for target.
-docs: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 docs
-.PHONY : docs
+Static_RNG_docs: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Static_RNG_docs
+.PHONY : Static_RNG_docs
 
 # fast build rule for target.
-docs/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/static_rng-build/CMakeFiles/docs.dir/build.make _deps/static_rng-build/CMakeFiles/docs.dir/build
-.PHONY : docs/fast
+Static_RNG_docs/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/build.make _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/build
+.PHONY : Static_RNG_docs/fast
 
 #=============================================================================
 # Target rules for targets named uniform
@@ -702,6 +715,32 @@ itertools_vec_comb/fast:
 .PHONY : itertools_vec_comb/fast
 
 #=============================================================================
+# Target rules for targets named bgl_concept
+
+# Build rule for target.
+bgl_concept: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bgl_concept
+.PHONY : bgl_concept
+
+# fast build rule for target.
+bgl_concept/fast:
+	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/bgl_concept.dir/build.make test/CMakeFiles/bgl_concept.dir/build
+.PHONY : bgl_concept/fast
+
+#=============================================================================
+# Target rules for targets named SIR_Metapopulation_Simulation
+
+# Build rule for target.
+SIR_Metapopulation_Simulation: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 SIR_Metapopulation_Simulation
+.PHONY : SIR_Metapopulation_Simulation
+
+# fast build rule for target.
+SIR_Metapopulation_Simulation/fast:
+	$(MAKE) $(MAKESILENT) -f Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/build.make Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/build
+.PHONY : SIR_Metapopulation_Simulation/fast
+
+#=============================================================================
 # Target rules for targets named SIR_Simulation
 
 # Build rule for target.
@@ -756,13 +795,16 @@ help:
 	@echo "... NightlySubmit"
 	@echo "... NightlyTest"
 	@echo "... NightlyUpdate"
-	@echo "... docs"
+	@echo "... Static_RNG_docs"
+	@echo "... Sycl_Graph_docs"
 	@echo "... Binder"
 	@echo "... Common"
 	@echo "... DataFrame"
 	@echo "... Math"
+	@echo "... SIR_Metapopulation_Simulation"
 	@echo "... SIR_Simulation"
 	@echo "... Sycl_Graph_Eigen"
+	@echo "... bgl_concept"
 	@echo "... itertools_vec_comb"
 	@echo "... sycl_copy_profiling"
 	@echo "... sycl_device_info"

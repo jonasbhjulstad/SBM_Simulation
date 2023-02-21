@@ -15,7 +15,7 @@ test/CMakeFiles/sycl_copy_profiling.dir/sycl_copy_profiling.cpp.o: \
   /usr/include/gnu/stubs-64.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/x86_64-pc-linux-gnu/bits/cpu_defines.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/pstl/pstl_config.h \
-  /usr/include/tbb/tbb.h \
+  /opt/intel/oneapi/tbb/2021.8.0/env/../include/tbb/tbb.h \
   /opt/intel/oneapi/compiler/2023.0.0/linux/lib/clang/16.0.0/include/stddef.h \
   /opt/intel/oneapi/compiler/2023.0.0/linux/lib/clang/16.0.0/include/__stddef_max_align_t.h \
   /usr/lib64/gcc/x86_64-pc-linux-gnu/12.2.1/../../../../include/c++/12.2.1/cstdint \

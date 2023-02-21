@@ -26,7 +26,7 @@
 namespace Sycl_Graph::Sycl
 {
 
-  template <typename V, typename E, std::unsigned_integer uI_t>
+  template <typename V, typename E, std::unsigned_integral uI_t>
   struct Graph : public Sycl_Graph::Graph_Base<V, E, uI_t, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>>
 
   {

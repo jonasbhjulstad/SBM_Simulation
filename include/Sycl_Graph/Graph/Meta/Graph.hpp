@@ -21,7 +21,7 @@
 
 namespace Sycl_Graph::Meta
 {
-    template <typename V, typename E, std::unsigned_integer uI_t> 
+    template <typename V, typename E, std::unsigned_integral uI_t> 
     struct Uniform_Graph
     {
         Uniform_Graph(const std::vector<Vertex<V, uI_t>> &vertices,
@@ -38,7 +38,7 @@ namespace Sycl_Graph::Meta
         Edge_Buffer<E, uI_t> edge_buf;
     };
 
-    // template <std::unsigned_integer uI_t, typename ... Vs, typename ... Es>
+    // template <std::unsigned_integral uI_t, typename ... Vs, typename ... Es>
     // struct Labeled_Graph
     // {
     //     //get number of types of Vs

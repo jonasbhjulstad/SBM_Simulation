@@ -1,6 +1,8 @@
 #ifndef SYCL_GRAPH_GRAPH_TYPES_HPP
 #define SYCL_GRAPH_GRAPH_TYPES_HPP
 #include <limits>
+#include <concepts>
+#include <numeric>
 #include <vector>
 #include <Sycl_Graph/Math/math.hpp>
 namespace Sycl_Graph
@@ -39,23 +41,7 @@ namespace Sycl_Graph
         ID_t from = invalid_id;
     };
 
-<<<<<<< HEAD
-    template <typename V, std::unsigned_integer uI_t, typename Derived>
-=======
-    template <typename D, typename ID_t>
-    std::vector<Edge<D, ID_t>> make_edges(const std::vector<D>& data, const std::vector<ID_t>& to, const std::vector<ID_t>& from)
-    {
-        std::vector<Edge<D, ID_t>> edges;
-        edges.reserve(data.size());
-        for (size_t i = 0; i < data.size(); ++i)
-        {
-            edges.emplace_back(data[i], to[i], from[i]);
-        }
-        return edges;
-    }
-
-    template <typename V, typename uI_t, typename Derived>
->>>>>>> 91d3e036c5389d2c0f22ce10c91c3fd58e099bff
+    template <typename V, std::unsigned_integral uI_t, typename Derived>
     struct Vertex_Buffer_Base
     {
         uI_t size() const
@@ -91,7 +77,7 @@ namespace Sycl_Graph
         }
     };
 
-    template <typename E, std::unsigned_integer uI_t, typename Derived>
+    template <typename E, std::unsigned_integral uI_t, typename Derived>
     struct Edge_Buffer_Base
     {
         uI_t size() const

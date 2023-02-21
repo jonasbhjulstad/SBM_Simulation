@@ -44,7 +44,7 @@ float compute_infection_probability(float beta, float N_I, float N, float dt,
 // sycl::is_device_copyable_v<SIR_Metapopulation_State>
 // is_copyable_SIR_Invidual_State;
 using namespace Sycl_Graph::Network_Models;
-using namespace Static_RNG::distributions;
+using namespace Static_RNG;
 template <typename T> using SIR_vector_t = std::vector<T, std::allocator<T>>;
 struct SIR_Metapopulation_Node {
   SIR_Metapopulation_State state;
@@ -59,11 +59,7 @@ struct SIR_Metapopulation_Temporal_Param {
 using SIR_Metapopulation_Graph =
     Sycl_Graph::Sycl::Graph<SIR_Metapopulation_Node, SIR_Metapopulation_Param,
                             uint32_t>;
-<<<<<<< HEAD
-template <Static_RNG::rng_type = Sycl_Graph::random::default_rng>
-=======
-template <typename RNG = Static_RNG::distributions::default_rng>
->>>>>>> 91d3e036c5389d2c0f22ce10c91c3fd58e099bff
+template <Static_RNG::rng_type RNG = Static_RNG::default_rng>
 struct SIR_Metapopulation_Network
     : public Network<SIR_Metapopulation_Network<RNG>, SIR_Metapopulation_State,
                      SIR_Metapopulation_Temporal_Param> {

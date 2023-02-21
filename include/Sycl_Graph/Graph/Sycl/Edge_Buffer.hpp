@@ -4,7 +4,7 @@
 #include <Sycl_Graph/Graph/Graph_Types.hpp>
 #include <Sycl_Graph/buffer_routines.hpp>
 namespace Sycl_Graph::Sycl {
-template <typename E, std::unsigned_integer uI_t, sycl::access::mode Mode>
+template <typename E, std::unsigned_integral uI_t, sycl::access::mode Mode>
 struct Edge_Accessor {
   Edge_Accessor(sycl::buffer<E, 1> &edge_buf, sycl::buffer<uI_t, 1> &to_buf,
                 sycl::buffer<uI_t, 1> &from_buf, sycl::handler &h,
@@ -17,9 +17,9 @@ struct Edge_Accessor {
 };
 
 enum Edge_Indexing { EDGE_INDEXING_ID, EDGE_INDEXING_POSITION };
-template <typename V, std::unsigned_integer uI_t> struct Vertex_Buffer;
+template <typename V, std::unsigned_integral uI_t> struct Vertex_Buffer;
 
-template <std::unsigned_integer uI_t = uint32_t>
+template <std::unsigned_integral uI_t = uint32_t>
 struct Edge_ID_Pair
 {
     static constexpr uI_t invalid_ID = std::numeric_limits<uI_t>::max();
@@ -33,7 +33,7 @@ struct Edge_ID_Pair
 
 };
 
-template <typename E, std::unsigned_integer uI_t> struct Edge_Buffer: public Edge_Buffer_Base<E, uI_t, Edge_Buffer<E, uI_t>>
+template <typename E, std::unsigned_integral uI_t> struct Edge_Buffer: public Edge_Buffer_Base<E, uI_t, Edge_Buffer<E, uI_t>>
  {
   // current number of edges
   uI_t N_edges = 0;

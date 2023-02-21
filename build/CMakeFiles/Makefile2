@@ -81,6 +81,7 @@ preinstall: Executables/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/Sycl_Graph_docs.dir/clean
 clean: _deps/static_rng-build/clean
 clean: _deps/cppitertools-build/clean
 clean: include/clean
@@ -126,6 +127,7 @@ Executables/Dataset_Graph_Generation/clean:
 # Directory level rules for directory Executables/Simulations
 
 # Recursive "all" directory target.
+Executables/Simulations/all: Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/all
 Executables/Simulations/all: Executables/Simulations/CMakeFiles/SIR_Simulation.dir/all
 .PHONY : Executables/Simulations/all
 
@@ -134,6 +136,7 @@ Executables/Simulations/preinstall:
 .PHONY : Executables/Simulations/preinstall
 
 # Recursive "clean" directory target.
+Executables/Simulations/clean: Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/clean
 Executables/Simulations/clean: Executables/Simulations/CMakeFiles/SIR_Simulation.dir/clean
 .PHONY : Executables/Simulations/clean
 
@@ -196,7 +199,7 @@ _deps/static_rng-build/clean: _deps/static_rng-build/CMakeFiles/ContinuousCovera
 _deps/static_rng-build/clean: _deps/static_rng-build/CMakeFiles/ContinuousMemCheck.dir/clean
 _deps/static_rng-build/clean: _deps/static_rng-build/CMakeFiles/ContinuousSubmit.dir/clean
 _deps/static_rng-build/clean: _deps/static_rng-build/CMakeFiles/Binder.dir/clean
-_deps/static_rng-build/clean: _deps/static_rng-build/CMakeFiles/docs.dir/clean
+_deps/static_rng-build/clean: _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/clean
 _deps/static_rng-build/clean: _deps/tinymt_repo-build/clean
 _deps/static_rng-build/clean: _deps/static_rng-build/test/clean
 .PHONY : _deps/static_rng-build/clean
@@ -267,16 +270,49 @@ include/Sycl_Graph/clean: include/Sycl_Graph/Graph/clean
 # Directory level rules for directory include/Sycl_Graph/Graph
 
 # Recursive "all" directory target.
-include/Sycl_Graph/Graph/all:
+include/Sycl_Graph/Graph/all: include/Sycl_Graph/Graph/Dynamic/all
+include/Sycl_Graph/Graph/all: include/Sycl_Graph/Graph/Sycl/all
 .PHONY : include/Sycl_Graph/Graph/all
 
 # Recursive "preinstall" directory target.
-include/Sycl_Graph/Graph/preinstall:
+include/Sycl_Graph/Graph/preinstall: include/Sycl_Graph/Graph/Dynamic/preinstall
+include/Sycl_Graph/Graph/preinstall: include/Sycl_Graph/Graph/Sycl/preinstall
 .PHONY : include/Sycl_Graph/Graph/preinstall
 
 # Recursive "clean" directory target.
-include/Sycl_Graph/Graph/clean:
+include/Sycl_Graph/Graph/clean: include/Sycl_Graph/Graph/Dynamic/clean
+include/Sycl_Graph/Graph/clean: include/Sycl_Graph/Graph/Sycl/clean
 .PHONY : include/Sycl_Graph/Graph/clean
+
+#=============================================================================
+# Directory level rules for directory include/Sycl_Graph/Graph/Dynamic
+
+# Recursive "all" directory target.
+include/Sycl_Graph/Graph/Dynamic/all:
+.PHONY : include/Sycl_Graph/Graph/Dynamic/all
+
+# Recursive "preinstall" directory target.
+include/Sycl_Graph/Graph/Dynamic/preinstall:
+.PHONY : include/Sycl_Graph/Graph/Dynamic/preinstall
+
+# Recursive "clean" directory target.
+include/Sycl_Graph/Graph/Dynamic/clean:
+.PHONY : include/Sycl_Graph/Graph/Dynamic/clean
+
+#=============================================================================
+# Directory level rules for directory include/Sycl_Graph/Graph/Sycl
+
+# Recursive "all" directory target.
+include/Sycl_Graph/Graph/Sycl/all:
+.PHONY : include/Sycl_Graph/Graph/Sycl/all
+
+# Recursive "preinstall" directory target.
+include/Sycl_Graph/Graph/Sycl/preinstall:
+.PHONY : include/Sycl_Graph/Graph/Sycl/preinstall
+
+# Recursive "clean" directory target.
+include/Sycl_Graph/Graph/Sycl/clean:
+.PHONY : include/Sycl_Graph/Graph/Sycl/clean
 
 #=============================================================================
 # Directory level rules for directory static
@@ -368,6 +404,7 @@ test/all: test/CMakeFiles/sycl_copy_profiling.dir/all
 test/all: test/CMakeFiles/sycl_kernel_emit.dir/all
 test/all: test/CMakeFiles/tinymt_kernel.dir/all
 test/all: test/CMakeFiles/itertools_vec_comb.dir/all
+test/all: test/CMakeFiles/bgl_concept.dir/all
 .PHONY : test/all
 
 # Recursive "preinstall" directory target.
@@ -380,7 +417,34 @@ test/clean: test/CMakeFiles/sycl_copy_profiling.dir/clean
 test/clean: test/CMakeFiles/sycl_kernel_emit.dir/clean
 test/clean: test/CMakeFiles/tinymt_kernel.dir/clean
 test/clean: test/CMakeFiles/itertools_vec_comb.dir/clean
+test/clean: test/CMakeFiles/bgl_concept.dir/clean
 .PHONY : test/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/Sycl_Graph_docs.dir
+
+# All Build rule for target.
+CMakeFiles/Sycl_Graph_docs.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Sycl_Graph_docs.dir/build.make CMakeFiles/Sycl_Graph_docs.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Sycl_Graph_docs.dir/build.make CMakeFiles/Sycl_Graph_docs.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=16 "Built target Sycl_Graph_docs"
+.PHONY : CMakeFiles/Sycl_Graph_docs.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/Sycl_Graph_docs.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 1
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Sycl_Graph_docs.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 0
+.PHONY : CMakeFiles/Sycl_Graph_docs.dir/rule
+
+# Convenience name for target.
+Sycl_Graph_docs: CMakeFiles/Sycl_Graph_docs.dir/rule
+.PHONY : Sycl_Graph_docs
+
+# clean rule for target.
+CMakeFiles/Sycl_Graph_docs.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Sycl_Graph_docs.dir/build.make CMakeFiles/Sycl_Graph_docs.dir/clean
+.PHONY : CMakeFiles/Sycl_Graph_docs.dir/clean
 
 #=============================================================================
 # Target rules for target _deps/static_rng-build/CMakeFiles/Experimental.dir
@@ -1137,30 +1201,30 @@ _deps/static_rng-build/CMakeFiles/Binder.dir/clean:
 .PHONY : _deps/static_rng-build/CMakeFiles/Binder.dir/clean
 
 #=============================================================================
-# Target rules for target _deps/static_rng-build/CMakeFiles/docs.dir
+# Target rules for target _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir
 
 # All Build rule for target.
-_deps/static_rng-build/CMakeFiles/docs.dir/all:
-	$(MAKE) $(MAKESILENT) -f _deps/static_rng-build/CMakeFiles/docs.dir/build.make _deps/static_rng-build/CMakeFiles/docs.dir/depend
-	$(MAKE) $(MAKESILENT) -f _deps/static_rng-build/CMakeFiles/docs.dir/build.make _deps/static_rng-build/CMakeFiles/docs.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=13 "Built target docs"
-.PHONY : _deps/static_rng-build/CMakeFiles/docs.dir/all
+_deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/all:
+	$(MAKE) $(MAKESILENT) -f _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/build.make _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/depend
+	$(MAKE) $(MAKESILENT) -f _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/build.make _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=13 "Built target Static_RNG_docs"
+.PHONY : _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/all
 
 # Build rule for subdir invocation for target.
-_deps/static_rng-build/CMakeFiles/docs.dir/rule: cmake_check_build_system
+_deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 1
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/static_rng-build/CMakeFiles/docs.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 0
-.PHONY : _deps/static_rng-build/CMakeFiles/docs.dir/rule
+.PHONY : _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/rule
 
 # Convenience name for target.
-docs: _deps/static_rng-build/CMakeFiles/docs.dir/rule
-.PHONY : docs
+Static_RNG_docs: _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/rule
+.PHONY : Static_RNG_docs
 
 # clean rule for target.
-_deps/static_rng-build/CMakeFiles/docs.dir/clean:
-	$(MAKE) $(MAKESILENT) -f _deps/static_rng-build/CMakeFiles/docs.dir/build.make _deps/static_rng-build/CMakeFiles/docs.dir/clean
-.PHONY : _deps/static_rng-build/CMakeFiles/docs.dir/clean
+_deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/clean:
+	$(MAKE) $(MAKESILENT) -f _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/build.make _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/clean
+.PHONY : _deps/static_rng-build/CMakeFiles/Static_RNG_docs.dir/clean
 
 #=============================================================================
 # Target rules for target _deps/static_rng-build/test/CMakeFiles/uniform.dir
@@ -1169,7 +1233,7 @@ _deps/static_rng-build/CMakeFiles/docs.dir/clean:
 _deps/static_rng-build/test/CMakeFiles/uniform.dir/all:
 	$(MAKE) $(MAKESILENT) -f _deps/static_rng-build/test/CMakeFiles/uniform.dir/build.make _deps/static_rng-build/test/CMakeFiles/uniform.dir/depend
 	$(MAKE) $(MAKESILENT) -f _deps/static_rng-build/test/CMakeFiles/uniform.dir/build.make _deps/static_rng-build/test/CMakeFiles/uniform.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=24,25 "Built target uniform"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=29,30 "Built target uniform"
 .PHONY : _deps/static_rng-build/test/CMakeFiles/uniform.dir/all
 
 # Build rule for subdir invocation for target.
@@ -1248,7 +1312,7 @@ static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/all: include/Sycl_Graph/
 static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/all: static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/all
 	$(MAKE) $(MAKESILENT) -f static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/build.make static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/depend
 	$(MAKE) $(MAKESILENT) -f static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/build.make static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=11,12 "Built target Sycl_Graph_Eigen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=14,15 "Built target Sycl_Graph_Eigen"
 .PHONY : static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/all
 
 # Build rule for subdir invocation for target.
@@ -1272,7 +1336,6 @@ static/Sycl_Graph/Eigen/CMakeFiles/Sycl_Graph_Eigen.dir/clean:
 
 # All Build rule for target.
 static/Sycl_Graph/Math/CMakeFiles/Math.dir/all: include/Sycl_Graph/CMakeFiles/Common.dir/all
-static/Sycl_Graph/Math/CMakeFiles/Math.dir/all: static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/all
 	$(MAKE) $(MAKESILENT) -f static/Sycl_Graph/Math/CMakeFiles/Math.dir/build.make static/Sycl_Graph/Math/CMakeFiles/Math.dir/depend
 	$(MAKE) $(MAKESILENT) -f static/Sycl_Graph/Math/CMakeFiles/Math.dir/build.make static/Sycl_Graph/Math/CMakeFiles/Math.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=7,8 "Built target Math"
@@ -1280,7 +1343,7 @@ static/Sycl_Graph/Math/CMakeFiles/Math.dir/all: static/Sycl_Graph/DataFrame/CMak
 
 # Build rule for subdir invocation for target.
 static/Sycl_Graph/Math/CMakeFiles/Math.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 6
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 static/Sycl_Graph/Math/CMakeFiles/Math.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 0
 .PHONY : static/Sycl_Graph/Math/CMakeFiles/Math.dir/rule
@@ -1299,16 +1362,15 @@ static/Sycl_Graph/Math/CMakeFiles/Math.dir/clean:
 
 # All Build rule for target.
 test/CMakeFiles/sycl_device_info.dir/all: include/Sycl_Graph/CMakeFiles/Common.dir/all
-test/CMakeFiles/sycl_device_info.dir/all: static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/all
 test/CMakeFiles/sycl_device_info.dir/all: static/Sycl_Graph/Math/CMakeFiles/Math.dir/all
 	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/sycl_device_info.dir/build.make test/CMakeFiles/sycl_device_info.dir/depend
 	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/sycl_device_info.dir/build.make test/CMakeFiles/sycl_device_info.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=18,19 "Built target sycl_device_info"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=23,24 "Built target sycl_device_info"
 .PHONY : test/CMakeFiles/sycl_device_info.dir/all
 
 # Build rule for subdir invocation for target.
 test/CMakeFiles/sycl_device_info.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test/CMakeFiles/sycl_device_info.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 0
 .PHONY : test/CMakeFiles/sycl_device_info.dir/rule
@@ -1327,16 +1389,15 @@ test/CMakeFiles/sycl_device_info.dir/clean:
 
 # All Build rule for target.
 test/CMakeFiles/sycl_copy_profiling.dir/all: include/Sycl_Graph/CMakeFiles/Common.dir/all
-test/CMakeFiles/sycl_copy_profiling.dir/all: static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/all
 test/CMakeFiles/sycl_copy_profiling.dir/all: static/Sycl_Graph/Math/CMakeFiles/Math.dir/all
 	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/sycl_copy_profiling.dir/build.make test/CMakeFiles/sycl_copy_profiling.dir/depend
 	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/sycl_copy_profiling.dir/build.make test/CMakeFiles/sycl_copy_profiling.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=16,17 "Built target sycl_copy_profiling"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=21,22 "Built target sycl_copy_profiling"
 .PHONY : test/CMakeFiles/sycl_copy_profiling.dir/all
 
 # Build rule for subdir invocation for target.
 test/CMakeFiles/sycl_copy_profiling.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test/CMakeFiles/sycl_copy_profiling.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 0
 .PHONY : test/CMakeFiles/sycl_copy_profiling.dir/rule
@@ -1355,16 +1416,15 @@ test/CMakeFiles/sycl_copy_profiling.dir/clean:
 
 # All Build rule for target.
 test/CMakeFiles/sycl_kernel_emit.dir/all: include/Sycl_Graph/CMakeFiles/Common.dir/all
-test/CMakeFiles/sycl_kernel_emit.dir/all: static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/all
 test/CMakeFiles/sycl_kernel_emit.dir/all: static/Sycl_Graph/Math/CMakeFiles/Math.dir/all
 	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/sycl_kernel_emit.dir/build.make test/CMakeFiles/sycl_kernel_emit.dir/depend
 	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/sycl_kernel_emit.dir/build.make test/CMakeFiles/sycl_kernel_emit.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=20,21 "Built target sycl_kernel_emit"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=25,26 "Built target sycl_kernel_emit"
 .PHONY : test/CMakeFiles/sycl_kernel_emit.dir/all
 
 # Build rule for subdir invocation for target.
 test/CMakeFiles/sycl_kernel_emit.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test/CMakeFiles/sycl_kernel_emit.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 0
 .PHONY : test/CMakeFiles/sycl_kernel_emit.dir/rule
@@ -1383,16 +1443,15 @@ test/CMakeFiles/sycl_kernel_emit.dir/clean:
 
 # All Build rule for target.
 test/CMakeFiles/tinymt_kernel.dir/all: include/Sycl_Graph/CMakeFiles/Common.dir/all
-test/CMakeFiles/tinymt_kernel.dir/all: static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/all
 test/CMakeFiles/tinymt_kernel.dir/all: static/Sycl_Graph/Math/CMakeFiles/Math.dir/all
 	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/tinymt_kernel.dir/build.make test/CMakeFiles/tinymt_kernel.dir/depend
 	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/tinymt_kernel.dir/build.make test/CMakeFiles/tinymt_kernel.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=22,23 "Built target tinymt_kernel"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=27,28 "Built target tinymt_kernel"
 .PHONY : test/CMakeFiles/tinymt_kernel.dir/all
 
 # Build rule for subdir invocation for target.
 test/CMakeFiles/tinymt_kernel.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test/CMakeFiles/tinymt_kernel.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 0
 .PHONY : test/CMakeFiles/tinymt_kernel.dir/rule
@@ -1411,16 +1470,15 @@ test/CMakeFiles/tinymt_kernel.dir/clean:
 
 # All Build rule for target.
 test/CMakeFiles/itertools_vec_comb.dir/all: include/Sycl_Graph/CMakeFiles/Common.dir/all
-test/CMakeFiles/itertools_vec_comb.dir/all: static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/all
 test/CMakeFiles/itertools_vec_comb.dir/all: static/Sycl_Graph/Math/CMakeFiles/Math.dir/all
 	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/itertools_vec_comb.dir/build.make test/CMakeFiles/itertools_vec_comb.dir/depend
 	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/itertools_vec_comb.dir/build.make test/CMakeFiles/itertools_vec_comb.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=14,15 "Built target itertools_vec_comb"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=19,20 "Built target itertools_vec_comb"
 .PHONY : test/CMakeFiles/itertools_vec_comb.dir/all
 
 # Build rule for subdir invocation for target.
 test/CMakeFiles/itertools_vec_comb.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test/CMakeFiles/itertools_vec_comb.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 0
 .PHONY : test/CMakeFiles/itertools_vec_comb.dir/rule
@@ -1435,20 +1493,73 @@ test/CMakeFiles/itertools_vec_comb.dir/clean:
 .PHONY : test/CMakeFiles/itertools_vec_comb.dir/clean
 
 #=============================================================================
+# Target rules for target test/CMakeFiles/bgl_concept.dir
+
+# All Build rule for target.
+test/CMakeFiles/bgl_concept.dir/all: include/Sycl_Graph/CMakeFiles/Common.dir/all
+test/CMakeFiles/bgl_concept.dir/all: static/Sycl_Graph/Math/CMakeFiles/Math.dir/all
+	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/bgl_concept.dir/build.make test/CMakeFiles/bgl_concept.dir/depend
+	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/bgl_concept.dir/build.make test/CMakeFiles/bgl_concept.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=17,18 "Built target bgl_concept"
+.PHONY : test/CMakeFiles/bgl_concept.dir/all
+
+# Build rule for subdir invocation for target.
+test/CMakeFiles/bgl_concept.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 6
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test/CMakeFiles/bgl_concept.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 0
+.PHONY : test/CMakeFiles/bgl_concept.dir/rule
+
+# Convenience name for target.
+bgl_concept: test/CMakeFiles/bgl_concept.dir/rule
+.PHONY : bgl_concept
+
+# clean rule for target.
+test/CMakeFiles/bgl_concept.dir/clean:
+	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/bgl_concept.dir/build.make test/CMakeFiles/bgl_concept.dir/clean
+.PHONY : test/CMakeFiles/bgl_concept.dir/clean
+
+#=============================================================================
+# Target rules for target Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir
+
+# All Build rule for target.
+Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/all: include/Sycl_Graph/CMakeFiles/Common.dir/all
+Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/all: static/Sycl_Graph/Math/CMakeFiles/Math.dir/all
+	$(MAKE) $(MAKESILENT) -f Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/build.make Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/depend
+	$(MAKE) $(MAKESILENT) -f Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/build.make Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=9,10 "Built target SIR_Metapopulation_Simulation"
+.PHONY : Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/all
+
+# Build rule for subdir invocation for target.
+Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 6
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 0
+.PHONY : Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/rule
+
+# Convenience name for target.
+SIR_Metapopulation_Simulation: Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/rule
+.PHONY : SIR_Metapopulation_Simulation
+
+# clean rule for target.
+Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/clean:
+	$(MAKE) $(MAKESILENT) -f Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/build.make Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/clean
+.PHONY : Executables/Simulations/CMakeFiles/SIR_Metapopulation_Simulation.dir/clean
+
+#=============================================================================
 # Target rules for target Executables/Simulations/CMakeFiles/SIR_Simulation.dir
 
 # All Build rule for target.
 Executables/Simulations/CMakeFiles/SIR_Simulation.dir/all: include/Sycl_Graph/CMakeFiles/Common.dir/all
-Executables/Simulations/CMakeFiles/SIR_Simulation.dir/all: static/Sycl_Graph/DataFrame/CMakeFiles/DataFrame.dir/all
 Executables/Simulations/CMakeFiles/SIR_Simulation.dir/all: static/Sycl_Graph/Math/CMakeFiles/Math.dir/all
 	$(MAKE) $(MAKESILENT) -f Executables/Simulations/CMakeFiles/SIR_Simulation.dir/build.make Executables/Simulations/CMakeFiles/SIR_Simulation.dir/depend
 	$(MAKE) $(MAKESILENT) -f Executables/Simulations/CMakeFiles/SIR_Simulation.dir/build.make Executables/Simulations/CMakeFiles/SIR_Simulation.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=9,10 "Built target SIR_Simulation"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/man/Documents/Sycl_Graph/build/CMakeFiles --progress-num=11,12 "Built target SIR_Simulation"
 .PHONY : Executables/Simulations/CMakeFiles/SIR_Simulation.dir/all
 
 # Build rule for subdir invocation for target.
 Executables/Simulations/CMakeFiles/SIR_Simulation.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Executables/Simulations/CMakeFiles/SIR_Simulation.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/man/Documents/Sycl_Graph/build/CMakeFiles 0
 .PHONY : Executables/Simulations/CMakeFiles/SIR_Simulation.dir/rule

@@ -14,7 +14,7 @@ CostDataFile:
 Site: man
 
 # Build name is osname-revision-compiler, i.e. Linux-2.4.2-2smp-c++
-BuildName: Linux-icpx
+BuildName: Linux-clang++
 
 # Subprojects
 LabelsForSubprojects: 
@@ -28,7 +28,7 @@ NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
 ConfigureCommand: "/usr/bin/cmake" "/home/man/Documents/Sycl_Graph/build/_deps/static_rng-src"
-MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}"
+MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
 DefaultCTestConfigurationType: Release
 
 # version control
@@ -63,7 +63,7 @@ UpdateOptions:
 UpdateType: git
 
 # Compiler info
-Compiler: /opt/intel/oneapi/compiler/latest/linux/bin/icpx
+Compiler: /opt/intel/oneapi/compiler/latest/linux/bin-llvm/clang++
 CompilerVersion: 2023.0.0
 
 # Dynamic analysis (MemCheck)
@@ -76,7 +76,7 @@ CudaSanitizerCommand:
 CudaSanitizerCommandOptions: 
 MemoryCheckType: 
 MemoryCheckSanitizerOptions: 
-MemoryCheckCommand: /usr/bin/valgrind
+MemoryCheckCommand: /opt/cuda/bin/cuda-memcheck
 MemoryCheckCommandOptions: 
 MemoryCheckSuppressionFile: 
 

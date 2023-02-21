@@ -1,7 +1,7 @@
 function(add_custom_executable source_file)
     add_executable(${source_file} "${source_file}.cpp")
     target_include_directories(${source_file} PUBLIC "../include"  ${SYCL_GRAPH_INCLUDE_DIRS})
-    target_link_libraries(${source_file} PUBLIC Graph ${ONEAPI_LIBRARIES} Math Static_RNG::Random Static_RNG::tinymt cppitertools::cppitertools Tracy::TracyClient ${SYCL_GRAPH_DEBUG_LIBRARIES} ${SYCL_GRAPH_LIBRARIES})
+    target_link_libraries(${source_file} PUBLIC Graph ${ONEAPI_LIBRARIES} Math Static_RNG Static_RNG::tinymt cppitertools::cppitertools Tracy::TracyClient ${SYCL_GRAPH_DEBUG_LIBRARIES} ${SYCL_GRAPH_LIBRARIES})
     target_compile_options(${source_file} PUBLIC ${SYCL_COMPILE_OPTIONS})
     if(${DEFAULT_WARNING_SUPPRESSION})
         target_compile_options(${source_file} PUBLIC ${DEFAULT_WARNING_FLAGS})

@@ -13,7 +13,7 @@ int main()
     sycl::buffer<float, 1> buf(sycl::range<1>(2));
 
     sycl::buffer<tinymt::tinymt32, 1> rng_buf(sycl::range<1>(1));
-    sycl::buffer<Static_RNG::distributions::uniform_real_distribution<>, 1> dist_buf(sycl::range<1>(1));
+    sycl::buffer<Static_RNG::uniform_real_distribution<>, 1> dist_buf(sycl::range<1>(1));
     q.submit([&](sycl::handler &cgh) {
         auto acc = buf.get_access<sycl::access::mode::write>(cgh);
         auto rng_acc = rng_buf.get_access<sycl::access::mode::read_write>(cgh);

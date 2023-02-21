@@ -1,5 +1,4 @@
 #include <Sycl_Graph/Graph/Graph_Base.hpp>
-#include <Sycl_Graph/Graph/Graph_Generation.hpp>
 #include <Sycl_Graph/Math/math.hpp>
 #include <Sycl_Graph/Network/SIR_Metapopulation/SIR_Metapopulation.hpp>
 #include <Sycl_Graph/path_config.hpp>
