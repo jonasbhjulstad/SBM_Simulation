@@ -21,7 +21,7 @@ int main()
   //create profiling queue
   sycl::queue q(sycl::gpu_selector_v, sycl::property::queue::enable_profiling{});
   int seed = 777;
-  Static_RNG::distributions::default_rng rng;
+  Static_RNG::default_rng rng;
   auto G = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER);
   SIR_Metapopulation_Network<> sir(G, N_pop, I0, R0, alpha, node_beta, edge_beta, seed);
   // generate sir_param

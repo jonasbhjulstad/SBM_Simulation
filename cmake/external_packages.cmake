@@ -6,7 +6,7 @@ CPMFindPackage(
     GIT_TAG master
     OPTIONS
     #pass cmake options to Static_RNG
-    ENABLE_SYCL OFF
+    STATIC_RNG_ENABLE_SYCL ON
     BUILD_PYTHON_BINDERS OFF
     BUILD_DOCS OFF
 )

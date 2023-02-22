@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <filesystem>
 
-using namespace Static_RNG::distributions;
+using namespace Static_RNG::;
 static constexpr size_t NV = 100;
 std::vector<uint32_t> N_pop = std::vector<uint32_t>(NV, 1000);
 std::vector<normal_distribution<float>> I0(N_pop.size());
@@ -30,7 +30,7 @@ int main()
   //create profiling queue
   sycl::queue q(sycl::gpu_selector_v, sycl::property::queue::enable_profiling{});
   int seed = 777;
-  Static_RNG::distributions::default_rng rng;
+  Static_RNG::default_rng rng;
   const std::vector<uint32_t> G0_ids = Sycl_Graph::range(0, NV);
   const std::vector<uint32_t> G1_ids = Sycl_Graph::range(NV, 2 * NV);
   auto G0 = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER, G0_ids);

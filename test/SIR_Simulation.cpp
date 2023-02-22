@@ -14,7 +14,7 @@ int main()
     size_t N_pop = 100;
     float p_ER = 1;
     sycl::queue q;
-    Static_RNG::distributions::default_rng rng;
+    Static_RNG::default_rng rng;
     // SIR_Graph G(q, 101, 100000);
     //generate sir_param
     size_t Nt = 100;

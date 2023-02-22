@@ -91,9 +91,9 @@ namespace Sycl_Graph
                     auto p_R = p_R_buf.get_access<sycl::access::mode::write>(h);
                     auto v_acc = G.get_vertex_access<sycl::access::mode::write>(h);
                     h.parallel_for(sycl::range<1>(G.N_vertices()), [=](sycl::id<1> i) {
-                    Static_RNG::distributions::uniform_real_distribution<float> d_I;
-                    Static_RNG::distributions::uniform_real_distribution<float> d_R;
-                    Static_RNG::distributions::default_rng rng(seed[i]);
+                    Static_RNG::uniform_real_distribution<float> d_I;
+                    Static_RNG::uniform_real_distribution<float> d_R;
+                    Static_RNG::default_rng rng(seed[i]);
 
                     if(d_I(rng) < p_I0)
                         {
@@ -250,8 +250,8 @@ namespace Sycl_Graph
                     sycl::stream out(1024, 256, h);
                     h.parallel_for(sycl::range<1>(sn_ids_acc.size()), [=](sycl::id<1> id)
                     {
-                        Static_RNG::distributions::default_rng rng(seed_acc[id]);
-                        Static_RNG::distributions::uniform_real_distribution<float> d_R(0, 1);
+                        Static_RNG::default_rng rng(seed_acc[id]);
+                        Static_RNG::uniform_real_distribution<float> d_R(0, 1);
                         if (v_acc.data[sn_ids_acc[id[0]]] == SIR_INDIVIDUAL_S)
                         {
                             if (d_R(rng) < p_I)
@@ -275,9 +275,9 @@ namespace Sycl_Graph
                     //  auto nv = neighbors_buf.get_access<sycl::access::mode::read_write>(h);
                     h.parallel_for(sycl::range<1>(G.N_vertices()), [=](sycl::id<1> id)
                                    {
-                        Static_RNG::distributions::default_rng rng(seed_acc[id]);
+                        Static_RNG::default_rng rng(seed_acc[id]);
                         seed_acc[id]++;
-                        Static_RNG::distributions::uniform_real_distribution<float> d_R(0, 1);
+                        Static_RNG::uniform_real_distribution<float> d_R(0, 1);
                             if(v_acc.data[id] == SIR_INDIVIDUAL_I)
                             {
                                 if(d_R(rng) < p_R)

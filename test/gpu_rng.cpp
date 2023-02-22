@@ -6,7 +6,7 @@
 int main()
 {
     size_t N_rngs = 4;
-    sycl::buffer<Static_RNG::distributions::default_rng, 1> rng_buf(N_rngs);
+    sycl::buffer<Static_RNG::default_rng, 1> rng_buf(N_rngs);
     std::vector<unsigned int> seeds(N_rngs);
     for (size_t i = 0; i < N_rngs; ++i)
     {

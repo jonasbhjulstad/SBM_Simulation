@@ -26,7 +26,7 @@ namespace Sycl_Graph
         return res;
     }
     template <typename T = uint32_t>
-    std::vector<T> range(T start, T end)
+    std::vector<T> range(auto start, auto end)
     {
         std::vector<T> res(end - start);
         for (T i = start; i < end; i++)

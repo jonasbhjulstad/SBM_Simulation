@@ -12,8 +12,8 @@ int main()
 
     Sycl_Graph_Sycl::Vertex_Buffer<int, int>* pv = &G.vertex_buf;
     // G.add_vertex(data, indices);
-    auto a = sizeof(Sycl_Graph::Vertex_Buffer_Base<int, int, Vertex_Buffer<int, int>>);
-    auto b = sizeof(Vertex_Buffer<int, int>);
+    // auto a = sizeof(Sycl_Graph::Vertex_Buffer_Base<int, int, Vertex_Buffer<int, int>>);
+    // auto b = sizeof(Vertex_Buffer<int, int>);
 
     G.add_vertex(Sycl_Graph::range(0, 100), Sycl_Graph::range(0,100));
 

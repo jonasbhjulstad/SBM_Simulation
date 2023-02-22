@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <filesystem>
 
-using namespace Static_RNG::distributions;
 static constexpr size_t NV = 100;
 int main()
 {
@@ -22,7 +21,7 @@ int main()
   // create profiling queue
   sycl::queue q(sycl::gpu_selector_v, sycl::property::queue::enable_profiling{});
   int seed = 777;
-  Static_RNG::distributions::default_rng rng;
+  Static_RNG::default_rng rng;
   auto G = generate_erdos_renyi<SIR_Graph>(q, NV, p_ER);
   SIR_Bernoulli_Network sir(G, p_I0, p_R0);
   // generate sir_param

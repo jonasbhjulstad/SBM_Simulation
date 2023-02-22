@@ -26,11 +26,11 @@
 namespace Sycl_Graph::Sycl
 {
 
-  template <typename V, typename E, std::unsigned_integral uI_t>
-  struct Graph : public Sycl_Graph::Graph_Base<V, E, uI_t, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>>
+  template <typename V, typename E, std::unsigned_integral uI_t = uint32_t, std::floating_point dType = float>
+  struct Graph : public Sycl_Graph::Graph_Base<V, E, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>, uI_t, dType>
 
   {
-    using Base_t = Sycl_Graph::Graph_Base<V, E, uI_t, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>>;
+    typedef Sycl_Graph::Graph_Base<V, E, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>, uI_t, dType> Base_t;
     // create copy constructor
     Graph(sycl::queue &q, uI_t NV, uI_t NE, const sycl::property_list &props = {})
         : q(q), vertex_buf(q, NV, props), edge_buf(q, NE, props), Base_t(vertex_buf, edge_buf) {}
@@ -43,12 +43,14 @@ namespace Sycl_Graph::Sycl
     Vertex_Buffer<V, uI_t> vertex_buf;
     Edge_Buffer<E, uI_t> edge_buf;
     uI_t Graph_ID = 0;
-    using Vertex_t = Vertex<V, uI_t>;
-    using Edge_t = Edge<E, uI_t>;
-    using Vertex_Prop_t = V;
-    using Edge_Prop_t = E;
-    using uInt_t = uI_t;
-    using Graph_t = Graph<V, E, uI_t>;
+    //convert to typedef
+    typedef Vertex<V, uI_t> Vertex_t;
+    typedef Edge<E, uI_t> Edge_t;
+    typedef V Vertex_Prop_t;
+    typedef E Edge_Prop_t;
+    typedef uI_t uInt_t;
+    typedef Graph<V, E, uI_t> Graph_t;  
+
     static constexpr auto invalid_id = std::numeric_limits<uI_t>::max();
     uI_t N_vertices() const
     {

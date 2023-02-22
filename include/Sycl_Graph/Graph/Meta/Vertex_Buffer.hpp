@@ -5,7 +5,7 @@
 namespace Sycl_Graph::Meta
 {
     template <typename V, std::unsigned_integral uI_t>
-    struct Vertex_Buffer: public Vertex_Buffer_Base<V, uI_t, Vertex_Buffer<V, uI_t>>
+    struct Vertex_Buffer: public Vertex_Buffer_Base<V, Vertex_Buffer<V, uI_t>, uI_t>
     {
         std::vector<Vertex<V*, uI_t>> vertices;
 

@@ -17,7 +17,7 @@ struct Vertex_Accessor {
 enum Vertex_Indexing { VERTEX_INDEX_ID, VERTEX_INDEX_POSITION };
 
 
-template <typename V, std::unsigned_integral uI_t> struct Vertex_Buffer : public Vertex_Buffer_Base<V, uI_t, Vertex_Buffer<V, uI_t>>{
+template <typename V, std::unsigned_integral uI_t> struct Vertex_Buffer : public Vertex_Buffer_Base<V, Vertex_Buffer<V, uI_t>, uI_t>{
 static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
 
   uI_t N_vertices = 0;
@@ -54,7 +54,6 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
     buffer_resize(q, id_buf, new_size);
     buffer_resize(q, data_buf, new_size);
   }
-
   void add(const std::vector<uI_t> &ids, const std::vector<V> &v_data = {}) {
     std::vector<V> data = (v_data.size() == 0) ? std::vector<V>(ids.size()) : v_data;
     if(N_vertices + ids.size() > data_buf.size())

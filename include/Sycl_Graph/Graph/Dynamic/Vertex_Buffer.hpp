@@ -10,7 +10,7 @@
 namespace Sycl_Graph::Dynamic
 {
     template <typename V, typename E, typename uI_t, boost::directed_tag graph_direction = boost::bidirectional>
-    struct Vertex_Buffer : public Vertex_Buffer_Base<V, uI_t, Vertex_Buffer<V, E, uI_t, graph_direction>>
+    struct Vertex_Buffer : public Vertex_Buffer_Base<V, Vertex_Buffer<V, E, uI_t, graph_direction>, uI_t>
     {
         using namespace boost;
         struct Vertex_tag

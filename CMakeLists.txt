@@ -31,8 +31,12 @@ option(DEFAULT_WARNING_SUPPRESSION "Default Warning Suppression" ON)
 set(DEFAULT_WARNING_FLAGS -Wunknown-cuda-version)
 option(TRACY_ENABLE "" ON)
 option (TRACY_ON_DEMAND "" ON)
-set(DPCPP_FLAGS -fsycl -Wno-linker-warnings)
+set(DPCPP_FLAGS -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization)
 set(SYCL_CUDA_FLAGS -fsycl-targets=spir64_x86_64,nvptx64-nvidia-cuda -Xsycl-target-backend=nvptx64-nvidia-cuda --cuda-gpu-arch=sm_60)
+
+if(${SYCL_GRAPH_USE_INTEL})
+    find_package(IntelDPCPP REQUIRED)
+endif()
 
 include(cmake/external_packages.cmake)
 include(cmake/custom_executable.cmake)

@@ -10,14 +10,14 @@ namespace Sycl_Graph
     template <typename D, typename ID_t>
     struct Vertex
     {
-        //sycl device copyable   
+        // sycl device copyable
         static constexpr ID_t invalid_id = std::numeric_limits<ID_t>::max();
         ID_t id = std::numeric_limits<ID_t>::max();
         D data;
     };
 
     template <typename D, typename ID_t>
-    std::vector<Vertex<D, ID_t>> make_vertices(const std::vector<D>& data, const std::vector<ID_t>& ids)
+    std::vector<Vertex<D, ID_t>> make_vertices(const std::vector<D> &data, const std::vector<ID_t> &ids)
     {
         std::vector<Vertex<D, ID_t>> vertices(data.size());
         vertices.reserve(data.size());
@@ -31,7 +31,7 @@ namespace Sycl_Graph
     template <typename D, typename ID_t>
     struct Edge
     {
-        Edge(const D& data, ID_t to, ID_t from)
+        Edge(const D &data, ID_t to, ID_t from)
             : data(data), to(to), from(from) {}
         Edge(ID_t to, ID_t from)
             : to(to), from(from) {}
@@ -41,68 +41,66 @@ namespace Sycl_Graph
         ID_t from = invalid_id;
     };
 
-    template <typename V, std::unsigned_integral uI_t, typename Derived>
+    template <typename V, typename Derived, std::unsigned_integral uI_t = uint32_t>
     struct Vertex_Buffer_Base
     {
-        uI_t size() const
+        auto size() const
         {
-            return static_cast<const Derived*>(this)->size();
+            return static_cast<const Derived *>(this)->size();
+        }
+        void add(const std::vector<uI_t> &ids, const std::vector<V> &data)
+        {
+            static_cast<Derived *>(this)->add(ids, data);
         }
 
-
-        void add(const std::vector<uI_t>& ids)
+        void add(const std::vector<uI_t> &ids)
         {
             std::vector<V> data(ids.size());
             add(ids, data);
         }
-        
-        template <typename T = V, typename = std::enable_if_t<!std::is_same<T, uI_t>::value>>
-        void add(const std::vector<V>& data)
+
+        template <typename std::enable_if<!std::is_integral<V>::value, bool> = true>
+        void add(const std::vector<V> &data)
         {
             add(data, Sycl_Graph::range(0, data.size()));
         }
 
-        void add(const std::vector<uI_t>& ids, const std::vector<V>& data)
+        std::vector<Vertex<V, uI_t>> get_vertices()
         {
-            static_cast<Derived*>(this)->add(ids, data);
+            return static_cast<Derived *>(this)->get_vertices();
         }
 
-        std::vector<Vertex<V*, uI_t>> get_vertices()
-        {
-            return static_cast<Derived*>(this)->get_vertices();
-        }
         void remove(uI_t index)
         {
-            static_cast<Derived*>(this)->remove(index);
+            static_cast<Derived *>(this)->remove(index);
         }
     };
 
-    template <typename E, std::unsigned_integral uI_t, typename Derived>
+    template <typename E, typename Derived, std::unsigned_integral uI_t = uint32_t>
     struct Edge_Buffer_Base
     {
         uI_t size() const
         {
-            return static_cast<const Derived*>(this)->size();
+            return static_cast<const Derived *>(this)->size();
         }
-        void add(const std::vector<uI_t>& to, const std::vector<uI_t>& from, const std::vector<E>& data)
+        void add(const std::vector<uI_t> &to, const std::vector<uI_t> &from, const std::vector<E> &data)
         {
-            static_cast<Derived*>(this)->add(to, from, data);
+            static_cast<Derived *>(this)->add(to, from, data);
         }
-        void add(const std::vector<uI_t>& to, const std::vector<uI_t>& from)
+        void add(const std::vector<uI_t> &to, const std::vector<uI_t> &from)
         {
             std::vector<E> data(to.size());
-            static_cast<Derived*>(this)->add(to, from, data);
+            static_cast<Derived *>(this)->add(to, from, data);
         }
 
-
-        std::vector<Edge<E*, uI_t>> get_edges()
+        std::vector<Edge<E *, uI_t>> get_edges()
         {
-            return static_cast<Derived*>(this)->get_edges();
+            return static_cast<Derived *>(this)->get_edges();
         }
 
         void remove(uI_t index)
         {
-            static_cast<Derived*>(this)->remove(index);
+            static_cast<Derived *>(this)->remove(index);
         }
     };
 
