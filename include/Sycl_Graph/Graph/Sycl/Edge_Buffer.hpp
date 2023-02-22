@@ -99,7 +99,7 @@ template <typename E, std::unsigned_integral uI_t> struct Edge_Buffer: public Ed
     N_edges += to.get_count();
   }
 
-  std::vector<Edge_ID_Pair<uI_t>> get_valid_edge_ids() {
+  std::vector<Edge_ID_Pair<uI_t>> get_valid_ids() {
     std::vector<Edge_ID_Pair<uI_t>> id_pairs;
     id_pairs.reserve(N_edges);
     q.submit([&](sycl::handler &h) {

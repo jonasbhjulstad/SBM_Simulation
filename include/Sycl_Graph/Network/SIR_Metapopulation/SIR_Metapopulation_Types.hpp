@@ -8,8 +8,8 @@ namespace Sycl_Graph::Network_Models {
 struct SIR_Metapopulation_State
 {
   SIR_Metapopulation_State() = default;
-  SIR_Metapopulation_State(float S): S(S), I(0), R(0) {}
-  SIR_Metapopulation_State(float S, float I, float R): S(S), I(I), R(R) {}
+  SIR_Metapopulation_State(uint32_t S): S(S), I(0), R(0) {}
+  SIR_Metapopulation_State(uint32_t S, uint32_t I, uint32_t R): S(S), I(I), R(R) {}
 
   //create default operator+=
   SIR_Metapopulation_State& operator+=(const SIR_Metapopulation_State &other)
@@ -32,9 +32,9 @@ struct SIR_Metapopulation_State
   {
     return SIR_Metapopulation_State(S + other.S, I + other.I, R + other.R);
   }
-  float S = 0.f;
-  float I = 0.f;
-  float R = 0.f;
+  uint32_t S = 0.f;
+  uint32_t I = 0.f;
+  uint32_t R = 0.f;
   friend std::ostream& operator<<(std::ostream& os, const SIR_Metapopulation_State& state)
   {
     os << state.S << " " << state.I << " " << state.R;

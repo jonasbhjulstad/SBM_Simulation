@@ -32,6 +32,8 @@ CPMFindPackage(
     OPTIONS
     "QUIET ON"
 )
+CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
+
 
 #boost graph library
 find_package(Boost REQUIRED COMPONENTS graph)

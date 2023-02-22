@@ -91,6 +91,12 @@ namespace Sycl_Graph
       return vertex_buf.get_data(std::forward<Args>(args)...);
     }
 
+    template <typename ... Args>
+    const std::vector<uI_t> get_vertex_ids(Args && ... args)
+    {
+      return vertex_buf.get_valid_ids(std::forward<Args>(args)...);
+    }
+
     template <typename... Args>
     E get_edge(Args &&...args)
     {

@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <filesystem>
 
-static constexpr size_t NV = 100;
+static constexpr size_t NV = 50;
 std::vector<uint32_t> N_pop = std::vector<uint32_t>(NV, 1000);
 std::vector<Static_RNG::normal_distribution<float>> I0(N_pop.size());
 std::vector<Static_RNG::normal_distribution<float>> R0(N_pop.size());
@@ -16,7 +16,6 @@ std::vector<float> node_beta(N_pop.size(), 0.1);
 std::vector<float> edge_beta(N_pop.size(), 0.1);
 int main()
 {
-
 
   std::transform(N_pop.begin(), N_pop.end(), I0.begin(), [](auto x)
                  { return Static_RNG::normal_distribution<float>(x * 0.1, x * 0.01); });
@@ -34,21 +33,23 @@ int main()
   // generate sir_param
   size_t Nt = 100;
   sir.initialize();
-  auto traj = sir.simulate(Nt);
+  auto traj = sir.simulate_nodes(Nt);
   // print traj
-  for (auto &x : traj)
-  {
-    std::cout << x.S << ", " << x.I << ", " << x.R << std::endl;
-  }
 
   // write to file
   std::filesystem::create_directory(
       std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/");
   std::ofstream file(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/traj.csv");
 
-  for (auto &x : traj)
+  for (int i = 0; i < Nt+1; i++)
   {
-    file << x.S << ", " << x.I << ", " << x.R << "\n";
+    for (int j = 0; j < NV; j++)
+    {
+      file << traj[i][j].S << ", " << traj[i][j].I << ", " << traj[i][j].R;
+      file << (j == NV - 1 ? "" : ", ");
+    }
+    file << "\n";
   }
+
   file.close();
 }
