@@ -54,22 +54,17 @@ endif()
 
 set(SYCL_GRAPH_DATA_DIR "${PROJECT_SOURCE_DIR}/data" CACHE INTERNAL "SYCL_GRAPH_DATA_DIR")
 set(SYCL_GRAPH_LOG_DIR "${PROJECT_SOURCE_DIR}/log" CACHE INTERNAL "SYCL_GRAPH_LOG_DIR")
-set(SYCL_GRAPH_INCLUDE "${PROJECT_SOURCE_DIR}/include" CACHE INTERNAL "SYCL_GRAPH_INCLUDE")
-set(SYCL_GRAPH_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include;${PROJECT_SOURCE_DIR}/static;${SYCL_HEADER_INCLUDE_DIR}" CACHE INTERNAL "SYCL_GRAPH_INCLUDE_DIRS")
+set(SYCL_GRAPH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include" CACHE INTERNAL "SYCL_GRAPH_INCLUDE_DIR")
 file(MAKE_DIRECTORY ${SYCL_GRAPH_DATA_DIR}/SIR_sim)
 
 include_directories(${SYCL_INCLUDE_DIR})
 add_subdirectory(include)
-add_subdirectory(static)
-# set(SYCL_GRAPH_LIBRARIES DataFrame Eigen3::Eigen)
 configure_file("${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.hpp.in" "${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.hpp")
 configure_file("${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.py.in" "${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.py")
 add_subdirectory(test)
 add_subdirectory(Executables)
 
-# Doxygen
 
-# look for Doxygen package
 find_package(Doxygen)
 
 if (DOXYGEN_FOUND)

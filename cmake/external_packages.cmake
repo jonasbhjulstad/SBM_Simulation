@@ -5,11 +5,11 @@ CPMFindPackage(
     GITHUB_REPOSITORY jonasbhjulstad/Static_RNG
     GIT_TAG master
     OPTIONS
-    #pass cmake options to Static_RNG
     STATIC_RNG_ENABLE_SYCL ON
     BUILD_PYTHON_BINDERS OFF
     BUILD_DOCS OFF
 )
+
 
 
 set(cppitertools_INSTALL_CMAKE_DIR share)
@@ -17,6 +17,8 @@ CPMFindPackage(
     NAME cppitertools
     GITHUB_REPOSITORY ryanhaining/cppitertools
     GIT_TAG master
+    OPTIONS
+    "cppitertools_INSTALL_CMAKE_DIR share"
 )
 include(FindThreads)
 CPMFindPackage(
@@ -32,6 +34,12 @@ CPMFindPackage(
     OPTIONS
     "QUIET ON"
 )
+CPMFindPackage(
+    NAME DataFrame
+    GITHUB_REPOSITORY hosseinmoein/DataFrame
+    GIT_TAG master
+)
+
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
 
 
