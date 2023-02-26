@@ -23,6 +23,8 @@ void random_connect(Graph &G, dType p_ER, RNG &rng) {
   std::vector<typename Graph::uInt_t> to;
   uint32_t N_edges_max = G.max_edges();
 
+  std::vector<uint32_t> test = Sycl_Graph::range<uint32_t>(0, G.N_vertices());
+
   from.reserve(N_edges_max);
   to.reserve(N_edges_max);
   // std::vector<typename Graph::Edge_Prop_t> edges(N_edges_max);
@@ -30,6 +32,17 @@ void random_connect(Graph &G, dType p_ER, RNG &rng) {
     if (d_ER(rng) < p_ER) {
       from.push_back(v_idx[0]);
       to.push_back(v_idx[1]);
+
+      N_edges++;
+      if (N_edges == G.N_edges()) {
+        std::cout << "Warning: max edges reached" << std::endl;
+        return;
+      }
+    }
+
+    if (d_ER(rng) < p_ER) {
+      from.push_back(v_idx[1]);
+      to.push_back(v_idx[0]);
 
       N_edges++;
       if (N_edges == G.N_edges()) {

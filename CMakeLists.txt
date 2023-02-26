@@ -31,6 +31,7 @@ option(DEFAULT_WARNING_SUPPRESSION "Default Warning Suppression" ON)
 set(DEFAULT_WARNING_FLAGS -Wunknown-cuda-version)
 option(TRACY_ENABLE "" ON)
 option (TRACY_ON_DEMAND "" ON)
+option(SYCL_GRAPH_ENABLE_PRECOMPILED_HEADERS "Enable Precompiled Headers" ON)
 set(DPCPP_FLAGS -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization)
 set(SYCL_CUDA_FLAGS -fsycl-targets=nvptx64-nvidia-cuda)
 

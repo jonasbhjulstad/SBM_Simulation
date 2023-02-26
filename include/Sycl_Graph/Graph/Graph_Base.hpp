@@ -121,7 +121,7 @@ namespace Sycl_Graph
     {
       auto edges = edge_buf.get_edges();
       std::ofstream file(filename);
-      file << "Graph_ID" << delimiter << "to" << delimiter << "from";
+      file << "to" << delimiter << "from";
       if (!edges_only)
       {
         file << delimiter << "data";
@@ -138,7 +138,7 @@ namespace Sycl_Graph
       auto edges = edge_buf.get_edges();
       for (auto e : edges)
       {
-        file << Graph_ID << delimiter << e.to << delimiter << e.from;
+        file << delimiter << e.to << delimiter << e.from;
         if (!edges_only)
         {
           file << delimiter << e.data;
@@ -151,7 +151,7 @@ namespace Sycl_Graph
     {
       auto vertices = vertex_buf.get_vertices();
       std::ofstream file(filename);
-      file << "Graph_ID" << delimiter << "id" << delimiter << "data"
+      file << delimiter << "id" << delimiter << "data"
            << "\n";
       write_vertexlist(file, delimiter);
       file.close();
@@ -162,7 +162,7 @@ namespace Sycl_Graph
       auto vertices = vertex_buf.get_vertices();
       for (auto v : vertices)
       {
-        file << Graph_ID << delimiter << v.id << delimiter << v.data << "\n";
+        file << delimiter << v.id << delimiter << v.data << "\n";
       }
     }
   };

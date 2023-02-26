@@ -6,9 +6,6 @@
 #include <Sycl_Graph/Network/Network.hpp>
 #include <Sycl_Graph/Graph/Sycl/Graph.hpp>
 #include <Static_RNG/distributions.hpp>
-#ifdef SYCL_GRAPH_USE_ONEAPI
-#include <oneapi/dpl/algorithm>
-#endif
 #include <utility>
 #include <type_traits>
 template <>

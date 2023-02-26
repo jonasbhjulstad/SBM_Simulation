@@ -45,8 +45,8 @@ int main()
 
   // write to file
   std::filesystem::create_directory(
-      std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/");
-  std::ofstream file(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/traj.csv");
+      std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_Metapopulation/");
+  std::ofstream file(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_Metapopulation/Node_trajectories.csv");
 
   for (int i = 0; i < Nt+1; i++)
   {
@@ -59,4 +59,8 @@ int main()
   }
 
   file.close();
+
+  std::ofstream edge_file(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_Metapopulation/Edgelist.csv");
+  G.write_edgelist(edge_file);
+  return 0;
 }

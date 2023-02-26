@@ -356,15 +356,16 @@ namespace Sycl_Graph
             rng_buf.template get_access<sycl::access::mode::read_write>(h);
         auto e_inf_acc =
             e_inf_buf.template get_access<sycl::access::mode::write>(h);
+        sycl::stream out(1024, 256, h);
         h.parallel_for(sycl::range<1>(N_edges), [=](sycl::id<1> edge_idx) {
           
           const auto from_id = e_acc.from[edge_idx];
           const auto to_id = e_acc.to[edge_idx];
-          if(from_id >= N_vertices || to_id >= N_vertices) return;
+          if(from_id == invalid_id || to_id == invalid_id) return;
 
-          const auto beta = e_acc.data[edge_idx].beta;
-          const auto S = v_acc.data[to_id].state.S;
-          const auto I = v_acc.data[from_id].state.I;
+          const auto& beta = e_acc.data[edge_idx].beta;
+          const auto& S = v_acc.data[to_id].state.S;
+          const auto& I = v_acc.data[from_id].state.I;
           
           auto p_I = compute_infection_probability(beta, I, S+I, dt);
         Static_RNG::approximate_binomial_distribution dist(S, p_I, poisson_approx_ratio);
@@ -373,12 +374,14 @@ namespace Sycl_Graph
           auto to_state = v_acc.data[e_acc.to[edge_idx]].state;
           auto from_state = v_acc.data[e_acc.from[edge_idx]].state;
           float susceptible_frac = (float)S / (float)(to_state.S + to_state.I + to_state.R);
-          Static_RNG::approximate_binomial_distribution<> d_edge(from_state.I, susceptible_frac, poisson_approx_ratio);
+          Static_RNG::approximate_binomial_distribution<> d_edge(N_potential_inf, susceptible_frac, poisson_approx_ratio);
           uint32_t N_edge_infected = d_edge(rng_acc[edge_idx]);
-
+          if (to_id == 0 || to_id == 1)
+            out << "Edge " << edge_idx << " from " << from_id << " to " << to_id << " has " << N_edge_infected << " infections" << sycl::endl;
           e_inf_acc[edge_idx] = N_edge_infected;
 
         }); });
+
           event_e_inf.wait();
           assert_population_size("Edge Infections");
           FrameMarkEnd("Edge Infections");
@@ -441,6 +444,7 @@ namespace Sycl_Graph
 
         auto event_e_gather = q.submit([&](sycl::handler &h)
                                        {
+                                        sycl::stream out(1024, 256, h);
                                         auto v_acc = G.get_vertex_access<sycl::access::mode::read_write>(h);
                                         auto e_acc = G.get_edge_access<sycl::access::mode::read>(h);
                                         auto e_inf_acc = e_inf_buf.template get_access<sycl::access::mode::read>(h);
@@ -453,6 +457,7 @@ namespace Sycl_Graph
                                               I_edge_total += e_inf_acc[i];
                                             }
                                           }
+                                          // out << "Vertex " << id << " has " << I_edge_total << " infections" << sycl::endl;
                                           auto& state = v_acc.data[id].state;
                                           uint32_t delta_I = std::min<uint32_t>(state.S, I_edge_total);
                                           state.S -= delta_I;

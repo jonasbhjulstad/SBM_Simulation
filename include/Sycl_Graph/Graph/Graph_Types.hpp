@@ -93,7 +93,7 @@ namespace Sycl_Graph
             static_cast<Derived *>(this)->add(to, from, data);
         }
 
-        std::vector<Edge<E *, uI_t>> get_edges()
+        std::vector<Edge<E , uI_t>> get_edges()
         {
             return static_cast<Derived *>(this)->get_edges();
         }

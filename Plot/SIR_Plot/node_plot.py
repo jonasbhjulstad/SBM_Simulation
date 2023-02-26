@@ -5,7 +5,7 @@ import pandas as pd
 import pathlib
 filedir = pathlib.Path(__file__).parent.absolute()
 
-fname = "/home/man/Documents/Sycl_Graph/data/SIR_sim/traj.csv"
+fname = "/home/man/Documents/Sycl_Graph/data/SIR_Metapopulation/Node_trajectories.csv"
 #read df without header
 #numpy read csv
 traj = np.genfromtxt(fname, delimiter=',')

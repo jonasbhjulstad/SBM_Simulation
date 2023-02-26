@@ -27,13 +27,13 @@ CPMFindPackage(
     GIT_TAG master
 )
 
-CPMFindPackage(
-    NAME Eigen3
-    GITHUB_REPOSITORY libigl/eigen
-    GIT_TAG master
-    OPTIONS
-    "QUIET ON"
-)
+# CPMFindPackage(
+#     NAME Eigen3
+#     GITHUB_REPOSITORY libigl/eigen
+#     GIT_TAG master
+#     OPTIONS
+#     "QUIET ON"
+# )
 # CPMFindPackage(
 #     NAME DataFrame
 #     GITHUB_REPOSITORY hosseinmoein/DataFrame
