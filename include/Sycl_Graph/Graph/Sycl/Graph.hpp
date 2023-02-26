@@ -61,6 +61,16 @@ namespace Sycl_Graph::Sycl
       return edge_buf.size();
     }
 
+    uI_t max_vertices() const
+    {
+      return vertex_buf.NV;
+    }
+
+    uI_t max_edges() const
+    {
+      return edge_buf.NE;
+    }
+
     void resize(uI_t NV_new, uI_t NE_new)
     {
       vertex_buf.resize(NV_new);

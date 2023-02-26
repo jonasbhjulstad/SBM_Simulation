@@ -34,11 +34,11 @@ CPMFindPackage(
     OPTIONS
     "QUIET ON"
 )
-CPMFindPackage(
-    NAME DataFrame
-    GITHUB_REPOSITORY hosseinmoein/DataFrame
-    GIT_TAG master
-)
+# CPMFindPackage(
+#     NAME DataFrame
+#     GITHUB_REPOSITORY hosseinmoein/DataFrame
+#     GIT_TAG master
+# )
 
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
 

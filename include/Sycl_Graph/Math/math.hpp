@@ -2,6 +2,9 @@
 #define SYCL_GRAPH_Sycl_Graph_Math_HPP
 
 #include <algorithm>
+#include <cstdint>
+#include <vector>
+#include <array>
 namespace Sycl_Graph
 {
 

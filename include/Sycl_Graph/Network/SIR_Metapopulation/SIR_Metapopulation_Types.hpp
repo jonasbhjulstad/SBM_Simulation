@@ -67,12 +67,18 @@ struct SIR_Metapopulation_Node_Param
     }
 };
 
+struct SIR_Metapopulation_Node
+{
+  SIR_Metapopulation_Node_Param param;
+  SIR_Metapopulation_State state;
+};
 
-template <typename dType = float>  
+
 struct SIR_Metapopulation_Temporal_Param
 {
   uint32_t Nt_min = std::numeric_limits<uint32_t>::max();
   uint32_t N_I_min = 0;
+  float dt = 0.5f;
   friend std::ostream& operator<<(std::ostream& os, const SIR_Metapopulation_Temporal_Param& param)
   {
     os << param.Nt_min << " " << param.N_I_min;

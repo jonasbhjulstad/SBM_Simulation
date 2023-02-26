@@ -96,7 +96,7 @@ template <typename E, std::unsigned_integral uI_t> struct Edge_Buffer: public Ed
     host_buffer_add(to_buf, to, q, N_edges, offset);
     host_buffer_add(from_buf, from, q, N_edges, offset);
     host_buffer_add(data_buf, data, q, N_edges, offset);
-    N_edges += to.get_count();
+    N_edges += to.size();
   }
 
   std::vector<Edge_ID_Pair<uI_t>> get_valid_ids() {
@@ -220,9 +220,9 @@ template <typename E, std::unsigned_integral uI_t> struct Edge_Buffer: public Ed
     index_type = EDGE_INDEXING_ID;
   }
   size_t byte_size() {
-    return to_buf.get_count() * sizeof(uI_t) +
-           from_buf.get_count() * sizeof(uI_t) +
-           data_buf.get_count() * sizeof(E);
+    return to_buf.size() * sizeof(uI_t) +
+           from_buf.size() * sizeof(uI_t) +
+           data_buf.size() * sizeof(E);
   }
 };
 } // namespace sycl_graph

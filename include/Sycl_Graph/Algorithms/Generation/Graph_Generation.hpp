@@ -21,7 +21,7 @@ void random_connect(Graph &G, dType p_ER, RNG &rng) {
   uint32_t N_edges = 0;
   std::vector<typename Graph::uInt_t> from;
   std::vector<typename Graph::uInt_t> to;
-  uint32_t N_edges_max = G.N_edges();
+  uint32_t N_edges_max = G.max_edges();
 
   from.reserve(N_edges_max);
   to.reserve(N_edges_max);
@@ -81,7 +81,7 @@ Graph generate_erdos_renyi(sycl::queue &q, typename Graph::uI_t NV, dType p_ER,
 
   //get typename as a string
   ids = ids.size() > 0 ? ids : Sycl_Graph::range<typename Graph::uI_t>(0, NV);
-  Graph G(q, NV+1, NE);
+  Graph G(q, NV, NE);
   G.add_vertex(ids);
   random_connect(G, p_ER, rng);
   return G;

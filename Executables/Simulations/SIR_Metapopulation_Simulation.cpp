@@ -1,3 +1,4 @@
+#define SYCL_GRAPH_DEBUG
 #include <Sycl_Graph/Graph/Graph_Base.hpp>
 #include <Sycl_Graph/Math/math.hpp>
 #include <Sycl_Graph/Algorithms/Generation/Graph_Generation.hpp>
@@ -7,7 +8,8 @@
 #include <algorithm>
 #include <filesystem>
 
-static constexpr size_t NV = 50;
+
+static constexpr size_t NV = 100;
 std::vector<uint32_t> N_pop = std::vector<uint32_t>(NV, 1000);
 std::vector<Static_RNG::normal_distribution<float>> I0(N_pop.size());
 std::vector<Static_RNG::normal_distribution<float>> R0(N_pop.size());
@@ -20,6 +22,8 @@ int main()
   std::transform(N_pop.begin(), N_pop.end(), I0.begin(), [](auto x)
                  { return Static_RNG::normal_distribution<float>(x * 0.1, x * 0.01); });
 
+  std::for_each(R0.begin(), R0.end(), [](auto &x)
+                { x = Static_RNG::normal_distribution<float>(0, 0); });
   using namespace Sycl_Graph::Sycl::Network_Models;
   using Sycl_Graph::Dynamic::Network_Models::generate_erdos_renyi;
   using namespace Sycl_Graph::Network_Models;
@@ -33,6 +37,9 @@ int main()
   // generate sir_param
   size_t Nt = 100;
   sir.initialize();
+  // auto traj = sir.simulate(Nt);
+
+  SIR_Metapopulation_Temporal_Param tp_i{};
   auto traj = sir.simulate_nodes(Nt);
   // print traj
 

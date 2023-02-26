@@ -8,17 +8,14 @@
 #include <Sycl_Graph/Network/Network.hpp>
 #include <Sycl_Graph/Math/math.hpp>
 #include <Static_RNG/distributions.hpp>
-#ifdef SYCL_GRAPH_USE_ONEAPI
-#include <oneapi/dpl/algorithm>
-#include <oneapi/dpl/internal/random_impl/uniform_real_distribution.h>
-#include <oneapi/dpl/random>
-#endif
+#include <Sycl_Graph/Network/SIR_Metapopulation/SIR_Metapopulation_Types.hpp>
 #include <CL/sycl.hpp>
 #include <fmt/format.h>
 #include <random>
 #include <stddef.h>
 #include <type_traits>
 #include <utility>
+#include <filesystem>
 
 template <>
 struct sycl::is_device_copyable<
@@ -54,17 +51,6 @@ namespace Sycl_Graph
     // is_copyable_SIR_Invidual_State;
     using namespace Sycl_Graph::Network_Models;
     using namespace Static_RNG;
-    struct SIR_Metapopulation_Node
-    {
-      SIR_Metapopulation_State state;
-      SIR_Metapopulation_Param param;
-    };
-    struct SIR_Metapopulation_Temporal_Param
-    {
-      SIR_Metapopulation_Temporal_Param() = default;
-      uint32_t Nt_max = 50;
-      float dt = 5.f;
-    };
 
     using SIR_Metapopulation_Graph =
         Sycl_Graph::Sycl::Graph<SIR_Metapopulation_Node, SIR_Metapopulation_Param,
@@ -82,22 +68,21 @@ namespace Sycl_Graph
                       SIR_Metapopulation_Temporal_Param, SIR_Metapopulation_State>
           Base_t;
 
-#ifdef SYCL_GRAPH_DEBUG
-      static uint32_t Instance_Count = 0;
-      uint32_t debug_instance_ID = Instance_Count++;
-#endif
       sycl::queue &q;
       Graph_t &G;
+      static constexpr auto invalid_id = Graph_t::invalid_id;
 
       const uint32_t t = 0;
-
+      // Poisson approximation ratio (np <= poisson_approx_ratio)
+      float poisson_approx_ratio = 10.f;
       sycl::buffer<RNG, 1> rng_buf;
       const std::vector<uint32_t> N_pop;
-      sycl::buffer<normal_distribution<float>, 1> I0_dist;
-      sycl::buffer<normal_distribution<float>, 1> R0_dist;
+      const std::vector<normal_distribution<float>> I0_dist;
+      const std::vector<normal_distribution<float>> R0_dist;
       const std::vector<float> alpha_0;
       const std::vector<float> node_beta_0;
       const std::vector<float> edge_beta_0;
+
       SIR_Metapopulation_Network(Graph_t &G, const std::vector<uint32_t> &N_pop,
                                  const std::vector<normal_distribution<float>> &I0,
                                  const std::vector<float> &alpha,
@@ -109,8 +94,8 @@ namespace Sycl_Graph
                 alpha, node_beta, edge_beta, seed) {}
 
       SIR_Metapopulation_Network(Graph_t &G, const std::vector<uint32_t> &N_pop,
-                                 const std::vector<normal_distribution<float>> &I0,
-                                 const std::vector<normal_distribution<float>> &R0,
+                                 const std::vector<normal_distribution<float>> I0,
+                                 const std::vector<normal_distribution<float>> R0,
                                  const std::vector<float> &alpha,
                                  const std::vector<float> &node_beta,
                                  const std::vector<float> &edge_beta,
@@ -119,17 +104,19 @@ namespace Sycl_Graph
             rng_buf(sycl::range<1>(std::max({G.N_vertices(), G.N_edges()}))), alpha_0(alpha),
             node_beta_0(node_beta), edge_beta_0(edge_beta)
       {
-        if (G.N_edges() > 0)
-          generate_seeds(seed);
-#ifdef SYCL_GRAPH_DEBUG
+
+        generate_seeds(seed);
         construction_debug_report();
-#endif
       }
 
       void initialize()
       {
         ZoneScoped;
+        const uint32_t N_vertices = G.N_vertices();
         sycl::buffer<uint32_t, 1> N_pop_buf(N_pop);
+
+        sycl::buffer<normal_distribution<float>, 1> I0_dist_buf(I0_dist);
+        sycl::buffer<normal_distribution<float>, 1> R0_dist_buf(R0_dist);
         q.submit([&](sycl::handler &h)
                  {
       auto N_pop_acc = N_pop_buf.get_access<sycl::access::mode::read>(h);
@@ -137,18 +124,19 @@ namespace Sycl_Graph
           rng_buf.template get_access<sycl::access::mode::read_write>(h);
       auto v = G.vertex_buf.template get_access<sycl::access::mode::write>(h);
       auto I0_dist_acc =
-          I0_dist.template get_access<sycl::access::mode::read_write>(h);
+          I0_dist_buf.template get_access<sycl::access::mode::read_write>(h);
       auto R0_dist_acc =
-          R0_dist.template get_access<sycl::access::mode::read_write>(h);
-      h.parallel_for(sycl::range<1>(G.N_vertices()), [=](sycl::id<1> id) {
+          R0_dist_buf.template get_access<sycl::access::mode::read_write>(h);
+      sycl::stream out(1024, 256, h);
+      h.parallel_for(sycl::range<1>(N_vertices), [=](sycl::id<1> id) {
         // total population stored in susceptible state
-        auto &N_pop = N_pop_acc[id];
+        auto N_pop = N_pop_acc[id];
         auto &rng = rng_acc[id];
         auto& I0_dist = I0_dist_acc[id];
         auto& R0_dist = R0_dist_acc[id];
 
-        auto I0 = I0_dist(rng);
-        auto R0 = R0_dist(rng);
+        uint32_t I0 = I0_dist(rng);
+        uint32_t R0 = R0_dist(rng);
 
         auto &state = v.data[id].state;
         state.S = N_pop - I0 - R0;
@@ -156,6 +144,8 @@ namespace Sycl_Graph
         state.R = R0;
 
       }); });
+
+        assert_population_size("Initialization");
         set_edge_beta(edge_beta_0);
         set_node_beta(node_beta_0);
         set_alpha(alpha_0);
@@ -286,6 +276,7 @@ namespace Sycl_Graph
 
       std::vector<SIR_Metapopulation_State> read_node_states(const SIR_Metapopulation_Temporal_Param tp)
       {
+        ZoneScoped;
         const auto N_vertices = G.N_vertices();
         std::vector<SIR_Metapopulation_State> states(N_vertices);
         sycl::buffer<SIR_Metapopulation_State, 1> state_buf(states.data(), sycl::range<1>(N_vertices));
@@ -321,13 +312,11 @@ namespace Sycl_Graph
       infection_scatter(float dt)
       {
         ZoneScoped;
-
+        const uint32_t N_vertices = G.N_vertices();
+        const uint32_t N_edges = G.N_edges();
         using Sycl_Graph::Network_Models::SIR_Metapopulation_State;
 
-        // buffer for unmerged infections generated by vertices
-        // sycl::buffer<float, 1> v_inf_buf(sycl::range<1>(G.N_vertices()));
-        // ensure that buffer is 0-initialized
-        sycl::buffer<uint32_t, 1> v_inf_buf(sycl::range<1>(G.N_vertices()));
+        sycl::buffer<uint32_t, 1> v_inf_buf((sycl::range<1>(N_vertices)));
         FrameMarkStart("Vertex Infections");
         auto event_v_inf = q.submit([&](sycl::handler &h)
                                     {
@@ -336,56 +325,62 @@ namespace Sycl_Graph
           v_inf_buf.template get_access<sycl::access::mode::read_write>(h);
       auto rng_acc =
           rng_buf.template get_access<sycl::access::mode::read_write>(h);
-      h.parallel_for(sycl::range<1>(G.N_vertices()), [=](sycl::id<1> id) {
+
+      const float poisson_approx_ratio = this->poisson_approx_ratio;
+      h.parallel_for(sycl::range<1>(N_vertices), [=](sycl::id<1> id) {
         auto beta = v_acc.data[id].param.beta;
         auto S = v_acc.data[id].state.S;
         auto I = v_acc.data[id].state.I;
         auto R = v_acc.data[id].state.R;
         auto N_pop = S + I + R;
-
         auto p_I = compute_infection_probability(beta, I, N_pop, dt);
-        Static_RNG::binomial_distribution<> d_I(
-            v_acc.data[id].state.S, p_I);
-        v_inf_acc[id] = d_I(rng_acc[id]);
+        Static_RNG::approximate_binomial_distribution dist(I, p_I, poisson_approx_ratio);
+        v_inf_acc[id] = dist(rng_acc[id]);
       }); });
         event_v_inf.wait();
+        assert_population_size("Vertex Infections");
         FrameMarkEnd("Vertex Infections");
-        uint32_t N_edges = G.N_edges();
-
-        uint32_t N_vertices = G.N_vertices();
-        auto v_inf_acc = v_inf_buf.template get_access<sycl::access::mode::read>();
-        sycl::buffer<uint32_t, 1> e_inf_buf(0, sycl::range<1>(N_vertices));
+        sycl::buffer<uint32_t, 1> e_inf_buf(0, sycl::range<1>(N_edges));
 
         if (N_edges > 0)
         {
 
+          const float poisson_approx_ratio = this->poisson_approx_ratio;
+
           FrameMarkStart("Edge Infections");
           auto event_e_inf = q.submit([&](sycl::handler &h)
                                       {
-        auto v_acc = G.get_vertex_access<sycl::access::mode::read_write>(h);
+        auto v_acc = G.get_vertex_access<sycl::access::mode::read>(h);
         auto e_acc = G.get_edge_access<sycl::access::mode::read>(h);
         auto rng_acc =
             rng_buf.template get_access<sycl::access::mode::read_write>(h);
         auto e_inf_acc =
             e_inf_buf.template get_access<sycl::access::mode::write>(h);
-        h.parallel_for(sycl::range<1>(N_edges), [=](sycl::id<1> id) {
-          auto beta = v_acc.data[id].param.beta;
-          auto S = v_acc.data[id].state.S;
-          auto I = v_acc.data[id].state.I;
-          auto R = v_acc.data[id].state.R;
-          auto N_pop = S + I + R;
+        h.parallel_for(sycl::range<1>(N_edges), [=](sycl::id<1> edge_idx) {
+          
+          const auto from_id = e_acc.from[edge_idx];
+          const auto to_id = e_acc.to[edge_idx];
+          if(from_id >= N_vertices || to_id >= N_vertices) return;
 
-          // Delta_I = bin(S, p_I)
-          // p_I = 1 - exp(-beta*c*I/N_pop*dt)
-          auto p_I = compute_infection_probability(beta, I, N_pop, dt);
-          // float p_I = 0.1f;
-          Static_RNG::binomial_distribution d_I(v_acc.data[id].state.S,
-                                                        p_I);
+          const auto beta = e_acc.data[edge_idx].beta;
+          const auto S = v_acc.data[to_id].state.S;
+          const auto I = v_acc.data[from_id].state.I;
+          
+          auto p_I = compute_infection_probability(beta, I, S+I, dt);
+        Static_RNG::approximate_binomial_distribution dist(S, p_I, poisson_approx_ratio);
+          uint32_t N_potential_inf = dist(rng_acc[edge_idx]);
 
-          auto N_infected = d_I(rng_acc[id]);
-          e_inf_acc[e_acc.to[id]] += N_infected;
+          auto to_state = v_acc.data[e_acc.to[edge_idx]].state;
+          auto from_state = v_acc.data[e_acc.from[edge_idx]].state;
+          float susceptible_frac = (float)S / (float)(to_state.S + to_state.I + to_state.R);
+          Static_RNG::approximate_binomial_distribution<> d_edge(from_state.I, susceptible_frac, poisson_approx_ratio);
+          uint32_t N_edge_infected = d_edge(rng_acc[edge_idx]);
+
+          e_inf_acc[edge_idx] = N_edge_infected;
+
         }); });
           event_e_inf.wait();
+          assert_population_size("Edge Infections");
           FrameMarkEnd("Edge Infections");
         }
 
@@ -394,9 +389,9 @@ namespace Sycl_Graph
       sycl::buffer<uint32_t, 1> recovery_scatter(float dt)
       {
         ZoneScoped;
-
-        sycl::buffer<uint32_t, 1> v_rec_buf(sycl::range<1>(G.N_vertices()));
-
+        const uint32_t N_vertices = G.N_vertices();
+        sycl::buffer<uint32_t, 1> v_rec_buf((sycl::range<1>(N_vertices)));
+        const float poisson_approx_ratio = this->poisson_approx_ratio;
         auto event_v_rec = q.submit([&](sycl::handler &h)
                                     {
       auto v_acc = G.get_vertex_access<sycl::access::mode::read>(h);
@@ -404,16 +399,12 @@ namespace Sycl_Graph
           v_rec_buf.template get_access<sycl::access::mode::read_write>(h);
       auto rng_acc =
           rng_buf.template get_access<sycl::access::mode::read_write>(h);
-      h.parallel_for(sycl::range<1>(G.N_edges()), [=](sycl::id<1> id) {
+      h.parallel_for(sycl::range<1>(N_vertices), [=](sycl::id<1> id) {
         auto alpha = v_acc.data[id].param.alpha;
         auto p_R = 1 - sycl::exp(-alpha * dt);
         auto I = v_acc.data[id].state.I;
-
-        // Delta_R = bin(I, p_R)
-        Static_RNG::binomial_distribution<> d_R(
-            v_acc.data[id].state.I, p_R);
-        auto N_recovered = d_R(rng_acc[id]);
-        v_rec_acc[id] = N_recovered;
+        Static_RNG::approximate_binomial_distribution dist(I, p_R, poisson_approx_ratio);
+        v_rec_acc[id] = dist(rng_acc[id]);
       }); });
         event_v_rec.wait();
 
@@ -424,7 +415,9 @@ namespace Sycl_Graph
                   sycl::buffer<uint32_t, 1> &v_rec_buf)
       {
         ZoneScoped;
-
+        const uint32_t N_vertices = G.N_vertices();
+        const uint32_t N_edges = G.N_edges();
+        const float poisson_approx_ratio = this->poisson_approx_ratio;
         auto event_v_gather = q.submit([&](sycl::handler &h)
                                        {
   
@@ -433,52 +426,41 @@ namespace Sycl_Graph
           v_inf_buf.template get_access<sycl::access::mode::read>(h);
       auto v_rec_acc =
           v_rec_buf.template get_access<sycl::access::mode::read>(h);
-      h.parallel_for(sycl::range<1>(G.N_vertices()), [=](sycl::id<1> id) {
+      h.parallel_for(sycl::range<1>(N_vertices), [=](sycl::id<1> id) {
         // Vertex infections and recoveries are updated first
 
-        auto& state = v_acc.data[id].state;
-        auto delta_I = std::min<uint32_t>(state.S, v_inf_acc[id]);
-        auto delta_R = std::min<uint32_t>(state.I, v_rec_acc[id]);
-        state.S = std::max<uint32_t>({0, state.S - delta_I});
-        state.I = std::max<uint32_t>({0, state.I + delta_I - delta_R});
+        auto state = v_acc.data[id].state;
+        uint32_t delta_I = std::min<uint32_t>(state.S, v_inf_acc[id]);
+        uint32_t delta_R = std::min<uint32_t>(state.I, v_rec_acc[id]);
+        state.S -= delta_I;
+        state.I += delta_I - delta_R;
         state.R += delta_R;
       }); });
         event_v_gather.wait();
-        if (G.N_edges() > 0)
-        {
-          auto event_e_gather = q.submit([&](sycl::handler &h)
-                                         {
-        auto v_acc = G.get_vertex_access<sycl::access::mode::read_write>(h);
-        auto e_acc = G.get_edge_access<sycl::access::mode::read>(h);
-        auto v_inf_acc =
-            v_inf_buf.template get_access<sycl::access::mode::read>(h);
-        auto e_inf_acc =
-            e_inf_buf.template get_access<sycl::access::mode::read>(h);
-        auto rng_acc =
-            rng_buf.template get_access<sycl::access::mode::read_write>(h);
-          cl::sycl::stream os(1024, 128, h);
-        h.parallel_for(sycl::range<1>(G.N_edges()), [=](sycl::id<1> id) {
-          // Probability of new infection is determined by the population
-          // fraction of infected
-          auto state = v_acc.data[e_acc.to[id]].state;
-          if (state.S <= 0 || e_acc.to[id] == Graph_t::invalid_id || e_acc.from[id] == Graph_t::invalid_id) return;
-          auto I_edge = e_inf_acc[id];
-          float susceptible_frac = (float)state.S / (float)(state.S + state.I);
-          
-          binomial_distribution<> d_edge(I_edge, susceptible_frac);
-          uint32_t N_edge_infected = d_edge(rng_acc[id]);
-          // os << "Edge " << id << " infected " << N_edge_infected << " people" << sycl::endl;
-          // os << "State: " << state.S << " " << state.I << " " << state.R << sycl::endl;
-          // os << "Susceptible fraction: " << susceptible_frac << sycl::endl;
-          // os << "e_inf_acc: " << e_inf_acc[id] << sycl::endl;
+        assert_population_size("Vertex Gather");
 
-          auto delta_I = std::min<uint32_t>(state.S, N_edge_infected);
-          
-          v_acc.data[e_acc.to[id]].state -= delta_I;
-          v_acc.data[e_acc.to[id]].state.I += delta_I;
-        }); });
-          event_e_gather.wait();
-        }
+        auto event_e_gather = q.submit([&](sycl::handler &h)
+                                       {
+                                        auto v_acc = G.get_vertex_access<sycl::access::mode::read_write>(h);
+                                        auto e_acc = G.get_edge_access<sycl::access::mode::read>(h);
+                                        auto e_inf_acc = e_inf_buf.template get_access<sycl::access::mode::read>(h);
+                                        h.parallel_for(sycl::range<1>(N_vertices), [=](sycl::id<1> id) {
+                                          uint32_t I_edge_total = 0;
+                                          for(int i = 0; i < N_edges; i++)
+                                          {
+                                            if(e_acc.to[i] == id)
+                                            {
+                                              I_edge_total += e_inf_acc[i];
+                                            }
+                                          }
+                                          auto& state = v_acc.data[id].state;
+                                          uint32_t delta_I = std::min<uint32_t>(state.S, I_edge_total);
+                                          state.S -= delta_I;
+                                          state.I += delta_I;
+                                        }); });
+
+        event_e_gather.wait();
+        assert_population_size("Edge Gather");
       }
 
       void reset() { initialize(); }
@@ -486,25 +468,31 @@ namespace Sycl_Graph
       void generate_seeds(int seed)
       {
         ZoneScoped;
-        // generate seeds
-        std::vector<int> seeds(G.N_edges());
-        // random device
-        // mt19937 generator
-        std::mt19937_64 gen(seed);
-        std::generate(seeds.begin(), seeds.end(), gen);
-        sycl::buffer<int, 1> seed_buf(seeds.data(), sycl::range<1>(G.N_edges()));
-        q.submit([&](sycl::handler &h)
-                 {
+        if (rng_buf.size() > 0)
+        {
+          // generate seeds
+          std::vector<int> seeds(rng_buf.size());
+          // random device
+          // mt19937 generator
+          std::mt19937_64 gen(seed);
+          std::generate(seeds.begin(), seeds.end(), gen);
+          sycl::buffer<int, 1> seed_buf(seeds);
+          q.submit([&](sycl::handler &h)
+                   {
       auto seed_acc = seed_buf.template get_access<sycl::access::mode::read>(h);
       auto rng_acc = rng_buf.template get_access<sycl::access::mode::write>(h);
-      h.parallel_for(sycl::range<1>(G.N_edges()),
+      h.parallel_for(sycl::range<1>(rng_acc.size()),
                      [=](sycl::id<1> id) { rng_acc[id].seed(seed_acc[id]); }); });
+        }
       }
 
-#ifdef SYCL_GRAPH_DEBUG
       void construction_debug_report()
       {
+#ifdef SYCL_GRAPH_DEBUG
         // fmt open file
+
+        static uint32_t Instance_Count = 0;
+        uint32_t debug_instance_ID = Instance_Count++;
         const std::string filename =
             SYCL_GRAPH_LOG_DIR +
             std::string("SIR_Metapopulation/Network" +
@@ -537,9 +525,45 @@ namespace Sycl_Graph
             total_passive_size + 3 * G.N_vertices() * sizeof(float);
         file << "Total Buffer space requirement: " << max_active_size << std::endl;
         file.close();
-      }
 #endif
+      }
+      void assert_population_size(const std::string &event_name)
+      {
+
+        // create buffer for event_name
+#ifdef SYCL_GRAPH_DEBUG
+        sycl::buffer<char, 1> event_name_buf(event_name.data(), sycl::range<1>(event_name.size()));
+        sycl::buffer<uint32_t, 1> N_pop_buf(N_pop.data(), sycl::range<1>(N_pop.size()));
+        q.submit([&](sycl::handler &h)
+                 {
+        auto event_name_acc = event_name_buf.template get_access<sycl::access::mode::read>(h);
+        auto v_acc = G.get_vertex_access<sycl::access::mode::read>(h);
+        auto rng_acc =
+            rng_buf.template get_access<sycl::access::mode::read_write>(h);
+        auto N_pop_acc =
+            N_pop_buf.template get_access<sycl::access::mode::read>(h);
+        sycl::stream os(1024, 128, h);
+        h.single_task([=]() {
+          for(int id = 0; id < v_acc.size(); id++)
+          {
+          auto state = v_acc.data[id].state;
+          auto N_pop = N_pop_acc[id];
+          if (state.S + state.I + state.R != N_pop)
+          {
+            os << "Event: ";
+            for(int i = 0; i < event_name_acc.size(); i++)
+              os << event_name_acc[i];
+            os << sycl::endl;
+            os << "Vertex " << id << " has incorrect population size" << sycl::endl;
+            os << "State: " << state.S << " " << state.I << " " << state.R << sycl::endl;
+            os << "N_pop: " << N_pop << sycl::endl;
+          }
+          }
+        }); });
+#endif
+      }
     };
+
   } // namespace Sycl::Network_Models
 } // namespace Sycl_Graph
 #endif
