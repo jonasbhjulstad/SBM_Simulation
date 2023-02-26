@@ -5,3 +5,4 @@
 vcpkg/
 data/
 build
+.cache
