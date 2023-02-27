@@ -6,7 +6,7 @@
 #include <vector>
 #include <Sycl_Graph/type_helpers.hpp>
 #include <Sycl_Graph/Math/math.hpp>
-namespace Sycl_Graph
+namespace Sycl_Graph::Graph::Base
 {
     enum Graph_Connection_Type
     {
@@ -69,16 +69,5 @@ namespace Sycl_Graph
         t.to;
         t.from;
     };
-
-    template <Edge_type E, Vertex_type _To, Vertex_type _From>
-    struct Invariant_Edge: public E
-    {
-        typedef _To To;
-        typedef _From From;
-    };
-
-    template <typename T>
-    concept Invariant_Edge_type = Edge_type<T> && Vertex_type<typename T::To> && Vertex_type<typename T::From>;
-
 } // namespace Sycl_Graph
 #endif // SYCL_GRAPH_GRAPH_TYPES_HPP

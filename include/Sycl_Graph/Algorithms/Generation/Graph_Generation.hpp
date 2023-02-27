@@ -6,7 +6,6 @@
 #define SYCL_GRAPH_GRAPH_GENERATION_HPP
 
 #include <Static_RNG/distributions.hpp>
-#include <Sycl_Graph/Graph/constraints.hpp>
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Math/math.hpp>
 #include <Sycl_Graph/Graph/Graph_Base.hpp>

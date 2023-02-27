@@ -23,7 +23,7 @@ namespace Sycl_Graph::Sycl
   };
 
   template <typename V, std::unsigned_integral uI_t = uint32_t>
-  struct Vertex_Buffer : public Vertex_Buffer_Base<V, Vertex_Buffer<V, uI_t>, uI_t>
+  struct Vertex_Buffer : public Vertex_Buffer_Base<V, Vertex_Buffer<V, uI_t>>
   {
     static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
 
