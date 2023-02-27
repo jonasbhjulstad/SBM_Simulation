@@ -53,7 +53,7 @@ namespace Sycl_Graph
     using namespace Static_RNG;
 
     using SIR_Metapopulation_Graph =
-        Sycl_Graph::Sycl::Graph<SIR_Metapopulation_State, SIR_Metapopulation_Param,
+        Sycl_Graph::Sycl::Graph<SIR_Metapopulation_Node, SIR_Metapopulation_Param,
                                 uint32_t>;
     template <Static_RNG::rng_type RNG = Static_RNG::default_rng>
     struct SIR_Metapopulation_Network
@@ -66,7 +66,7 @@ namespace Sycl_Graph
       typedef typename Graph_t::Edge_t Edge_t;
       typedef Network<SIR_Metapopulation_Network<RNG>,
                       SIR_Metapopulation_Temporal_Param, SIR_Metapopulation_State>
-      Base_t;
+          Base_t;
 
       sycl::queue &q;
       Graph_t &G;
@@ -80,25 +80,29 @@ namespace Sycl_Graph
       const std::vector<normal_distribution<float>> I0_dist;
       const std::vector<normal_distribution<float>> R0_dist;
       const std::vector<float> alpha_0;
-      const std::vector<float> beta_0;
+      const std::vector<float> node_beta_0;
+      const std::vector<float> edge_beta_0;
 
       SIR_Metapopulation_Network(Graph_t &G, const std::vector<uint32_t> &N_pop,
                                  const std::vector<normal_distribution<float>> &I0,
                                  const std::vector<float> &alpha,
-                                 const std::vector<float> &beta,
+                                 const std::vector<float> &node_beta,
+                                 const std::vector<float> &edge_beta,
                                  int seed = 777)
           : SIR_Metapopulation_Network(
                 G, N_pop, I0, std::vector<normal_distribution<float>>(I0.size()),
-                alpha, beta, seed) {}
+                alpha, node_beta, edge_beta, seed) {}
 
       SIR_Metapopulation_Network(Graph_t &G, const std::vector<uint32_t> &N_pop,
                                  const std::vector<normal_distribution<float>> I0,
                                  const std::vector<normal_distribution<float>> R0,
                                  const std::vector<float> &alpha,
-                                 const std::vector<float> &beta,
+                                 const std::vector<float> &node_beta,
+                                 const std::vector<float> &edge_beta,
                                  int seed = 777)
           : q(G.q), G(G), N_pop(N_pop), I0_dist(I0), R0_dist(R0),
-            rng_buf(sycl::range<1>(std::max({G.N_vertices(), G.N_edges()}))), alpha_0(alpha), beta_0(beta)
+            rng_buf(sycl::range<1>(std::max({G.N_vertices(), G.N_edges()}))), alpha_0(alpha),
+            node_beta_0(node_beta), edge_beta_0(edge_beta)
       {
 
         generate_seeds(seed);
@@ -134,7 +138,7 @@ namespace Sycl_Graph
         uint32_t I0 = I0_dist(rng);
         uint32_t R0 = R0_dist(rng);
 
-        auto &state = v.data[id];
+        auto &state = v.data[id].state;
         state.S = N_pop - I0 - R0;
         state.I = I0;
         state.R = R0;
@@ -142,7 +146,8 @@ namespace Sycl_Graph
       }); });
 
         assert_population_size("Initialization");
-        set_beta(beta_0);
+        set_edge_beta(edge_beta_0);
+        set_node_beta(node_beta_0);
         set_alpha(alpha_0);
       }
 
@@ -167,7 +172,29 @@ namespace Sycl_Graph
       }); });
       }
 
-      void set_beta(const std::vector<float> &beta)
+      void set_node_beta(const std::vector<float> &beta)
+      {
+        set_node_beta(beta, Sycl_Graph::range(0, beta.size()));
+      }
+
+      void set_node_beta(const std::vector<float> &beta,
+                         const std::vector<uint32_t> &idx)
+      {
+        ZoneScoped;
+
+        sycl::buffer<float, 1> beta_buf(beta);
+        sycl::buffer<uint32_t, 1> idx_buf(idx);
+        q.submit([&](sycl::handler &h)
+                 {
+      auto beta_acc = beta_buf.get_access<sycl::access::mode::read>(h);
+      auto idx_acc = idx_buf.get_access<sycl::access::mode::read>(h);
+      auto v = G.vertex_buf.template get_access<sycl::access::mode::write>(h);
+      h.parallel_for(sycl::range<1>(idx.size()), [=](sycl::id<1> id) {
+        v.data[idx_acc[id]].param.beta = beta_acc[id];
+      }); });
+      }
+
+      void set_edge_beta(const std::vector<float> &beta)
       {
         ZoneScoped;
 
@@ -187,7 +214,7 @@ namespace Sycl_Graph
       }); });
       }
 
-      void set_beta(const std::vector<float> &beta,
+      void set_edge_beta(const std::vector<float> &beta,
                          const std::vector<uint32_t> &to_idx,
                          const std::vector<uint32_t> &from_idx)
       {

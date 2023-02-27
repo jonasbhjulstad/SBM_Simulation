@@ -2,27 +2,36 @@
 #define SYCL_GRAPH_GRAPH_HPP
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Graph/Graph_Types.hpp>
-// #include <Sycl_Graph/Graph/Dynamic/Graph.hpp>
+#include <Sycl_Graph/Graph/Vertex_Buffer.hpp>
+#include <Sycl_Graph/Graph/Edge_Buffer.hpp>
 #include <array>
 #include <concepts>
 namespace Sycl_Graph
 {
-  template <typename V, typename E, typename DV, typename DE,
-            std::unsigned_integral _uI_t = uint32_t,
-            std::floating_point _dType = float>
-  struct Graph_Base
+
+
+  template <Invariant_Vertex_Buffer_type vertex_buffer, 
+            Invariant_Edge_Buffer_type edge_buffer>
+  struct Invariant_Graph_Base
   {
-    Graph_Base(Vertex_Buffer_Base<V, DV, _uI_t> &vertex_buf, Edge_Buffer_Base<E, DE, _uI_t> &edge_buf) : vertex_buf(vertex_buf), edge_buf(edge_buf) {}
-    Vertex_Buffer_Base<V, DV, _uI_t> &vertex_buf;
-    Edge_Buffer_Base<E, DE, _uI_t> &edge_buf;
-    typedef Vertex<V, _uI_t> Vertex_t;
-    typedef Edge<E, _uI_t> Edge_t;
-    typedef V Vertex_Prop_t;
-    typedef E Edge_Prop_t;
-    typedef _uI_t uI_t;
-    typedef _dType dType;
+    template <Vertex_Buffer_type ... VBs, Edge_Buffer_type ... EBs>
+    Invariant_Graph_Base(VBs &&... vertex_buffers, EBs &&... edge_buffers)
+        : vertex_buf(vertex_buffers ...), edge_buf(edge_buffers ...)
+    {
+    }
+    typedef Invariant_Edge_Buffer IEB;
+    typedef Invariant_Vertex_Buffer IVB;
+
+    typedef IVB::uI_t uI_t;
+    typedef IVB::Vertex_t Vertex_t;
+    typedef IVB::Data_t Vertex_Data_t;
+    typedef IEB::Edge_t Edge_t;
+    typedef IEB::Data_t Edge_Data_t;
+
+    IVB vertex_buf;
+    IEB edge_buf;
+
     uI_t Graph_ID = 0;
-    typedef Graph_Base<V, E, DV, DE, uI_t, dType> Graph_t;
 
     static constexpr auto invalid_id = std::numeric_limits<uI_t>::max();
     uI_t N_vertices() const { return vertex_buf.N_vertices(); }
@@ -34,12 +43,11 @@ namespace Sycl_Graph
       edge_buf.resize(NE_new);
     }
 
-    Graph_t operator+(const Graph_t &other) const
+    auto& operator+(const Graph_t &other) const
     {
-      Graph_t result;
-      result.vertex_buf = vertex_buf + other.vertex_buf;
-      result.edge_buf = edge_buf + other.edge_buf;
-      return result;
+      
+      auto new_graph = Graph_t(vertex_buf + other.vertex_buf, edge_buf + other.edge_buf);
+      return new_graph;
     }
 
     Graph_t &operator=(Graph_t &other)
@@ -49,70 +57,39 @@ namespace Sycl_Graph
       return *this;
     }
 
-    template <typename... Args>
-    void add_vertex(Args &&...args)
+
+    void add_vertex(const auto&& ... args)
     {
-      vertex_buf.add(std::forward<Args>(args)...);
+      vertex_buf.add(std::forward<decltype(args)>(args) ...);
     }
 
-    template <typename... Args>
-    void add_edge(Args &&...args)
+    void add_edge(const auto&& ... args)
     {
-      edge_buf.add(std::forward<Args>(args)...);
+      edge_buf.add(std::forward<decltype(args)>(args) ...);
     }
 
-    template <typename... Args>
-    void remove_vertex(Args &&...args)
+    void remove_vertex(const auto&& ... args)
     {
-      vertex_buf.remove(std::forward<Args>(args)...);
+      vertex_buf.remove(std::forward<decltype(args)>(args) ...);
     }
 
-    template <typename... Args>
-    void remove_edge(Args &&...args)
+    void remove_edge(const auto&& ... args)
     {
-      edge_buf.remove(std::forward<Args>(args)...);
+      edge_buf.remove(std::forward<decltype(args)>(args) ...);
     }
-
-    template <typename... Args>
-    void assign_vertex(Args &&...args)
+    template <typename T>
+    auto get_edges(const std::vector<uI_t>&& ids)
     {
-      vertex_buf.assign(std::forward<Args>(args)...);
+      return edge_buf.get_edges<T>(std::forward<decltype(ids)>(ids));
     }
-
-    template <typename... Args>
-    void assign_edge(Args &&...args)
+    template <typename T>
+    auto get_edges()
     {
-      edge_buf.assign(std::forward<Args>(args)...);
+      return edge_buf.get_edges<T>();
     }
-
-    template <typename... Args>
-    V get_vertex(Args &&...args)
+    auto get_edges()
     {
-      return vertex_buf.get_data(std::forward<Args>(args)...);
-    }
-
-    template <typename ... Args>
-    const std::vector<uI_t> get_vertex_ids(Args && ... args)
-    {
-      return vertex_buf.get_valid_ids(std::forward<Args>(args)...);
-    }
-
-    template <typename... Args>
-    E get_edge(Args &&...args)
-    {
-      return edge_buf.get_data(std::forward<Args>(args)...);
-    }
-
-    template <typename... Args>
-    std::vector<V> get_vertex_data(Args &&...args)
-    {
-      return vertex_buf.get_data(std::forward<Args>(args)...);
-    }
-
-    template <typename... Args>
-    std::vector<E> get_edge_data(Args &&...args)
-    {
-      return edge_buf.get_data(std::forward<Args>(args)...);
+      return edge_buf.get_edges();
     }
 
     // file I/O
@@ -167,51 +144,8 @@ namespace Sycl_Graph
     }
   };
 
-  // namespace _detail {
-  // template <typename...> struct Typelist {};
 
-  // }
 
-  // template <typename uI_t, typename V_LABEL_TYPES, typename E_LABEL_TYPES,
-  //           typename DV_LABEL_TYPES, typename DE_LABEL_TYPES>
-  // struct Labeled_Graph;
-
-  // template <std::unsigned_integral uI_t, typename V_LABEL_TYPES, typename E_LABEL_TYPES,
-  //           typename DV_LABEL_TYPES, typename DE_LABEL_TYPES>
-  // struct Labeled_Graph;
-
-  // template <std::unsigned_integral uI_t, typename... Vs, typename... Es, typename... DVs,
-  //           typename... DEs>
-  // struct Labeled_Graph<uI_t, _detail::Typelist<Vs...>, _detail::Typelist<Es...>,
-  //                      _detail::Typelist<DVs...>, _detail::Typelist<DEs...>> {
-  //   // get number of types of Vs
-  //   static constexpr auto N_LABELS_V = sizeof...(Vs);
-  //   // get number of types of Es
-  //   static constexpr auto N_LABELS_E = sizeof...(Es);
-
-  //   static constexpr auto V_LABELS =
-  //       std::array<const char *, N_LABELS_V>{typeid(Vs).name()...};
-  //   static constexpr auto E_LABELS =
-  //       std::array<const char *, N_LABELS_E>{typeid(Es).name()...};
-
-  //   // create N_LABELS_V Vertex_Buffers
-  //   std::array<Vertex_Buffer_Base<Vs..., uI_t, DVs...>, N_LABELS_V> vertex_bufs;
-  //   // create N_LABELS_E Edge_Buffers
-  //   std::array<Edge_Buffer_Base<Es..., uI_t, DEs...>, N_LABELS_E> edge_bufs;
-
-  //   using Graph_t = Labeled_Graph<uI_t, _detail::Typelist<Vs...>,
-  //                                 _detail::Typelist<Es...>,
-  //                                 _detail::Typelist<DVs...>,
-  //                                 _detail::Typelist<DEs...>>;
-
-  //   using Vertex_t = boost::variant<Vertex<Vs, uI_t>...>;
-  //   using Edge_t = boost::variant<Edge<Es, uI_t>...>;
-
-  //   Labeled_Graph(const std::vector<Vertex<Vs, uI_t>> &...vertices,
-  //                 const std::vector<Edge<Es, uI_t>> &...edges)
-  //       : vertex_bufs{vertices...}, edge_bufs{edges...} {}
-
-  // };
 
 } // namespace Sycl_Graph
 #endif

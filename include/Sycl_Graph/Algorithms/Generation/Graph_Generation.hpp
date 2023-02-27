@@ -16,7 +16,7 @@
 
 namespace Sycl_Graph::Dynamic::Network_Models {
 template <Graph_type Graph, Static_RNG::rng_type RNG, std::floating_point dType = float>
-void random_connect(Graph &G, dType p_ER, RNG &rng) {
+void random_connect(Graph &G, dType p_ER, RNG &rng, Graph_Connection_Type connection_type = undirected, bool allow_self_loops = true) {
   Static_RNG::uniform_real_distribution d_ER;
   uint32_t N_edges = 0;
   std::vector<typename Graph::uInt_t> from;
@@ -32,18 +32,6 @@ void random_connect(Graph &G, dType p_ER, RNG &rng) {
     if (d_ER(rng) < p_ER) {
       from.push_back(v_idx[0]);
       to.push_back(v_idx[1]);
-
-      N_edges++;
-      if (N_edges == G.N_edges()) {
-        std::cout << "Warning: max edges reached" << std::endl;
-        return;
-      }
-    }
-
-    if (d_ER(rng) < p_ER) {
-      from.push_back(v_idx[1]);
-      to.push_back(v_idx[0]);
-
       N_edges++;
       if (N_edges == G.N_edges()) {
         std::cout << "Warning: max edges reached" << std::endl;

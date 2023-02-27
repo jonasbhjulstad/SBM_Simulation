@@ -4,22 +4,40 @@
 #include <concepts>
 #include <numeric>
 #include <vector>
+#include <Sycl_Graph/type_helpers.hpp>
 #include <Sycl_Graph/Math/math.hpp>
 namespace Sycl_Graph
 {
-    template <typename D, typename ID_t>
+    enum Graph_Connection_Type
+    {
+        directed,
+        undirected
+    };
+
+    template <typename D, std::unsigned_integral _uI_t = uint32_t>
     struct Vertex
     {
-        // sycl device copyable
-        static constexpr ID_t invalid_id = std::numeric_limits<ID_t>::max();
-        ID_t id = std::numeric_limits<ID_t>::max();
+        Vertex(_uI_t id, const D& data): id(id), data(data) {}        
+        typedef D Data_t;
+        typedef _uI_t uI_t;
+        static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
+        uI_t id = std::numeric_limits<uI_t>::max();
         D data;
     };
 
-    template <typename D, typename ID_t>
-    std::vector<Vertex<D, ID_t>> make_vertices(const std::vector<D> &data, const std::vector<ID_t> &ids)
+    template <typename T>
+    concept Vertex_type = 
+    std::unsigned_integral<typename T::uI_t> &&
+    requires(T t)
     {
-        std::vector<Vertex<D, ID_t>> vertices(data.size());
+        {t.id} -> std::convertible_to<typename T::uI_t>;
+        {t.data} -> std::convertible_to<typename T::Data_t>;
+    };
+
+    template <typename D, typename uI_t>
+    std::vector<Vertex<D, uI_t>> make_vertices(const std::vector<D> &data, const std::vector<uI_t> &ids)
+    {
+        std::vector<Vertex<D, uI_t>> vertices(data.size());
         vertices.reserve(data.size());
         for (size_t i = 0; i < data.size(); ++i)
         {
@@ -28,81 +46,39 @@ namespace Sycl_Graph
         return vertices;
     }
 
-    template <typename D, typename ID_t>
+    template <typename D, std::unsigned_integral _uI_t = uint32_t>
     struct Edge
     {
-        Edge(const D &data, ID_t to, ID_t from)
+        typedef D Data_t;
+        typedef _uI_t uI_t;
+        Edge(const D &data, uI_t to, uI_t from)
             : data(data), to(to), from(from) {}
-        Edge(ID_t to, ID_t from)
-            : to(to), from(from) {}
+        Edge(uI_t to, uI_t from)
+            : to(to), from(from), D{} {}
         D data;
-        static constexpr ID_t invalid_id = std::numeric_limits<ID_t>::max();
-        ID_t to = invalid_id;
-        ID_t from = invalid_id;
+        static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
+        uI_t to = invalid_id;
+        uI_t from = invalid_id;
+
     };
 
-    template <typename V, typename Derived, std::unsigned_integral uI_t = uint32_t>
-    struct Vertex_Buffer_Base
+    template <typename T>
+    concept Edge_type = requires(T t)
     {
-        auto size() const
-        {
-            return static_cast<const Derived *>(this)->size();
-        }
-        void add(const std::vector<uI_t> &ids, const std::vector<V> &data)
-        {
-            static_cast<Derived *>(this)->add(ids, data);
-        }
-
-        void add(const std::vector<uI_t> &ids)
-        {
-            std::vector<V> data(ids.size());
-            add(ids, data);
-        }
-
-        template <typename std::enable_if<!std::is_integral<V>::value, bool> = true>
-        void add(const std::vector<V> &data)
-        {
-            add(data, Sycl_Graph::range(0, data.size()));
-        }
-
-        std::vector<Vertex<V, uI_t>> get_vertices()
-        {
-            return static_cast<Derived *>(this)->get_vertices();
-        }
-
-        void remove(uI_t index)
-        {
-            static_cast<Derived *>(this)->remove(index);
-        }
+        t.data;
+        t.to;
+        t.from;
     };
 
-    template <typename E, typename Derived, std::unsigned_integral uI_t = uint32_t>
-    struct Edge_Buffer_Base
+    template <Edge_type E, Vertex_type _To, Vertex_type _From>
+    struct Invariant_Edge: public E
     {
-        uI_t size() const
-        {
-            return static_cast<const Derived *>(this)->size();
-        }
-        void add(const std::vector<uI_t> &to, const std::vector<uI_t> &from, const std::vector<E> &data)
-        {
-            static_cast<Derived *>(this)->add(to, from, data);
-        }
-        void add(const std::vector<uI_t> &to, const std::vector<uI_t> &from)
-        {
-            std::vector<E> data(to.size());
-            static_cast<Derived *>(this)->add(to, from, data);
-        }
-
-        std::vector<Edge<E , uI_t>> get_edges()
-        {
-            return static_cast<Derived *>(this)->get_edges();
-        }
-
-        void remove(uI_t index)
-        {
-            static_cast<Derived *>(this)->remove(index);
-        }
+        typedef _To To;
+        typedef _From From;
     };
+
+    template <typename T>
+    concept Invariant_Edge_type = Edge_type<T> && Vertex_type<typename T::To> && Vertex_type<typename T::From>;
 
 } // namespace Sycl_Graph
 #endif // SYCL_GRAPH_GRAPH_TYPES_HPP

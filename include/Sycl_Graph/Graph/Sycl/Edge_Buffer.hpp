@@ -33,7 +33,8 @@ struct Edge_ID_Pair
 
 };
 
-template <typename E, std::unsigned_integral uI_t> struct Edge_Buffer: public Edge_Buffer_Base<E, Edge_Buffer<E, uI_t>, uI_t>
+template <typename E, std::unsigned_integral uI_t = uint32_t> 
+struct Edge_Buffer: public Edge_Buffer_Base<E, Edge_Buffer<E, uI_t>, uI_t>
  {
   // current number of edges
   uI_t N_edges = 0;
