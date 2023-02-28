@@ -1,4 +1,4 @@
-#include <Sycl_Graph/Graph/Graph_Base.hpp>
+#include <Sycl_Graph/Graph/Base/Graph.hpp>
 #include <random>
 #include <algorithm>
 #include <iostream>

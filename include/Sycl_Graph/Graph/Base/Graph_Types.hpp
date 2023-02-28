@@ -4,15 +4,11 @@
 #include <concepts>
 #include <numeric>
 #include <vector>
+#include <Sycl_Graph/Graph/Graph_Types.hpp>
 #include <Sycl_Graph/type_helpers.hpp>
 #include <Sycl_Graph/Math/math.hpp>
-namespace Sycl_Graph::Graph::Base
+namespace Sycl_Graph::Base
 {
-    enum Graph_Connection_Type
-    {
-        directed,
-        undirected
-    };
 
     template <typename D, std::unsigned_integral _uI_t = uint32_t>
     struct Vertex
@@ -34,18 +30,6 @@ namespace Sycl_Graph::Graph::Base
         {t.data} -> std::convertible_to<typename T::Data_t>;
     };
 
-    template <typename D, typename uI_t>
-    std::vector<Vertex<D, uI_t>> make_vertices(const std::vector<D> &data, const std::vector<uI_t> &ids)
-    {
-        std::vector<Vertex<D, uI_t>> vertices(data.size());
-        vertices.reserve(data.size());
-        for (size_t i = 0; i < data.size(); ++i)
-        {
-            vertices[i] = {ids[i], data[i]};
-        }
-        return vertices;
-    }
-
     template <typename D, std::unsigned_integral _uI_t = uint32_t>
     struct Edge
     {
@@ -54,20 +38,20 @@ namespace Sycl_Graph::Graph::Base
         Edge(const D &data, uI_t to, uI_t from)
             : data(data), to(to), from(from) {}
         Edge(uI_t to, uI_t from)
-            : to(to), from(from), D{} {}
+            : to(to), from(from) {}
         D data;
         static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
         uI_t to = invalid_id;
         uI_t from = invalid_id;
-
     };
+
 
     template <typename T>
     concept Edge_type = requires(T t)
     {
-        t.data;
-        t.to;
-        t.from;
+        typename T::Data_t;
+        typename T::uI_t;
+        T::invalid_id;
     };
 } // namespace Sycl_Graph
 #endif // SYCL_GRAPH_GRAPH_TYPES_HPP

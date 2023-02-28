@@ -8,14 +8,14 @@
 #include <Static_RNG/distributions.hpp>
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Math/math.hpp>
-#include <Sycl_Graph/Graph/Graph_Base.hpp>
+#include <Sycl_Graph/Graph/Base/Graph.hpp>
 #include <itertools.hpp>
 #include <memory>
 #include <random>
 
-namespace Sycl_Graph::Dynamic::Network_Models {
-template <Graph_type Graph, Static_RNG::rng_type RNG, std::floating_point dType = float>
-void random_connect(Graph &G, dType p_ER, RNG &rng, Graph_Connection_Type connection_type = undirected, bool allow_self_loops = true) {
+namespace Sycl_Graph {
+template <Base::Graph_type Graph, Static_RNG::rng_type RNG, std::floating_point dType = float>
+void random_connect(Graph &G, dType p_ER, RNG &rng) {
   Static_RNG::uniform_real_distribution d_ER;
   uint32_t N_edges = 0;
   std::vector<typename Graph::uInt_t> from;
@@ -41,7 +41,7 @@ void random_connect(Graph &G, dType p_ER, RNG &rng, Graph_Connection_Type connec
   G.add_edge(to, from);
 }
 
-template <Graph_type Graph, Static_RNG::rng_type RNG, std::floating_point dType = float,
+template <Base::Graph_type Graph, Static_RNG::rng_type RNG, std::floating_point dType = float,
           std::unsigned_integral uI_t = uint32_t>
 void random_connect(Graph &G, const std::vector<uI_t> &from_IDs,
                      const std::vector<uI_t> &to_IDs, dType p_ER,
@@ -72,7 +72,7 @@ void random_connect(Graph &G, const std::vector<uI_t> &from_IDs,
   G.add_edge(to, from, edges);
 }
 
-template <Graph_type Graph, std::floating_point dType = float, Static_RNG::rng_type RNG = Static_RNG::default_rng>
+template <Base::Graph_type Graph, std::floating_point dType = float, Static_RNG::rng_type RNG = Static_RNG::default_rng>
 Graph generate_erdos_renyi(sycl::queue &q, typename Graph::uI_t NV, dType p_ER,
                            std::vector<typename Graph::uI_t> ids = {},
                            RNG rng = RNG(),

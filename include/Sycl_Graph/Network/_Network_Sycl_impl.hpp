@@ -1,7 +1,7 @@
 #ifndef SYCL_GRAPH_NETWORK_SYCL_IMPL_HPP
 #define SYCL_GRAPH_NETWORK_SYCL_IMPL_HPP
 #include <Sycl_Graph/Math/math.hpp>
-#include <Sycl_Graph/Graph/Graph_Base.hpp>
+#include <Sycl_Graph/Graph/Base/Graph.hpp>
 #include <random>
 #include <stddef.h>
 #include <vector>

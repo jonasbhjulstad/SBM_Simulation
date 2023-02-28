@@ -1,21 +1,22 @@
     #ifndef SYCL_GRAPH_GRAPH_INVARIANT_BUFFER_HPP
     #define SYCL_GRAPH_GRAPH_INVARIANT_BUFFER_HPP
-    #include <Sycl_Graph/Graph/Graph_Types.hpp>
+    #include <Sycl_Graph/Buffer/Base/Buffer.hpp>
+    #include <Sycl_Graph/Graph/Invariant/Graph_Types.hpp>
     #include <tuple>
     namespace Sycl_Graph::Invariant
     {
-    template <Sycl_Graph::Buffer_type ... Bs>
+    template <Sycl_Graph::Base::Buffer_type ... Bs>
     struct Buffer
     {
-        Buffer() = default;
-        Buffer(Bs &&... buffers): buffers(buffers ...) {}
-        
-        typedef Buffer<Bs ...> This_t;
-        std::tuple<Bs ...> buffers;
-
         typedef typename std::tuple_element_t<0, std::tuple<Bs ...>>::uI_t uI_t;
         typedef std::tuple<typename Bs::Container_t ...> Container_t;
         typedef std::tuple<typename Bs::Container_t::Data_t ...> Data_t;
+        Buffer() = default;
+        Buffer(Bs &&... buffers): buffers(buffers ...) {}
+        Buffer(const std::tuple<Bs ...>& buffers): buffers(buffers) {}
+        typedef Buffer<Bs ...> This_t;
+        std::tuple<Bs ...> buffers;
+
 
         static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
         
@@ -57,13 +58,13 @@
         template <typename D> requires Container_Data_type<D>::value
         static constexpr auto get_buffer_index()
         {
-            return Sycl_Graph::index_of_type<Vertex<D, uI_t>, typename Bs::Container_t ...>();
+            return Sycl_Graph::index_of_type<Sycl_Graph::Base::Vertex<D, uI_t>, typename Bs::Container_t ...>();
         }
 
         template <typename ... Ds> requires (Container_Data_type<Ds>::value && ...)
         static constexpr auto get_buffer_index()
         {
-            return std::array<uI_t, sizeof...(Ds)>{type_index<Vertex<Ds, uI_t>>() ...};
+            return std::array<uI_t, sizeof...(Ds)>{type_index<Sycl_Graph::Base::Vertex<Ds, uI_t>>() ...};
         }
 
         template <typename D> requires Container_Data_type<D>::value
@@ -117,19 +118,21 @@
 
         auto copy() const
         {
-            Buffer B();
+            Buffer B;
             B.buffers = this->buffers;
             return B;
         }
 
         auto &operator+(const This_t &other)
         {
-            std::apply([](auto &&...buffers)
-                       { ((buffers + other.buffers), ...); },
-                       buffers);
+            std::apply([&other](auto &&... buffers) {
+                return std::make_tuple((buffers + other.buffers) ...);}, this->buffers);
             return *this;
         }
     };
+
+    template <typename T>
+    concept Buffer_type = Sycl_Graph::Base::Buffer_type<T>;
     } // namespace Sycl_Graph::Invariant
 
     #endif // SYCL_GRAPH_GRAPH_INVARIANT_BUFFER_HPP

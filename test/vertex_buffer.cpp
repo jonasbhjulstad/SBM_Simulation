@@ -1,6 +1,6 @@
 #include <Sycl_Graph/Graph/Sycl/Vertex_Buffer.hpp>
 #include <Sycl_Graph/Graph/Sycl/Graph.hpp>
-#include <Sycl_Graph/Graph/Graph_Base.hpp>
+#include <Sycl_Graph/Graph/Base/Graph.hpp>
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Math/math.hpp>
 int main()
@@ -12,8 +12,6 @@ int main()
 
     Sycl_Graph_Sycl::Vertex_Buffer<int, int>* pv = &G.vertex_buf;
     // G.add_vertex(data, indices);
-    // auto a = sizeof(Sycl_Graph::Vertex_Buffer_Base<int, int, Vertex_Buffer<int, int>>);
-    // auto b = sizeof(Vertex_Buffer<int, int>);
 
     G.add_vertex(Sycl_Graph::range(0, 100), Sycl_Graph::range(0,100));
 

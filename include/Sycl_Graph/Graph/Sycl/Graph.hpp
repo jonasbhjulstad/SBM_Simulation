@@ -19,39 +19,35 @@
 #include <utility>
 // #include <Sycl_Graph/execution.hpp>
 #include <CL/sycl.hpp>
-#include <Sycl_Graph/Graph/Sycl/Edge_Buffer.hpp>
-#include <Sycl_Graph/Graph/Sycl/Vertex_Buffer.hpp>
-#include <Sycl_Graph/Graph/Graph_Base.hpp>
+#include <Sycl_Graph/Buffer/Sycl/Edge_Buffer.hpp>
+#include <Sycl_Graph/Buffer/Sycl/Vertex_Buffer.hpp>
+#include <Sycl_Graph/Graph/Base/Graph.hpp>
 #include <type_traits>
 namespace Sycl_Graph::Sycl
 {
 
-  template <typename V, typename E, std::unsigned_integral uI_t = uint32_t, std::floating_point dType = float>
-  struct Graph : public Sycl_Graph::Graph_Base<V, E, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>, uI_t, dType>
+  template <Vertex_Buffer_type _Vertex_Buffer, Edge_Buffer_type _Edge_Buffer>
+  struct Graph : public Sycl_Graph::Base::Graph<_Vertex_Buffer, _Edge_Buffer>
 
   {
-    typedef Sycl_Graph::Graph_Base<V, E, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>, uI_t, dType> Base_t;
+    typedef Sycl_Graph::Base::Graph<_Vertex_Buffer, _Edge_Buffer> Base_t;
+    typedef _Vertex_Buffer Vertex_Buffer;
+    typedef _Edge_Buffer Edge_Buffer;
+    typedef typename Base_t::uI_t uI_t;
+    typedef typename Base_t::Vertex_t Vertex_t;
+    typedef typename Base_t::Vertex_Data_t Vertex_Data_t;
+    typedef typename Base_t::Edge_t Edge_t;
+    typedef typename Base_t::Edge_Data_t Edge_Data_t;
     // create copy constructor
     Graph(sycl::queue &q, uI_t NV, uI_t NE, const sycl::property_list &props = {})
-        : q(q), vertex_buf(q, NV, props), edge_buf(q, NE, props), Base_t(vertex_buf, edge_buf) {}
+        : q(q), Base_t(Vertex_Buffer(q, NV, props), Edge_Buffer(q, NE, props)) {}
 
-    Graph(sycl::queue &q, const std::vector<Vertex<V, uI_t>> &vertices,
-          const std::vector<Edge<E, uI_t>> &edges = {},
+    Graph(sycl::queue &q, const std::vector<Vertex_t> &vertices,
+          const std::vector<Edge_t> &edges = {},
           const sycl::property_list &props = {})
-        : vertex_buf(q, vertices, props), edge_buf(q, edges, props), q(q), Base_t(vertex_buf, edge_buf) {}
+        : q(q), Base_t(Vertex_Buffer(q, vertices, props), Edge_Buffer(q, edges, props)) {}
     sycl::queue &q;
-    Vertex_Buffer<V, uI_t> vertex_buf;
-    Edge_Buffer<E, uI_t> edge_buf;
-    uI_t Graph_ID = 0;
-    //convert to typedef
-    typedef Vertex<V, uI_t> Vertex_t;
-    typedef Edge<E, uI_t> Edge_t;
-    typedef V Vertex_Prop_t;
-    typedef E Edge_Prop_t;
-    typedef uI_t uInt_t;
-    typedef Graph<V, E, uI_t> Graph_t;  
-
-    static constexpr auto invalid_id = std::numeric_limits<uI_t>::max();
+    uI_t Graph_ID& = this->Graph_ID;
     uI_t N_vertices() const
     {
       return vertex_buf.size();

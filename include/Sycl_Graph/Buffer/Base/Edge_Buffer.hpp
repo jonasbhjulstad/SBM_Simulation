@@ -1,8 +1,8 @@
 #ifndef SYCL_GRAPH_EDGE_BUFFER_HPP
 #define SYCL_GRAPH_EDGE_BUFFER_HPP
-#include <Sycl_Graph/Graph/Graph_Types.hpp>
-#include <Sycl_Graph/Graph/Graph_Base.hpp>
-namespace Sycl_Graph::Buffer::Base
+#include <Sycl_Graph/Buffer/Base/Buffer.hpp>
+#include <Sycl_Graph/Graph/Base/Graph_Types.hpp>
+namespace Sycl_Graph::Base
 {
 
     template <Edge_type E, typename Derived>
@@ -11,6 +11,8 @@ namespace Sycl_Graph::Buffer::Base
         typedef E Edge_t;
         typedef typename Edge_t::uI_t uI_t;
         typedef typename Edge_t::Data_t Data_t;
+        typedef Edge_t Container_t;
+        typedef Data_t Container_Data_t;
 
         uI_t size() const
         {
@@ -78,15 +80,9 @@ namespace Sycl_Graph::Buffer::Base
 
     template <typename T>
     concept Edge_Buffer_type =
+    Buffer_type<T> &&
     Edge_type<typename T::Edge_t> &&
-    std::unsigned_integral<typename T::uI_t> && 
-    requires(T t)
-    {
-        t.size();
-        t.add(std::vector<typename T::Edge_t>());
-        t.get_edges();
-        t.remove(T::uI_t());
-    };
+    std::unsigned_integral<typename T::uI_t>;
 
 }
 

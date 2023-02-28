@@ -1,18 +1,20 @@
-#ifndef SYCL_GRAPH_GRAPH_VERTEX_HPP
-#define SYCL_GRAPH_GRAPH_VERTEX_HPP
+#ifndef SYCL_GRAPH_BUFFER_SYCL_VERTEX_BUFFER_HPP
+#define SYCL_GRAPH_BUFFER_SYCL_VERTEX_BUFFER_HPP
 #include <CL/sycl.hpp>
-#include <Sycl_Graph/Graph/Graph_Types.hpp>
-#include <Sycl_Graph/buffer_routines.hpp>
+#include <Sycl_Graph/Buffer/Base/Vertex_Buffer.hpp>
+#include <Sycl_Graph/Buffer/Sycl/Buffer_Routines.hpp>
 namespace Sycl_Graph::Sycl
 {
-  template <typename V, std::unsigned_integral uI_t, sycl::access::mode mode>
+  template <Sycl_Graph::Base::Vertex_type Vertex_t, sycl::access::mode mode>
   struct Vertex_Accessor
   {
-    Vertex_Accessor(sycl::buffer<V, 1> &v_buf, sycl::buffer<uI_t, 1> &id_buf,
+    typedef typename Vertex_t::uI_t uI_t;
+    typedef typename Vertex_t::data_t Data_t;
+    Vertex_Accessor(sycl::buffer<Data_t, 1> &v_buf, sycl::buffer<uI_t, 1> &id_buf,
                     sycl::handler &h, sycl::property_list props = {})
         : data(v_buf, h, props), id(id_buf, h, props) {}
     uI_t size() const { return data.size(); }
-    sycl::accessor<V, 1, mode> data;
+    sycl::accessor<Data_t, 1, mode> data;
     sycl::accessor<uI_t, 1, mode> id;
   };
 
@@ -22,28 +24,33 @@ namespace Sycl_Graph::Sycl
     VERTEX_INDEX_POSITION
   };
 
-  template <typename V, std::unsigned_integral uI_t = uint32_t>
-  struct Vertex_Buffer : public Vertex_Buffer_Base<V, Vertex_Buffer<V, uI_t>>
-  {
-    static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
 
-    uI_t N_vertices = 0;
-    sycl::buffer<uI_t, 1> id_buf;
-    sycl::buffer<V, 1> data_buf;
+  template <Sycl_Graph::Base::Vertex_type _Vertex_t>
+  struct Vertex_Buffer : public Sycl_Graph::Base::Vertex_Buffer<_Vertex_t, Vertex_Buffer<_Vertex_t>>
+  {
+
     sycl::queue &q;
+    typedef _Vertex_t Vertex_t;
+    typedef typename Vertex_t::Data_t Data_t;
+    typedef typename Vertex_t::uI_t uI_t;
+    static constexpr uI_t invalid_id = Vertex_t::invalid_id;
+    uI_t N_vertices = 0;
     const uI_t NV;
+    sycl::buffer<uI_t, 1> id_buf;
+    sycl::buffer<Data_t, 1> data_buf;
 
     Vertex_Buffer(sycl::queue &q, uI_t NV, const sycl::property_list &props = {})
         : id_buf(sycl::range<1>(NV), props), data_buf(sycl::range<1>(NV), props), NV(NV), q(q) {}
 
-    Vertex_Buffer(sycl::queue &q, const std::vector<Vertex<V, uI_t>> &vertices,
+    Vertex_Buffer(sycl::queue &q, const std::vector<Vertex_t> &vertices,
                   const sycl::property_list &props = {})
         : id_buf(sycl::range<1>(vertices.size()), props),
           data_buf(sycl::range<1>(vertices.size()), props),
-          q(q)
+          q(q),
+          NV(vertices.size())
     {
       std::vector<uI_t> ids(vertices.size());
-      std::vector<V> v_data(vertices.size());
+      std::vector<Data_t> v_data(vertices.size());
       for (uI_t i = 0; i < vertices.size(); ++i)
       {
         ids[i] = vertices[i].id;
@@ -53,9 +60,9 @@ namespace Sycl_Graph::Sycl
     }
     uI_t size() const { return data_buf.size(); };
     template <sycl::access::mode mode>
-    Vertex_Accessor<V, uI_t, mode> get_access(sycl::handler &h)
+    Vertex_Accessor<Data_t, mode> get_access(sycl::handler &h)
     {
-      return Vertex_Accessor<V, uI_t, mode>(data_buf, id_buf, h);
+      return Vertex_Accessor<Data_t, mode>(data_buf, id_buf, h);
     }
 
     void resize(uI_t new_size)
@@ -64,9 +71,9 @@ namespace Sycl_Graph::Sycl
       buffer_resize(q, id_buf, new_size);
       buffer_resize(q, data_buf, new_size);
     }
-    void add(const std::vector<uI_t> &ids, const std::vector<V> &v_data = {})
+    void add(const std::vector<uI_t> &ids, const std::vector<Data_t> &v_data = {})
     {
-      std::vector<V> data = (v_data.size() == 0) ? std::vector<V>(ids.size()) : v_data;
+      std::vector<Data_t> data = (v_data.size() == 0) ? std::vector<Data_t>(ids.size()) : v_data;
       if (N_vertices + ids.size() > data_buf.size())
       {
         resize(N_vertices + ids.size());
@@ -91,11 +98,11 @@ namespace Sycl_Graph::Sycl
       return ids;
     }
 
-    std::vector<V> get_data(const std::vector<uI_t> &ids)
+    std::vector<Data_t> get_data(const std::vector<uI_t> &ids)
     {
-      std::vector<V> result(ids.size());
+      std::vector<Data_t> result(ids.size());
 
-      sycl::buffer<V, 1> res_buf(result.data(), ids.size());
+      sycl::buffer<Data_t, 1> res_buf(result.data(), ids.size());
       q.submit([&](sycl::handler &h)
                {
       auto out = res_buf.template get_access<sycl::access::mode::read>(h);
@@ -112,9 +119,9 @@ namespace Sycl_Graph::Sycl
       return result;
     }
 
-    std::vector<Vertex<V, uI_t>> get_vertices()
+    std::vector<Vertex_t> get_vertices()
     {
-      std::vector<Vertex<V, uI_t>> result(N_vertices);
+      std::vector<Vertex_t> result(N_vertices);
       auto id_acc = id_buf.template get_access<sycl::access::mode::read>();
       auto v_acc = data_buf.template get_access<sycl::access::mode::read>();
       uI_t i = 0;
@@ -131,7 +138,7 @@ namespace Sycl_Graph::Sycl
     }
 
     template <Vertex_Indexing idx_type = VERTEX_INDEX_ID>
-    void assign(const std::vector<uI_t> &id, const std::vector<V> &data)
+    void assign(const std::vector<uI_t> &id, const std::vector<Data_t> &data)
     {
       q.submit([&](sycl::handler &h)
                {
@@ -166,7 +173,7 @@ namespace Sycl_Graph::Sycl
       N_vertices -= id.size();
     }
 
-    Vertex_Buffer<V, uI_t> &operator=(const Vertex_Buffer<V, uI_t> &other)
+    Vertex_Buffer<Vertex_t> &operator=(const Vertex_Buffer<Vertex_t> &other)
     {
       id_buf = other.id_buf;
       data_buf = other.data_buf;
@@ -174,7 +181,7 @@ namespace Sycl_Graph::Sycl
       return *this;
     }
 
-    Vertex_Buffer<V, uI_t> operator+(const Vertex_Buffer<V, uI_t> &other)
+    Vertex_Buffer<Vertex_t> operator+(const Vertex_Buffer<Vertex_t> &other)
     {
 
       id_buf = device_buffer_combine(q, id_buf, other.id_buf, this->N_vertices,
@@ -188,6 +195,9 @@ namespace Sycl_Graph::Sycl
     size_t byte_size() { return data_buf.byte_size() + id_buf.byte_size(); }
   };
 
+  template <typename T>
+  concept Vertex_Buffer_type = Sycl_Graph::Base::Vertex_Buffer_type<T>;
+
 } // namespace Sycl_Graph::Sycl
 
-#endif
+#endif // SYCL_GRAPH_SYCL_VERTEX_BUFFER_HPP

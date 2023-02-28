@@ -1,17 +1,22 @@
 #ifndef SYCL_GRAPH_GRAPH_HPP
 #define SYCL_GRAPH_GRAPH_HPP
 #include <concepts>
-#include <Sycl_Graph/Graph/Edge_Buffer_Base.hpp>
-#include <Sycl_Graph/Graph/Vertex_Buffer_Base.hpp>
-namespace Sycl_Graph::Graph::Base
+#include <Sycl_Graph/Buffer/Base/Edge_Buffer.hpp>
+#include <Sycl_Graph/Buffer/Base/Vertex_Buffer.hpp>
+namespace Sycl_Graph::Base
 {
 
 
   template <Vertex_Buffer_type _Vertex_Buffer_t, 
             Edge_Buffer_type _Edge_Buffer_t>
-  struct Graph_Base
+  struct Graph
   {
-    Graph_Base(const _Vertex_Buffer_t&& vertex_buffer, const _Edge_Buffer_t && edge_buffer)
+
+    Graph(const _Vertex_Buffer_t& vertex_buffer, const _Edge_Buffer_t& edge_buffer)
+        : vertex_buf(vertex_buffer), edge_buf(edge_buffer)
+    {
+    }
+    Graph(const _Vertex_Buffer_t&& vertex_buffer, const _Edge_Buffer_t && edge_buffer)
         : vertex_buf(vertex_buffer), edge_buf(edge_buffer)
     {
     }
@@ -24,14 +29,13 @@ namespace Sycl_Graph::Graph::Base
     typedef typename Edge_Buffer_t::Edge_t Edge_t;
     typedef typename Edge_Buffer_t::Data_t Edge_Data_t;
 
-    typedef Graph_Base<Vertex_Buffer_t, Edge_Buffer_t> Graph_t;
-
+    typedef Graph<Vertex_Buffer_t, Edge_Buffer_t> Graph_t;
+    static constexpr auto invalid_id = Vertex_t::invalid_id;
     Vertex_Buffer_t vertex_buf;
     Edge_Buffer_t edge_buf;
 
     uI_t Graph_ID = 0;
 
-    static constexpr auto invalid_id = std::numeric_limits<uI_t>::max();
     uI_t N_vertices() const { return vertex_buf.N_vertices(); }
     uI_t N_edges() const { return edge_buf.N_edges(); }
 
@@ -43,9 +47,9 @@ namespace Sycl_Graph::Graph::Base
 
     auto& operator+(const Graph_t &other) const
     {
-      
-      auto new_graph = Graph_t(vertex_buf + other.vertex_buf, edge_buf + other.edge_buf);
-      return new_graph;
+      this->vertex_buf + other.vertex_buf;
+      this->edge_buf + other.edge_buf;
+      return *this;
     }
 
     Graph_t &operator=(Graph_t &other)
@@ -142,7 +146,35 @@ namespace Sycl_Graph::Graph::Base
     // }
   };
 
-
+  template <typename T>
+  concept Graph_type = requires(T t)
+  {
+    typename T::Vertex_Buffer_t;
+    typename T::Edge_Buffer_t;
+    typename T::uI_t;
+    typename T::Vertex_t;
+    typename T::Vertex_Data_t;
+    typename T::Edge_t;
+    typename T::Edge_Data_t;
+    typename T::Graph_t;
+    {t.vertex_buf};
+    {t.edge_buf};
+    {t.N_vertices()};
+    {t.N_edges()};
+    {t.resize(0, 0)};
+    {t + t};
+    {t = t};
+    {t.add_vertex(0)};
+    {t.add_edge(0, 0)};
+    {t.remove_vertex(0)};
+    {t.remove_edge(0, 0)};
+    {t.template get_edges<int>()};
+    {t.template get_edges<int>(std::vector<typename T::uI_t>{})};
+    // {t.write_edgelist("")};
+    // {t.write_edgelist(std::ofstream{})};
+    // {t.write_vertexlist("")};
+    // {t.write_vertexlist(std::ofstream{})};
+  };
 
 
 } // namespace Sycl_Graph

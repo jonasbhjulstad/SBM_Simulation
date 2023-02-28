@@ -1,104 +1,42 @@
-#ifndef SYCL_GRAPH_EDGE_HPP
-#define SYCL_GRAPH_EDGE_HPP
+#ifndef SYCL_GRAPH_SYCL_EDGE_BUFFER_HPP
+#define SYCL_GRAPH_SYCL_EDGE_BUFFER_HPP
 #include <CL/sycl.hpp>
-#include <Sycl_Graph/Graph/Graph_Types.hpp>
-#include <Sycl_Graph/buffer_routines.hpp>
+#include <Sycl_Graph/Graph/Base/Graph_Types.hpp>
+#include <Sycl_Graph/Buffer/Base/Edge_Buffer.hpp>
+#include <Sycl_Graph/Buffer/Sycl/Buffer_Routines.hpp>
 namespace Sycl_Graph::Sycl {
-template <typename E, std::unsigned_integral uI_t, sycl::access::mode Mode>
+template <Sycl_Graph::Base::Edge_type Edge_t, sycl::access::mode Mode>
 struct Edge_Accessor {
-  Edge_Accessor(sycl::buffer<E, 1> &edge_buf, sycl::buffer<uI_t, 1> &to_buf,
+  typedef typename Edge_t::uI_t uI_t;
+
+  Edge_Accessor(sycl::buffer<Edge_t, 1> &edge_buf, sycl::buffer<uI_t, 1> &to_buf,
                 sycl::buffer<uI_t, 1> &from_buf, sycl::handler &h,
                 sycl::property_list props = {})
       : data(edge_buf, h, props), to(to_buf, h, props),
         from(from_buf, h, props) {}
-  sycl::accessor<E, 1, Mode> data;
+  sycl::accessor<Edge_t, 1, Mode> data;
   sycl::accessor<uI_t, 1, Mode> to;
   sycl::accessor<uI_t, 1, Mode> from;
 };
 
-enum Edge_Indexing { EDGE_INDEXING_ID, EDGE_INDEXING_POSITION };
-template <typename V, std::unsigned_integral uI_t> struct Vertex_Buffer;
-
-template <std::unsigned_integral uI_t = uint32_t>
-struct Edge_ID_Pair
-{
-    static constexpr uI_t invalid_ID = std::numeric_limits<uI_t>::max();
-    Edge_ID_Pair() = default;
-    bool valid() const
-    {
-        return to != invalid_ID && from != invalid_ID;
-    }
-    uI_t to = invalid_ID;
-    uI_t from = invalid_ID;
-
-};
-
-template <typename E, std::unsigned_integral uI_t = uint32_t> 
-struct Edge_Buffer: public Edge_Buffer_Base<E, Edge_Buffer<E, uI_t>>
+template <Sycl_Graph::Base::Edge_type _Edge_t> 
+struct Edge_Buffer: public Sycl_Graph::Base::Edge_Buffer<_Edge_t, Edge_Buffer<_Edge_t>>
  {
-  // current number of edges
-  uI_t N_edges = 0;
-  // maximum number of edges
-  const uI_t NE;
-  sycl::queue &q;
-  sycl::buffer<uI_t, 1> to_buf;
-  sycl::buffer<uI_t, 1> from_buf;
-  sycl::buffer<E, 1> data_buf;
+  typedef Sycl_Graph::Base::Edge_Buffer<_Edge_t, Edge_Buffer<_Edge_t>> Base_t;
+  typedef typename Base_t::Container_t Container_t;
+  typedef _Edge_t Edge_t;
+  typedef typename Edge_t::uI_t uI_t;
+  typedef typename Edge_t::Data_t Data_t;
 
-  Edge_Indexing index_type = EDGE_INDEXING_ID;
-
-  static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
   Edge_Buffer(sycl::queue &q, uI_t NE, const sycl::property_list &props = {})
-      : to_buf(sycl::range<1>(NE), props), from_buf(sycl::range<1>(NE), props),
-        data_buf(sycl::range<1>(NE), props), NE(NE), q(q) {}
+      : 
 
-  Edge_Buffer(sycl::queue &q, const std::vector<Edge<E, uI_t>> &edges,
+  Edge_Buffer(sycl::queue &q, const std::vector<Edge_t> &edges,
               const sycl::property_list &props = {})
       : to_buf(sycl::range<1>(edges.size()), props),
         from_buf(sycl::range<1>(edges.size()), props),
         data_buf(sycl::range<1>(edges.size()), props), NE(edges.size()), q(q){
-    // split edges into to/from and data
-    std::vector<uI_t> edge_to(edges.size());
-    std::vector<uI_t> edge_from(edges.size());
-    std::vector<E> edge_data(edges.size());
-    for (uI_t i = 0; i < edges.size(); ++i) {
-      edge_to[i] = edges[i].to;
-      edge_from[i] = edges[i].from;
-      edge_data[i] = edges[i].data;
-    }
-      host_buffer_copy(q, to_buf, edge_to);
-      host_buffer_copy(q, from_buf, edge_from);
-      host_buffer_copy(q, data_buf, edge_data);
-  }
 
-  uI_t size() const { return N_edges; }
-  template <sycl::access::mode Mode>
-  Edge_Accessor<E, uI_t, Mode> get_access(sycl::handler &h) {
-    return Edge_Accessor<E, uI_t, Mode>(data_buf, to_buf, from_buf, h);
-  }
-  void resize(uI_t new_size) {
-    N_edges = (N_edges > new_size) ? N_edges : new_size;
-    buffer_resize(to_buf, new_size, q);
-    buffer_resize(from_buf, new_size, q);
-    buffer_resize(data_buf, new_size, q);
-  }
-
-  void add(const std::vector<uI_t> &to, const std::vector<uI_t> &from,
-           const std::vector<E> &data, uI_t offset = 0) {
-    host_buffer_add(to_buf, to, q, offset);
-    host_buffer_add(from_buf, from, q, offset);
-    host_buffer_add(data_buf, data, q, offset);
-
-    N_edges += to.size();
-  }
-
-  void add(const sycl::buffer<uI_t, 1> &to, const sycl::buffer<uI_t, 1> &from,
-           const sycl::buffer<E, 1> &data, uI_t offset = 0) {
-    host_buffer_add(to_buf, to, q, N_edges, offset);
-    host_buffer_add(from_buf, from, q, N_edges, offset);
-    host_buffer_add(data_buf, data, q, N_edges, offset);
-    N_edges += to.size();
-  }
 
   std::vector<Edge_ID_Pair<uI_t>> get_valid_ids() {
     std::vector<Edge_ID_Pair<uI_t>> id_pairs;
@@ -117,9 +55,9 @@ struct Edge_Buffer: public Edge_Buffer_Base<E, Edge_Buffer<E, uI_t>>
     return id_pairs;
   }
 
-  std::vector<Edge<E, uI_t>> get_edges()
+  std::vector<Edge_t> get_edges()
   {
-      std::vector<Edge<E, uI_t>> edges;
+      std::vector<Edge_t> edges;
       edges.reserve(N_edges);
       auto to_acc = to_buf.template get_access<sycl::access::mode::read>();
       auto from_acc = from_buf.template get_access<sycl::access::mode::read>();
@@ -155,35 +93,7 @@ struct Edge_Buffer: public Edge_Buffer_Base<E, Edge_Buffer<E, uI_t>>
     N_edges -= to.size();
   }
 
-  template <typename V>
-  void positional_index_convert(Vertex_Buffer<V, uI_t> &v_buf) {
-    if (index_type == EDGE_INDEXING_POSITION) {
-      return;
-    }
-    uI_t N_vertices = v_buf.size();
-    uI_t N_edges = this->size();
-    q.submit([&](sycl::handler &h) {
-      auto v_acc = v_buf.template get_access<sycl::access::mode::read>(h);
-      auto to_acc =
-          to_buf.template get_access<sycl::access::mode::read_write>(h);
-      auto from_acc =
-          from_buf.template get_access<sycl::access::mode::read_write>(h);
-
-      h.parallel_for(sycl::range<1>(N_edges), [=](sycl::id<1> id) {
-        for (int i = 0; i < N_vertices; i++) {
-          if (to_acc[id] == v_acc.id[i]) {
-            to_acc[id] = i;
-          }
-          if (from_acc[id] == v_acc.id[i]) {
-            from_acc[id] = i;
-          }
-        }
-      });
-    });
-    index_type = EDGE_INDEXING_POSITION;
-  }
-
-  Edge_Buffer<E, uI_t> &operator=(const Edge_Buffer<E, uI_t> &other) {
+  Edge_Buffer<Edge_t> &operator=(const Edge_Buffer<Edge_t> &other) {
     to_buf = other.to_buf;
     from_buf = other.from_buf;
     data_buf = other.data_buf;
@@ -191,7 +101,7 @@ struct Edge_Buffer: public Edge_Buffer_Base<E, Edge_Buffer<E, uI_t>>
     return *this;
   }
 
-  Edge_Buffer<E, uI_t> operator+(const Edge_Buffer<E, uI_t> &other) {
+  Edge_Buffer<Edge_t> operator+(const Edge_Buffer<Edge_t> &other) {
     to_buf = device_buffer_combine(q, to_buf, other.to_buf, this->N_edges,
                                    other.N_edges);
     from_buf = device_buffer_combine(q, from_buf, other.from_buf, this->N_edges,
@@ -201,31 +111,15 @@ struct Edge_Buffer: public Edge_Buffer_Base<E, Edge_Buffer<E, uI_t>>
     N_edges = to_buf.size();
     return *this;
   }
-
-  template <typename V> void id_index_convert(Vertex_Buffer<V, uI_t> &v_buf) {
-    if (index_type == EDGE_INDEXING_ID) {
-      return;
-    }
-    q.submit([&](sycl::handler &h) {
-      auto v_acc = v_buf.get_access<sycl::access::mode::read>(h);
-      auto to_acc =
-          to_buf.template get_access<sycl::access::mode::read_write>(h);
-      auto from_acc =
-          from_buf.template get_access<sycl::access::mode::read_write>(h);
-
-      h.parallel_for(sycl::range<1>(to_acc.size()), [&](sycl::id<1> id) {
-        to_acc[id] = v_acc[to_acc[id]].id;
-        from_acc[id] = v_acc[from_acc[id]].id;
-      });
-    });
-    index_type = EDGE_INDEXING_ID;
-  }
   size_t byte_size() {
     return to_buf.size() * sizeof(uI_t) +
            from_buf.size() * sizeof(uI_t) +
-           data_buf.size() * sizeof(E);
+           data_buf.size() * sizeof(Data_t);
   }
 };
+
+template <typename T>
+concept Edge_Buffer_type = Sycl_Graph::Base::Edge_Buffer_type<T>;
 } // namespace sycl_graph
 
 #endif // 

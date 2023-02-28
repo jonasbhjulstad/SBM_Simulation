@@ -1,28 +1,26 @@
 #ifndef SYCL_GRAPH_INVARIANT_EDGE_BUFFER_HPP
 #define SYCL_GRAPH_INVARIANT_EDGE_BUFFER_HPP
-#include <Sycl_Graph/Graph/Invariant/Buffer.hpp>
-#include <Sycl_Graph/Graph/Invariant/Graph_Types.hpp>
-#include <Sycl_Graph/Graph/Graph_Base.hpp>
+#include <Sycl_Graph/Buffer/Invariant/Buffer.hpp>
 
 namespace Sycl_Graph::Invariant
 {
-    template <Sycl_Graph::Edge_Buffer_type... EBs>
-        requires(Edge_type<typename EBs::Edge_t> && ...)
+    template <Sycl_Graph::Base::Edge_Buffer_type... EBs>
+        // requires(Edge_type<typename EBs::Edge_t> && ...)
     struct Edge_Buffer: public Buffer<EBs...>
     {
-        Edge_Buffer(EBs &&...buffers) : buffers(buffers...) {}
+        Edge_Buffer(const EBs &...buffers) : buffers(buffers...) {}
+        Edge_Buffer(const EBs &&...buffers) : buffers(buffers...) {}
 
         std::tuple<EBs...> buffers;
-
-        template <typename V>
-        using Edge_type = Base_t::Container_type;
-        template <typename D>
-        using Edge_Data_type = Base_t::Container_Data_type;
-
-
         typedef Buffer<EBs...> Base_t;
+        template <typename V>
+        using Edge_type = typename Base_t::template Container_type<V>;
+        template <typename D>
+        using Edge_Data_type = typename  Base_t::template Container_Data_type<D>;
+
         typedef typename Base_t::uI_t uI_t;
-        typedef std::tuple<typename EBs::Edge_t...> Edge_t;
+
+        typedef Sycl_Graph::Base::Edge<std::tuple<typename EBs::Edge_t...>, uI_t> Edge_t;
         typedef std::tuple<typename EBs::Edge_t::Data_t...> Data_t;
 
         static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
@@ -45,6 +43,9 @@ namespace Sycl_Graph::Invariant
                               { return std::tuple_cat(buffers.get_edges()...); },
                               buffers);
         }
-    }
+    };
+
+    template <typename T>
+    concept Edge_Buffer_type = Buffer_type<T>;
 }
 #endif
