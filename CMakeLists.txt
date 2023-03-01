@@ -32,7 +32,6 @@ option(SYCL_GRAPH_ENABLE_PRECOMPILED_HEADERS "Enable Precompiled Headers" OFF)
 set(DPCPP_FLAGS -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization)
 set(SYCL_CUDA_FLAGS -fsycl-targets=nvptx64-nvidia-cuda)
 
-add_compile_options(-Wdeprecated_declarations)
 
 if(${SYCL_GRAPH_USE_INTEL})
     find_package(IntelDPCPP REQUIRED)
