@@ -34,6 +34,7 @@ namespace Sycl_Graph::Sycl
         sycl::queue &q;
         std::tuple<sycl::buffer<Ds, 1>...> bufs;
         uI_t curr_size = 0;
+
         Buffer(sycl::queue &q, uI_t N, const sycl::property_list &props = {})
             : bufs(sycl::buffer<Ds, 1>(sycl::range<1>(N), props)...), q(q){}
 
@@ -41,7 +42,7 @@ namespace Sycl_Graph::Sycl
                const sycl::property_list &props = {})
             : bufs(sycl::buffer<Ds, 1>(data, props)...), q(q){}
 
-        uI_t size() const { return std::get<0>(bufs).size(); }
+        uI_t current_size() const { return curr_size; }
 
         // returns a buffer accessor with all types
         template <sycl::access::mode Mode>
@@ -135,7 +136,7 @@ namespace Sycl_Graph::Sycl
             return std::get<0>(bufs).size();
         }
 
-        size_t byte_size()
+        uI_t byte_size() const
         {
             return std::accumulate(buffer_type_sizes.begin(), buffer_type_sizes.end(), 0) * max_size();
         }

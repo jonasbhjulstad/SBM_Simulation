@@ -8,11 +8,10 @@ namespace Sycl_Graph::Invariant
         // requires(Edge_type<typename EBs::Edge_t> && ...)
     struct Edge_Buffer: public Buffer<EBs...>
     {
-        Edge_Buffer(const EBs &...buffers) : buffers(buffers...) {}
-        Edge_Buffer(const EBs &&...buffers) : buffers(buffers...) {}
-
-        std::tuple<EBs...> buffers;
         typedef Buffer<EBs...> Base_t;
+        Edge_Buffer(const EBs &...buffers) : Base_t(buffers ...) {}
+        Edge_Buffer(const EBs &&...buffers) : Base_t(buffers ...) {}
+
 
         typedef typename Base_t::uI_t uI_t;
 
@@ -27,17 +26,15 @@ namespace Sycl_Graph::Invariant
             return get_buffer<E>().get_edges();
         }
 
-        template <Edge_type E>
-        auto get_edges(const std::vector<uI_t> &&to_ids, const std::vector<uI_t> &&from_ids)
+        template <typename V>
+        auto get_edges(const std::vector<uI_t> &ids)
         {
-            return get_buffer<E>().get_edges(to_ids, from_ids);
+            return get_buffer<V>().get_edges(ids);
         }
 
         auto get_edges()
         {
-            return std::apply([](auto &&...buffers)
-                              { return std::tuple_cat(buffers.get_edges()...); },
-                              buffers);
+            return std::make_tuple((get_buffer<EBs>().get_edges(), ...));
         }
     };
 

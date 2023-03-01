@@ -36,9 +36,10 @@ namespace Sycl_Graph::Base
 
     uI_t Graph_ID = 0;
 
-    uI_t N_vertices() const { return vertex_buf.N_vertices(); }
-    uI_t N_edges() const { return edge_buf.N_edges(); }
-
+    uI_t N_vertices() const { return vertex_buf.current_size(); }
+    uI_t N_edges() const { return edge_buf.current_size(); }
+    uI_t N_vertices_max() const { return vertex_buf.max_size(); }
+    uI_t N_edges_max() const { return edge_buf.max_size(); }
     void resize(uI_t NV_new, uI_t NE_new)
     {
       vertex_buf.resize(NV_new);
@@ -93,6 +94,7 @@ namespace Sycl_Graph::Base
     {
       return edge_buf.get_edges();
     }
+
 
     // // file I/O
     // void write_edgelist(std::string filename, std::string delimiter = ",",

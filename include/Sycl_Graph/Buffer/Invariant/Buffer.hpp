@@ -10,9 +10,10 @@
     {
         typedef typename std::tuple_element_t<0, std::tuple<Bs ...>>::uI_t uI_t;
         typedef std::tuple<typename Bs::Data_t ...> Data_t;
-        Buffer() = default;
-        Buffer(Bs &&... buffers): buffers(buffers ...) {}
+        Buffer(const Bs &... buffers): buffers(std::make_tuple(buffers ...)) {}
+        Buffer(const Bs &&... buffers): buffers(std::make_tuple(buffers ...)) {}
         Buffer(const std::tuple<Bs ...>& buffers): buffers(buffers) {}
+        Buffer(const Buffer &other): buffers(other.buffers) {}
         typedef Buffer<Bs ...> This_t;
         std::tuple<Bs ...> buffers;
 
@@ -90,6 +91,20 @@
             std::apply([&other](auto &&... buffers) {
                 return std::make_tuple((buffers + other.buffers) ...);}, this->buffers);
             return *this;
+        }
+
+        uI_t current_size() const
+        {
+            return std::apply([](auto &&... buffers) {
+                return (buffers.current_size() + ...);
+            }, this->buffers);
+        }
+
+        uI_t max_size() const
+        {
+            return std::apply([](auto &&... buffers) {
+                return (buffers.max_size() + ...);
+            }, this->buffers);
         }
     };
 

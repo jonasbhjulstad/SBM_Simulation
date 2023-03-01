@@ -21,12 +21,12 @@ namespace Sycl_Graph::Invariant
     typedef typename Vertex_Buffer_t::Data_t Vertex_Data_t;
     typedef typename Edge_Buffer_t::Edge_t Edge_t;
     typedef typename Edge_Buffer_t::Data_t Edge_Data_t;
+    Graph(const Vertex_Buffer_t &vertex_buffer, const Edge_Buffer_t &edge_buffer) : Base_t(vertex_buffer, edge_buffer) {}
 
     uI_t& Graph_ID = this->Graph_ID;
 
     static constexpr auto invalid_id = std::numeric_limits<uI_t>::max();
 
-    Graph(const Vertex_Buffer_t &vertex_buffer, const Edge_Buffer_t &edge_buffer) : Base_t(vertex_buffer, edge_buffer) {}
 
 
   };

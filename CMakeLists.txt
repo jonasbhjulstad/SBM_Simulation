@@ -25,14 +25,14 @@ set(SYCL_CUDA_TARGET "")
 option(SYCL_GRAPH_USE_INTEL "Use Intel" ON)
 option(SYCL_GRAPH_USE_HIPSYCL "Use HIPSYCL" OFF)
 option(DEFAULT_WARNING_SUPPRESSION "Default Warning Suppression" ON)
-set(DEFAULT_WARNING_FLAGS -Wunknown-cuda-version)
+set(DEFAULT_WARNING_FLAGS -Wunknown-cuda-version -Wdeprecated-declarations)
 option(TRACY_ENABLE "" ON)
 option (TRACY_ON_DEMAND "" ON)
 option(SYCL_GRAPH_ENABLE_PRECOMPILED_HEADERS "Enable Precompiled Headers" OFF)
 set(DPCPP_FLAGS -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization)
 set(SYCL_CUDA_FLAGS -fsycl-targets=nvptx64-nvidia-cuda)
 
-
+add_compile_options(-Wdeprecated_declarations)
 
 if(${SYCL_GRAPH_USE_INTEL})
     find_package(IntelDPCPP REQUIRED)

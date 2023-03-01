@@ -11,16 +11,17 @@ namespace Sycl_Graph::Invariant
     template <Sycl_Graph::Base::Vertex_Buffer_type... VBs>
     struct Vertex_Buffer : public Buffer<VBs...>
     {
-        typedef Buffer<VBs...> Base_t;
         typedef typename std::tuple_element_t<0, std::tuple<VBs...>>::uI_t uI_t;
         typedef std::tuple<typename VBs::Vertex_t::Data_t...> Data_t;
 
         typedef Sycl_Graph::Base::Vertex<std::tuple<typename VBs::Vertex_t ...>, uI_t> Vertex_t;
+        typedef Buffer<VBs...> Base_t;
 
-        Vertex_Buffer(const VBs &...buffers) : buffers(buffers...) {}
-        Vertex_Buffer(const VBs &&...buffers) : buffers(buffers...) {}
-        // Vertex_Buffer(const std::vector<typename VBs::Vertex_t>&& ... vertices): buffers(vertices ...) {}
-        std::tuple<VBs...> buffers;
+        Vertex_Buffer(const VBs &...buffers) : Base_t(buffers ...){}
+        Vertex_Buffer(const VBs &&...buffers) : Base_t(buffers ...) {}
+
+
+        // std::tuple<VBs...> buffers;
 
         static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
         template <typename V>
@@ -84,9 +85,7 @@ namespace Sycl_Graph::Invariant
 
         auto get_vertices()
         {
-            return std::apply([](auto &&...buffers)
-                              { return std::tuple_cat(buffers.get_vertices()...); },
-                              buffers);
+            return std::make_tuple((get_buffer<VBs>().get_vertices(), ...));
         }
     };
 

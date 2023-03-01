@@ -32,5 +32,7 @@ int main()
     Sycl_Graph::Invariant::Edge_Buffer edge_buffer(i_f_e_buf, f_i_e_buf);
     Sycl_Graph::Invariant::Graph graph(vertex_buffer, edge_buffer);
 
+    std::cout << "Graph has " << graph.N_vertices() << " vertices and " << graph.N_edges() << " edges." << std::endl;
+
     return 0;
 }
