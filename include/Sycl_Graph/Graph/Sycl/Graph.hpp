@@ -47,66 +47,66 @@ namespace Sycl_Graph::Sycl
           const sycl::property_list &props = {})
         : q(q), Base_t(Vertex_Buffer(q, vertices, props), Edge_Buffer(q, edges, props)) {}
     sycl::queue &q;
-    uI_t Graph_ID& = this->Graph_ID;
+    uI_t& Graph_ID = this->Graph_ID;
     uI_t N_vertices() const
     {
-      return vertex_buf.size();
+      return this->vertex_buf.size();
     }
     uI_t N_edges() const
     {
-      return edge_buf.size();
+      return this->edge_buf.current_size();
     }
 
     uI_t max_vertices() const
     {
-      return vertex_buf.NV;
+      return this->vertex_buf.max_size();
     }
 
     uI_t max_edges() const
     {
-      return edge_buf.NE;
+      return this->edge_buf.max_size();
     }
 
     void resize(uI_t NV_new, uI_t NE_new)
     {
-      vertex_buf.resize(NV_new);
-      edge_buf.resize(NE_new);
+      this->vertex_buf.resize(NV_new);
+      this->edge_buf.resize(NE_new);
     }
 
-  // find vertex index based on condition
-  template <typename T> uI_t find(T condition) {
-    uI_t idx = Vertex_t::invalid_id;
-    sycl::buffer<uI_t, 1> res_buf(&idx, 1);
-    q.submit([&](sycl::handler &h) {
-      auto out = res_buf.template get_access<sycl::access::mode::write>(h);
-      auto vertex_acc =
-          vertex_buf.template get_access<sycl::access::mode::read>(h);
-      find(out, vertex_acc, condition, h);
-    });
-    q.wait();
-    return idx;
-  }
+  // // find vertex index based on condition
+  // template <typename T> uI_t find(T condition) {
+  //   uI_t idx = Vertex_t::invalid_id;
+  //   sycl::buffer<uI_t, 1> res_buf(&idx, 1);
+  //   q.submit([&](sycl::handler &h) {
+  //     auto out = res_buf.template get_access<sycl::access::mode::write>(h);
+  //     auto vertex_acc =
+  //         vertex_buf.template get_access<sycl::access::mode::read>(h);
+  //     find(out, vertex_acc, condition, h);
+  //   });
+  //   q.wait();
+  //   return idx;
+  // }
 
-  template <typename T0, typename T1, typename T2>
-  void find(T0 &res_acc, T1 &v_acc, T2 condition, sycl::handler &h) {
-    h.parallel_for<class vertex_id_search>(sycl::range<1>(v_acc.size()),
-                                           [=](sycl::id<1> id) {
-                                             if (condition(v_acc[id[0]]))
-                                               res_acc[0] = id[0];
-                                           });
-  }
+  // template <typename T0, typename T1, typename T2>
+  // void find(T0 &res_acc, T1 &v_acc, T2 condition, sycl::handler &h) {
+  //   h.parallel_for<class vertex_id_search>(sycl::range<1>(v_acc.size()),
+  //                                          [=](sycl::id<1> id) {
+  //                                            if (condition(v_acc[id[0]]))
+  //                                              res_acc[0] = id[0];
+  //                                          });
+  // }
 
-    template <sycl::access::mode mode>
-    auto get_vertex_access(sycl::handler &h)
-    {
-      return vertex_buf.template get_access<mode>(h);
-    }
+    // template <sycl::access::mode mode>
+    // auto get_vertex_access(sycl::handler &h)
+    // {
+    //   return vertex_buf.template get_access<mode>(h);
+    // }
 
-    template <sycl::access::mode mode>
-    auto get_edge_access(sycl::handler &h)
-    {
-      return edge_buf.template get_access<mode>(h);
-    }
+    // template <sycl::access::mode mode>
+    // auto get_edge_access(sycl::handler &h)
+    // {
+    //   return edge_buf.template get_access<mode>(h);
+    // }
   };
 } // namespace Sycl_Graph::Sycl
 

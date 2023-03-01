@@ -7,7 +7,6 @@ namespace Sycl_Graph::Base
     template <typename T>
     concept Buffer_type = requires(T buf)
     {
-        typename T::Container_t;
         typename T::Data_t;
         typename T::uI_t;
     };

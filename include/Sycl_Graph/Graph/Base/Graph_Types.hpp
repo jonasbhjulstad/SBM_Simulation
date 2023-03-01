@@ -10,39 +10,59 @@
 namespace Sycl_Graph::Base
 {
 
-    template <typename D, std::unsigned_integral _uI_t = uint32_t>
+    template <typename D, typename _ID_t = uint32_t, _ID_t _invalid_id = std::numeric_limits<_ID_t>::max()>
     struct Vertex
     {
-        Vertex(_uI_t id, const D& data): id(id), data(data) {}        
+        typedef _ID_t ID_t;
+        static constexpr ID_t invalid_id = _invalid_id;
         typedef D Data_t;
-        typedef _uI_t uI_t;
-        static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
-        uI_t id = std::numeric_limits<uI_t>::max();
-        D data;
+        
+        Vertex(ID_t id, const D& data): id(id), data(data) {}        
+        ID_t id = invalid_id;
+        Data_t data;
+
+        bool is_valid() const
+        {
+            return id != invalid_id;
+        }
+
     };
 
     template <typename T>
     concept Vertex_type = 
-    std::unsigned_integral<typename T::uI_t> &&
+    std::unsigned_integral<typename T::ID_t> &&
     requires(T t)
     {
-        {t.id} -> std::convertible_to<typename T::uI_t>;
+        {t.id} -> std::convertible_to<typename T::ID_t>;
         {t.data} -> std::convertible_to<typename T::Data_t>;
     };
 
-    template <typename D, std::unsigned_integral _uI_t = uint32_t>
+    template <typename _ID_t = uint32_t, _ID_t _invalid_id = std::numeric_limits<_ID_t>::max()>
+    struct Connection_ID_Pair
+    {
+        typedef _ID_t ID_t;
+        _ID_t to = invalid_id;
+        _ID_t from = invalid_id;
+        static constexpr ID_t invalid_id = _invalid_id;
+
+        bool is_valid() const
+        {
+            return to != invalid_id && from != invalid_id;
+        }
+    };
+    template <typename D, typename _Connection_IDs = Connection_ID_Pair<>>
     struct Edge
     {
         typedef D Data_t;
-        typedef _uI_t uI_t;
-        Edge(const D &data, uI_t to, uI_t from)
-            : data(data), to(to), from(from) {}
-        Edge(uI_t to, uI_t from)
-            : to(to), from(from) {}
-        D data;
-        static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
-        uI_t to = invalid_id;
-        uI_t from = invalid_id;
+        typedef _Connection_IDs Connection_IDs;
+        typedef typename Connection_IDs::ID_t ID_t;
+        static constexpr auto invalid_id = Connection_IDs::invalid_id;
+        Data_t data;
+        Edge(const D &data, ID_t to, ID_t from)
+            : data(data), ids{to, from} {}
+        Edge(ID_t to, ID_t from)
+            : ids{to, from} {}
+        Connection_IDs ids;
     };
 
 
@@ -50,7 +70,7 @@ namespace Sycl_Graph::Base
     concept Edge_type = requires(T t)
     {
         typename T::Data_t;
-        typename T::uI_t;
+        typename T::ID_t;
         T::invalid_id;
     };
 } // namespace Sycl_Graph

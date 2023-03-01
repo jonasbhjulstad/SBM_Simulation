@@ -20,6 +20,8 @@ namespace Sycl_Graph
     };
 
 
+
+
     //Get the index of a type in a parameter pack
     template <typename T, typename... Types>
     struct index_of_type;
@@ -30,6 +32,11 @@ namespace Sycl_Graph
     template <typename T, typename First, typename... Rest>
     struct index_of_type<T, First, Rest...>
         : std::integral_constant<std::size_t, 1 + index_of_type<T, Rest...>::value> {};
+
+    template<typename... Ts, typename... Types>
+    constexpr auto get_by_types(const std::tuple<Types...>& tuple) {
+        return std::make_tuple(std::get<index_of_type<Ts, Types...>::value>(tuple)...);
+    }
 
 
     // //Get the Nth base type of a class

@@ -53,8 +53,7 @@ namespace Sycl_Graph
     using namespace Static_RNG;
 
     using SIR_Metapopulation_Graph =
-        Sycl_Graph::Sycl::Graph<SIR_Metapopulation_State, SIR_Metapopulation_Param,
-                                uint32_t>;
+        Sycl_Graph::Sycl::Graph<SIR_Metapopulation_State, SIR_Metapopulation_Param>;
     template <Static_RNG::rng_type RNG = Static_RNG::default_rng>
     struct SIR_Metapopulation_Network
         : public Network<SIR_Metapopulation_Network<RNG>, SIR_Metapopulation_State,

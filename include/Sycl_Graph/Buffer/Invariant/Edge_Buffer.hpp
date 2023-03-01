@@ -3,7 +3,7 @@
 #include <Sycl_Graph/Buffer/Invariant/Buffer.hpp>
 
 namespace Sycl_Graph::Invariant
-{
+{    
     template <Sycl_Graph::Base::Edge_Buffer_type... EBs>
         // requires(Edge_type<typename EBs::Edge_t> && ...)
     struct Edge_Buffer: public Buffer<EBs...>
@@ -13,14 +13,10 @@ namespace Sycl_Graph::Invariant
 
         std::tuple<EBs...> buffers;
         typedef Buffer<EBs...> Base_t;
-        template <typename V>
-        using Edge_type = typename Base_t::template Container_type<V>;
-        template <typename D>
-        using Edge_Data_type = typename  Base_t::template Container_Data_type<D>;
 
         typedef typename Base_t::uI_t uI_t;
 
-        typedef Sycl_Graph::Base::Edge<std::tuple<typename EBs::Edge_t...>, uI_t> Edge_t;
+        typedef std::tuple<typename EBs::Edge_t...> Edge_t;
         typedef std::tuple<typename EBs::Edge_t::Data_t...> Data_t;
 
         static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
@@ -46,6 +42,6 @@ namespace Sycl_Graph::Invariant
     };
 
     template <typename T>
-    concept Edge_Buffer_type = Buffer_type<T>;
+    concept Edge_Buffer_type = true;
 }
 #endif

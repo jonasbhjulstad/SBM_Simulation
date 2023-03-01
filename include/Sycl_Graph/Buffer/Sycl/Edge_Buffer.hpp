@@ -2,6 +2,7 @@
 #define SYCL_GRAPH_SYCL_EDGE_BUFFER_HPP
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Graph/Base/Graph_Types.hpp>
+#include <Sycl_Graph/Buffer/Sycl/Buffer.hpp>
 #include <Sycl_Graph/Buffer/Base/Edge_Buffer.hpp>
 #include <Sycl_Graph/Buffer/Sycl/Buffer_Routines.hpp>
 namespace Sycl_Graph::Sycl {
@@ -19,103 +20,61 @@ struct Edge_Accessor {
   sycl::accessor<uI_t, 1, Mode> from;
 };
 
-template <Sycl_Graph::Base::Edge_type _Edge_t> 
-struct Edge_Buffer: public Sycl_Graph::Base::Edge_Buffer<_Edge_t, Edge_Buffer<_Edge_t>>
+template <Sycl_Graph::Base::Edge_type _Edge_t, std::unsigned_integral _uI_t = uint32_t> 
+struct Edge_Buffer: public Buffer<_uI_t, typename _Edge_t::Connection_IDs, typename _Edge_t::Data_t>
  {
-  typedef Sycl_Graph::Base::Edge_Buffer<_Edge_t, Edge_Buffer<_Edge_t>> Base_t;
-  typedef typename Base_t::Container_t Container_t;
   typedef _Edge_t Edge_t;
-  typedef typename Edge_t::uI_t uI_t;
+  typedef typename Edge_t::ID_t ID_t;
   typedef typename Edge_t::Data_t Data_t;
+  typedef typename Edge_t::Connection_IDs Connection_IDs;
+  typedef _uI_t uI_t;
+  typedef Buffer<uI_t, Connection_IDs, Data_t> Base_t;
 
-  Edge_Buffer(sycl::queue &q, uI_t NE, const sycl::property_list &props = {})
-      : 
+  sycl::queue& q = Base_t::q;
+  Edge_Buffer(sycl::queue &q, uI_t NE, const sycl::property_list &props = {}): Base_t(q, NE, props){}
+
+  Edge_Buffer(sycl::queue &q, const std::vector<Connection_IDs>& ids, const std::vector<Data_t>& data, const sycl::property_list &props = {}): Base_t(q, ids, data, props){}
 
   Edge_Buffer(sycl::queue &q, const std::vector<Edge_t> &edges,
-              const sycl::property_list &props = {})
-      : to_buf(sycl::range<1>(edges.size()), props),
-        from_buf(sycl::range<1>(edges.size()), props),
-        data_buf(sycl::range<1>(edges.size()), props), NE(edges.size()), q(q){
+              const sycl::property_list &props = {}): Base_t(q, edges.size(), props)
+              {
+                //transform edges to three vectors
+                std::vector<Connection_IDs> ids;
+                std::vector<Data_t> data;
+                data.reserve(edges.size());
+                ids.reserve(edges.size());
+                for (const auto& e: edges)
+                {
+                    ids.push_back(e.ids);
+                    data.push_back(e.data);
+                }
+                this->add(ids, data);
+              }
+              
 
-
-  std::vector<Edge_ID_Pair<uI_t>> get_valid_ids() {
-    std::vector<Edge_ID_Pair<uI_t>> id_pairs;
-    id_pairs.reserve(N_edges);
-    q.submit([&](sycl::handler &h) {
-      auto to_acc = to_buf.template get_access<sycl::access::mode::read>(h);
-      auto from_acc =
-          from_buf.template get_access<sycl::access::mode::read>(h);
-      h.parallel_for<class edge_get_valid_ids>(
-          sycl::range<1>(N_edges), [=](sycl::id<1> id) {
-            if (to_acc[id] != invalid_id && from_acc[id] != invalid_id) {
-              id_pairs.push_back({to_acc[id], from_acc[id]});
-            }
-          });
-    });
-    return id_pairs;
+  std::vector<Connection_IDs> get_valid_ids() {
+      return this->template get<Connection_IDs>([](const auto& e){return e.is_valid();});
   }
+
+  uI_t N_edges() const { return this->current_size(); }
 
   std::vector<Edge_t> get_edges()
   {
-      std::vector<Edge_t> edges;
-      edges.reserve(N_edges);
-      auto to_acc = to_buf.template get_access<sycl::access::mode::read>();
-      auto from_acc = from_buf.template get_access<sycl::access::mode::read>();
-      auto data_acc = data_buf.template get_access<sycl::access::mode::read>();
-      for (uI_t i = 0; i < N_edges; ++i)
-      {
-          if (to_acc[i] != invalid_id && from_acc[i] != invalid_id)
-          {
-              edges.push_back({data_acc[i], to_acc[i], from_acc[i]});
-          }
-      }
-      return edges;
+    auto edge_tuple = this->template get<Connection_IDs, Data_t>();
+    std::vector<Edge_t> edges;
+    edges.reserve(edge_tuple.first.size());
+    for (size_t i = 0; i < edge_tuple.first.size(); i++)
+    {
+        edges.push_back(Edge_t(edge_tuple.first[i], edge_tuple.second[i]));
+    }
+    return edges;
   }
 
-  void remove(const std::vector<uI_t> &to, const std::vector<uI_t> &from) {
-    // Set ids of edges to invalid_id
-    q.submit([&](sycl::handler &h) {
-      auto data_acc =
-          data_buf.template get_access<sycl::access::mode::read_write>(h);
-      h.parallel_for<class edge_remove>(
-          sycl::range<1>(to.size()), [=](sycl::id<1> id) {
-            auto it = std::find_if(data_acc.begin(), data_acc.end(),
-                                   [id, from, to](const auto &e) {
-                                     return e.from == from[id[0]] &&
-                                            e.to == to[id[0]];
-                                   });
-            if (it != data_acc.end()) {
-              it->from = invalid_id;
-              it->to = invalid_id;
-            }
-          });
-    });
-    N_edges -= to.size();
+  void remove(const std::vector<Connection_IDs>& ids)
+  {
+    this->template remove_elements<Connection_IDs>(ids);
   }
 
-  Edge_Buffer<Edge_t> &operator=(const Edge_Buffer<Edge_t> &other) {
-    to_buf = other.to_buf;
-    from_buf = other.from_buf;
-    data_buf = other.data_buf;
-    N_edges = other.N_edges;
-    return *this;
-  }
-
-  Edge_Buffer<Edge_t> operator+(const Edge_Buffer<Edge_t> &other) {
-    to_buf = device_buffer_combine(q, to_buf, other.to_buf, this->N_edges,
-                                   other.N_edges);
-    from_buf = device_buffer_combine(q, from_buf, other.from_buf, this->N_edges,
-                                     other.N_edges);
-    data_buf = device_buffer_combine(q, data_buf, other.data_buf, this->N_edges,
-                                     other.N_edges);
-    N_edges = to_buf.size();
-    return *this;
-  }
-  size_t byte_size() {
-    return to_buf.size() * sizeof(uI_t) +
-           from_buf.size() * sizeof(uI_t) +
-           data_buf.size() * sizeof(Data_t);
-  }
 };
 
 template <typename T>

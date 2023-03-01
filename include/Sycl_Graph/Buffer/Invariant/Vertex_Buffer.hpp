@@ -13,7 +13,6 @@ namespace Sycl_Graph::Invariant
     {
         typedef Buffer<VBs...> Base_t;
         typedef typename std::tuple_element_t<0, std::tuple<VBs...>>::uI_t uI_t;
-        typedef std::tuple<typename VBs::Container_t...> Container_t;
         typedef std::tuple<typename VBs::Vertex_t::Data_t...> Data_t;
 
         typedef Sycl_Graph::Base::Vertex<std::tuple<typename VBs::Vertex_t ...>, uI_t> Vertex_t;
@@ -28,15 +27,6 @@ namespace Sycl_Graph::Invariant
         using Vertex = Sycl_Graph::Base::Vertex<V, uI_t>;
 
         template <typename V>
-        using Vertex_type = typename Base_t::template Container_type<V>;
-        template <typename D>
-        using Vertex_Data_type = typename Base_t::template Container_Data_type<D>;
-
-
-
-
-        template <typename V>
-            requires Vertex_type<V>::value
         void add(const std::vector<uI_t> &&ids, const std::vector<V> &&data)
         {
             // create vector of vertices
@@ -48,7 +38,6 @@ namespace Sycl_Graph::Invariant
         }
 
         template <typename D>
-            requires Vertex_Data_type<D>::value
         void add(const std::vector<D> &&data)
         {
             std::vector<Vertex<D>> vertices(data.size());
@@ -60,14 +49,12 @@ namespace Sycl_Graph::Invariant
         }
 
         template <typename... Ds>
-            requires(Vertex_Data_type<Ds>::value && ...)
         void add(const std::vector<Ds> &&...data)
         {
             (add(data), ...);
         }
 
         template <typename D>
-            requires Vertex_Data_type<D>::value
         void add(const std::vector<uI_t> &&ids)
         {
             std::vector<Vertex<D>> vertices(ids.size());
@@ -78,21 +65,18 @@ namespace Sycl_Graph::Invariant
         }
 
         template <typename V>
-            requires Vertex_type<V>::value
         void remove(const std::vector<uI_t> &&ids)
         {
             get_buffer<V>().remove(ids);
         }
 
         template <typename V>
-            requires Vertex_type<V>::value
         auto get_vertices()
         {
             return get_buffer<V>().get_vertices();
         }
 
         template <typename V>
-            requires Vertex_type<V>::value
         auto get_vertices(const std::vector<uI_t> &ids)
         {
             return get_buffer<V>().get_vertices(ids);
@@ -108,7 +92,6 @@ namespace Sycl_Graph::Invariant
 
     template <typename T>
     concept Vertex_Buffer_type =
-        Buffer_type<T> &&
         std::unsigned_integral<typename T::uI_t>;
 
 } // namespace Sycl_Graph::Invariant

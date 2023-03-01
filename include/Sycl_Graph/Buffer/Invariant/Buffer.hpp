@@ -9,8 +9,7 @@
     struct Buffer
     {
         typedef typename std::tuple_element_t<0, std::tuple<Bs ...>>::uI_t uI_t;
-        typedef std::tuple<typename Bs::Container_t ...> Container_t;
-        typedef std::tuple<typename Bs::Container_t::Data_t ...> Data_t;
+        typedef std::tuple<typename Bs::Data_t ...> Data_t;
         Buffer() = default;
         Buffer(Bs &&... buffers): buffers(buffers ...) {}
         Buffer(const std::tuple<Bs ...>& buffers): buffers(buffers) {}
@@ -21,59 +20,28 @@
         static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
         
         template <typename T>
-        struct Container_type
+        struct Data_type
         {
-            static constexpr bool value = (std::is_same_v<T, typename Bs::Container_t> || ...);
+            static constexpr bool value = (std::is_same_v<T, typename Bs::Data_t> || ...);
         };
-        template <typename T>
-        struct Container_Data_type
-        {
-            static constexpr bool value = (std::is_same_v<T, typename Bs::Container_t::Data_t> || ...);
-        };
-        template <typename C> requires Container_type<C>::value
+        template <typename D> requires Data_type<D>::value
         static constexpr auto get_buffer_index()
         {
-            return Sycl_Graph::index_of_type<C, typename Bs::Container_t ...>();
+            return Sycl_Graph::index_of_type<D, typename Bs::Data_t ...>();
         }
 
-        template <typename ... Cs> requires (Container_type<Cs>::value && ...)
+        template <typename ... Ds> requires (Data_type<Ds>::value && ...)
         static constexpr auto get_buffer_index()
         {
-            return std::array<uI_t, sizeof...(Cs)>{type_index<Cs>() ...};
+            return std::array<uI_t, sizeof...(Ds)>{type_index<Ds>() ...};
         }
 
-        template <typename C> requires Container_type<C>::value
+        template <typename D> requires Data_type<D>::value
         auto&& get_buffer()
         {
-            //get index of buffer
-            constexpr uI_t index = get_buffer_index<C>();
-            return std::get<index>(buffers);
+            return std::get<D>(buffers);
         }
-        template <typename ... Cs> requires (Container_type<Cs>::value && ...)
-        auto&& get_buffers()
-        {
-            return std::array{get_buffer<Cs>() ...};
-        }
-
-        template <typename D> requires Container_Data_type<D>::value
-        static constexpr auto get_buffer_index()
-        {
-            return Sycl_Graph::index_of_type<Sycl_Graph::Base::Vertex<D, uI_t>, typename Bs::Container_t ...>();
-        }
-
-        template <typename ... Ds> requires (Container_Data_type<Ds>::value && ...)
-        static constexpr auto get_buffer_index()
-        {
-            return std::array<uI_t, sizeof...(Ds)>{type_index<Sycl_Graph::Base::Vertex<Ds, uI_t>>() ...};
-        }
-
-        template <typename D> requires Container_Data_type<D>::value
-        auto&& get_buffer()
-        {
-            constexpr uI_t index = get_buffer_index<D>();
-            return std::get<index>(buffers);
-        }
-        template <typename ... Ds> requires (Container_Data_type<Ds>::value && ...)
+        template <typename ... Ds> requires (Data_type<Ds>::value && ...)
         auto&& get_buffers()
         {
             return std::array{get_buffer<Ds>() ...};
@@ -86,28 +54,22 @@
             }, buffers);
         }
 
-        template <typename C> requires Container_type<C>::value
+        template <typename D> requires Data_type<D>::value
         auto size() const
         {
-            return get_buffer<C>().size();
+            return get_buffer<D>().size();
         }
 
-        template <typename ... Cs> requires (Container_type<Cs>::value && ...)
-        void add(const std::vector<Cs> && ... vertices)
+        template <typename ... Ds> requires (Data_type<Ds>::value && ...)
+        void add(const std::vector<Ds> && ... data)
         {
-            (get_buffer<Cs>().add(vertices), ...);
+            (get_buffer<Ds>().add(data), ...);
         }
 
-        template <typename ... Ds> requires (Container_Data_type<Ds>::value && ...)
-        void add(const std::vector<Ds>&& ... data)
+        template <typename ... Ds> requires (Data_type<Ds>::value && ...)
+        void remove(const std::vector<Ds>&&... elements)
         {
-            (add(data), ...);
-        }
-
-        template <typename ... Cs> requires (Container_type<Cs>::value && ...)
-        void remove(const std::vector<Cs>&&... elements)
-        {
-            ((get_buffer<Cs>().remove(elements), ...));
+            ((get_buffer<Ds>().remove(elements), ...));
         }
 
         auto &operator=(This_t &&other)

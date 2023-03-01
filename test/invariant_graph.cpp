@@ -6,9 +6,9 @@
 #include <Sycl_Graph/Graph/Invariant/Graph.hpp>
 
 using namespace Sycl_Graph;
-typedef Sycl_Graph::Base::Vertex<float, uint32_t> fVertex;
-typedef Sycl_Graph::Base::Vertex<int, uint32_t> iVertex;
-typedef Sycl_Graph::Base::Edge<float, uint32_t> void_Edge;
+typedef Sycl_Graph::Base::Vertex<float> fVertex;
+typedef Sycl_Graph::Base::Vertex<int> iVertex;
+typedef Sycl_Graph::Base::Edge<float> void_Edge;
 typedef Sycl_Graph::Invariant::Edge<void_Edge, iVertex, fVertex> i_f_edges;
 typedef Sycl_Graph::Invariant::Edge<void_Edge, fVertex, iVertex> f_i_edges;
 

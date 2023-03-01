@@ -3,7 +3,6 @@ target_include_directories(Sycl_Graph PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE
 target_link_libraries(Sycl_Graph PRIVATE Tracy::TracyClient)
 target_link_libraries(Sycl_Graph PUBLIC cppitertools::cppitertools)
 
-message(WARNING ${Static_RNG_INCLUDE_DIR})
 if(${SYCL_GRAPH_ENABLE_PRECOMPILED_HEADERS})
     #find all *.hpp and *.h files in include dirs
     set(SYCL_GRAPH_PCH_HEADERS)
