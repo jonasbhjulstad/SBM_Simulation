@@ -40,7 +40,7 @@ namespace Sycl_Graph::Sycl
 
         Buffer(sycl::queue &q, const std::vector<Ds>& ... data,
                const sycl::property_list &props = {})
-            : bufs(sycl::buffer<Ds, 1>(data, props)...), q(q){}
+            : bufs(sycl::buffer<Ds, 1>(data, props)...), q(q), curr_size(std::get<0>(data ...).size()){}
 
         uI_t current_size() const { return curr_size; }
 
@@ -56,7 +56,7 @@ namespace Sycl_Graph::Sycl
         Buffer_Accessor<Mode, D_subset...> get_access(sycl::handler &h)
         {   
             auto types = indices_of_types<D_subset ..., Ds ...>();
-            return Buffer_Accessor<Mode, D_subset...>(get_by_types<D_subset ..., Ds ...>(bufs), h);
+            return Buffer_Accessor<Mode, D_subset...>(Type_Helpers::get_by_types<D_subset ..., Ds ...>(bufs), h);
         }
 
         void resize(uI_t new_size)
@@ -65,9 +65,17 @@ namespace Sycl_Graph::Sycl
             curr_size = std::min(curr_size, new_size);
         }
 
-        void add(const std::tuple<std::vector<Ds> ...>& data, uI_t offset = 0)
+        template <typename Target_t>
+        void assign_add(const std::tuple<std::vector<Ds> ...>& data)
         {
-            buffer_add(bufs, data, q, offset);
+            auto N_added = buffer_assign_add<Target_t, uI_t, Ds ...>(bufs, q, data, curr_size);
+            curr_size += N_added;
+        }
+
+        template <typename Target_t>
+        void assign_add(const std::vector<Ds>& ... data)
+        {
+            this->assign_add<Target_t>(std::make_tuple(data ...));
         }
 
         void add(const std::vector<Ds> &... data, uI_t offset = 0)

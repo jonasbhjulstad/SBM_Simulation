@@ -36,19 +36,9 @@ struct Edge_Buffer: public Buffer<_uI_t, typename _Edge_t::Connection_IDs, typen
   Edge_Buffer(sycl::queue &q, const std::vector<Connection_IDs>& ids, const std::vector<Data_t>& data, const sycl::property_list &props = {}): Base_t(q, ids, data, props){}
 
   Edge_Buffer(sycl::queue &q, const std::vector<Edge_t> &edges,
-              const sycl::property_list &props = {}): Base_t(q, edges.size(), props)
+              const sycl::property_list &props = {}): Base_t(q, 0, props)
               {
-                //transform edges to three vectors
-                std::vector<Connection_IDs> ids;
-                std::vector<Data_t> data;
-                data.reserve(edges.size());
-                ids.reserve(edges.size());
-                for (const auto& e: edges)
-                {
-                    ids.push_back(e.ids);
-                    data.push_back(e.data);
-                }
-                this->add(ids, data);
+                this->add(edges);
               }
               
 
@@ -57,6 +47,20 @@ struct Edge_Buffer: public Buffer<_uI_t, typename _Edge_t::Connection_IDs, typen
   }
 
   uI_t N_edges() const { return this->current_size(); }
+
+  void add(const std::vector<Edge_t>& edges)
+  {
+          std::vector<Connection_IDs> ids;
+      std::vector<Data_t> data;
+      data.reserve(edges.size());
+      ids.reserve(edges.size());
+      for (const auto& e: edges)
+      {
+          ids.push_back(e.ids);
+          data.push_back(e.data);
+      }
+      this->template assign_add<Connection_IDs>(ids, data);
+  }
 
   std::vector<Edge_t> get_edges()
   {

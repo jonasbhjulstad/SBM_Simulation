@@ -28,7 +28,7 @@
         template <typename D> requires Data_type<D>::value
         static constexpr auto get_buffer_index()
         {
-            return Sycl_Graph::index_of_type<D, typename Bs::Data_t ...>();
+            return Sycl_Graph::Type_Helpers::index_of_type<D, typename Bs::Data_t ...>();
         }
 
         template <typename ... Ds> requires (Data_type<Ds>::value && ...)
@@ -95,16 +95,12 @@
 
         uI_t current_size() const
         {
-            return std::apply([](auto &&... buffers) {
-                return (buffers.current_size() + ...);
-            }, this->buffers);
+            return std::apply([](auto... args) { return (args.current_size() + ...); }, buffers); 
         }
 
         uI_t max_size() const
         {
-            return std::apply([](auto &&... buffers) {
-                return (buffers.max_size() + ...);
-            }, this->buffers);
+            return std::apply([](auto... args) { return (args.max_size() + ...); }, buffers);
         }
     };
 

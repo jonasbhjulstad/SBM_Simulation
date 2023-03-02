@@ -7,6 +7,7 @@
 #include <Sycl_Graph/Graph/Graph_Types.hpp>
 #include <Sycl_Graph/type_helpers.hpp>
 #include <Sycl_Graph/Math/math.hpp>
+#include <ostream>
 namespace Sycl_Graph::Base
 {
 
@@ -49,6 +50,11 @@ namespace Sycl_Graph::Base
         {
             return to != invalid_id && from != invalid_id;
         }
+
+        bool operator==(const Connection_ID_Pair &other) const
+        {
+            return to == other.to && from == other.from;
+        }
     };
     template <typename D, typename _Connection_IDs = Connection_ID_Pair<>>
     struct Edge
@@ -57,7 +63,7 @@ namespace Sycl_Graph::Base
         typedef _Connection_IDs Connection_IDs;
         typedef typename Connection_IDs::ID_t ID_t;
         static constexpr auto invalid_id = Connection_IDs::invalid_id;
-        Data_t data;
+        Data_t data = Data_t{};
         Edge(const D &data, ID_t to, ID_t from)
             : data(data), ids{to, from} {}
         Edge(ID_t to, ID_t from)

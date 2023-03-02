@@ -27,8 +27,19 @@ struct Vertex_Buffer : public Buffer<_uI_t, typename _Vertex_t::ID_t,
 
   Vertex_Buffer(sycl::queue &q, const std::vector<Vertex_t> &vertices,
                 const sycl::property_list &props = {})
-      : Base_t(q, vertices.size(), props) {
+      : Base_t(q, 0, props) {
+
     // transform vertices to three vectors
+    this->add(vertices);
+  }
+
+  std::vector<ID_t> get_valid_ids() {
+    return this->template get<ID_t>(
+        [](const auto &v) { return v.is_valid(); });
+  }
+
+  void add(const std::vector<Vertex_t>& vertices)
+  {
     std::vector<ID_t> ids;
     std::vector<Data_t> data;
     data.reserve(vertices.size());
@@ -37,12 +48,7 @@ struct Vertex_Buffer : public Buffer<_uI_t, typename _Vertex_t::ID_t,
       ids.push_back(v.id);
       data.push_back(v.data);
     }
-    this->add(ids, data);
-  }
-
-  std::vector<ID_t> get_valid_ids() {
-    return this->template get<ID_t>(
-        [](const auto &v) { return v.is_valid(); });
+    this->template assign_add<ID_t>(ids, data);
   }
 
   uI_t N_vertices() const { return this->current_size(); }

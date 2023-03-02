@@ -6,6 +6,9 @@
 namespace Sycl_Graph::Invariant
 {
 
+    template <typename D, typename _ID_t = uint32_t, _ID_t _invalid_id = std::numeric_limits<_ID_t>::max()>
+    using Vertex = Sycl_Graph::Base::Vertex<D, _ID_t, _invalid_id>;
+
     template <Sycl_Graph::Base::Edge_type E, Sycl_Graph::Base::Vertex_type _To, Sycl_Graph::Base::Vertex_type _From>
     struct Edge: public E
     {

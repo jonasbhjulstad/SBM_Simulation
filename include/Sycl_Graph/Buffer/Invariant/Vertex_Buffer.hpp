@@ -21,11 +21,16 @@ namespace Sycl_Graph::Invariant
         Vertex_Buffer(const VBs &&...buffers) : Base_t(buffers ...) {}
 
 
-        // std::tuple<VBs...> buffers;
-
         static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
         template <typename V>
         using Vertex = Sycl_Graph::Base::Vertex<V, uI_t>;
+
+        //check if T is in ID_t
+        template <typename T>
+        static constexpr bool is_ID_type = std::disjunction_v<std::is_same<T, VBs::Vertex_t::ID_t>...>;
+
+        template <typename T>
+        static constexpr bool is_Data_type = std::disjunction_v<std::is_same<T, VBs::Vertex_t::Data_t>...>;
 
         template <typename V>
         void add(const std::vector<uI_t> &&ids, const std::vector<V> &&data)

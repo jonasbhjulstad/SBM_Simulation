@@ -8,9 +8,9 @@
 using namespace Sycl_Graph;
 typedef Sycl_Graph::Base::Vertex<float> fVertex;
 typedef Sycl_Graph::Base::Vertex<int> iVertex;
-typedef Sycl_Graph::Base::Edge<float> void_Edge;
-typedef Sycl_Graph::Invariant::Edge<void_Edge, iVertex, fVertex> i_f_edges;
-typedef Sycl_Graph::Invariant::Edge<void_Edge, fVertex, iVertex> f_i_edges;
+typedef Sycl_Graph::Base::Edge<float> fEdge;
+typedef Sycl_Graph::Invariant::Edge<fEdge, iVertex, fVertex> i_f_edges;
+typedef Sycl_Graph::Invariant::Edge<fEdge, fVertex, iVertex> f_i_edges;
 
 
 int main()
@@ -20,8 +20,8 @@ int main()
     std::vector<fVertex> fvertices = {fVertex{0, 0.0f}, fVertex{1, 1.0f}, fVertex{2, 2.0f}, fVertex{3, 3.0f}};
     std::vector<iVertex> ivertices = {iVertex{0, 0}, iVertex{1, 1}, iVertex{2, 2}, iVertex{3, 3}};
 
-    std::vector<void_Edge> i_f_edges = {void_Edge{0, 1}, void_Edge{1, 2}, void_Edge{2, 3}, void_Edge{3, 0}};
-    std::vector<void_Edge> f_i_edges = {void_Edge{0, 1}, void_Edge{1, 2}, void_Edge{2, 3}, void_Edge{3, 0}};
+    std::vector<fEdge> i_f_edges = {fEdge{0, 1}, fEdge{1, 2}, fEdge{2, 3}, fEdge{3, 2}};
+    std::vector<fEdge> f_i_edges = {fEdge{0, 1}, fEdge{1, 2}, fEdge{2, 3}, fEdge{3, 2}};
 
     Sycl_Graph::Sycl::Vertex_Buffer fv_buf(q, fvertices);
     Sycl_Graph::Sycl::Vertex_Buffer iv_buf(q, ivertices);
