@@ -1,6 +1,7 @@
 #ifndef SYCL_GRAPH_INVARIANT_VERTEX_BUFFER_HPP
 #define SYCL_GRAPH_INVARIANT_VERTEX_BUFFER_HPP
 #include <concepts>
+#include <Sycl_Graph/type_helpers.hpp>
 #include <Sycl_Graph/Buffer/Invariant/Buffer.hpp>
 #include <Sycl_Graph/Buffer/Base/Vertex_Buffer.hpp>
 
@@ -16,10 +17,12 @@ namespace Sycl_Graph::Invariant
 
         typedef Sycl_Graph::Base::Vertex<std::tuple<typename VBs::Vertex_t ...>, uI_t> Vertex_t;
         typedef Buffer<VBs...> Base_t;
-
+        Vertex_Buffer() = default;
         Vertex_Buffer(const VBs &...buffers) : Base_t(buffers ...){}
         Vertex_Buffer(const VBs &&...buffers) : Base_t(buffers ...) {}
 
+        template <typename T>
+        using Vertex_Type_Maps = std::tuple<Type_Map<T, typename VBs::Vertex_t>...>;
 
         static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
         template <typename V>

@@ -39,7 +39,7 @@ namespace Sycl_Graph::Sycl
     typedef typename Base_t::Edge_t Edge_t;
     typedef typename Base_t::Edge_Data_t Edge_Data_t;
     // create copy constructor
-    Graph(sycl::queue &q, uI_t NV, uI_t NE, const sycl::property_list &props = {})
+    Graph(sycl::queue &q, uI_t NV = 0, uI_t NE = 0, const sycl::property_list &props = {})
         : q(q), Base_t(Vertex_Buffer(q, NV, props), Edge_Buffer(q, NE, props)) {}
 
     Graph(sycl::queue &q, const std::vector<Vertex_t> &vertices,

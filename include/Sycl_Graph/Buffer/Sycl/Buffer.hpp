@@ -36,7 +36,7 @@ namespace Sycl_Graph::Sycl
         uI_t curr_size = 0;
 
         Buffer(sycl::queue &q, uI_t N, const sycl::property_list &props = {})
-            : bufs(sycl::buffer<Ds, 1>(sycl::range<1>(N), props)...), q(q){}
+            : bufs(sycl::buffer<Ds, 1>(sycl::range<1>(std::max(N, 1)), props)...), q(q){}
 
         Buffer(sycl::queue &q, const std::vector<Ds>& ... data,
                const sycl::property_list &props = {})
@@ -149,6 +149,7 @@ namespace Sycl_Graph::Sycl
             return std::accumulate(buffer_type_sizes.begin(), buffer_type_sizes.end(), 0) * max_size();
         }
     };
+
 
 } // namespace Sycl_Graph::Sycl
 #endif

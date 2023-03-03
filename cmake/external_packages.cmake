@@ -29,6 +29,15 @@ CPMFindPackage(
 
 find_package(oneDPL REQUIRED)
 
+CPMFindPackage(NAME etl
+    GITHUB_REPOSITORY  ETLCPP/etl
+    GIT_TAG master    
+)
+
+CPMFindPackage(NAME Metal
+    GITHUB_REPOSITORY brunocodutra/metal
+    GIT_TAG master
+)
 
 # CPMFindPackage(
 #     NAME Eigen3

@@ -15,13 +15,26 @@ namespace Sycl_Graph::Network::Dynamic
 namespace Sycl_Graph::Network::Dynamics
 {
 
-    template <Sycl_Graph::Graph::Base::Graph_type Graph_t, class Derived>
+    template <Sycl_Graph::Graph::Invariant::Graph_type Graph_t, class Derived>
     struct Network: public Graph_t
     {
+
         typedef typename Graph_t::Vertex_Buffer_t Vertex_Buffer_t;
+        typedef Vertex_Buffer_t Vertex_Sync_Buffer_t;
         typedef typename Graph_t::Edge_Buffer_t Edge_Buffer_t;
         typedef typename Vertex_Buffer_t::Data_t State_t;
         typedef typename Edge_Buffer_t::TemporalParam_t TemporalParam_t;
+        Vertex_Buffer_t vertex_sync_buf;
+        Edge_Buffer_t edge_sync_buf;
+
+        Network() = default;
+        Network(const Vertex_Buffer_t& vertex_buffer, const Edge_Buffer_t& edge_buffer) : Graph_t(vertex_buffer, edge_buffer) {}
+        
+        bool advance()
+        {
+            return static_cast<Derived *>(this)->advance();
+        }
+
 
         template <Vertex_type ... Vs>
         auto read_node_states(const TemporalParam_t& tp){

@@ -3,33 +3,33 @@
 #include <Sycl_Graph/Buffer/Base/Buffer.hpp>
 namespace Sycl_Graph::Base
 {
-//     template <Vertex_type V, typename Derived>
-//     struct Vertex_Buffer
-//     {
-//         typedef V Vertex_t;
-//         typedef typename V::ID_t ID_t;
-//         typedef typename V::Data_t Data_t;
-//         typedef Vertex_t Container_t;
-//         typedef Data_t Container_Data_t;
+    template <Vertex_type V, typename Derived>
+    struct Vertex_Buffer
+    {
+        typedef V Vertex_t;
+        typedef typename V::ID_t ID_t;
+        typedef typename V::Data_t Data_t;
+        typedef Vertex_t Container_t;
+        typedef Data_t Container_Data_t;
 
-//         auto size() const
-//         {
-//             return static_cast<const Derived *>(this)->size();
-//         }
-//         void add(const std::vector<Data_t> && data, const std::vector<uI_t> && indices)
-//         {
-//             static_cast<Derived *>(this)->add(data, indices);
-//         }
-//         std::vector<Vertex_t> get_vertices()
-//         {
-//             return static_cast<Derived *>(this)->get_vertices();
-//         }
+        auto size() const
+        {
+            return static_cast<const Derived *>(this)->size();
+        }
+        void add(const std::vector<Data_t> && data, const std::vector<uI_t> && indices)
+        {
+            static_cast<Derived *>(this)->add(data, indices);
+        }
+        std::vector<Vertex_t> get_vertices()
+        {
+            return static_cast<Derived *>(this)->get_vertices();
+        }
 
-//         void remove(const std::vector<uI_t>&& indices)
-//         {
-//             static_cast<Derived *>(this)->remove(indices);
-//         }
-//     };
+        void remove(const std::vector<uI_t>&& indices)
+        {
+            static_cast<Derived *>(this)->remove(indices);
+        }
+    };
 
     template <typename T>
     concept Vertex_Buffer_type = true;

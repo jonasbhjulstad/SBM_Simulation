@@ -17,19 +17,17 @@ struct Vertex_Buffer : public Buffer<_uI_t, typename _Vertex_t::ID_t,
   typedef Buffer<uI_t,ID_t, Data_t> Base_t;
 
   sycl::queue &q = Base_t::q;
-  Vertex_Buffer(sycl::queue &q, uI_t NE, const sycl::property_list &props = {})
-      : Base_t(q, NE, props) {}
+  Vertex_Buffer(sycl::queue &q, uI_t NV = 1, const sycl::property_list &props = {})
+      : Base_t(q, NV, props) {}
 
   Vertex_Buffer(sycl::queue &q, const std::vector<ID_t> &ids,
-                const std::vector<Data_t> &data,
+                const std::vector<Data_t> &data = {},
                 const sycl::property_list &props = {})
       : Base_t(q, ids, data, props) {}
 
   Vertex_Buffer(sycl::queue &q, const std::vector<Vertex_t> &vertices,
                 const sycl::property_list &props = {})
-      : Base_t(q, 0, props) {
-
-    // transform vertices to three vectors
+      : Base_t(q, 1, props) {
     this->add(vertices);
   }
 

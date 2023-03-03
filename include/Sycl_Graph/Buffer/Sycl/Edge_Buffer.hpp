@@ -31,9 +31,9 @@ struct Edge_Buffer: public Buffer<_uI_t, typename _Edge_t::Connection_IDs, typen
   typedef Buffer<uI_t, Connection_IDs, Data_t> Base_t;
 
   sycl::queue& q = Base_t::q;
-  Edge_Buffer(sycl::queue &q, uI_t NE, const sycl::property_list &props = {}): Base_t(q, NE, props){}
+  Edge_Buffer(sycl::queue &q, uI_t NE = 1, const sycl::property_list &props = {}): Base_t(q, NE, props){}
 
-  Edge_Buffer(sycl::queue &q, const std::vector<Connection_IDs>& ids, const std::vector<Data_t>& data, const sycl::property_list &props = {}): Base_t(q, ids, data, props){}
+  Edge_Buffer(sycl::queue &q, const std::vector<Connection_IDs>& ids, const std::vector<Data_t>& data = {}, const sycl::property_list &props = {}): Base_t(q, ids, data, props){}
 
   Edge_Buffer(sycl::queue &q, const std::vector<Edge_t> &edges,
               const sycl::property_list &props = {}): Base_t(q, 0, props)

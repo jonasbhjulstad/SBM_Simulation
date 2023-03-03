@@ -19,7 +19,7 @@ namespace Sycl_Graph::Network::Dynamics::SIR_Metapopulation
 
   using namespace Static_RNG;
 
-  struct Node
+  struct State
   {
     State() = default;
     State(uint32_t S): S(S), I(0), R(0) {}

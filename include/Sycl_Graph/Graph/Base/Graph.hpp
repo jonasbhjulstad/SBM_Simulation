@@ -12,6 +12,8 @@ namespace Sycl_Graph::Base
   struct Graph
   {
 
+
+    Graph() = default;
     Graph(const _Vertex_Buffer_t& vertex_buffer, const _Edge_Buffer_t& edge_buffer)
         : vertex_buf(vertex_buffer), edge_buf(edge_buffer)
     {
@@ -94,7 +96,6 @@ namespace Sycl_Graph::Base
     {
       return edge_buf.get_edges();
     }
-
 
     // // file I/O
     // void write_edgelist(std::string filename, std::string delimiter = ",",

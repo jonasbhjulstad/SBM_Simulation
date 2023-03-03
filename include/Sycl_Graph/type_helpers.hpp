@@ -3,7 +3,7 @@
 #include <type_traits>
 #include <tuple>
 #include <array>
-
+#include <metal.hpp>
 namespace Sycl_Graph::Type_Helpers
 {
     template <class T, class Tuple>
@@ -81,10 +81,24 @@ namespace Sycl_Graph::Type_Helpers
         static constexpr bool value = std::disjunction_v<std::is_same<T, Ts>...>;
     };
 
+    template <typename T, typename... Ts>
+    struct Type_Map
+    {
+        std::array<T, sizeof...(Ts)> values;
+        Type_Map() = default;
+        Type_Map(const std::tuple<Ts...> &tuple){}
+        template <typename U>
+        T get()
+        {
+            return values[index_of_type<U, Ts...>::value];
+        }
+    };
 
-
-    
-
+    template <typename T, typename T_Array>
+    concept Indexable = requires(const T_Array& array)
+    {
+        {array[0]} -> std::same_as<T>;
+    };
 
     // //Get the Nth base type of a class
 

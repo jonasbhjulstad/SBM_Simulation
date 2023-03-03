@@ -48,6 +48,10 @@ namespace Sycl_Graph
   void buffer_resize(sycl::buffer<T, 1> &buf, sycl::queue &q,
                                    size_t new_size)
   {
+    if(buf.size() == new_size)
+    {
+      return;
+    }
     sycl::buffer<T, 1> new_buf(new_size);
     auto smallest_buf_size = std::min<size_t>(buf.size(), new_size);
     q.submit([&](sycl::handler &h)

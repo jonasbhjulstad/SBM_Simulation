@@ -10,13 +10,15 @@
     {
         typedef typename std::tuple_element_t<0, std::tuple<Bs ...>>::uI_t uI_t;
         typedef std::tuple<typename Bs::Data_t ...> Data_t;
+        static constexpr uI_t N_buffers = sizeof...(Bs);
+        Buffer() = default;
         Buffer(const Bs &... buffers): buffers(std::make_tuple(buffers ...)) {}
         Buffer(const Bs &&... buffers): buffers(std::make_tuple(buffers ...)) {}
         Buffer(const std::tuple<Bs ...>& buffers): buffers(buffers) {}
         Buffer(const Buffer &other): buffers(other.buffers) {}
+
         typedef Buffer<Bs ...> This_t;
         std::tuple<Bs ...> buffers;
-
 
         static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
         
@@ -91,6 +93,12 @@
             std::apply([&other](auto &&... buffers) {
                 return std::make_tuple((buffers + other.buffers) ...);}, this->buffers);
             return *this;
+        }
+
+        template <typename D> requires Data_type<D>::value
+        void resize(const uI_t &size)
+        {
+            get_buffer<D>().resize(size);
         }
 
         uI_t current_size() const
