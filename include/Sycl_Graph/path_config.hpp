@@ -6,9 +6,9 @@
 
 namespace Sycl_Graph {
 // const char *SYCL_GRAPH_ROOT_DIR = "";
-// const char *SYCL_GRAPH_INCLUDE_DIR = "/home/man/Documents/Sycl_Graph/include";
-    const char *SYCL_GRAPH_DATA_DIR = "/home/man/Documents/Sycl_Graph/data";
-    const char *SYCL_GRAPH_LOG_DIR = "/home/man/Documents/Sycl_Graph/log";
+// const char *SYCL_GRAPH_INCLUDE_DIR = "/home/man/Documents/Sycl_Graph_T/include";
+    const char *SYCL_GRAPH_DATA_DIR = "/home/man/Documents/Sycl_Graph_T/data";
+    const char *SYCL_GRAPH_LOG_DIR = "/home/man/Documents/Sycl_Graph_T/log";
 
 
     std::string MC_filename(uint32_t N_pop, float p_ER, uint32_t iter, std::string network_type) {

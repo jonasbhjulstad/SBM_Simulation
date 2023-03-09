@@ -399,11 +399,14 @@ namespace Sycl_Graph
           v_rec_buf.template get_access<sycl::access::mode::read_write>(h);
       auto rng_acc =
           rng_buf.template get_access<sycl::access::mode::read_write>(h);
+          sycl::stream out(1024, 256, h);
       h.parallel_for(sycl::range<1>(N_vertices), [=](sycl::id<1> id) {
         auto alpha = v_acc.data[id].param.alpha;
         auto p_R = 1 - sycl::exp(-alpha * dt);
         auto I = v_acc.data[id].state.I;
-        Static_RNG::approximate_binomial_distribution dist(I, p_R, poisson_approx_ratio);
+        Static_RNG::binomial_distribution dist(I, p_R);
+        //print alpha, p_R
+        // out << "alpha: " << alpha << " p_R: " << p_R << sycl::endl;
         v_rec_acc[id] = dist(rng_acc[id]);
       }); });
         event_v_rec.wait();
@@ -426,12 +429,14 @@ namespace Sycl_Graph
           v_inf_buf.template get_access<sycl::access::mode::read>(h);
       auto v_rec_acc =
           v_rec_buf.template get_access<sycl::access::mode::read>(h);
+          sycl::stream out(1024, 256, h);
       h.parallel_for(sycl::range<1>(N_vertices), [=](sycl::id<1> id) {
         // Vertex infections and recoveries are updated first
 
-        auto state = v_acc.data[id].state;
+        auto& state = v_acc.data[id].state;
         uint32_t delta_I = std::min<uint32_t>(state.S, v_inf_acc[id]);
         uint32_t delta_R = std::min<uint32_t>(state.I, v_rec_acc[id]);
+        out << "delta_I: " << delta_I << " delta_R: " << delta_R << sycl::endl;
         state.S -= delta_I;
         state.I += delta_I - delta_R;
         state.R += delta_R;
