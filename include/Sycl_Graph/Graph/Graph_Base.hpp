@@ -34,20 +34,6 @@ namespace Sycl_Graph
       edge_buf.resize(NE_new);
     }
 
-    Graph_t operator+(const Graph_t &other) const
-    {
-      Graph_t result;
-      result.vertex_buf = vertex_buf + other.vertex_buf;
-      result.edge_buf = edge_buf + other.edge_buf;
-      return result;
-    }
-
-    Graph_t &operator=(Graph_t &other)
-    {
-      vertex_buf = other.vertex_buf;
-      edge_buf = other.edge_buf;
-      return *this;
-    }
 
     template <typename... Args>
     void add_vertex(Args &&...args)

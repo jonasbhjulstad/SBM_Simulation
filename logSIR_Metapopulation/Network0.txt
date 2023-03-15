@@ -1,0 +1,12 @@
+SIR_Metapopulation Network Report for instance 0
+---------------------------------
+N_vertices: 1000
+N_edges: 50025
+---------------------------------
+Buffer sizes
+---------------------------------
+Vertex buffer size: 40000
+Edge buffer size: 15984000
+RNG buffer size: 1600800
+---------------------------------
+Total Buffer space requirement: 17636800

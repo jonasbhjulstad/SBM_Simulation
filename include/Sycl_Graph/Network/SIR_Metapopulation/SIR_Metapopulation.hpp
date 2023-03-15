@@ -10,7 +10,6 @@
 #include <Static_RNG/distributions.hpp>
 #include <Sycl_Graph/Network/SIR_Metapopulation/SIR_Metapopulation_Types.hpp>
 #include <CL/sycl.hpp>
-#include <fmt/format.h>
 #include <random>
 #include <stddef.h>
 #include <type_traits>
@@ -399,6 +398,7 @@ namespace Sycl_Graph
           v_rec_buf.template get_access<sycl::access::mode::read_write>(h);
       auto rng_acc =
           rng_buf.template get_access<sycl::access::mode::read_write>(h);
+      sycl::stream out(1024, 256, h);
       h.parallel_for(sycl::range<1>(N_vertices), [=](sycl::id<1> id) {
         auto alpha = v_acc.data[id].param.alpha;
         auto p_R = 1 - sycl::exp(-alpha * dt);
@@ -429,7 +429,7 @@ namespace Sycl_Graph
       h.parallel_for(sycl::range<1>(N_vertices), [=](sycl::id<1> id) {
         // Vertex infections and recoveries are updated first
 
-        auto state = v_acc.data[id].state;
+        auto& state = v_acc.data[id].state;
         uint32_t delta_I = std::min<uint32_t>(state.S, v_inf_acc[id]);
         uint32_t delta_R = std::min<uint32_t>(state.I, v_rec_acc[id]);
         state.S -= delta_I;

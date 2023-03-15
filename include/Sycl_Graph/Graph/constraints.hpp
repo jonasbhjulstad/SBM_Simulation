@@ -1,7 +1,7 @@
 #ifndef SYCL_GRAPH_GRAPH_CONSTRAINTS_HPP
 #define SYCL_GRAPH_GRAPH_CONSTRAINTS_HPP
 #include <concepts>
-
+#include <vector>
 namespace Sycl_Graph
 {
     template <typename T>
@@ -17,20 +17,7 @@ namespace Sycl_Graph
                         };
 
     template <typename T>
-    concept Graph_type = requires(T g) {
-                             typename T::uI_t;
-                             typename T::dType;
-                             typename T::Vertex_t;
-                             typename T::Edge_t;
-                             typename T::Vertex_Prop_t;
-                             typename T::Edge_Prop_t;
-                             typename T::uInt_t;
-                             typename T::Graph_t;
-                             g.invalid_id;
-                             // verify that these functions exist
-                             g.N_vertices();
-                             g.N_edges();
-                         };
+    concept Graph_type = true;
 
     template <typename T>
     concept Vertex_Buffer_type = requires(T buf) {

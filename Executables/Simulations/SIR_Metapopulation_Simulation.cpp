@@ -9,13 +9,13 @@
 #include <filesystem>
 
 
-static constexpr size_t NV = 100;
+static constexpr size_t NV = 1000;
 std::vector<uint32_t> N_pop = std::vector<uint32_t>(NV, 1000);
 std::vector<Static_RNG::normal_distribution<float>> I0(N_pop.size());
 std::vector<Static_RNG::normal_distribution<float>> R0(N_pop.size());
 std::vector<float> alpha(N_pop.size(), 0.01);
-std::vector<float> node_beta(N_pop.size(), 0.1);
-std::vector<float> edge_beta(N_pop.size(), 0.1);
+std::vector<float> node_beta(N_pop.size(), 0.00000005);
+std::vector<float> edge_beta(N_pop.size(), 0.00000005);
 int main()
 {
 
@@ -27,7 +27,7 @@ int main()
   using namespace Sycl_Graph::Sycl::Network_Models;
   using Sycl_Graph::Dynamic::Network_Models::generate_erdos_renyi;
   using namespace Sycl_Graph::Network_Models;
-  float p_ER = 0.5;
+  float p_ER = 0.1;
   //create profiling queue
   sycl::queue q(sycl::gpu_selector_v, sycl::property::queue::enable_profiling{});
   int seed = 777;

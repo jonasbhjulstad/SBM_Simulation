@@ -48,8 +48,15 @@ template <typename E, std::unsigned_integral uI_t> struct Edge_Buffer: public Ed
 
   static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
   Edge_Buffer(sycl::queue &q, uI_t NE, const sycl::property_list &props = {})
-      : to_buf(sycl::range<1>(NE), props), from_buf(sycl::range<1>(NE), props),
-        data_buf(sycl::range<1>(NE), props), NE(NE), q(q) {}
+      : NE(NE), q(q), N_edges(0), to_buf(sycl::buffer<uI_t, 1>(sycl::range<1>(NE), props)), from_buf(sycl::buffer<uI_t, 1>(sycl::range<1>(NE), props)), data_buf(sycl::buffer<E, 1>(sycl::range<1>(NE), props))
+        {
+          if (NE > 0)
+          {
+            to_buf = sycl::buffer<uI_t, 1>(sycl::range<1>(NE), props);
+            from_buf = sycl::buffer<uI_t, 1>(sycl::range<1>(NE), props);
+            data_buf = sycl::buffer<E, 1>(sycl::range<1>(NE), props);
+          }
+        }
 
   Edge_Buffer(sycl::queue &q, const std::vector<Edge<E, uI_t>> &edges,
               const sycl::property_list &props = {})
@@ -76,7 +83,6 @@ template <typename E, std::unsigned_integral uI_t> struct Edge_Buffer: public Ed
     return Edge_Accessor<E, uI_t, Mode>(data_buf, to_buf, from_buf, h);
   }
   void resize(uI_t new_size) {
-    N_edges = (N_edges > new_size) ? N_edges : new_size;
     buffer_resize(to_buf, new_size, q);
     buffer_resize(from_buf, new_size, q);
     buffer_resize(data_buf, new_size, q);
@@ -191,6 +197,27 @@ template <typename E, std::unsigned_integral uI_t> struct Edge_Buffer: public Ed
   }
 
   Edge_Buffer<E, uI_t> operator+(const Edge_Buffer<E, uI_t> &other) {
+    to_buf = device_buffer_combine(q, to_buf, other.to_buf, this->N_edges,
+                                   other.N_edges);
+    from_buf = device_buffer_combine(q, from_buf, other.from_buf, this->N_edges,
+                                     other.N_edges);
+    data_buf = device_buffer_combine(q, data_buf, other.data_buf, this->N_edges,
+                                     other.N_edges);
+    N_edges = to_buf.size();
+    return *this;
+  }
+
+  Edge_Buffer<E, uI_t>& operator+=(const Edge_Buffer<E, uI_t> &other) {
+
+    if (this->size() == 0)
+    {
+        *this = other;
+        return *this;
+    }
+    else if(other.size() == 0)
+    {
+        return *this;
+    }
     to_buf = device_buffer_combine(q, to_buf, other.to_buf, this->N_edges,
                                    other.N_edges);
     from_buf = device_buffer_combine(q, from_buf, other.from_buf, this->N_edges,

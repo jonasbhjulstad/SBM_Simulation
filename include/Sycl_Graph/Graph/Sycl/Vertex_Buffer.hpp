@@ -26,8 +26,15 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
   sycl::queue &q;
   const uI_t NV;
 
-  Vertex_Buffer(sycl::queue &q, uI_t NV, const sycl::property_list &props = {})
-      : id_buf(sycl::range<1>(NV), props), data_buf(sycl::range<1>(NV), props), NV(NV), q(q) {}
+
+  Vertex_Buffer(sycl::queue &q, uI_t NV, const sycl::property_list &props = {}): id_buf(sycl::range<1>(NV), props), data_buf(sycl::range<1>(NV), props), q(q), NV(NV)
+  {
+    if (NV > 0)
+    {
+      id_buf = sycl::buffer<uI_t, 1>(sycl::range<1>(NV), props);
+      data_buf = sycl::buffer<V, 1>(sycl::range<1>(NV), props);
+    }
+  }
 
   Vertex_Buffer(sycl::queue &q, const std::vector<Vertex<V, uI_t>> &vertices,
                 const sycl::property_list &props = {})
@@ -50,7 +57,6 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
 
   void resize(uI_t new_size) 
   {
-    N_vertices = (N_vertices > new_size) ? N_vertices : new_size;
     buffer_resize(q, id_buf, new_size);
     buffer_resize(q, data_buf, new_size);
   }
@@ -155,6 +161,27 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
 
   Vertex_Buffer<V, uI_t> operator+(const Vertex_Buffer<V, uI_t> &other) {
     
+
+    id_buf = device_buffer_combine(q, id_buf, other.id_buf, this->N_vertices,
+                                   other.N_vertices);
+    data_buf = device_buffer_combine(q, data_buf, other.data_buf,
+                                     this->N_vertices, other.N_vertices);
+    N_vertices += other.N_vertices;
+    return *this;
+  }
+
+
+  Vertex_Buffer<V, uI_t> operator+=(const Vertex_Buffer<V, uI_t> other) {
+    
+    if (this->size() == 0)
+    {
+        *this = other;
+        return *this;
+    }
+    else if(other.size() == 0)
+    {
+        return *this;
+    }
 
     id_buf = device_buffer_combine(q, id_buf, other.id_buf, this->N_vertices,
                                    other.N_vertices);

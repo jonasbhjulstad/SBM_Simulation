@@ -1,7 +1,7 @@
 #include <CL/sycl.hpp>
 
 
-int main()
+auto main() -> int
 {
     //enable profiling
     sycl::queue q(sycl::gpu_selector_v, sycl::property::queue::enable_profiling{});
