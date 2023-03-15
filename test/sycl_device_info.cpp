@@ -1,7 +1,7 @@
 //include sycl
 #include <CL/sycl.hpp>
 
-int main()
+auto main() -> int
 {
     //get global and local memory size on GPU in Mb
     auto global_mem_size = sycl::device().get_info<sycl::info::device::global_mem_size>() / 1024 / 1024;

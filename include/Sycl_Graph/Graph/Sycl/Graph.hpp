@@ -27,10 +27,10 @@ namespace Sycl_Graph::Sycl
 {
 
   template <typename V, typename E, std::unsigned_integral uI_t = uint32_t, std::floating_point dType = float>
-  struct Graph : public Sycl_Graph::Graph_Base<V, E, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>, uI_t, dType>
+  struct Graph : public ::Sycl_Graph::Graph_Base<V, E, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>, uI_t, dType>
 
   {
-    typedef Sycl_Graph::Graph_Base<V, E, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>, uI_t, dType> Base_t;
+    typedef ::Sycl_Graph::Graph_Base<V, E, Vertex_Buffer<V, uI_t>, Edge_Buffer<E, uI_t>, uI_t, dType> Base_t;
     // create copy constructor
     Graph(sycl::queue &q, uI_t NV, uI_t NE, const sycl::property_list &props = {})
         : q(q), vertex_buf(q, NV, props), edge_buf(q, NE, props), Base_t(vertex_buf, edge_buf) {}
@@ -75,6 +75,37 @@ namespace Sycl_Graph::Sycl
     {
       vertex_buf.resize(NV_new);
       edge_buf.resize(NE_new);
+    }
+
+    Graph_t operator+(const Graph_t &other) const
+    {
+      //call derived copy constructor
+      Graph_t result(*this);
+      result.vertex_buf += other.vertex_buf;
+      result.edge_buf += other.edge_buf;
+      return result;
+    }
+
+
+    Graph_t operator=(Graph_t other)
+    {
+      vertex_buf = other.vertex_buf;
+      edge_buf = other.edge_buf;
+      return *this;
+    }
+
+    Graph_t &operator=(Graph_t &other)
+    {
+      vertex_buf = other.vertex_buf;
+      edge_buf = other.edge_buf;
+      return *this;
+    }
+
+    Graph_t &operator+=(const Graph_t &other)
+    {
+      vertex_buf += other.vertex_buf;
+      edge_buf += other.edge_buf;
+      return *this;
     }
 
   // find vertex index based on condition
