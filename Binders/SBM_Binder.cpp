@@ -8,57 +8,80 @@
 #include <algorithm>
 #include <cstdint>
 #include <filesystem>
-#include <utility>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
+#include <utility>
 using Sycl_Graph::Dynamic::Network_Models::generate_SBM;
 using namespace Sycl_Graph::Sycl::Network_Models;
-
+typedef typename SIR_Bernoulli_SBM_Network::Base_t SBM_Base_t;
 typedef SIR_Bernoulli_SBM_Network Network_t;
 typedef typename Network_t::Graph_t Graph_t;
-//create pybind11 module
+// create pybind11 module
+// auto create_SIR_Bernoulli_SBM(sycl::queue& q, const std::vector<size_t> N_pop, const std::vector<float> p_SBM, const float p_I0, const float p_R0 = 0.0, bool undirected = true)
+// {
+//     // create profiling queue
+//     //reshape vector to vector<vector> of size N_pop
+//     std::vector<std::vector<float>> p_SBM_reshaped(N_pop.size());
+//     for (size_t i = 0; i < N_pop.size(); i++)
+//     {
+//         p_SBM_reshaped[i] = std::vector<float>(N_pop.size());
+//         for (size_t j = 0; j < N_pop.size(); j++)
+//         {
+//             p_SBM_reshaped[i][j] = p_SBM[i * N_pop.size() + j];
+//         }
+//     }
+
+//     auto [G, edge_ids_SBM] = generate_SBM<Graph_t, Static_RNG::default_rng>(q, N_pop, p_SBM_reshaped, undirected);
+//     return std::make_tuple(G, Network_t(G, p_I0, p_R0, edge_ids_SBM), edge_ids_SBM);
+// }
+
 std::pair<Network_t, std::vector<std::vector<std::pair<uint32_t, uint32_t>>>>
- create_SIR_Bernoulli_SBM(const std::vector<size_t> N_pop, const std::vector<float> p_SBM, const float p_I0, const float p_R0 = 0.0, bool undirected = true)
-{
-    // create profiling queue
-    //reshape vector to vector<vector> of size N_pop
-    std::vector<std::vector<float>> p_SBM_reshaped(N_pop.size());
-    for (size_t i = 0; i < N_pop.size(); i++)
-    {
-        p_SBM_reshaped[i] = std::vector<float>(N_pop.size());
-        for (size_t j = 0; j < N_pop.size(); j++)
-        {
-            p_SBM_reshaped[i][j] = p_SBM[i * N_pop.size() + j];
-        }
+create_SIR_Bernoulli_SBM(const std::vector<size_t>& N_pop,
+                         const std::vector<float>& p_SBM, const float p_I0,
+                         const float p_R0 = 0.0, bool undirected = true) {
+  // create profiling queue
+  // reshape vector to vector<vector> of size N_pop
+  std::vector<std::vector<float>> p_SBM_reshaped(N_pop.size());
+  for (size_t i = 0; i < N_pop.size(); i++) {
+    p_SBM_reshaped[i] = std::vector<float>(N_pop.size());
+    for (size_t j = 0; j < N_pop.size(); j++) {
+      p_SBM_reshaped[i][j] = p_SBM[i * N_pop.size() + j];
     }
+  }
 
-    sycl::queue q(sycl::cpu_selector_v,
-                  sycl::property::queue::enable_profiling{});
-    auto [G, edge_ids_SBM] = generate_SBM<Graph_t, Static_RNG::default_rng>(q, N_pop, p_SBM_reshaped, undirected);
-    return std::make_pair(Network_t(G, p_I0, p_R0, edge_ids_SBM), edge_ids_SBM);
+  static sycl::queue q(sycl::gpu_selector_v);
+  auto [G, edge_ids_SBM] = generate_SBM<Graph_t, Static_RNG::default_rng>(
+      q, N_pop, p_SBM_reshaped, undirected);
+  return std::make_pair(Network_t(G, p_I0, p_R0, edge_ids_SBM), edge_ids_SBM);
 }
 
+PYBIND11_MODULE(SBM_Binder, m) {
+  typedef typename Network_t::Trajectory_t Traj_t;
+  typedef typename Network_t::Trajectory_pair_t TrajPair_t;
+  // class for temporal_param
+  pybind11::class_<SIR_Bernoulli_SBM_Temporal_Param<float>>(m, "Temporal_Param")
+      .def(pybind11::init<>())
+      .def_readwrite("p_Is", &SIR_Bernoulli_SBM_Temporal_Param<float>::p_Is)
+      .def_readwrite("p_R", &SIR_Bernoulli_SBM_Temporal_Param<float>::p_R)
+      .def_readwrite("Nt_min", &SIR_Bernoulli_SBM_Temporal_Param<float>::Nt_min)
+      .def_readwrite("NI_min",
+                     &SIR_Bernoulli_SBM_Temporal_Param<float>::N_I_min);
 
+  pybind11::class_<SBM_Base_t>(m, "Network")
+      .def("simulate",
+           static_cast<Traj_t (SBM_Base_t::*)(
+               std::vector<SIR_Bernoulli_SBM_Temporal_Param<>>)>(
+               &SBM_Base_t::simulate));
 
-PYBIND11_MODULE(SBM_Binder, m)
-{
-    //class for temporal_param
-    pybind11::class_<SIR_Bernoulli_SBM_Temporal_Param<float>>(m, "Temporal_Param")
-        .def(pybind11::init<>())
-        .def_readwrite("p_Is", &SIR_Bernoulli_SBM_Temporal_Param<float>::p_Is)
-        .def_readwrite("p_R", &SIR_Bernoulli_SBM_Temporal_Param<float>::p_R)
-        .def_readwrite("Nt_min", &SIR_Bernoulli_SBM_Temporal_Param<float>::Nt_min)
-        .def_readwrite("NI_min", &SIR_Bernoulli_SBM_Temporal_Param<float>::N_I_min);
+  // define class
+  pybind11::class_<SIR_Bernoulli_SBM_Network, SBM_Base_t>(m, "SBM")
+      .def("initialize", &SIR_Bernoulli_SBM_Network::initialize)
+      // .def("simulate_groups", &SIR_Bernoulli_SBM_Network::simulate_groups);
+      .def("simulate_groups", &Network_t::simulate_groups);
 
-    //define class
-    pybind11::class_<SIR_Bernoulli_SBM_Network>(m, "SBM")
-    .def("initialize", &SIR_Bernoulli_SBM_Network::initialize)
-        .def("simulate", &SIR_Bernoulli_SBM_Network::simulate);
-
-    m.def("create_SIR_Bernoulli_SBM", &create_SIR_Bernoulli_SBM);
+  m.def("create_SIR_Bernoulli_SBM", &create_SIR_Bernoulli_SBM);
 }
-
 
 // int main() {
 
@@ -74,8 +97,9 @@ PYBIND11_MODULE(SBM_Binder, m)
 //   // create profiling queue
 //   sycl::queue q(sycl::gpu_selector_v,
 //                 sycl::property::queue::enable_profiling{});
-//   auto [G, edge_ids_SBM] = generate_SBM <Graph_t, Static_RNG::default_rng>(q, N_pop, p_SBM, true);
-//   SIR_Bernoulli_SBM_Network sir(G, p_I0, p_R0, edge_ids_SBM);
+//   auto [G, edge_ids_SBM] = generate_SBM <Graph_t, Static_RNG::default_rng>(q,
+//   N_pop, p_SBM, true); SIR_Bernoulli_SBM_Network sir(G, p_I0, p_R0,
+//   edge_ids_SBM);
 //   // generate sir_param
 //   size_t Nt = 100;
 //   std::vector<SIR_Bernoulli_SBM_Temporal_Param<float>> sir_param;

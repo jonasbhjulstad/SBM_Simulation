@@ -88,18 +88,31 @@ random_connect(Graph &G0, Graph &G1, RNG &rng, dType p,
 template <Graph_type Graph, typename RNG, std::floating_point dType = float,
           std::unsigned_integral uI_t = uint32_t>
 std::pair<Graph, std::vector<std::vector<std::pair<uI_t, uI_t>>>>
-random_connect(const std::vector<Graph> &Gs,
+random_connect(std::vector<Graph> &Gs,
                const std::vector<std::vector<dType>> &ps, std::vector<RNG> &rng,
                bool directed = false) {
 
-  std::vector<std::pair<Graph, Graph>> G_combs;
-  for (auto comb : iter::combinations(Gs, 2)) {
-    G_combs.push_back(std::make_pair(comb[0], comb[1]));
+  auto Np = ps.size(); 
+  std::vector<std::vector<std::pair<Graph*, Graph*>>> G_combs;
+  G_combs.resize(Np);
+  //resize each vector to G.size
+  for (auto &&G : G_combs) {
+    G.resize(Np);
   }
-  for (auto &&G : Gs) {
-    G_combs.push_back(std::make_pair(G, G));
+  for (auto comb : iter::product(Sycl_Graph::range(0, G_combs.size()), Sycl_Graph::range(0, G_combs.size()))) {
+    auto idx_0 = std::get<0>(comb);
+    auto idx_1 = std::get<1>(comb);
+    G_combs[idx_0][idx_1] = std::make_pair(&Gs[idx_0], &Gs[idx_1]);
   }
+  // for (int i = 0; i < G_combs.size(); i++) {
+  //   G_combs[i][i] = std::make_pair(&Gs[i], &Gs[i]);
+  // }
 
+  //flatten G_combs
+  std::vector<std::pair<Graph*, Graph*>> G_combs_flat;
+  for (auto &&G : G_combs) {
+    G_combs_flat.insert(G_combs_flat.end(), G.begin(), G.end());
+  }
 
   // flatten ps
   std::vector<dType> ps_flat;
@@ -109,9 +122,9 @@ random_connect(const std::vector<Graph> &Gs,
 
   size_t N_G_packs = 0;
   std::vector<std::vector<std::pair<uI_t, uI_t>>> edge_ids;
-  for (int i = 0; i < G_combs.size(); i++)
+  for (int i = 0; i < G_combs_flat.size(); i++)
   {
-    edge_ids.push_back(random_connect(G_combs[i].first, G_combs[i].second, rng[i], ps_flat[i], directed));
+    edge_ids.push_back(random_connect(*(G_combs_flat[i].first), *(G_combs_flat[i].second), rng[i], ps_flat[i], directed));
   }
   // uI_t N_G_pack = std::distance(G_pack.begin(), G_pack.end());
 

@@ -38,11 +38,12 @@ namespace Sycl_Graph
             using Base_t = Network<SIR_Bernoulli_SBM_Network, std::vector<uint32_t>, SIR_Bernoulli_SBM_Temporal_Param<>>;
             const float p_I0;
             const float p_R0;
-            const uint32_t t = 0;
             sycl::buffer<int, 1> seed_buf;
+            bool record_group_infections = true;
 
             std::vector<std::vector<std::pair<uint32_t, uint32_t>>> SBM_ids;
-            SIR_Bernoulli_SBM_Network(Graph_t &G, float p_I0, float p_R0, auto& SBM_ids, int seed = 777)
+
+            SIR_Bernoulli_SBM_Network(const Graph_t &G, float p_I0, float p_R0, auto& SBM_ids, int seed = 777)
                 : q(G.q), G(G), p_I0(p_I0), p_R0(p_R0), seed_buf(sycl::range<1>(G.N_vertices())), SBM_ids(SBM_ids)
             {
                 assert(G.N_vertices() > 0);
@@ -146,7 +147,7 @@ namespace Sycl_Graph
             }
 
             // function for infection step
-            void infection_step(float p_I, const std::vector<std::pair<uint32_t, uint32_t>>& SBM_connection)
+            uint32_t infection_step(float p_I, const std::vector<std::pair<uint32_t, uint32_t>>& SBM_connection)
             {
                 using Sycl_Graph::Network_Models::SIR_Individual_State;
 
@@ -182,6 +183,8 @@ namespace Sycl_Graph
                     else
                         return Graph_t::invalid_id; });
 
+                if (G.N_edges() > 0)
+                {
                 sycl::buffer<bool> sn_buf(sycl::range<1>(G.N_vertices()));
                 q.submit([&, this](sycl::handler &h)
                          {
@@ -189,16 +192,19 @@ namespace Sycl_Graph
                     auto e_SBM_acc = SBM_id_buf.get_access<sycl::access::mode::read>(h);
                     auto sn_acc = sn_buf.get_access<sycl::access::mode::write>(h);
                     // parallel for
+
                     h.parallel_for<class edge_validity>(sycl::range<1>(e_SBM_acc.size()), [=](sycl::id<1> index)
                                                        {
                         // get the index of the element to sort
                         int i = index[0];
                         uint32_t sn = get_susceptible_neighbor(v_acc.data, e_SBM_acc[i].first, e_SBM_acc[i].second);
                         if (sn != Graph_t::invalid_id)
-                        sn_acc[sn] = true;
-                    }); });
+                        {sn_acc[sn] = true;
+                        }
+                    }); }).wait();
 
-                sycl::buffer<uint32_t> sn_count_buf(sycl::range<1>(1));
+                uint32_t count = 0;
+                sycl::buffer<uint32_t> sn_count_buf(&count, sycl::range<1>(1));
 
                 q.submit([&](sycl::handler &h)
                          {
@@ -216,9 +222,13 @@ namespace Sycl_Graph
                     }); });
                 q.wait();
 
+                //read count from buffer
+                auto count_acc = sn_count_buf.get_access<sycl::access::mode::read>();
+                count = count_acc[0];
+
+                if (count > 0)
+                {
                 // get neighbor count
-                sycl::host_accessor<uint32_t> sn_count_acc(sn_count_buf);
-                uint32_t count = sn_count_acc[0];
                 sycl::buffer<uint32_t> sn_ids_buf((sycl::range<1>(count)));
 
                 q.submit([&](sycl::handler &h)
@@ -238,12 +248,14 @@ namespace Sycl_Graph
                         }
                     }); });
 
+                auto state_old = read_state({});
+
+
                 q.submit([&](sycl::handler &h)
                          {
                     auto sn_ids_acc = sn_ids_buf.get_access<sycl::access::mode::read>(h);
                     auto v_acc = G.get_vertex_access<sycl::access_mode::read_write>(h);
                     auto seed_acc = seed_buf.get_access<sycl::access::mode::read_write>(h);
-                    sycl::stream out(1024, 256, h);
                     h.parallel_for(sycl::range<1>(sn_ids_acc.size()), [=](sycl::id<1> id)
                     {
                         Static_RNG::default_rng rng(seed_acc[id]);
@@ -257,6 +269,16 @@ namespace Sycl_Graph
                         }
                         seed_acc[id] += 1;
                     }); });
+                q.wait();
+                auto state_new = read_state({});
+                return state_new[1] - state_old[1];
+                }
+                else
+                {
+                    return 0;
+                }
+                }
+                return 0;
             }
 
             void recovery_step(float p_R)
@@ -292,8 +314,19 @@ namespace Sycl_Graph
                 recovery_step(p.p_R);
             }
 
+            void advance(const SIR_Bernoulli_SBM_Temporal_Param<> &p, std::vector<uint32_t>& N_infected)
+            {
+
+                for (int i = 0; i < SBM_ids.size(); i++)
+                {
+                    N_infected[i] = infection_step(p.p_Is[i], SBM_ids[i]);
+                }
+                recovery_step(p.p_R);
+            }
+
             bool terminate(const std::vector<uint32_t> &x, const SIR_Bernoulli_SBM_Temporal_Param<> &p)
             {
+                static int t = 0;
                 bool early_termination = ((t > p.Nt_min) && (x[1] < p.N_I_min));
                 return early_termination;
             }
@@ -310,8 +343,48 @@ namespace Sycl_Graph
                                    }); });
             }
 
+            SIR_Bernoulli_SBM_Network& operator=(SIR_Bernoulli_SBM_Network other)
+            {
+                q = other.q;
+                std::swap(G, other.G);
+                std::swap(SBM_ids, other.SBM_ids);
+                std::swap(seed_buf, other.seed_buf);
+                return *this;
+            }
+
+        using Base_t::simulate;
+
+        typedef std::vector<std::vector<uint32_t>> Trajectory_t;
+        typedef std::pair<Trajectory_t, Trajectory_t> Trajectory_pair_t;
+
+        Trajectory_pair_t simulate_groups(const std::vector<SIR_Bernoulli_SBM_Temporal_Param<>> tp)
+        {
+            auto Nt = tp.size()-1;
+            std::vector<std::vector<uint32_t>> group_trajectory(Nt);
+            //resize group_trajectory
+            for (int i = 0; i < Nt; i++)
+            {
+                group_trajectory[i].resize(SBM_ids.size(), 0);
+            }
+            std::vector<std::vector<uint32_t>> trajectory(Nt+1);
+            uint32_t t = 0;
+            auto tp_i = tp[0];
+            trajectory[0] = read_state(tp[0]);
+            for (int i = 0; i < Nt; i++)
+            {
+                auto tp_i = tp[i+1];
+                advance(tp_i, group_trajectory[i]);
+                trajectory[i+1] = read_state(tp_i);
+                if (terminate(trajectory[i+1], tp_i))
+                {
+                    break;
+                }
+            }
+            return std::make_pair(trajectory, group_trajectory);
+        }
+
         private:
-            Graph_t &G;
+            Graph_t G;
             sycl::queue &q;
         };
     } // namespace Sycl

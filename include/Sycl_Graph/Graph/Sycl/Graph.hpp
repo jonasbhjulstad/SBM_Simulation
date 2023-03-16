@@ -87,17 +87,12 @@ namespace Sycl_Graph::Sycl
     }
 
 
-    Graph_t operator=(Graph_t other)
-    {
-      vertex_buf = other.vertex_buf;
-      edge_buf = other.edge_buf;
-      return *this;
-    }
 
-    Graph_t &operator=(Graph_t &other)
+    Graph_t &operator=(Graph_t other)
     {
-      vertex_buf = other.vertex_buf;
-      edge_buf = other.edge_buf;
+      std::swap(vertex_buf, other.vertex_buf);
+      std::swap(edge_buf, other.edge_buf);
+      std::swap(q, other.q);
       return *this;
     }
 
