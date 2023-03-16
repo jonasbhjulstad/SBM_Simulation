@@ -9,10 +9,7 @@ enum SIR_Individual_State: int { SIR_INDIVIDUAL_S = 0, SIR_INDIVIDUAL_I = 1, SIR
 struct SIR_Edge {};
 
 template <typename dType = float> struct SIR_Bernoulli_SBM_Temporal_Param {
-  SIR_Bernoulli_SBM_Temporal_Param<>(){};
-  SIR_Bernoulli_SBM_Temporal_Param<>(const std::vector<dType>& p_Is): p_Is(p_Is){}
-
-  std::array<dType, N_p_Is> p_Is;
+  std::vector<dType> p_Is = {0.1,0.01,0.01,0.1};
   
   dType p_R = 0.01;
   uint32_t Nt_min = std::numeric_limits<uint32_t>::max();

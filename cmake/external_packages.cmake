@@ -1,4 +1,4 @@
-include(cmake/CPM.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/CPM.cmake)
 
 CPMFindPackage(
     NAME Static_RNG

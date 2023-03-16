@@ -188,11 +188,17 @@ template <typename E, std::unsigned_integral uI_t> struct Edge_Buffer: public Ed
     index_type = EDGE_INDEXING_POSITION;
   }
 
-  Edge_Buffer<E, uI_t> &operator=(const Edge_Buffer<E, uI_t> &other) {
+  Edge_Buffer<E, uI_t> &operator=(Edge_Buffer<E, uI_t> other) {
     to_buf = other.to_buf;
     from_buf = other.from_buf;
     data_buf = other.data_buf;
     N_edges = other.N_edges;
+
+    std::swap(to_buf, other.to_buf);
+    std::swap(from_buf, other.from_buf);
+    std::swap(data_buf, other.data_buf);
+    std::swap(N_edges, other.N_edges);
+    std::swap(q, other.q);
     return *this;
   }
 

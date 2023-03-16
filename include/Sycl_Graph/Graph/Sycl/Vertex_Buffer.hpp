@@ -152,10 +152,11 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
     N_vertices -= id.size();
   }
 
-  Vertex_Buffer<V, uI_t> &operator=(const Vertex_Buffer<V, uI_t> &other) {
-    id_buf = other.id_buf;
-    data_buf = other.data_buf;
-    N_vertices = other.N_vertices;
+  Vertex_Buffer<V, uI_t> &operator=(Vertex_Buffer<V, uI_t> other) {
+    std::swap(id_buf, other.id_buf);
+    std::swap(data_buf, other.data_buf);
+    std::swap(N_vertices, other.N_vertices);
+    std::swap(q, other.q);
     return *this;
   }
 
