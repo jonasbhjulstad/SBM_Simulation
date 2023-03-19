@@ -12,6 +12,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 #include <utility>
+#include <execution>
 using Sycl_Graph::Dynamic::Network_Models::generate_SBM;
 using namespace Sycl_Graph::Sycl::Network_Models;
 typedef typename SIR_Bernoulli_SBM_Network::Base_t SBM_Base_t;
@@ -36,8 +37,10 @@ typedef typename Network_t::Graph_t Graph_t;
 //     return std::make_tuple(G, Network_t(G, p_I0, p_R0, edge_ids_SBM), edge_ids_SBM);
 // }
 
-std::pair<Network_t, std::vector<std::vector<std::pair<uint32_t, uint32_t>>>>
-create_SIR_Bernoulli_SBM(const std::vector<size_t>& N_pop,
+  typedef std::pair<Network_t,
+  std::vector<std::vector<std::pair<uint32_t, uint32_t>>>> Network_Data_t;
+
+Network_Data_t create_SIR_Bernoulli_SBM(const std::vector<size_t>& N_pop,
                          const std::vector<float>& p_SBM, const float p_I0,
                          const float p_R0 = 0.0, bool undirected = true) {
   // create profiling queue
@@ -56,12 +59,36 @@ create_SIR_Bernoulli_SBM(const std::vector<size_t>& N_pop,
   return std::make_pair(Network_t(G, p_I0, p_R0, edge_ids_SBM), edge_ids_SBM);
 }
 
+std::vector<Network_Data_t> create_SIR_Bernoulli_SBMs(
+    const std::vector<std::vector<size_t>>& N_pops,
+    const std::vector<std::vector<float>>& p_SBMs,
+    const float p_I0,
+    const float p_R0 = 0.0, bool undirected = true) {
+  std::vector<Network_Data_t> networks;
+
+
+  std::vector<std::tuple<std::vector<size_t>, std::vector<float>>> N_pops_p_SBMs;
+  //make tuple zip of N_pops and p_SBMs
+  std::transform(N_pops.begin(), N_pops.end(), p_SBMs.begin(), std::back_inserter(N_pops_p_SBMs), [](auto N_pop, auto p_SBM){
+    return std::make_tuple(N_pop, p_SBM);
+  });
+
+  
+
+  std::transform(std::execution::par_unseq,N_pops_p_SBMs.begin(), N_pops_p_SBMs.end(), std::back_inserter(networks), [=](auto N_pop, auto p_SBM){
+    return create_SIR_Bernoulli_SBM(N_pop, p_SBM, p_I0, p_R0, undirected);
+  });
+  return networks;
+}
+
+
 PYBIND11_MODULE(SBM_Binder, m) {
   typedef typename Network_t::Trajectory_t Traj_t;
   typedef typename Network_t::Trajectory_pair_t TrajPair_t;
   // class for temporal_param
   pybind11::class_<SIR_Bernoulli_SBM_Temporal_Param<float>>(m, "Temporal_Param")
       .def(pybind11::init<>())
+      .def(pybind11::init<const std::vector<float>&, const float>())
       .def_readwrite("p_Is", &SIR_Bernoulli_SBM_Temporal_Param<float>::p_Is)
       .def_readwrite("p_R", &SIR_Bernoulli_SBM_Temporal_Param<float>::p_R)
       .def_readwrite("Nt_min", &SIR_Bernoulli_SBM_Temporal_Param<float>::Nt_min)
@@ -81,6 +108,7 @@ PYBIND11_MODULE(SBM_Binder, m) {
       .def("simulate_groups", &Network_t::simulate_groups);
 
   m.def("create_SIR_Bernoulli_SBM", &create_SIR_Bernoulli_SBM);
+  m.def("create_SIR_Bernoulli_SBMs", &create_SIR_Bernoulli_SBMs);
 }
 
 // int main() {

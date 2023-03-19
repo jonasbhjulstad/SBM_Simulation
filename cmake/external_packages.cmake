@@ -27,6 +27,8 @@ CPMFindPackage(
     GIT_TAG master
 )
 
+find_package(TBB REQUIRED)
+
 CPMFindPackage(
     NAME Eigen3
     GITHUB_REPOSITORY libigl/eigen

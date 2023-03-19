@@ -7,6 +7,8 @@ enum SIR_Individual_State: int { SIR_INDIVIDUAL_S = 0, SIR_INDIVIDUAL_I = 1, SIR
 struct SIR_Edge {};
 
 template <typename dType = float> struct SIR_Bernoulli_Temporal_Param {
+  SIR_Bernoulli_Temporal_Param(){}
+  SIR_Bernoulli_Temporal_Param(const std::vector<dType>& p_Is, const dType p_R){}
   dType p_I = 0.05;
   dType p_R = 0.01;
   uint32_t Nt_min = std::numeric_limits<uint32_t>::max();
