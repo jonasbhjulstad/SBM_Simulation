@@ -87,10 +87,24 @@ namespace Sycl_Graph
         {
             static_cast<Derived *>(this)->add(to, from, data);
         }
+
+
         void add(const std::vector<uI_t> &to, const std::vector<uI_t> &from)
         {
             std::vector<E> data(to.size());
             static_cast<Derived *>(this)->add(to, from, data);
+        }
+        void add(const std::vector<std::pair<uI_t, uI_t>>& ids)
+        {
+            //separate
+            std::vector<uI_t> to(ids.size());
+            std::vector<uI_t> from(ids.size());
+            for (size_t i = 0; i < ids.size(); ++i)
+            {
+                to[i] = ids[i].first;
+                from[i] = ids[i].second;
+            }
+            add(to, from);
         }
 
         std::vector<Edge<E *, uI_t>> get_edges()

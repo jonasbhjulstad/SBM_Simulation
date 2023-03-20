@@ -193,7 +193,7 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
   }
 
 
-  size_t byte_size() { return data_buf.byte_size() + id_buf.byte_size(); }
+  size_t byte_size() const { return data_buf.byte_size() + id_buf.byte_size(); }
 };
 
 

@@ -20,6 +20,7 @@ CPMFindPackage(
     OPTIONS
     "cppitertools_INSTALL_CMAKE_DIR share"
 )
+find_package(TBB REQUIRED)
 include(FindThreads)
 CPMFindPackage(
     NAME Tracy

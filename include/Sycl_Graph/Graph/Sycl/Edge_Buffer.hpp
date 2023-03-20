@@ -97,6 +97,18 @@ template <typename E, std::unsigned_integral uI_t> struct Edge_Buffer: public Ed
     N_edges += to.size();
   }
 
+  void add(const std::vector<std::pair<uI_t, uI_t>>& ids)
+  {
+    std::vector<uI_t> to(ids.size());
+    std::vector<uI_t> from(ids.size());
+    for (uI_t i = 0; i < ids.size(); ++i)
+    {
+      to[i] = ids[i].first;
+      from[i] = ids[i].second;
+    }
+    add(to, from, std::vector<E>(ids.size(), E{}));
+  }
+
   void add(const sycl::buffer<uI_t, 1> &to, const sycl::buffer<uI_t, 1> &from,
            const sycl::buffer<E, 1> &data, uI_t offset = 0) {
     host_buffer_add(to_buf, to, q, N_edges, offset);
@@ -252,7 +264,7 @@ template <typename E, std::unsigned_integral uI_t> struct Edge_Buffer: public Ed
     });
     index_type = EDGE_INDEXING_ID;
   }
-  size_t byte_size() {
+  size_t byte_size() const {
     return to_buf.size() * sizeof(uI_t) +
            from_buf.size() * sizeof(uI_t) +
            data_buf.size() * sizeof(E);

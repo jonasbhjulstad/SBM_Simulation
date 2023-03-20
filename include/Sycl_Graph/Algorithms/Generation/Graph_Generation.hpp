@@ -62,22 +62,19 @@ template <Graph_type Graph, std::floating_point dType = float> struct SBM_pack {
   Graph G1;
 };
 
-template <Graph_type Graph, typename RNG, std::floating_point dType = float,
+template <typename RNG, std::floating_point dType = float,
           std::unsigned_integral uI_t = uint32_t>
 std::vector<std::pair<uI_t, uI_t>>
-random_connect(Graph &G0, Graph &G1, RNG &rng, dType p,
+random_connect(const std::vector<uI_t>& ids_0, const std::vector<uI_t>& ids_1, RNG &rng, dType p,
                bool directed = false) {
   Static_RNG::bernoulli_distribution<dType> d(p);
-  typedef typename Graph::Edge_t Edge_t;
   uint32_t N_edges = 0;
-  std::vector<uI_t> G0_ids = G0.vertex_buf.get_valid_ids();
-  std::vector<uI_t> G1_ids = G1.vertex_buf.get_valid_ids();
 
 
   std::vector<std::pair<uI_t, uI_t>> edge_ids;
-  uint32_t N_expected_edges = G0.N_vertices() * G1.N_vertices() * p;
+  uint32_t N_expected_edges = ids_0.size()*ids_1.size() * p;
   edge_ids.reserve(N_expected_edges);
-  for (auto &&[id_0, id_1] : iter::product(G0_ids, G1_ids)) {
+  for (auto &&[id_0, id_1] : iter::product(ids_0, ids_1)) {
     if (d(rng)) {
       edge_ids.push_back(std::make_pair(id_0, id_1));
     }
@@ -85,91 +82,47 @@ random_connect(Graph &G0, Graph &G1, RNG &rng, dType p,
 
   return edge_ids;
 }
-template <Graph_type Graph, typename RNG, std::floating_point dType = float,
+typedef std::vector<std::vector<std::pair<uint32_t, uint32_t>>> G_ID_Pairs_t;
+
+template <typename RNG, std::floating_point dType = float,
           std::unsigned_integral uI_t = uint32_t>
-std::pair<Graph, std::vector<std::vector<std::pair<uI_t, uI_t>>>>
-random_connect(std::vector<Graph> &Gs,
+G_ID_Pairs_t
+random_connect(const std::vector<std::vector<uI_t>>& ids, std::vector<RNG> &rng,
+               const std::vector<std::vector<dType>> &ps, bool directed = false) {
+  std::vector<std::pair<std::vector<uI_t>, std::vector<uI_t>>> v_id_pairs;
+  for(auto&& prod : iter::product(ids, ids)) {
+   v_id_pairs.push_back(std::make_pair(std::get<0>(prod), std::get<1>(prod)));
+  }
+  std::vector<dType> ps_flat;
+  for(auto&& p : ps) {
+    ps_flat.insert(ps_flat.end(), p.begin(), p.end());
+  }
+  G_ID_Pairs_t edge_ids(ps_flat.size());
+
+  #pragma omp parallel for
+  for (int i = 0; i < v_id_pairs.size(); i++) {
+    edge_ids[i] = random_connect(v_id_pairs[i].first, v_id_pairs[i].second, rng[i], ps_flat[i], directed);
+  }
+  return edge_ids;
+}
+
+template <typename RNG, std::floating_point dType = float>
+G_ID_Pairs_t
+random_connect(const std::vector<uint32_t>& N_pops,
                const std::vector<std::vector<dType>> &ps, std::vector<RNG> &rng,
                bool directed = false) {
 
-  auto Np = ps.size(); 
-  std::vector<std::vector<std::pair<Graph*, Graph*>>> G_combs;
-  G_combs.resize(Np);
-  //resize each vector to G.size
-  for (auto &&G : G_combs) {
-    G.resize(Np);
-  }
-  for (auto comb : iter::product(Sycl_Graph::range(0, G_combs.size()), Sycl_Graph::range(0, G_combs.size()))) {
-    auto idx_0 = std::get<0>(comb);
-    auto idx_1 = std::get<1>(comb);
-    G_combs[idx_0][idx_1] = std::make_pair(&Gs[idx_0], &Gs[idx_1]);
-  }
-  // for (int i = 0; i < G_combs.size(); i++) {
-  //   G_combs[i][i] = std::make_pair(&Gs[i], &Gs[i]);
-  // }
+  typedef std::vector<uint32_t> ID_vec;
+  std::vector<std::vector<uint32_t>> ids(N_pops.size());
+  std::transform(N_pops.begin(), N_pops.end(), ids.begin(),
+  [id_offset = 0](auto &&N_pop) mutable {
+    std::vector<uint32_t> id(N_pop);
+    std::iota(id.begin(), id.end(), id_offset);
+    id_offset += N_pop;
+    return id;
+  });
 
-  //flatten G_combs
-  std::vector<std::pair<Graph*, Graph*>> G_combs_flat;
-  for (auto &&G : G_combs) {
-    G_combs_flat.insert(G_combs_flat.end(), G.begin(), G.end());
-  }
-
-  // flatten ps
-  std::vector<dType> ps_flat;
-  for (auto &&p : ps) {
-    ps_flat.insert(ps_flat.end(), p.begin(), p.end());
-  }
-
-  size_t N_G_packs = 0;
-  std::vector<std::vector<std::pair<uI_t, uI_t>>> edge_ids;
-  for (int i = 0; i < G_combs_flat.size(); i++)
-  {
-    edge_ids.push_back(random_connect(*(G_combs_flat[i].first), *(G_combs_flat[i].second), rng[i], ps_flat[i], directed));
-  }
-  // uI_t N_G_pack = std::distance(G_pack.begin(), G_pack.end());
-
-  // std::vector<std::vector<std::pair<uI_t, uI_t>>> edge_ids(N_G_pack);
-  // std::transform(std::execution::par_unseq, G_pack.begin(), G_pack.end(),
-  //                edge_ids.begin(), [&](auto &&pack) {
-  //                  return random_connect(std::get<0>(pack).first, std::get<0>(pack).second, std::get<1>(pack),
-  //                                        std::get<2>(pack), directed);
-  //                });
-
-  std::vector<uI_t> from;
-  std::vector<uI_t> to;
-  // get total size of edge_ids
-  uI_t N_new_edges = std::accumulate(
-      edge_ids.begin(), edge_ids.end(), 0,
-      [](auto &&acc, auto &&edge_id) { return acc + edge_id.size(); });
-  from.reserve(N_new_edges);
-  to.reserve(N_new_edges);
-
-  for (auto &&edge_id : edge_ids) {
-    for (auto &&edge : edge_id) {
-      from.push_back(edge.first);
-      to.push_back(edge.second);
-    }
-  }
-
-  // get total number of vertices
-  uI_t N_cluster_vertices =
-      std::accumulate(Gs.begin(), Gs.end(), 0, [](auto &&acc, auto &&G) {
-        return acc + G.N_vertices();
-      });
-  // get total number of edges
-  uI_t N_cluster_edges = std::accumulate(
-      edge_ids.begin(), edge_ids.end(), 0,
-      [](auto &&acc, auto &&edge_id) { return acc + edge_id.size(); });
-  uI_t N_edges = N_cluster_edges + N_new_edges;
-
-  Graph G_res(Gs[0].q, 0, 0);
-  for (int i = 0; i < Gs.size(); i++)
-  {
-    G_res += Gs[i];
-  }
-
-  G_res.add_edge(from, to);
-  return std::make_pair(G_res, edge_ids);
+  return random_connect(ids, rng, ps, directed);
 }
 
 template <Graph_type Graph, typename RNG, std::floating_point dType = float,
@@ -218,35 +171,26 @@ Graph generate_erdos_renyi(sycl::queue &q, typename Graph::uI_t NV, dType p_ER,
   return G;
 }
 
-template <Graph_type Graph, typename RNG = Static_RNG::default_rng,
-          std::floating_point dType = float,
-          std::unsigned_integral uI_t = uint32_t>
-auto generate_SBM(sycl::queue &q, const std::vector<uI_t> NVs,
+template <typename RNG = Static_RNG::default_rng,
+          std::floating_point dType = float>
+auto generate_SBM(const std::vector<uint32_t> N_pops,
                   const std::vector<std::vector<dType>> &ps,
-                  bool directed = false, std::vector<uI_t> seeds = {}) {
-  std::vector<Graph> Gs;
-  // initialize vector of graphs
-  uI_t id_offset = 0;
-  for (int i = 0; i < NVs.size(); i++) {
-    auto NE = 2 * Sycl_Graph::n_choose_k(NVs[i], 2);
-    Gs.push_back(Graph(q, 0, 0));
-    Gs[i].vertex_buf.add(Sycl_Graph::range(id_offset, id_offset + NVs[i]));
-    id_offset += NVs[i];
-  }
+                  bool directed = false, std::vector<uint32_t> seeds = {}) {
 
   if (seeds.size() == 0) {
-    for (int i = 0; i < NVs.size(); i++) {
+    for (int i = 0; i < N_pops.size(); i++) {
       seeds.push_back(std::random_device()());
     }
   }
   std::vector<RNG> rngs;
   // initialize vector of rngs
-  for (int i = 0; i < NVs.size() * NVs.size(); i++) {
+  for (int i = 0; i < N_pops.size() * N_pops.size(); i++) {
     rngs.push_back(RNG(seeds[i]));
   }
 
-  return random_connect(Gs, ps, rngs, directed);
+  return random_connect(N_pops, ps, rngs, directed);
 }
+
 
 } // namespace Sycl_Graph::Dynamic::Network_Models
 #endif

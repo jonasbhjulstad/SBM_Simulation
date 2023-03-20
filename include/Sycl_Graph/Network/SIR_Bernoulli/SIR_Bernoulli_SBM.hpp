@@ -43,12 +43,12 @@ namespace Sycl_Graph
 
             std::vector<std::vector<std::pair<uint32_t, uint32_t>>> SBM_ids;
 
-            SIR_Bernoulli_SBM_Network(): seed_buf(sycl::range<1>(0)) {}
+            // SIR_Bernoulli_SBM_Network(): p_R0(0), p_I0(0),seed_buf(sycl::range<1>(0)), G(q, 0, 0) {}
 
             SIR_Bernoulli_SBM_Network(const Graph_t &G, float p_I0, float p_R0, auto& SBM_ids, int seed = 777)
                 : q(G.q), G(G), p_I0(p_I0), p_R0(p_R0), seed_buf(sycl::range<1>(G.N_vertices())), SBM_ids(SBM_ids)
             {
-                assert(G.N_vertices() > 0);
+                assert(G.N_vertices() > 0 && "Graph must have at least one vertex");
                 // generate G.N_vertices() random numbers
                 // create rng
                 std::mt19937 rng(seed);
@@ -384,6 +384,7 @@ namespace Sycl_Graph
             }
             return std::make_pair(trajectory, group_trajectory);
         }
+        auto byte_size() const { return G.byte_size(); }
 
         private:
             Graph_t G;

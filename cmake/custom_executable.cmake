@@ -1,6 +1,6 @@
 function(add_custom_executable source_file)
     add_executable(${source_file} "${source_file}.cpp")
-    target_link_libraries(${source_file} PUBLIC Sycl_Graph Static_RNG Tracy::TracyClient)
+    target_link_libraries(${source_file} PUBLIC Sycl_Graph Static_RNG Tracy::TracyClient TBB::tbb)
     target_compile_options(${source_file} PUBLIC ${SYCL_COMPILE_OPTIONS})
     target_compile_options(${source_file} PUBLIC ${DEFAULT_WARNING_FLAGS})
     target_compile_options(${source_file} PRIVATE ${DPCPP_FLAGS} -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda)

@@ -137,6 +137,10 @@ namespace Sycl_Graph::Sycl
     {
       return edge_buf.template get_access<mode>(h);
     }
+    auto byte_size() const 
+    {
+      return vertex_buf.byte_size() + edge_buf.byte_size();
+    }
   };
 } // namespace Sycl_Graph::Sycl
 
