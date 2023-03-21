@@ -23,6 +23,8 @@ find_package(ZLIB REQUIRED)
 find_package(fmt REQUIRED)
 find_package(re2 REQUIRED)
 find_package(absl CONFIG REQUIRED)
+
+# pkg_check_modules(ortools REQUIRED IMPORTED_TARGET ortools)
 find_package(ortools CONFIG REQUIRED)
 # target_link_libraries(ortools PUBLIC )
 get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
