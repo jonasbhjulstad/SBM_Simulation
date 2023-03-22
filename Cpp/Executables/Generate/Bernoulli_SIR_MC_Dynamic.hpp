@@ -23,7 +23,7 @@ namespace FROLS
         dType R0_min = 0.0f;
         dType alpha = 0.1f;
         dType p_I = 0.f;
-        uint32_t N_sim = 1000;
+        uint32_t N_sim = 400;
         uint32_t Nt_min = 15;
         dType p_R = 0.1f;
         uint32_t seed;

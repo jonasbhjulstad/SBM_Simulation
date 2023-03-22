@@ -47,7 +47,6 @@ PYBIND11_MODULE(pyFROLS, m) {
 
   py::class_<Polynomial_Model, Feature_Model>(m, "Polynomial_Model")
       .def(py::init<uint32_t, uint32_t, uint32_t, uint32_t>())
-
       // .def("get_features", &Polynomial_Model::get_features)
       .def("write_csv", &Polynomial_Model::write_csv)
       .def("feature_summary", &Polynomial_Model::feature_summary)

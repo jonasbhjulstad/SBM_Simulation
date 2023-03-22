@@ -8,16 +8,13 @@
 namespace FROLS::Features {
 
     struct Polynomial_Model : public Feature_Model {
-        const uint32_t d_max;
+        const uint32_t d_max = 2;
         const uint32_t Nx;
         const uint32_t Nu;
 
         Polynomial_Model(uint32_t Nx, uint32_t Nu, uint32_t d_max, uint32_t N_output_features = 20)
                 : d_max(d_max), Nx(Nx), Nu(Nu) ,Feature_Model(N_output_features)
                 {
-                    if (this->N_output_features > get_N_features_max()) {
-                        this->N_output_features = get_N_features_max();
-                    }
 
                 }
 

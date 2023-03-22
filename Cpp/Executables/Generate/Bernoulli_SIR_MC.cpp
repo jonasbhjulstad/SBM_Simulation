@@ -11,7 +11,7 @@
 
 
 constexpr float p_I0 = 1.0;
-constexpr uint32_t N_pop =200;
+constexpr uint32_t N_pop =100;
 constexpr float p_ER = 1.00;
 constexpr uint32_t Nt = 50;
 constexpr uint32_t NV = N_pop;

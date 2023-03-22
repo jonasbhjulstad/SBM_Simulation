@@ -156,6 +156,8 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     std::vector<std::vector<Vec>> Y_sep(3);
     std::vector<std::vector<Feature>> qr_features(3);
     qr_invoked = true;
+    // auto qr_features = qr_regressors[0].transform_fit(X_list, U_list, Y_list, qr_model);
+    
     for (int i = 0; i < Y_sep.size();i++)
     {
         Y_sep[i].reserve(N_sims);
@@ -220,8 +222,8 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 int main(int argc, char **argv)
 {
     // auto N_pop_vec = FROLS::arange((uint32_t)10, (uint32_t)100, (uint32_t)10);
-    std::vector<float> N_pop_vec = {20};
-    std::vector<float> p_ER_vec = {0.1, 0.5,1.0};
+    std::vector<float> N_pop_vec = {100};
+    std::vector<float> p_ER_vec = {1.0};
     std::reverse(N_pop_vec.begin(), N_pop_vec.end());
     std::reverse(p_ER_vec.begin(), p_ER_vec.end());
     for (const float &p_ER : p_ER_vec)

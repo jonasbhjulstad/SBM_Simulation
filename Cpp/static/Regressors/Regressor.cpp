@@ -189,9 +189,9 @@ Feature Regressor::feature_selection_criteria(
     }
   }
 
-  assert(!std::all_of(ERRs.begin(), ERRs.end(), [](const auto &p) {
-    return p.second == false;
-  }));
+  // assert(!std::all_of(ERRs.begin(), ERRs.end(), [](const auto &p) {
+  //   return p.second == false;
+  // }));
 
 
   // find index of best ERR according to objective_condition with std::

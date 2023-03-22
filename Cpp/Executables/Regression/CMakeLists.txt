@@ -13,6 +13,7 @@ endfunction()
 # add_regression(Linear_System_Stochastic)
 # add_regression(Quantile_ERR_Response)
 add_regression(Bernoulli_MC_Regression)
+add_regression(SIR_Sine_Regression)
 
 
 
