@@ -1,0 +1,2 @@
+#!/bin/bash
+source "/opt/intel/oneapi/vtune/latest/env/vars.sh" && vtune-gui --project-path "/opt/intel/oneapi/vtune/latest/bin64/vtune" --app-path "/home/man/Documents/Sycl_Graph_Old/build/Executables/Simulations/planted_SIR_Simulation"
