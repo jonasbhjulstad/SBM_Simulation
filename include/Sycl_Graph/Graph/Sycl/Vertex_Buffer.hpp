@@ -26,7 +26,6 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
   sycl::queue &q;
   const uI_t NV;
 
-
   Vertex_Buffer(sycl::queue &q, uI_t NV, const sycl::property_list &props = {}): id_buf(sycl::range<1>(NV), props), data_buf(sycl::range<1>(NV), props), q(q), NV(NV)
   {
     if (NV > 0)
@@ -191,7 +190,6 @@ static constexpr uI_t invalid_id = std::numeric_limits<uI_t>::max();
     N_vertices += other.N_vertices;
     return *this;
   }
-
 
   size_t byte_size() const { return data_buf.byte_size() + id_buf.byte_size(); }
 };

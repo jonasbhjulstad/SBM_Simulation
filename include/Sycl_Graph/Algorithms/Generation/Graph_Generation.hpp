@@ -82,6 +82,8 @@ random_connect(const std::vector<uI_t>& ids_0, const std::vector<uI_t>& ids_1, R
 
   return edge_ids;
 }
+
+
 typedef std::vector<std::vector<std::pair<uint32_t, uint32_t>>> G_ID_Pairs_t;
 
 template <typename RNG, std::floating_point dType = float,
@@ -90,6 +92,7 @@ G_ID_Pairs_t
 random_connect(const std::vector<std::vector<uI_t>>& ids, std::vector<RNG> &rng,
                const std::vector<std::vector<dType>> &ps, bool directed = false) {
   std::vector<std::pair<std::vector<uI_t>, std::vector<uI_t>>> v_id_pairs;
+  v_id_pairs.reserve(ids.size() * ids.size());
   for(auto&& prod : iter::product(ids, ids)) {
    v_id_pairs.push_back(std::make_pair(std::get<0>(prod), std::get<1>(prod)));
   }
@@ -105,6 +108,8 @@ random_connect(const std::vector<std::vector<uI_t>>& ids, std::vector<RNG> &rng,
   }
   return edge_ids;
 }
+
+
 
 template <typename RNG, std::floating_point dType = float>
 G_ID_Pairs_t
@@ -129,7 +134,7 @@ template <Graph_type Graph, typename RNG, std::floating_point dType = float,
           std::unsigned_integral uI_t = uint32_t>
 void random_connect(Graph &G, const std::vector<uI_t> &from_IDs,
                     const std::vector<uI_t> &to_IDs, dType p_ER,
-                    RNG rng = std::mt19937(std::random_device()())) {
+                    RNG rng = Static_RNG::default_rng(std::random_device()())) {
   Static_RNG::uniform_real_distribution d_ER;
   uint32_t N_edges = 0;
   std::vector<typename Graph::uInt_t> from;
@@ -186,6 +191,27 @@ auto generate_SBM(const std::vector<uint32_t> N_pops,
   // initialize vector of rngs
   for (int i = 0; i < N_pops.size() * N_pops.size(); i++) {
     rngs.push_back(RNG(seeds[i]));
+  }
+
+  return random_connect(N_pops, ps, rngs, directed);
+}
+
+G_ID_Pairs_t generate_planted_partition(uint32_t N_pop, uint32_t N_clusters, float p_in, float p_out, bool directed) {
+  std::vector<uint32_t> N_pops(N_clusters, N_pop);
+  std::vector<std::vector<float>> ps(N_clusters, std::vector<float>(N_clusters, p_out));
+  for (int i = 0; i < N_clusters; i++) {
+    ps[i][i] = p_in;
+  }
+  uint32_t seed = std::random_device()();
+  //create rngs
+  std::vector<uint32_t> seeds;
+  std::random_device rd;
+  for (int i = 0; i < N_clusters*N_clusters; i++) {
+    seeds.push_back(rd());
+  }
+  std::vector<Static_RNG::default_rng> rngs;
+  for (int i = 0; i < N_clusters*N_clusters; i++) {
+    rngs.push_back(Static_RNG::default_rng(seeds[i]));
   }
 
   return random_connect(N_pops, ps, rngs, directed);

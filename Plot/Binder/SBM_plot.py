@@ -1,5 +1,5 @@
 #add binder .so to path
-SBM_Binder_path = "/home/man/Documents/Sycl_Graph_Old/build/Binders"
+SBM_Binder_path = "/home/man/Documents/Old_Sycl_Graph/build/Binders"
 Sycl_path = "/opt/intel/oneapi/compiler/2022.2.0/linux/lib"
 import matplotlib.pyplot as plt
 import sys

@@ -156,8 +156,9 @@ int main() {
   // generate sir_param
   uint32_t Nt = 100;
   // std::vector<SIR_Bernoulli_SBM_Temporal_Param<float>> sir_param(Nt);
-  std::vector<float> p_Is = {0.1,0.01,0.1};
+  std::vector<float> p_Is()
   SIR_Bernoulli_SBM_Temporal_Param<>  sir_param;
+  sir_param.p_Is = p_Is;
   typedef std::vector<SIR_Bernoulli_SBM_Temporal_Param<> > Param_t; 
   Param_t sir_param_vec;
   for (int i = 0; i < Nt; i++)

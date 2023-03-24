@@ -67,7 +67,12 @@ namespace Sycl_Graph
                         }); });
             }
 
-
+            uint32_t N_communities() const
+            {
+                //inverse of n(n−1)/2
+                return (1 + std::sqrt(1 + 8 * SBM_ids.size())) / 2;
+                // return SBM_ids.size();
+            }
             void initialize()
             {
 
@@ -361,6 +366,8 @@ namespace Sycl_Graph
 
         Trajectory_pair_t simulate_groups(const std::vector<SIR_Bernoulli_SBM_Temporal_Param<>> tp)
         {
+
+            assert(tp[0].p_Is.size() == SBM_ids.size() && "Must have one p_I for each SBM_id_group");
             auto Nt = tp.size()-1;
             std::vector<std::vector<uint32_t>> group_trajectory(Nt);
             //resize group_trajectory
@@ -386,8 +393,8 @@ namespace Sycl_Graph
         }
         auto byte_size() const { return G.byte_size(); }
 
-        private:
             Graph_t G;
+        private:
             sycl::queue &q;
         };
     } // namespace Sycl

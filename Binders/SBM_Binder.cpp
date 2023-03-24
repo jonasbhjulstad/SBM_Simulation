@@ -13,7 +13,8 @@
 #include <pybind11/stl_bind.h>
 #include <utility>
 #include <execution>
-using Sycl_Graph::Dynamic::Network_Models::generate_SBM;
+// using Sycl_Graph::Dynamic::Network_Models::generate_SBM;
+using namespace Sycl_Graph::Dynamic::Network_Models;
 using namespace Sycl_Graph::Sycl::Network_Models;
 typedef typename SIR_Bernoulli_SBM_Network::Base_t SBM_Base_t;
 typedef SIR_Bernoulli_SBM_Network Network_t;
@@ -22,7 +23,7 @@ typedef typename Network_t::Graph_t Graph_t;
 
 auto create_SIR_Bernoulli_SBM(const std::vector<uint32_t> N_pop, const std::vector<float> p_SBM, const float p_I0, const float p_R0 = 0.0, bool undirected = true)
 {
-    static sycl::queue q;
+    static sycl::queue q(sycl::gpu_selector_v);
     // create profiling queue
     //reshape vector to vector<vector> of size N_pop
     std::vector<std::vector<float>> p_SBM_reshaped(N_pop.size());
@@ -67,7 +68,7 @@ auto create_SIR_Bernoulli_SBM(const std::vector<uint32_t> N_pop, const std::vect
     
     
     
-    return std::make_pair(G, sir);
+    return sir;
 }
 
 
@@ -90,7 +91,7 @@ std::vector<Network_t> create_SIR_Bernoulli_SBMs(
   for (uint32_t i = 0; i < N_pops_p_SBMs.size(); i++)
   {
     auto [N_pop, p_SBM] = N_pops_p_SBMs[i];
-    auto [G, sir] = create_SIR_Bernoulli_SBM(N_pop, p_SBM, p_I0, p_R0, undirected);
+    auto sir = create_SIR_Bernoulli_SBM(N_pop, p_SBM, p_I0, p_R0, undirected);
     networks[i].push_back(sir);
   }
 
@@ -191,6 +192,8 @@ void simulate_N_parallel_to_file(std::vector<Network_t>& networks, const std::ve
     networks_list[i] = networks;
   }
   
+  std::cout << "Networks copied, running " << tp_list.size() << " simulations" << std::endl;
+
   //print total byte size
   uint32_t total_size = 0;
   for (uint32_t i = 0; i < networks_list.size(); i++)
@@ -243,6 +246,34 @@ void simulate_N_parallel_to_file(std::vector<Network_t>& networks, const std::ve
 }
 
 
+auto create_SIR_Bernoulli_planted(uint32_t N_pop, uint32_t N, float p_in, float p_out, float p_I0, float p_R0 = 0.0, bool undirected = true)
+{
+  static sycl::queue q(sycl::gpu_selector_v);
+  std::vector<float> p_SBM(N * N);
+  for (uint32_t i = 0; i < N; i++)
+  {
+    for (uint32_t j = 0; j < N; j++)
+    {
+      if (i == j)
+      {
+        p_SBM[i * N + j] = p_in;
+      }
+      else
+      {
+        p_SBM[i * N + j] = p_out;
+      }
+    }
+  }
+
+  //vector<vector< N_pop
+
+
+  return create_SIR_Bernoulli_SBM(std::vector(N, N_pop), p_SBM, p_I0, p_R0, undirected);
+}
+
+
+
+
 PYBIND11_MODULE(SBM_Binder, m) {
   typedef typename Network_t::Trajectory_t Traj_t;
   typedef typename Network_t::Trajectory_pair_t TrajPair_t;
@@ -256,32 +287,15 @@ PYBIND11_MODULE(SBM_Binder, m) {
       .def_readwrite("NI_min",
                      &SIR_Bernoulli_SBM_Temporal_Param<float>::N_I_min);
 
-  // .def("add_vertex", &Graph_t::add_vertex)
-  // .def("add_edge", &Graph_t::add_edge)
-  // .def("remove_vertex", &Graph_t::remove_vertex)
-  // .def("remove_edge", &Graph_t::remove_edge)
-  // .def("assign_vertex", &Graph_t::assign_vertex)
-  // .def("assign_edge", &Graph_t::assign_edge)
-  // .def("get_vertex", &Graph_t::get_vertex)
-  // .def("get_edge", &Graph_t::get_edge)
-  // .def("get_vertex_data", &Graph_t::get_vertex_data)
-  // .def("get_edge_data", &Graph_t::get_edge_data)
-  // .def("get_vertex_ids", &Graph_t::get_vertex_ids)
-  // .def("resize", &Graph_t::resize);
-
   pybind11::class_<SBM_Base_t>(m, "SIR_SBM_Network_Base")
       .def("simulate",
            static_cast<Traj_t (SBM_Base_t::*)(
                std::vector<SIR_Bernoulli_SBM_Temporal_Param<>>)>(
                &SBM_Base_t::simulate));
 
-  // pybind11::class_<Graph_t>(m, "SBM_Graph")
-  //     .def("byte_size", &Graph_t::byte_size);
-
   // define class
   pybind11::class_<SIR_Bernoulli_SBM_Network, SBM_Base_t>(m, "SBM")
       .def("initialize", &SIR_Bernoulli_SBM_Network::initialize)
-      // .def("simulate_groups", &SIR_Bernoulli_SBM_Network::simulate_groups);
       .def("simulate_groups", &Network_t::simulate_groups)
       .def_readwrite("SBM_ids", &SIR_Bernoulli_SBM_Network::SBM_ids)
       .def("byte_size", &SIR_Bernoulli_SBM_Network::byte_size);
@@ -293,4 +307,8 @@ PYBIND11_MODULE(SBM_Binder, m) {
   m.def("simulate_N_parallel", &simulate_N_parallel);
   m.def("simulate_N_parallel_copied", &simulate_N_parallel_copied);
   m.def("simulate_N_parallel_to_file", &simulate_N_parallel_to_file);
+
+
+  m.def("generate_planted_partition", &Sycl_Graph::Dynamic::Network_Models::generate_planted_partition);
+  m.def("create_SIR_Bernoulli_planted", &create_SIR_Bernoulli_planted);
 }
