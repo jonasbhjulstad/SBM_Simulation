@@ -1,4 +1,0 @@
-add_custom_executable(SIR_Metapopulation_Simulation)
-add_custom_executable(SBM_SIR_Simulation)
-add_custom_executable(planted_SIR_Simulation)
-add_custom_executable(SIR_Simulation)

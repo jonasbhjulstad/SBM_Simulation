@@ -11,7 +11,6 @@ CPMFindPackage(
 )
 
 
-
 set(cppitertools_INSTALL_CMAKE_DIR share)
 CPMFindPackage(
     NAME cppitertools
@@ -45,6 +44,3 @@ CPMFindPackage(
 
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
 
-
-#boost graph library
-find_package(Boost REQUIRED COMPONENTS graph)

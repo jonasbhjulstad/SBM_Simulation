@@ -63,8 +63,6 @@ auto create_SIR_Bernoulli_SBM(const std::vector<uint32_t> N_pop, const std::vect
 
     //create network
     Network_t sir(G, p_I0, p_R0, edge_ids_SBM);
-
-    
     
     
     

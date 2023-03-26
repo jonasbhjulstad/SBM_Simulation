@@ -1,2 +1,1 @@
-add_subdirectory(Simulations)
-add_subdirectory(Dataset_Graph_Generation)
+add_custom_executable(planted_SIR_Simulation)
