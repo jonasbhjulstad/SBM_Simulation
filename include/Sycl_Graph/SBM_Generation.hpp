@@ -47,15 +47,18 @@ namespace Sycl_Graph::SBM
     return edge_list;
   }
 
-  auto n_choose_k(uint32_t n, uint32_t k)
+  long long n_choose_k(int n, int k)
   {
-    return std::tgamma(n + 1) / (std::tgamma(k + 1) * std::tgamma(n - k + 1));
+    long long product = 1;
+    for (int i = 1; i <= k; i++)
+      product = product * (n - k + i) / i; // Must do mul before div
+    return product;
   }
 
   auto random_connect(const std::vector<Nodelist_t> &nodelists,
-                 const std::vector<float> &p_list, bool self_loop = true,
-                 bool undirected = true, uint32_t N_threads = 4,
-                 uint32_t seed = 47)
+                      float p_in, float p_out, bool self_loop = true,
+                      bool undirected = true, uint32_t N_threads = 4,
+                      uint32_t seed = 47)
   {
     uint32_t N_node_pairs = n_choose_k(nodelists.size(), 2);
     N_node_pairs += self_loop ? nodelists.size() : 0;
@@ -66,16 +69,17 @@ namespace Sycl_Graph::SBM
     std::vector<std::tuple<Nodelist_t, Nodelist_t, float, uint32_t>> node_pairs;
     node_pairs.reserve(N_node_pairs);
     uint32_t n = 0;
+
     for (auto &&comb : iter::combinations(nodelists, 2))
     {
-
-      node_pairs.push_back(std::make_tuple(comb[0], comb[1], p_list[n], seeds[n]));
+      node_pairs.push_back(std::make_tuple(comb[0], comb[1], p_out, seeds[n]));
+      n++;
     }
     if (self_loop)
     {
       for (auto &&nodelist : nodelists)
       {
-        node_pairs.push_back(std::make_tuple(nodelist, nodelist, p_list[n], seeds[n]));
+        node_pairs.push_back(std::make_tuple(nodelist, nodelist, p_in, seeds[n]));
       }
     }
     std::vector<Partition_Edge_List_t> edge_lists(N_node_pairs);
@@ -93,7 +97,6 @@ namespace Sycl_Graph::SBM
     std::transform(nodelists.begin(), nodelists.end(), community_sizes.begin(),
                    [](const auto &nodelist)
                    { return nodelist.size(); });
-                   
 
     std::vector<uint32_t> community_idx(nodelists.size());
     std::iota(community_idx.begin(), community_idx.end(), 0);
@@ -103,7 +106,12 @@ namespace Sycl_Graph::SBM
       connection_targets.push_back(comb[1]);
     }
 
-    if(self_loop)
+    for (auto &&comb : iter::combinations(community_idx, 2))
+    {
+      connection_targets.push_back(comb[0]);
+    }
+
+    if (self_loop)
     {
       for (auto &&idx : community_idx)
       {
@@ -114,10 +122,9 @@ namespace Sycl_Graph::SBM
     return std::make_tuple(nodelists, edge_lists, connection_targets);
   }
 
-
   // create pybind11 module
   auto create_SBM(const std::vector<uint32_t> N_pop,
-                  const std::vector<float> p_SBM, bool undirected = true,
+                  float p_in, float p_out, bool undirected = true,
                   uint32_t N_threads = 4, uint32_t seed = 47)
   {
 
@@ -132,31 +139,15 @@ namespace Sycl_Graph::SBM
     n++;
     return nodelist; });
 
-    return random_connect(nodelists, p_SBM, true, undirected, N_threads, seed);
+    return random_connect(nodelists, p_in, p_out, true, undirected, N_threads, seed);
   }
 
   auto create_planted_SBM(uint32_t N_pop, uint32_t N,
                           float p_in, float p_out, bool undirected = true,
                           uint32_t N_threads = 4, uint32_t seed = 47)
   {
-    std::vector<float> p_SBM(N * N);
-    for (uint32_t i = 0; i < N; i++)
-    {
-      for (uint32_t j = 0; j < N; j++)
-      {
-        if (i == j)
-        {
-          p_SBM[i * N + j] = p_in;
-        }
-        else
-        {
-          p_SBM[i * N + j] = p_out;
-        }
-      }
-    }
-
     std::vector<uint32_t> N_pop_vec(N, N_pop);
-    return create_SBM(N_pop_vec, p_SBM, undirected,
+    return create_SBM(N_pop_vec, p_in, p_out, undirected,
                       N_threads, seed);
   }
 

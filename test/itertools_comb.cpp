@@ -25,7 +25,7 @@ int main() {
     // allows elements to be used repeatedly
     std::cout << "combinations_with_replacement({1, 2}, 4):\n";
     std::vector<int> v2 = {1,2};
-    for (auto&& ns : iter::combinations_with_replacement(v2, 4)) {
+    for (auto&& ns : iter::combinations_with_replacement(v2, 2)) {
         std::cout << "{ ";
         for (auto&& j : ns ) {
             std::cout << j << ' ';

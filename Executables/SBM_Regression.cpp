@@ -9,6 +9,8 @@ using Vec = Eigen::VectorXf;
 using namespace std;
 std::string fpath = Sycl_Graph::SYCL_GRAPH_DATA_DIR + std::string("/SIR_sim/");
 auto inf_filename = [](uint32_t idx){return std::string("community_infs_" + std::to_string(idx) + ".csv");};
+auto connection_inf_filename = [](uint32_t idx){return std::string("connection_infs_" + std::to_string(idx) + ".csv");};
+auto rec_filename = [](uint32_t idx){return std::string("community_recs_" + std::to_string(idx) + ".csv");};
 auto tot_traj_filename = [](uint32_t idx){return std::string("tot_traj_" + std::to_string(idx) + ".csv");};
 static constexpr size_t MAXBUFSIZE=100000;
 
@@ -84,10 +86,21 @@ Vec get_init_state(std::string filename)
 
 int main()
 {
-    uint32_t N_community_connections = 56;
-    uint32_t Nt = 69;
     Vec init_state = get_init_state(fpath + tot_traj_filename(0));
+
     Mat infs = openData(fpath + inf_filename(0));
-    std::cout << infs << std::endl;
+    Mat recs = openData(fpath + rec_filename(0));
+    Mat connection_infs = openData(fpath + connection_inf_filename(0));
+
+    auto N_connections = connection_infs.cols();
+    auto Nt = infs.rows();
+    auto N_communities = recs.cols();
+    std::cout << connection_infs << std::endl;
+
+    
+
+    
+
+
     return 0;
 }
