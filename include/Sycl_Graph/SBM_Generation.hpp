@@ -63,21 +63,19 @@ namespace Sycl_Graph::SBM
     std::vector<uint32_t> seeds(N_threads);
     std::generate(seeds.begin(), seeds.end(), [&rd]()
                   { return rd(); });
-    std::vector<std::tuple<Nodelist_t, Nodelist_t, float, uint32_t>> node_pairs(
-        N_node_pairs);
+    std::vector<std::tuple<Nodelist_t, Nodelist_t, float, uint32_t>> node_pairs;
+    node_pairs.reserve(N_node_pairs);
     uint32_t n = 0;
     for (auto &&comb : iter::combinations(nodelists, 2))
     {
 
-      node_pairs[n] = std::make_tuple(comb[0], comb[1], p_list[n], seeds[n]);
-      n++;
+      node_pairs.push_back(std::make_tuple(comb[0], comb[1], p_list[n], seeds[n]));
     }
     if (self_loop)
     {
       for (auto &&nodelist : nodelists)
       {
-        node_pairs[n] = std::make_tuple(nodelist, nodelist, p_list[n], seeds[n]);
-        n++;
+        node_pairs.push_back(std::make_tuple(nodelist, nodelist, p_list[n], seeds[n]));
       }
     }
     std::vector<Partition_Edge_List_t> edge_lists(N_node_pairs);
@@ -95,8 +93,25 @@ namespace Sycl_Graph::SBM
     std::transform(nodelists.begin(), nodelists.end(), community_sizes.begin(),
                    [](const auto &nodelist)
                    { return nodelist.size(); });
+                   
 
-    return std::make_pair(nodelists, edge_lists);
+    std::vector<uint32_t> community_idx(nodelists.size());
+    std::iota(community_idx.begin(), community_idx.end(), 0);
+    std::vector<uint32_t> connection_targets;
+    for (auto &&comb : iter::combinations(community_idx, 2))
+    {
+      connection_targets.push_back(comb[1]);
+    }
+
+    if(self_loop)
+    {
+      for (auto &&idx : community_idx)
+      {
+        connection_targets.push_back(idx);
+      }
+    }
+
+    return std::make_tuple(nodelists, edge_lists, connection_targets);
   }
 
 
@@ -156,7 +171,7 @@ namespace Sycl_Graph::SBM
     std::generate(seeds.begin(), seeds.end(), [&rd]()
                   { return rd(); });
 
-    std::vector<std::pair<SBM_Node_List_t, SBM_Edge_List_t>> edge_lists(Ng);
+    std::vector<std::tuple<SBM_Node_List_t, SBM_Edge_List_t, std::vector<uint32_t>>> edge_lists(Ng);
     std::transform(std::execution::par_unseq, seeds.begin(), seeds.end(), edge_lists.begin(), [&](auto seed)
                    { return create_planted_SBM(N_pop, N, p_in, p_out, undirected, N_threads, seed); });
 

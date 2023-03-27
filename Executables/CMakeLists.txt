@@ -1,1 +1,3 @@
-add_custom_executable(planted_SIR_Simulation)
+add_sycl_executable(planted_SIR_Simulation)
+
+add_regression_executable(SBM_Regression)
