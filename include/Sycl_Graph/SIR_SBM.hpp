@@ -145,47 +145,30 @@ namespace Sycl_Graph::SBM
   auto create_edge_community_map(
       const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &SBM_ids, uint32_t N_communities)
   {
-    std::vector<uint32_t> group_sizes(SBM_ids.size());
-    std::transform(SBM_ids.begin(), SBM_ids.end(), group_sizes.begin(),
+    std::vector<uint32_t> g0(SBM_ids.size());
+    std::transform(SBM_ids.begin(), SBM_ids.end(), g0.begin(),
                    [](const auto &group)
                    { return group.size(); });
+    std::vector<uint32_t> g1 = g0;
+    g0.insert(g0.end(), g1.begin(), g1.end());
+    assert(g0.size() == 2 * SBM_ids.size());
+    std::vector<uint32_t> ecm_indices(2*SBM_ids.size());
+    std::iota(ecm_indices.begin(), ecm_indices.end(), 0);
+    
+    std::vector<std::vector<uint32_t>> ecm_components(2*SBM_ids.size());
+    std::transform(g0.begin(), g0.end(), ecm_indices.begin(), ecm_components.begin(),
+                   [](const auto &g, const auto &i)
+                   { return std::vector<uint32_t>(g, i); });
 
-    auto N_edges = std::accumulate(group_sizes.begin(), group_sizes.end(), 0);
+    //combine all ecm_components to one vector
     std::vector<uint32_t> edge_community_map;
-    edge_community_map.reserve(N_edges*2);
-
-    auto ecm_part = [&](auto offset, auto idx_offset)
+    for (auto &v : ecm_components)
     {
-    // create a vector with sbm_ids[0].size() 0, sbm_ids[1].size() 1, ...
-    std::vector<std::vector<uint32_t>> group_indices(SBM_ids.size());
-    std::vector<uint32_t> vec;
-    for (int i = 0; i < SBM_ids.size() - idx_offset; i++)
-    {
-      group_indices[i].resize(SBM_ids[i].size());
-      std::fill(group_indices[i].begin(), group_indices[i].end(), i);
-      vec.insert(vec.end(),
-                                group_indices[i].begin(), group_indices[i].end());
+      edge_community_map.insert(edge_community_map.end(), v.begin(), v.end());
     }
-
-    return vec;
-    };
-
-    auto ecm_part_0 = ecm_part(0, 0);
-    auto ecm_part_1 = ecm_part(ecm_part_0.size(), N_communities);
-
-
-    //merge ecm_part_0 and ecm_part_1 to edge_community_map
-    std::merge(ecm_part_0.begin(), ecm_part_0.end(), ecm_part_1.begin(),
-               ecm_part_1.end(), std::back_inserter(edge_community_map));
-
-    // assert that all indices are lower than SBM_ids.size()
-    assert(std::all_of(edge_community_map.begin(), edge_community_map.end(),
-                       [&](const auto &e)
-                       { return e < 2*SBM_ids.size(); }));
-
-
-
     return edge_community_map;
+    
+
   }
 
   bool is_susceptible_infected_edge(auto &v_acc, const uint32_t e0_to,
@@ -255,7 +238,6 @@ namespace Sycl_Graph::SBM
 
     sycl::buffer<float, 1> p_I_buf((sycl::range<1>(p_I.size())));
     auto p_I_copy_event = copy_to_buffer(p_I_buf, p_I, q);
-
     auto event_spread = q.submit([&](sycl::handler &h)
                                  {
     h.depends_on({dep_event, p_I_copy_event});
@@ -269,6 +251,8 @@ namespace Sycl_Graph::SBM
     auto p_I_acc = p_I_buf.get_access<sycl::access::mode::read,
                                       sycl::access::target::device>(h);
     auto ecm_acc = ecm_buf.get_access<sycl::access::mode::read,
+                                      sycl::access::target::device>(h);
+    auto vcm_acc = vcm_buf.get_access<sycl::access::mode::read,
                                       sycl::access::target::device>(h);
     auto edge_infs_acc = edge_infs.get_access<sycl::access::mode::read_write,
                                               sycl::access::target::device>(h);
@@ -295,24 +279,28 @@ namespace Sycl_Graph::SBM
       //from direction
       sus_id = get_susceptible_if_infected_from(v_acc, e_acc[id].first, e_acc[id].second);
           if ((sus_id != invalid_id) && d_I(rng)) {
-          inf_event_idx_acc[id[0]] = ecm_acc[id + N_edges];
+          auto& v0 = v_acc[e_acc[id].first];
+          auto& v1 = v_acc[e_acc[id].second];
+          uint32_t ecm_idx = (vcm_acc[v0] == vcm_acc[v1]) ? id : id + N_edges; 
+          inf_event_idx_acc[id] = ecm_acc[ecm_idx];
           edge_infs_acc[id] = true;
           v_acc[sus_id] = SIR_INDIVIDUAL_I;
           return;
         }
 
+
     }); });
 
 
 
-    event_spread.wait();
-    //print inf_event_idx_acc
-    auto inf_event_idx_acc = inf_event_idx_buf.get_access<sycl::access::mode::read>();
-    for (int i = 0; i < N_edges; i++)
-    {
-      if (inf_event_idx_acc[i] != std::numeric_limits<uint32_t>::max())
-        std::cout << "inf_event_idx_acc[" << i << "] = " << inf_event_idx_acc[i] << std::endl;
-    }
+    // event_spread.wait();
+    // //print inf_event_idx_acc
+    // auto inf_event_idx_acc = inf_event_idx_buf.get_access<sycl::access::mode::read>();
+    // for (int i = 0; i < N_edges; i++)
+    // {
+    //   if (inf_event_idx_acc[i] != std::numeric_limits<uint32_t>::max())
+    //     std::cout << "inf_event_idx_acc[" << i << "] = " << inf_event_idx_acc[i] << std::endl;
+    // }
     return std::make_tuple(inf_event_idx_buf, edge_infs, event_spread);
   }
 
@@ -370,34 +358,36 @@ namespace Sycl_Graph::SBM
     return std::make_tuple(community_infections, event);
   }
 
-  std::vector<uint32_t> sample_connection_infections(sycl::buffer<uint32_t, 1> &infection_events, std::vector<uint32_t>& community_infections, const std::vector<uint32_t> &ctm, uint32_t seed)
+  std::vector<uint32_t> sample_connection_infections(sycl::buffer<uint32_t, 1> &infection_events, std::vector<uint32_t>& community_infections, const std::vector<uint32_t>& ctm, uint32_t seed)
   {
     const uint32_t N_connections = infection_events.size();
     const uint32_t N_communities = community_infections.size();
     auto infection_events_acc = infection_events.template get_access<sycl::access::mode::read>();
-    std::vector<uint32_t> weights(N_connections);
 
-    for (int i = 0; i < N_connections; i++)
-    {
-        weights[i] = infection_events_acc[i];
-    }
+
 
     std::mt19937 rng(seed);
-    std::discrete_distribution<uint32_t> d(weights.begin(), weights.end());
-
     std::vector<uint32_t> connection_infections(N_connections, 0);
-    uint32_t tot_infections = 0;
-    for(int i = 0; i < N_communities; i++)
+    for (int i = 0; i < N_communities; i++)
     {
-      tot_infections += community_infections[i];
-      for(int j = 0; j < community_infections[i]; j++)
-      {
-        uint32_t connection = d(rng);
-        connection_infections[connection]++;
-      }
+        std::vector<uint32_t> weights(N_connections, 0);
+
+        for(int j = 0; j < N_connections; j++)
+        {
+            if(ctm[j] == i)
+            {
+                weights[j] = infection_events_acc[j];
+            }
+        }
+
+        std::discrete_distribution<uint32_t> d(weights.begin(), weights.end());
+        //sample community_infections[i] from weights
+        for(int j = 0; j < community_infections[i]; j++)
+        {
+            connection_infections[d(rng)]++;
+        }
     }
 
-    assert(tot_infections == std::accumulate(connection_infections.begin(), connection_infections.end(), 0));
 
     return connection_infections;
   }
@@ -565,12 +555,12 @@ namespace Sycl_Graph::SBM
                     sycl::queue &q, unsigned long seed = 42)
   {
     const uint32_t N_vertices = vcm.size();
-    const uint32_t N_edges = ecm.size();
+    const uint32_t N_edges = edges.size();
     const uint32_t N_communities = *std::max_element(vcm.begin(), vcm.end()) + 1;
     const uint32_t N_community_connections = connection_targets.size();
     auto seed_buf = generate_seeds(N_edges, q, seed);
     auto vcm_buf = sycl::buffer<uint32_t, 1>((sycl::range<1>(N_vertices)));
-    auto ecm_buf = sycl::buffer<uint32_t, 1>((sycl::range<1>(N_edges)));
+    auto ecm_buf = sycl::buffer<uint32_t, 1>((sycl::range<1>(2*N_edges)));
     auto ctm = sycl::buffer<uint32_t, 1>(sycl::range<1>(connection_targets.size()));
     copy_to_buffer(vcm_buf, vcm, q);
     copy_to_buffer(ecm_buf, ecm, q);

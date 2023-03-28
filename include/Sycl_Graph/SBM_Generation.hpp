@@ -106,10 +106,6 @@ namespace Sycl_Graph::SBM
       connection_targets.push_back(comb[1]);
     }
 
-    for (auto &&comb : iter::combinations(community_idx, 2))
-    {
-      connection_targets.push_back(comb[0]);
-    }
 
     if (self_loop)
     {
@@ -117,6 +113,10 @@ namespace Sycl_Graph::SBM
       {
         connection_targets.push_back(idx);
       }
+    }
+    for (auto &&comb : iter::combinations(community_idx, 2))
+    {
+      connection_targets.push_back(comb[0]);
     }
 
     return std::make_tuple(nodelists, edge_lists, connection_targets);

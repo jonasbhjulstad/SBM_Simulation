@@ -33,7 +33,7 @@ namespace Sycl_Graph::SBM
 std::vector<uint32_t> iteration_lists_to_community_state(
     const std::vector<uint32_t> &prev_state,
     const std::vector<uint32_t> &connection_infs,
-    const std::vector<uint32_t> &recoveries, const auto &connection_targets) {
+    const std::vector<uint32_t> &recoveries, const auto &connection_targets, const auto& community_infs) {
   // find largest element in connection_targets pairs
 uint32_t N_communities = prev_state.size()/3;
 
@@ -45,7 +45,7 @@ uint32_t N_communities = prev_state.size()/3;
     auto community = connection_targets[i];
     delta_Is[community] += connection_infs[i];
   }
-  std::vector<int> c_state(N_communities);
+  std::vector<int> c_state(3*N_communities);
   std::vector<uint32_t> total_state(3,0);
   for(int i = 0; i < N_communities; i++)
   {
@@ -69,24 +69,27 @@ auto linewrite(std::ofstream &file, const auto &iter) {
   file << "\n";
 }
 
-void iterations_to_file(const auto& inf_events, const auto& community_infs, const auto& community_recs, const std::string &file_path,
+void iterations_to_file(const auto& inf_events, const auto& community_infs, const auto& community_recs, const auto& connection_infs, const std::string &file_path,
                         uint32_t sim_idx) {
 
-  std::ofstream connection_infections_f(file_path + "connection_infs_" +
+  std::ofstream inf_events_f(file_path + "infection_events_" +
                              std::to_string(sim_idx) + ".csv");
   std::ofstream community_infs_f(file_path + "community_infs_" +
                                  std::to_string(sim_idx) + ".csv");
   std::ofstream community_recs_f(file_path + "community_recs_" +
                                  std::to_string(sim_idx) + ".csv");
+  std::ofstream connection_infs_f(file_path + "connection_infs_" +
+                                 std::to_string(sim_idx) + ".csv");
   for(int i = 0; i < inf_events.size(); i++)
   {
-    linewrite(connection_infections_f, inf_events[i]);
+    linewrite(inf_events_f, inf_events[i]);
     linewrite(community_infs_f, community_infs[i]);
     linewrite(community_recs_f, community_recs[i]);
+    linewrite(connection_infs_f, connection_infs[i]);
   }
 }
 
-void write_community_traj(const auto &init_state, const auto& inf_events, const auto& connection_infs, const auto& community_recs, const auto& connection_targets,
+void write_community_traj(const auto &init_state, const auto& inf_events, const auto& connection_infs, const auto& community_recs, const auto& connection_targets, const auto& community_infs,
                           const std::string &file_path, uint32_t sim_idx) {
   std::vector<uint32_t> state;
   //flatten init_state
@@ -100,7 +103,7 @@ void write_community_traj(const auto &init_state, const auto& inf_events, const 
   for(int i = 0; i < inf_events.size(); i++)
   {
     state = iteration_lists_to_community_state(state, connection_infs[i], community_recs[i],
-                                               connection_targets);
+                                               connection_targets, community_infs[i]);
     linewrite(traj_f, state);
   }
 }

@@ -65,8 +65,8 @@ void simulate_to_file(const auto &SBM_node_list, const auto &SBM_edge_list,
   }
   write_tot_traj(init_state, inf_events, connection_infs, community_recs, file_path, sim_idx);
 
-  write_community_traj(init_state, inf_events, connection_infs, community_recs, SBM_connection_targets, file_path, sim_idx);
-  iterations_to_file(inf_events, community_infs, community_recs, file_path, sim_idx);
+  write_community_traj(init_state, inf_events, connection_infs, community_recs, SBM_connection_targets, community_infs, file_path, sim_idx);
+  iterations_to_file(inf_events, community_infs, community_recs, connection_infs, file_path, sim_idx);
 }
 
 auto create_seeds_idx(uint32_t N_sims, uint32_t seed) {
