@@ -1,3 +1,3 @@
 # enable fPIC for custom_binder
 
-# add_custom_binder(SBM_Binder)
+add_custom_binder(SIR_SBM)

@@ -13,5 +13,5 @@ endfunction()
 
 function(add_regression_executable source_file)
     add_executable(${source_file} "${source_file}.cpp")
-    target_link_libraries(${source_file} PUBLIC Sycl_Graph Static_RNG TBB::tbb cppitertools Eigen3::Eigen)
+    target_link_libraries(${source_file} PUBLIC Sycl_Graph Static_RNG TBB::tbb cppitertools Eigen3::Eigen ortools::ortools)
 endfunction()

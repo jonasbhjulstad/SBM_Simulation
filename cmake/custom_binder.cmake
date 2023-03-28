@@ -1,6 +1,6 @@
 function(add_custom_binder source_file)
     pybind11_add_module(${source_file} "${source_file}.cpp")
-    target_link_libraries(${source_file} PUBLIC Sycl_Graph Static_RNG Tracy::TracyClient TBB::tbb)
+    target_link_libraries(${source_file} PUBLIC Sycl_Graph Static_RNG Tracy::TracyClient TBB::tbb Eigen3::Eigen ortools::ortools)
     target_compile_options(${source_file} PUBLIC ${SYCL_COMPILE_OPTIONS})
     target_compile_options(${source_file} PUBLIC ${DEFAULT_WARNING_FLAGS})
     target_compile_options(${source_file} PUBLIC ${DPCPP_FLAGS} -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda -fPIC)
