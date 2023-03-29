@@ -7,8 +7,8 @@
 namespace Sycl_Graph {
 // const char *SYCL_GRAPH_ROOT_DIR = "";
 // const char *SYCL_GRAPH_INCLUDE_DIR = "/home/man/Documents/Sycl_Graph/include";
-    const char *SYCL_GRAPH_DATA_DIR = "/home/man/Documents/Old_Sycl_Graph/data";
-    const char *SYCL_GRAPH_LOG_DIR = "/home/man/Documents/Old_Sycl_Graph/log";
+    const char *SYCL_GRAPH_DATA_DIR = "/home/man/Documents/Sycl_Graph_Old/data";
+    const char *SYCL_GRAPH_LOG_DIR = "/home/man/Documents/Sycl_Graph_Old/log";
     std::string Sim_Datapath = Sycl_Graph::SYCL_GRAPH_DATA_DIR + std::string("/SIR_sim/");
     auto community_infs_filename = [](uint32_t idx){return std::string("community_infs_" + std::to_string(idx) + ".csv");};
     auto connection_infs_filename = [](uint32_t idx){return std::string("connection_infs_" + std::to_string(idx) + ".csv");};

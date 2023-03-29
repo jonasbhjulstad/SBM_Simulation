@@ -19,8 +19,6 @@ namespace Sycl_Graph
             return 0.0f;
         }
 
-        std::cout << x << std::endl;
-        std::cout << y << std::endl;
         if ((y.lpNorm<Eigen::Infinity>() < y_tol) || (x.lpNorm<Eigen::Infinity>() < x_tol))
         {
             float ynorm = y.lpNorm<Eigen::Infinity>();

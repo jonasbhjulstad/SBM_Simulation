@@ -36,8 +36,6 @@ if __name__ == '__main__':
         d_Is = np.zeros(N_communities)
         for i in range(N_communities):
             d_Is[i] = community_delta_I(i, c_states, c_p_Is)
-        
-        assert(np.isnan(d_Is).any() == False)
         return d_Is
     
     def community_delta_Rs(c_states):

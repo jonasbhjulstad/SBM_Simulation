@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 
-Project_root = "/home/man/Documents/Old_Sycl_Graph/"
+Project_root = "/home/man/Documents/Sycl_Graph_Old/"
 Binder_path = Project_root + "/build/Binders"
 Data_dir = Project_root + "/data/SIR_sim/"
 sys.path.append(Binder_path)
@@ -13,10 +13,10 @@ if __name__ == '__main__':
     N_pop = 100
     N_clusters = 10
     p_in = 1.0
-    p_out = 0.0
+    p_out = 1.0
     N_threads = 4
     N_sims = 100
-    seed = 999
+    seed = 675
     Nt = 70
     tau = .5
     Ng = 1
