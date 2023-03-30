@@ -230,9 +230,9 @@ namespace Sycl_Graph::SBM
 
     const uint32_t N_edges = e_buf.size();
     const uint32_t N_vertices = v_buf.size();
-    sycl::buffer<uint32_t, 1> inf_event_idx_buf((sycl::range<1>(N_edges)));
+    sycl::buffer<uint32_t, 1> inf_event_idx_buf((sycl::range<1>(2*N_edges)));
     // initialize to false
-    sycl::buffer<bool, 1> edge_infs((sycl::range<1>(N_edges)));
+    sycl::buffer<bool, 1> edge_infs((sycl::range<1>(2*N_edges)));
 
     sycl::buffer<float, 1> p_I_buf((sycl::range<1>(p_I.size())));
     auto p_I_copy_event = copy_to_buffer(p_I_buf, p_I, q);
@@ -277,11 +277,11 @@ namespace Sycl_Graph::SBM
       //from direction
       sus_id = get_susceptible_if_infected_from(v_acc, e_acc[id].first, e_acc[id].second);
           if ((sus_id != invalid_id) && d_I(rng)) {
-          auto& v0 = v_acc[e_acc[id].first];
-          auto& v1 = v_acc[e_acc[id].second];
+            auto& v0 = e_acc[id].first;
+            auto& v1 = e_acc[id].second;
           uint32_t ecm_idx = (vcm_acc[v0] == vcm_acc[v1]) ? id : id + N_edges; 
-          inf_event_idx_acc[id] = ecm_acc[ecm_idx];
-          edge_infs_acc[id] = true;
+          inf_event_idx_acc[id + N_edges] = ecm_acc[id + N_edges];
+          edge_infs_acc[id + N_edges] = true;
           v_acc[sus_id] = SIR_INDIVIDUAL_I;
           return;
         }

@@ -1,9 +1,11 @@
 from casadi import *
 import sys
 import numpy as np
+import os
+import matplotlib.pyplot as plt
 Project_root = "/home/man/Documents/Sycl_Graph_Old/"
 Binder_path = Project_root + "/build/Binders"
-Data_dir = Project_root + "/data/SIR_sim/"
+Data_dir = Project_root + "/data/SIR_sim/p_out_0/"
 
 sys.path.append(Binder_path)
 sys.path.append('/usr/local/lib')
@@ -16,9 +18,9 @@ def get_avg_init_state(dirpath, N):
         with open(filename, 'r') as f:
             first_line = f.readline()
             if avg_init_state is None:
-                avg_init_state = np.array(first_line.split(",")).astype(np.float)
+                avg_init_state = np.array(first_line.split(",")).astype(float)
             else:
-                avg_init_state += np.array(first_line.split(",")).astype(np.float)
+                avg_init_state += np.array(first_line.split(",")).astype(float)
     return avg_init_state / N
 
 
@@ -40,16 +42,16 @@ def delta_I(state_s, state_r, p_I, theta):
     return p_I*state_s[0]*state_r[1]/(state_s[0] + state_r[1] + state_s[2])*theta
 
 
-def solve_single_shoot(c_targets, c_sources, beta_LS, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max):
+def solve_single_shoot(c_targets, c_sources, beta, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max):
     
     def community_delta_I(community_idx, c_states, c_p_Is):
         d_I = 0
         state_s = c_states[3*community_idx:3*community_idx+3]
         for i, ct in enumerate(c_targets):
             if (ct == community_idx):
-                beta = beta_LS[i]
+                beta_c = beta[i]
                 state_r = c_states[3*int(c_sources[i]):3*int(c_sources[i])+3]
-                d_I += delta_I(state_s, state_r, c_p_Is[i], beta)
+                d_I += delta_I(state_s, state_r, c_p_Is[i], beta_c)
         return d_I
     def community_delta_Rs(c_states):
         return c_states[1::3]*alpha
@@ -118,43 +120,12 @@ def solve_single_shoot(c_targets, c_sources, beta_LS, alpha, N_communities, N_co
 
     solver = nlpsol("solver", "ipopt", {"x":w, "f":f}, ipopt_options)
 
-
     #solve
-    res_community = solver(x0=np.ones(w.shape)*u_min, lbx=u_min*np.ones(w.shape), ubx=u_max*np.ones(w.shape))
-    w_opt = res_community["x"].full()
+    res = solver(x0=np.ones(w.shape)*u_min, lbx=u_min*np.ones(w.shape), ubx=u_max*np.ones(w.shape))
+    obj_val = res['f'][0][0]
+    w_opt = res["x"].full()
     u_opt = f_w_u(w_opt).full()
     traj = f_traj(w_opt).T.full()
-    return u_opt, traj
-
-
-if __name__ == '__main__':
-    dirpath = Data_dir + "Graph_0/"
-    N_sims = 100
-    tau = 0.95
-    Wu = 300
-    u_max = 1e-2
-    u_min = 1e-3
-    # alpha, theta_LS, theta_QR = regression_on_datasets(dirpath, N_sims, tau)
-
-    c_targets, c_sources, beta_LS, beta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt = load_data(dirpath)
-
-
-    
-
-    import matplotlib.pyplot as plt
-    traj = f_traj(w_opt).T.full()
-    fig, ax = plt.subplots(4)
-    for i in range(3):
-        ax[i].plot(traj[:,i::3])
-    ax[3].plot(u_opt)
-    fig.savefig(Data_dir + "/optimal_community_traj.png")
-
-    fig2, ax2 = plt.subplots(3)
-    total_state = np.array([np.sum(traj[:,i::3], axis=1) for i in range(3)]).T
-    for i in range(3):
-        ax2[i].plot(total_state[:,i])
-    fig2.suptitle("Total State, f = " + str(res_community["f"].full()[0][0]))
-    fig2.savefig(Data_dir + "/total_state.png")
 
 
     f_uniform, state_unif = construct_objective(u_uniform)
@@ -166,21 +137,58 @@ if __name__ == '__main__':
     res_uniform = solver_uniform(x0=np.ones(u_unif.shape)*u_min, lbx=u_min*np.ones(u_unif.shape), ubx=u_max*np.ones(u_unif.shape))
 
     u_opt_uniform = res_uniform["x"].full()
-
     traj_uniform = f_traj_uniform(u_opt_uniform).T.full()
-    fig_uniform, ax_uniform = plt.subplots(4)
+
+    obj_val_uniform = res_uniform['f'][0][0]
+    return u_opt, traj, obj_val, u_opt_uniform, traj_uniform, obj_val_uniform
+
+
+def solution_plot(traj, u_opt, obj_val, Data_dir):
+    fig, ax = plt.subplots(4)
     for i in range(3):
-        ax_uniform[i].plot(traj_uniform[:,i::3])
-    ax_uniform[3].plot(u_opt_uniform)
-    fig_uniform.savefig(Data_dir + "/optimal_uniform_traj.png")
+        ax[i].plot(traj[:,i::3])
+    ax[3].plot(u_opt)
+    fig.savefig(Data_dir + "/optimal_community_traj.png")
 
-
-    fig2_uniform, ax2_uniform = plt.subplots(3)
-    total_state_uniform = np.array([np.sum(traj_uniform[:,i::3], axis=1) for i in range(3)]).T
+    fig2, ax2 = plt.subplots(3)
+    total_state = np.array([np.sum(traj[:,i::3], axis=1) for i in range(3)]).T
     for i in range(3):
-        ax2_uniform[i].plot(total_state_uniform[:,i])
+        ax2[i].plot(total_state[:,i])
+    fig2.suptitle("Total State, f = " + str(obj_val))
+    fig2.savefig(Data_dir + "/total_state.png")
 
-    #figtitle res[f]
-    fig2_uniform.suptitle("Total State, f = " + str(res_uniform["f"].full()[0][0]))
+if __name__ == '__main__':
+    dirpath = Data_dir + "Graph_0/"
 
-    fig2_uniform.savefig(Data_dir + "/total_state_uniform.png")
+    N_sims = 100
+    tau = 0.8
+    Wu = 300
+    u_max = 1e-2
+    u_min = 1e-3
+    alpha, theta_LS, theta_QR = regression_on_datasets(dirpath, N_sims, tau, 0)
+    # alpha, theta_LS, theta_QR = regression_on_datasets(dirpath, N_sims, tau)
+
+    c_targets, c_sources, beta_LS, beta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt = load_data(dirpath, N_sims)
+
+
+    u_opt_LS, traj_LS, f_LS, u_opt_LS_uniform, traj_LS_uniform, f_LS_uniform = solve_single_shoot(c_targets, c_sources, beta_LS, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max)
+
+    u_opt_QR, traj_QR, f_QR, u_opt_QR_uniform, traj_QR_uniform, f_QR_uniform = solve_single_shoot(c_targets, c_sources, beta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max)
+
+    if not os.path.exists(Data_dir + "LS/"):
+       os.makedirs(Data_dir + "LS/")
+    if not os.path.exists(Data_dir + "QR/"):
+         os.makedirs(Data_dir + "QR/")
+    #write all to file
+    np.savetxt(Data_dir + "LS/u_opt.csv", u_opt_LS)
+    np.savetxt(Data_dir + "LS/traj.csv", traj_LS)
+    np.savetxt(Data_dir + "LS/u_opt_uniform.csv", u_opt_LS_uniform)
+    np.savetxt(Data_dir + "LS/traj_uniform.csv", traj_LS_uniform)
+    np.savetxt(Data_dir + "QR/u_opt.csv", u_opt_QR)
+    np.savetxt(Data_dir + "QR/traj.csv", traj_QR)
+    np.savetxt(Data_dir + "QR/u_opt_uniform.csv", u_opt_QR_uniform)
+    np.savetxt(Data_dir + "QR/traj_uniform.csv", traj_QR_uniform)
+    
+
+    solution_plot(traj_LS, u_opt_LS, f_LS, Data_dir + "LS/")
+    solution_plot(traj_QR, u_opt_QR, f_QR, Data_dir + "QR/")

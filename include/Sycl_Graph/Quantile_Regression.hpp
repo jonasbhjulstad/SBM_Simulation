@@ -14,10 +14,13 @@ namespace Sycl_Graph
     {
 
         //if all y is 0, return 0
-        if (y.lpNorm<Eigen::Infinity>() == 0)
+        if (y.lpNorm<Eigen::Infinity>() == 0 || x.lpNorm<Eigen::Infinity>() == 0)
         {
             return 0.0f;
         }
+
+        std::cout << "x: " << x.transpose() << std::endl;
+        std::cout << "y: " << y.transpose() << std::endl;
 
         if ((y.lpNorm<Eigen::Infinity>() < y_tol) || (x.lpNorm<Eigen::Infinity>() < x_tol))
         {

@@ -52,6 +52,10 @@ namespace Sycl_Graph
         Mat connection_targets = openData(datapath + connection_targets_filename(idx));
         Mat connection_sources = openData(datapath + connection_sources_filename(idx));
         Mat community_traj = openData(datapath + community_traj_filename(idx));
+
+        assert((connection_infs.array() <= 1000).all());
+        assert((connection_infs.array() >= 0).all());
+        assert((community_traj.array() <= 1000).all());
         auto N_connections = connection_infs.cols();
         auto Nt = community_traj.rows() - 1;
         uint32_t N_communities = community_traj.cols() / 3;
@@ -70,7 +74,7 @@ namespace Sycl_Graph
             // community_traj[:, 3*target_idx:3*target_idx+3]
             Mat target_traj = community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * target_idx, 3));
             Mat source_traj = community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * source_idx, 3));
-
+            
             Vec S_r = source_traj.col(0);
             Vec I_r = source_traj.col(1);
             Vec R_r = source_traj.col(2);

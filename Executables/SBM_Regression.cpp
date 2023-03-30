@@ -93,12 +93,22 @@ std::pair<Mat, Mat> connection_regression(const std::string datapath, uint32_t i
 
         Vec denom = (S_s.array() + I_r.array() + R_s.array()).matrix();
         Vec nom = (S_s.array() * I_r.array()).matrix();
+        std::cout << "denom: " << denom << std::endl;
+        std::cout << "nom: " << nom << std::endl;
         Vec connection_inf = connection_infs.col(i);
         F_beta_rs_mat.col(i) = p_I.array() * nom.array() / denom.array();
+        assert((F_beta_rs_mat.col(i).array() <= 10000).all());
     }
     //not all zero
     assert(F_beta_rs_mat.array().sum() != 0);
     assert(connection_infs.array().sum() != 0);
+    //not any inf
+    assert(!F_beta_rs_mat.array().isInf().any());
+    assert(!connection_infs.array().isInf().any());
+    //not any nan
+    assert(!F_beta_rs_mat.array().isNaN().any());
+    assert(!connection_infs.array().isNaN().any());
+
     return std::make_pair(F_beta_rs_mat, connection_infs);
 }
 
@@ -128,7 +138,6 @@ std::tuple<Mat, Mat, Vec, Vec> load_N_datasets(const std::string& datapath, uint
         connection_infs_tot(Eigen::seqN(row_offset, size.first), Eigen::all) = dataset.second;
         F_beta_rs_mat(Eigen::seqN(row_offset, size.first), Eigen::all) = dataset.first;
         row_offset += size.first;
-
 
         Mat tot_traj = openData(datapath + tot_traj_filename(i));
         uint32_t N_elems = tot_traj.rows()-1;
@@ -187,8 +196,8 @@ void alpha_regression(const Vec& x, const Vec& y, std::string datapath)
 int main()
 {
     float tau = .5f;
-    std::string path = Sim_Datapath + "/Graph_0/";
-    auto [F_beta_rs_mat,connection_infs, x_recovery, y_recovery] = load_N_datasets(path, 10);
+    std::string path = Sim_Datapath + "/p_out_0/Graph_0/";
+    auto [F_beta_rs_mat,connection_infs, x_recovery, y_recovery] = load_N_datasets(path, 20);
     beta_regression(F_beta_rs_mat, connection_infs, tau, path);
     alpha_regression(x_recovery, y_recovery, path);
     return 0;

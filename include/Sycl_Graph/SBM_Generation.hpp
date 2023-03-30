@@ -189,10 +189,10 @@ namespace Sycl_Graph::SBM
 
     uint32_t N_communities_old = G.node_list.size();
 
-    for (int i = 0; i < N_communities_old; i++)
+    for (auto &&comb : iter::combinations(community_idx, 2))
     {
-      auto mapped_target_idx = cmap[i];
-      auto mapped_source_idx = cmap[i];
+      G_new.connection_targets.push_back(comb[1]);
+      G_new.connection_sources.push_back(comb[0]);
     }
     for (int i = 0; i < G_new.node_list.size(); i++)
     {

@@ -58,10 +58,10 @@ int main()
 
   std::vector<uint32_t> cmap(Gs[0].node_list.size(), 0);
   cmap[2] = 1; cmap[4] = 1; cmap[3] = 1; cmap[0] = 1;
-  std::for_each(Gs.begin(), Gs.end(), [&](auto &G)
-                {
-                  G = rearrange_SBM_with_cmap(cmap, G);
-                });
+  // std::for_each(Gs.begin(), Gs.end(), [&](auto &G)
+  //               {
+  //                 G = rearrange_SBM_with_cmap(cmap, G);
+  //               });
   //check that sizes of nodelists equal N_pop*N_clusters
 
 
