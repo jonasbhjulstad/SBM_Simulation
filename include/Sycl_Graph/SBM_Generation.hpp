@@ -59,6 +59,7 @@ namespace Sycl_Graph::SBM
     std::vector<Edge_List_t> edge_lists;
     std::vector<uint32_t> connection_targets;
     std::vector<uint32_t> connection_sources;
+    std::vector<std::pair<uint32_t, uint32_t>> community_connections;
   };
 
   SBM_Graph_t random_connect(const std::vector<Node_List_t> &nodelists,
@@ -107,6 +108,7 @@ namespace Sycl_Graph::SBM
     std::iota(community_idx.begin(), community_idx.end(), 0);
     std::vector<uint32_t> connection_targets;
     std::vector<uint32_t> connection_sources;
+    std::vector<std::pair<uint32_t, uint32_t>> community_connections;
     for (auto &&comb : iter::combinations(community_idx, 2))
     {
       connection_targets.push_back(comb[1]);
@@ -128,6 +130,85 @@ namespace Sycl_Graph::SBM
     }
 
     return {nodelists, edge_lists, connection_targets, connection_sources};
+  }
+
+  SBM_Graph_t rearrange_SBM_with_cmap(const std::vector<uint32_t> &cmap, const SBM_Graph_t &G)
+  {
+    SBM_Graph_t G_new;
+    uint32_t N_new_communities = *std::max_element(cmap.begin(), cmap.end()) + 1;
+    std::vector<uint32_t> community_idx(N_new_communities);
+    std::iota(community_idx.begin(), community_idx.end(), 0);
+    G_new.node_list.resize(N_new_communities);
+    for (int i = 0; i < G.node_list.size(); i++)
+    {
+      auto mapped_idx = cmap[i];
+      G_new.node_list[mapped_idx].insert(G_new.node_list[mapped_idx].end(),
+                                         G.node_list[i].begin(), G.node_list[i].end());
+    }
+
+    // G.connection_targets.reserve(community_idx.size());
+    // G.connection_sources.reserve(community_idx.size());
+    uint32_t N_connections = n_choose_k(community_idx.size(), 2) + community_idx.size();
+    G_new.edge_lists.resize(N_connections);
+
+    std::vector<uint32_t> community_idx_old(G.node_list.size());
+    std::iota(community_idx_old.begin(), community_idx_old.end(), 0);
+    std::vector<uint32_t> connection_idx_old(G.edge_lists.size());
+    std::iota(connection_idx_old.begin(), connection_idx_old.end(), 0);
+    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> remapped_edges(N_connections);
+
+    std::vector<std::pair<uint32_t, uint32_t>> community_connections;
+
+    for (auto &&comb : iter::combinations(community_idx, 2))
+    {
+      community_connections.push_back(std::make_pair(comb[0], comb[1]));
+    }
+
+    uint32_t n = n_choose_k(community_idx.size(), 2);
+    for (int i = 0; i < G.edge_lists.size(); i++)
+    {
+      auto mapped_target_idx = cmap[G.connection_targets[i]];
+      auto mapped_source_idx = cmap[G.connection_sources[i]];
+      // find index of connection in community_connections
+      auto it = std::find_if(community_connections.begin(), community_connections.end(), [&](const auto &a)
+                             {
+                             return (a.first == mapped_target_idx && a.second == mapped_source_idx) ||
+                                    (a.first == mapped_source_idx && a.second == mapped_target_idx);
+                             });
+      if (it != community_connections.end())
+      {
+        std::cout << "Assigning " << i << " to " << std::distance(community_connections.begin(), it) << std::endl;
+        auto idx = std::distance(community_connections.begin(), it);
+        remapped_edges[idx].insert(remapped_edges[idx].end(), G.edge_lists[i].begin(), G.edge_lists[i].end());
+      }
+      else{
+        remapped_edges[n + cmap[mapped_target_idx]].insert(remapped_edges[n + cmap[mapped_target_idx]].end(), G.edge_lists[i].begin(), G.edge_lists[i].end());
+      }
+    }
+
+
+    uint32_t N_communities_old = G.node_list.size();
+
+    for (int i = 0; i < N_communities_old; i++)
+    {
+      auto mapped_target_idx = cmap[i];
+      auto mapped_source_idx = cmap[i];
+    }
+    for (int i = 0; i < G_new.node_list.size(); i++)
+    {
+      G_new.connection_sources.push_back(i);
+      G_new.connection_targets.push_back(i);
+    }
+
+    G_new.edge_lists = remapped_edges;
+
+    for (auto &&comb : iter::combinations(community_idx, 2))
+    {
+      G_new.connection_targets.push_back(comb[0]);
+      G_new.connection_sources.push_back(comb[1]);
+    }
+
+    return G_new;
   }
 
   // create pybind11 module
@@ -160,7 +241,7 @@ namespace Sycl_Graph::SBM
   }
 
   std::vector<SBM_Graph_t> create_planted_SBMs(uint32_t Ng, uint32_t N_pop,
-                                  uint32_t N, float p_in, float p_out, uint32_t N_threads = 4, uint32_t seed = 47)
+                                               uint32_t N, float p_in, float p_out, uint32_t N_threads = 4, uint32_t seed = 47)
   {
     std::mt19937 rd(seed);
     std::vector<uint32_t> seeds(Ng);

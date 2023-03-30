@@ -10,28 +10,6 @@ Data_dir = Project_root + "/data/SIR_sim/"
 sys.path.append(Binder_path)
 from SIR_SBM import *
 
-def gen_draw_graph(N_pop, N_clusters, p_in, p_out, N_threads, seed):
-    G = create_planted_SBM(N_pop, N_clusters, p_in, p_out, N_threads, seed)
-
-    weights = [len(edgelist) for edgelist in G.edge_lists]
-
-
-    gt_edgelist = []
-    for i, edgelist in enumerate(G.edge_lists):
-        id_to = G.connection_targets[i]
-        id_from = G.connection_sources[i]
-        gt_edgelist.append((id_from, id_to, weights[i]))
-    # gt_G = gt.Graph(gt_edgelist, eprops=[("weight", "double")])
-    v_labels = np.concatenate([np.ones(len(v_list))*i for i, v_list in enumerate(G.vertex_list)])
-    gt_G = gt.Graph(np.concatenate(G.edge_lists), directed=False)
-    v_prop= gt_G.new_vertex_property("int")
-    v_prop.a = v_labels
-    
-    #number of edges in gt_G
-    a = gt_G.num_edges()
-    b = gt_G.num_vertices()
-    state = gt.minimize_blockmodel_dl(gt_G, state_args=dict(recs=[gt_G.ep.weight], rec_types=["discrete-poisson"]))
-    return gt_G, state
 
 def obtain_graph_state(N_pop, N_clusters, p_in, p_out, N_threads, seed):
     G = create_planted_SBM(N_pop, N_clusters, p_in, p_out, N_threads, seed)
@@ -45,10 +23,7 @@ def obtain_graph_state(N_pop, N_clusters, p_in, p_out, N_threads, seed):
         id_from = G.connection_sources[i]
         gt_edgelist.append((id_from, id_to, weights[i]))
     gt_G = gt.Graph(gt_edgelist, eprops=[("weight", "int")])
-    # v_labels = np.concatenate([np.ones(len(v_list))*i for i, v_list in enumerate(G.node_list)])
-    # gt_G = gt.Graph(np.concatenate([e for e in G.edge_lists if e != []]), directed=False)
-    # v_prop= gt_G.new_vertex_property("int")
-    # v_prop.a = v_labels
+
     
 
 
@@ -57,18 +32,36 @@ def obtain_graph_state(N_pop, N_clusters, p_in, p_out, N_threads, seed):
     b = gt_G.num_vertices()
     state = gt.minimize_nested_blockmodel_dl(gt_G, state_args=dict(eweight=gt_G.ep.weight))
     # state = gt.minimize_blockmodel_dl(gt_G, state_args=dict(recs=[gt_G.ep.weight], rec_types=["discrete-poisson"]))
-    return gt_G, state
+    return gt_G, state, G
 
-def custom_draw(g, state, pi, po):
-    state.draw(edge_color=g.ep.weight, ecmap=(matplotlib.cm.inferno, .6),
-            eorder=g.ep.weight, edge_pen_width=gt.prop_to_size(g.ep.weight, 2, 8, power=1),
-            edge_gradient=[], output=Data_dir + "/Illustrations/graph_" + str(pi) + "_" + str(po) + ".png")
+def obtain_p_I_mapping(state, level):
+    l_state = state.get_levels()[level]
+    blocks = list(l_state.get_blocks())
+    block_idx = np.unique(blocks)
+    N_communities = len(block_idx)
+    desired_idx = list(range(N_communities))
+    
+    res_idx = []
+
+    for i in range(len(blocks)):
+        w = np.where(block_idx == blocks[i])[0][0]
+        res_idx.append(desired_idx[w])
+    
+
+    return res_idx, N_communities
+
+def obtain_community_inferred_planted_partition(N_pop, N_clusters, p_in, p_out, N_threads, seed)
+    gt_G, state, G = obtain_graph_state(N_pop, N_clusters, p_in, p_out, N_threads, seed)
+    c_map, N_communities = obtain_p_I_mapping(state, 1)
+    G_cmap = rearrange_SBM_with_cmap(c_map, G)
+    return G_cmap
+
 if __name__ == '__main__':
 
     N_pop = 100
     N_clusters = 10
     p_in = 1.0
-    p_out = np.linspace(0.0, .99, 8)
+    p_out = np.linspace(0.0, .99, 2)
     N_threads = 4
     seed = 999
     Nt = 70
@@ -105,19 +98,11 @@ if __name__ == '__main__':
 
 
 
+    
 
-    for j, po in enumerate(p_out):
-        print("j: ", j)
-        G, state = obtain_graph_state(N_pop, N_clusters, p_in, po, N_threads, np.random.randint(0, 100000))
-        states.append(state)
-        entropies.append([s.entropy() for s in state.get_levels()])
-        state.draw(output='graph_' + str(p_in) + '_' + str(po) + '.png')
-        # weights.append(w)
-        # entropy_levels.append([level.entropy() for level in state.get_levels()])
-        # N_partitions.append(states[j])
-    #heatmap of entropies
+    c_map, N_communities = obtain_p_I_mapping(state, 1)
 
-
+    G_cmap = rearrange_SBM_with_cmap(c_map, G)
     fig = plt.figure()
     ax = fig.add_subplot(111)
     for i, e in enumerate(entropies):

@@ -187,8 +187,9 @@ void alpha_regression(const Vec& x, const Vec& y, std::string datapath)
 int main()
 {
     float tau = .5f;
-    auto [F_beta_rs_mat,connection_infs, x_recovery, y_recovery] = load_N_datasets(Sim_Datapath, 10);
-    beta_regression(F_beta_rs_mat, connection_infs, tau, Sim_Datapath);
-    alpha_regression(x_recovery, y_recovery, Sim_Datapath);
+    std::string path = Sim_Datapath + "/Graph_0/";
+    auto [F_beta_rs_mat,connection_infs, x_recovery, y_recovery] = load_N_datasets(path, 10);
+    beta_regression(F_beta_rs_mat, connection_infs, tau, path);
+    alpha_regression(x_recovery, y_recovery, path);
     return 0;
 }

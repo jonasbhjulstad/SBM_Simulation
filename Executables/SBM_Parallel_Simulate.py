@@ -18,7 +18,7 @@ if __name__ == '__main__':
     N_sims = 100
     seed = 675
     Nt = 70
-    tau = .5
+    tau = .95
     Ng = 1
     output_dirs = [Data_dir + "Graph_" + str(i) + "/" for i in range(Ng)]
     qs = [sycl_queue(selector) for _ in range(N_sims)]
@@ -26,9 +26,9 @@ if __name__ == '__main__':
     np.random.seed(seed)
     #create seeds
     seeds = np.random.randint(0, 1000000, N_sims)
+    output_dir = Data_dir + "Graph_" + str(0) + "/"
 
     Gs = create_planted_SBMs(Ng, N_pop, N_clusters, p_in, p_out, N_threads, seed)
-
 
     N_community_connections = len(Gs[0].edge_lists)
     p = SIR_SBM_Param()
@@ -50,11 +50,13 @@ if __name__ == '__main__':
     for i, (p, G) in enumerate(zip(params, Gs)):
         output_dir = Data_dir + "Graph_" + str(i) + "/"
         parallel_simulate_to_file(G, p, qs, output_dir, N_sims, seed)
-        alpha, theta_LS, theta_QR = regression_on_datasets(output_dir, N_sims, tau)
+        alpha, theta_LS, theta_QR = regression_on_datasets(output_dir, N_sims, tau, 0)
         #write alpha, theta_LS, theta_QR to files in output_dir
         np.array(alpha).tofile(output_dir + "alpha.csv", sep=",")
         np.array(theta_LS).tofile(output_dir + "theta_LS.csv", sep=",")
         np.array(theta_QR).tofile(output_dir + "theta_QR.csv", sep=",")
 
+
+        
 
     a = 1

@@ -69,7 +69,9 @@ PYBIND11_MODULE(SIR_SBM, m) {
     m.def("parallel_simulate_to_file", static_cast<void (*)(const SBM_Graph_t&, const std::vector<SIR_SBM_Param_t>&, std::vector<sycl::queue>&, const std::string&, uint32_t, uint32_t)>(&parallel_simulate_to_file), "Parallel simulate to file");
     m.def("parallel_simulate_to_file", static_cast<void (*)(const std::vector<SBM_Graph_t>&, const std::vector<std::vector<SIR_SBM_Param_t>>&, std::vector<std::vector<sycl::queue>>&, const std::vector<std::string>&, uint32_t)>(&parallel_simulate_to_file), "Parallel simulate to file");
  
-    m.def("regression_on_datasets", static_cast<std::tuple<float, std::vector<float>, std::vector<float>> (*)(const std::string&, uint32_t, float)>(&regression_on_datasets), "Regression on datasets");
-    m.def("regression_on_datasets", static_cast<std::tuple<float, std::vector<float>, std::vector<float>> (*)(const std::vector<std::string>&, uint32_t, float)>(&regression_on_datasets), "Regression on datasets");
+    m.def("regression_on_datasets", static_cast<std::tuple<float, std::vector<float>, std::vector<float>> (*)(const std::string&, uint32_t, float, uint32_t)>(&regression_on_datasets), "Regression on datasets");
+    m.def("regression_on_datasets", static_cast<std::tuple<float, std::vector<float>, std::vector<float>> (*)(const std::vector<std::string>&, uint32_t, float, uint32_t)>(&regression_on_datasets), "Regression on datasets");
+
+    m.def("rearrange_SBM_with_cmap", &rearrange_SBM_with_cmap, "Rearrange SBM with cmap");
 }
 

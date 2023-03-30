@@ -90,10 +90,10 @@ namespace Sycl_Graph
         return std::make_pair(F_beta_rs_mat, connection_infs);
     }
 
-    std::tuple<Mat, Mat, Vec, Vec> load_N_datasets(const std::string &datapath, uint32_t N)
+    std::tuple<Mat, Mat, Vec, Vec> load_N_datasets(const std::string &datapath, uint32_t N, uint32_t offset = 0)
     {
         std::vector<uint32_t> idx(N);
-        std::iota(idx.begin(), idx.end(), 0);
+        std::iota(idx.begin(), idx.end(), offset);
         std::vector<std::pair<Mat, Mat>> datasets;
         std::transform(idx.begin(), idx.end(), std::back_inserter(datasets), [&](auto idx)
                        { return connection_regression(datapath, idx); });
@@ -154,19 +154,19 @@ namespace Sycl_Graph
         return y.dot(x) / x.dot(x);
     }
 
-    std::tuple<float, std::vector<float>, std::vector<float>> regression_on_datasets(const std::string &datapath, uint32_t N, float tau)
+    std::tuple<float, std::vector<float>, std::vector<float>> regression_on_datasets(const std::string &datapath, uint32_t N, float tau, uint32_t offset)
     {
-        auto [F_beta_rs_mat, connection_infs, x_recovery, y_recovery] = load_N_datasets(datapath, N);
+        auto [F_beta_rs_mat, connection_infs, x_recovery, y_recovery] = load_N_datasets(datapath, N, offset);
         float alpha = alpha_regression(x_recovery, y_recovery);
         auto [thetas_LS, thetas_QR] = beta_regression(F_beta_rs_mat, connection_infs, tau);
         return std::make_tuple(alpha, thetas_LS, thetas_QR);
     }
 
-    std::tuple<float, std::vector<float>, std::vector<float>> regression_on_datasets(const std::vector<std::string> &datapaths, uint32_t N, float tau)
+    std::tuple<float, std::vector<float>, std::vector<float>> regression_on_datasets(const std::vector<std::string> &datapaths, uint32_t N, float tau, uint32_t offset = 0)
     {
         std::vector<std::tuple<Mat, Mat, Vec, Vec>> datasets(datapaths.size());
         std::transform(datapaths.begin(), datapaths.end(), datasets.begin(), [&](auto &datapath)
-                       { return load_N_datasets(datapath, N); });
+                       { return load_N_datasets(datapath, N, offset); });
 
 
 
