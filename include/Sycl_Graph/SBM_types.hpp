@@ -17,9 +17,16 @@ namespace Sycl_Graph::SBM
     float p_R0;
   };
 
-  typedef std::pair<uint32_t, uint32_t> ID_Pair_t;
-  typedef std::vector<ID_Pair_t> Edge_List_t;
+  struct Edge_t
+  {
+    uint32_t from = std::numeric_limits<uint32_t>::max();
+    uint32_t to = std::numeric_limits<uint32_t>::max();
+  };
+  typedef std::vector<Edge_t> Edge_List_t;
+  
   typedef std::vector<uint32_t> Node_List_t;
+
+
 
 }
 

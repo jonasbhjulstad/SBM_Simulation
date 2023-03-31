@@ -1,6 +1,6 @@
 #include "Static_RNG/distributions.hpp"
 #include <Sycl_Graph/SBM_Generation.hpp>
-#include <Sycl_Graph/SIR_SBM.hpp>
+#include <Sycl_Graph/SIR_SBM_Network.hpp>
 #include <Sycl_Graph/path_config.hpp>
 #include <Sycl_Graph/SBM_write.hpp>
 #include <algorithm>

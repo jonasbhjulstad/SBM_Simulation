@@ -29,7 +29,7 @@ namespace Sycl_Graph::SBM
     uint32_t n = 0;
     for (auto &&prod : iter::product(to_nodes, from_nodes))
     {
-      edge_list[n] = std::make_pair(std::get<0>(prod), std::get<1>(prod));
+      edge_list[n] = {std::get<0>(prod), std::get<1>(prod)};
       n++;
     }
     RNG rng(seed);
@@ -53,13 +53,67 @@ namespace Sycl_Graph::SBM
     return product;
   }
 
+
   struct SBM_Graph_t
   {
     std::vector<Node_List_t> node_list;
     std::vector<Edge_List_t> edge_lists;
     std::vector<uint32_t> connection_targets;
     std::vector<uint32_t> connection_sources;
-    std::vector<std::pair<uint32_t, uint32_t>> community_connections;
+    uint32_t N_vertices() const
+    {
+      uint32_t N = 0;
+      for (auto &&nodelist : node_list)
+      {
+        N += nodelist.size();
+      }
+      return N;
+    }
+
+    uint32_t N_edges() const
+    {
+      uint32_t N = 0;
+      for (auto &&edge_list : edge_lists)
+      {
+        N += edge_list.size();
+      }
+      return N;
+    }
+
+    uint32_t N_connections() const
+    {
+      return edge_lists.size();
+    }
+
+    uint32_t N_communities() const
+    {
+      return node_list.size();
+    }
+
+    sycl::buffer<Edge_t> create_edge_buffer() const
+    {
+      std::vector<Edge_t> edges;
+      edges.reserve(N_edges());
+      for (auto &&edge_list : edge_lists)
+      {
+        edges.insert(edges.end(), edge_list.begin(), edge_list.end());
+      }
+      return sycl::buffer<Edge_t>(edges.data(), edges.size());
+    }
+
+    sycl::buffer<uint32_t> create_community_buffer()
+    {
+      std::vector<uint32_t> community;
+      community.reserve(N_vertices());
+      for (uint32_t i = 0; i < N_communities(); i++)
+      {
+        for (auto &&node : node_list[i])
+        {
+          community.push_back(i);
+        }
+      }
+      return sycl::buffer<uint32_t>(community.data(), community.size());
+    }
   };
 
   SBM_Graph_t random_connect(const std::vector<Node_List_t> &nodelists,
@@ -108,13 +162,12 @@ namespace Sycl_Graph::SBM
     std::iota(community_idx.begin(), community_idx.end(), 0);
     std::vector<uint32_t> connection_targets;
     std::vector<uint32_t> connection_sources;
-    std::vector<std::pair<uint32_t, uint32_t>> community_connections;
+
     for (auto &&comb : iter::combinations(community_idx, 2))
     {
       connection_targets.push_back(comb[1]);
       connection_sources.push_back(comb[0]);
     }
-
     if (self_loop)
     {
       for (auto &&idx : community_idx)
@@ -157,12 +210,6 @@ namespace Sycl_Graph::SBM
     std::iota(connection_idx_old.begin(), connection_idx_old.end(), 0);
     std::vector<std::vector<std::pair<uint32_t, uint32_t>>> remapped_edges(N_connections);
 
-    std::vector<std::pair<uint32_t, uint32_t>> community_connections;
-
-    for (auto &&comb : iter::combinations(community_idx, 2))
-    {
-      community_connections.push_back(std::make_pair(comb[0], comb[1]));
-    }
 
     uint32_t n = n_choose_k(community_idx.size(), 2);
     for (int i = 0; i < G.edge_lists.size(); i++)
