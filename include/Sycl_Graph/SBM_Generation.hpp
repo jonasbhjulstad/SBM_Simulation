@@ -53,7 +53,6 @@ namespace Sycl_Graph::SBM
     return product;
   }
 
-
   struct SBM_Graph_t
   {
     std::vector<Node_List_t> node_list;
@@ -185,78 +184,76 @@ namespace Sycl_Graph::SBM
     return {nodelists, edge_lists, connection_targets, connection_sources};
   }
 
-  SBM_Graph_t rearrange_SBM_with_cmap(const std::vector<uint32_t> &cmap, const SBM_Graph_t &G)
-  {
-    SBM_Graph_t G_new;
-    uint32_t N_new_communities = *std::max_element(cmap.begin(), cmap.end()) + 1;
-    std::vector<uint32_t> community_idx(N_new_communities);
-    std::iota(community_idx.begin(), community_idx.end(), 0);
-    G_new.node_list.resize(N_new_communities);
-    for (int i = 0; i < G.node_list.size(); i++)
-    {
-      auto mapped_idx = cmap[i];
-      G_new.node_list[mapped_idx].insert(G_new.node_list[mapped_idx].end(),
-                                         G.node_list[i].begin(), G.node_list[i].end());
-    }
+  // SBM_Graph_t rearrange_SBM_with_cmap(const std::vector<uint32_t> &cmap, const SBM_Graph_t &G)
+  // {
+  //   SBM_Graph_t G_new;
+  //   uint32_t N_new_communities = *std::max_element(cmap.begin(), cmap.end()) + 1;
+  //   std::vector<uint32_t> community_idx(N_new_communities);
+  //   std::iota(community_idx.begin(), community_idx.end(), 0);
+  //   G_new.node_list.resize(N_new_communities);
+  //   for (int i = 0; i < G.node_list.size(); i++)
+  //   {
+  //     auto mapped_idx = cmap[i];
+  //     G_new.node_list[mapped_idx].insert(G_new.node_list[mapped_idx].end(),
+  //                                        G.node_list[i].begin(), G.node_list[i].end());
+  //   }
 
-    // G.connection_targets.reserve(community_idx.size());
-    // G.connection_sources.reserve(community_idx.size());
-    uint32_t N_connections = n_choose_k(community_idx.size(), 2) + community_idx.size();
-    G_new.edge_lists.resize(N_connections);
+  //   // G.connection_targets.reserve(community_idx.size());
+  //   // G.connection_sources.reserve(community_idx.size());
+  //   uint32_t N_connections = n_choose_k(community_idx.size(), 2) + community_idx.size();
+  //   G_new.edge_lists.resize(N_connections);
 
-    std::vector<uint32_t> community_idx_old(G.node_list.size());
-    std::iota(community_idx_old.begin(), community_idx_old.end(), 0);
-    std::vector<uint32_t> connection_idx_old(G.edge_lists.size());
-    std::iota(connection_idx_old.begin(), connection_idx_old.end(), 0);
-    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> remapped_edges(N_connections);
+  //   std::vector<uint32_t> community_idx_old(G.node_list.size());
+  //   std::iota(community_idx_old.begin(), community_idx_old.end(), 0);
+  //   std::vector<uint32_t> connection_idx_old(G.edge_lists.size());
+  //   std::iota(connection_idx_old.begin(), connection_idx_old.end(), 0);
+  //   std::vector<std::vector<std::pair<uint32_t, uint32_t>>> remapped_edges(N_connections);
 
+  //   uint32_t n = n_choose_k(community_idx.size(), 2);
+  //   for (int i = 0; i < G.edge_lists.size(); i++)
+  //   {
+  //     auto mapped_target_idx = cmap[G.connection_targets[i]];
+  //     auto mapped_source_idx = cmap[G.connection_sources[i]];
+  //     // find index of connection in community_connections
+  //     auto it = std::find_if(community_connections.begin(), community_connections.end(), [&](const auto &a)
+  //                            {
+  //                            return (a.first == mapped_target_idx && a.second == mapped_source_idx) ||
+  //                                   (a.first == mapped_source_idx && a.second == mapped_target_idx);
+  //                            });
+  //     if (it != community_connections.end())
+  //     {
+  //       std::cout << "Assigning " << i << " to " << std::distance(community_connections.begin(), it) << std::endl;
+  //       auto idx = std::distance(community_connections.begin(), it);
+  //       remapped_edges[idx].insert(remapped_edges[idx].end(), G.edge_lists[i].begin(), G.edge_lists[i].end());
+  //     }
+  //     else{
+  //       remapped_edges[n + cmap[mapped_target_idx]].insert(remapped_edges[n + cmap[mapped_target_idx]].end(), G.edge_lists[i].begin(), G.edge_lists[i].end());
+  //     }
+  //   }
 
-    uint32_t n = n_choose_k(community_idx.size(), 2);
-    for (int i = 0; i < G.edge_lists.size(); i++)
-    {
-      auto mapped_target_idx = cmap[G.connection_targets[i]];
-      auto mapped_source_idx = cmap[G.connection_sources[i]];
-      // find index of connection in community_connections
-      auto it = std::find_if(community_connections.begin(), community_connections.end(), [&](const auto &a)
-                             {
-                             return (a.first == mapped_target_idx && a.second == mapped_source_idx) ||
-                                    (a.first == mapped_source_idx && a.second == mapped_target_idx);
-                             });
-      if (it != community_connections.end())
-      {
-        std::cout << "Assigning " << i << " to " << std::distance(community_connections.begin(), it) << std::endl;
-        auto idx = std::distance(community_connections.begin(), it);
-        remapped_edges[idx].insert(remapped_edges[idx].end(), G.edge_lists[i].begin(), G.edge_lists[i].end());
-      }
-      else{
-        remapped_edges[n + cmap[mapped_target_idx]].insert(remapped_edges[n + cmap[mapped_target_idx]].end(), G.edge_lists[i].begin(), G.edge_lists[i].end());
-      }
-    }
+  //   uint32_t N_communities_old = G.node_list.size();
 
+  //   for (auto &&comb : iter::combinations(community_idx, 2))
+  //   {
+  //     G_new.connection_targets.push_back(comb[1]);
+  //     G_new.connection_sources.push_back(comb[0]);
+  //   }
+  //   for (int i = 0; i < G_new.node_list.size(); i++)
+  //   {
+  //     G_new.connection_sources.push_back(i);
+  //     G_new.connection_targets.push_back(i);
+  //   }
 
-    uint32_t N_communities_old = G.node_list.size();
+  //   G_new.edge_lists = remapped_edges;
 
-    for (auto &&comb : iter::combinations(community_idx, 2))
-    {
-      G_new.connection_targets.push_back(comb[1]);
-      G_new.connection_sources.push_back(comb[0]);
-    }
-    for (int i = 0; i < G_new.node_list.size(); i++)
-    {
-      G_new.connection_sources.push_back(i);
-      G_new.connection_targets.push_back(i);
-    }
+  //   for (auto &&comb : iter::combinations(community_idx, 2))
+  //   {
+  //     G_new.connection_targets.push_back(comb[0]);
+  //     G_new.connection_sources.push_back(comb[1]);
+  //   }
 
-    G_new.edge_lists = remapped_edges;
-
-    for (auto &&comb : iter::combinations(community_idx, 2))
-    {
-      G_new.connection_targets.push_back(comb[0]);
-      G_new.connection_sources.push_back(comb[1]);
-    }
-
-    return G_new;
-  }
+  //   return G_new;
+  // }
 
   // create pybind11 module
   SBM_Graph_t create_SBM(const std::vector<uint32_t> N_pop,
@@ -300,6 +297,67 @@ namespace Sycl_Graph::SBM
                    { return create_planted_SBM(N_pop, N, p_in, p_out, N_threads, seed); });
 
     return result;
+  }
+
+  std::vector<std::vector<float>> generate_p_Is(uint32_t N_community_connections, float p_I_min,
+                                                float p_I_max, uint32_t Nt, uint32_t seed = 42)
+  {
+    std::vector<Static_RNG::default_rng> rngs(Nt);
+    Static_RNG::default_rng rd(seed);
+    std::vector<uint32_t> seeds(Nt);
+    std::generate(seeds.begin(), seeds.end(), [&rd]()
+                  { return rd(); });
+    std::transform(seeds.begin(), seeds.end(), rngs.begin(),
+                   [](auto seed)
+                   { return Static_RNG::default_rng(seed); });
+
+    std::vector<std::vector<float>> p_Is(
+        Nt, std::vector<float>(N_community_connections));
+
+    std::transform(
+        std::execution::par_unseq, rngs.begin(), rngs.end(), p_Is.begin(),
+        [&](auto &rng)
+        {
+          Static_RNG::uniform_real_distribution<> dist(p_I_min, p_I_max);
+          std::vector<float> p_I(N_community_connections);
+          std::generate(p_I.begin(), p_I.end(), [&]()
+                        { return dist(rng); });
+          return p_I;
+        });
+
+    return p_Is;
+  }
+
+  std::vector<std::vector<std::vector<float>>> generate_p_Is(uint32_t N_community_connections, uint32_t N_sims, float p_I_min,
+                                                             float p_I_max, uint32_t Nt, uint32_t seed = 42)
+  {
+    std::vector<uint32_t> seeds(N_sims);
+    Static_RNG::default_rng rd(seed);
+    std::generate(seeds.begin(), seeds.end(), [&rd]()
+                  { return rd(); });
+    std::vector<std::vector<std::vector<float>>> p_Is(N_sims);
+    std::transform(std::execution::par_unseq, seeds.begin(), seeds.end(), p_Is.begin(),
+                   [&](auto seed)
+                   {
+                     return generate_p_Is(N_community_connections, p_I_min, p_I_max, Nt, seed);
+                   });
+    return p_Is;
+  }
+
+  std::vector<std::vector<std::vector<std::vector<float>>>> generate_p_Is(uint32_t N_community_connections, uint32_t N_sims, uint32_t Ng, float p_I_min,
+                                                                          float p_I_max, uint32_t Nt, uint32_t seed = 42)
+  {
+    std::vector<uint32_t> seeds(Ng);
+    Static_RNG::default_rng rd(seed);
+    std::generate(seeds.begin(), seeds.end(), [&rd]()
+                  { return rd(); });
+    std::vector<std::vector<std::vector<std::vector<float>>>> p_Is(Ng);
+    std::transform(std::execution::par_unseq, seeds.begin(), seeds.end(), p_Is.begin(),
+                   [&](auto seed)
+                   {
+                     return generate_p_Is(N_community_connections, N_sims, p_I_min, p_I_max, Nt, seed);
+                   });
+    return p_Is;
   }
 }
 #endif

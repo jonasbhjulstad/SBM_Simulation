@@ -3,7 +3,6 @@
 #include <vector>
 #include <filesystem>
 #include <Sycl_Graph/SBM_types.hpp>
-#include <Sycl_Graph/SIR_SBM.hpp>
 namespace Sycl_Graph::SBM
 {
 
@@ -161,55 +160,6 @@ auto create_seeds_idx(uint32_t N_sims, uint32_t seed) {
   return zip;
 }
 
-std::vector<std::vector<float>> generate_p_Is(uint32_t N_community_connections, float p_I_min,
-                   float p_I_max, uint32_t Nt, uint32_t seed = 42) {
-  std::vector<Static_RNG::default_rng> rngs(Nt);
-  Static_RNG::default_rng rd(seed);
-  std::vector<uint32_t> seeds(Nt);
-  std::generate(seeds.begin(), seeds.end(), [&rd]() { return rd(); });
-  std::transform(seeds.begin(), seeds.end(), rngs.begin(),
-                 [](auto seed) { return Static_RNG::default_rng(seed); });
-
-  std::vector<std::vector<float>> p_Is(
-      Nt, std::vector<float>(N_community_connections));
-
-  std::transform(
-      std::execution::par_unseq, rngs.begin(), rngs.end(), p_Is.begin(),
-      [&](auto &rng) {
-        Static_RNG::uniform_real_distribution<> dist(p_I_min, p_I_max);
-        std::vector<float> p_I(N_community_connections);
-        std::generate(p_I.begin(), p_I.end(), [&]() { return dist(rng); });
-        return p_I;
-      });
-
-  return p_Is;
-}
-
-std::vector<std::vector<std::vector<float>>> generate_p_Is(uint32_t N_community_connections, uint32_t N_sims, float p_I_min,
-                   float p_I_max, uint32_t Nt, uint32_t seed = 42) {
-  std::vector<uint32_t> seeds(N_sims);
-  Static_RNG::default_rng rd(seed);
-  std::generate(seeds.begin(), seeds.end(), [&rd]() { return rd(); });
-  std::vector<std::vector<std::vector<float>>> p_Is(N_sims);
-  std::transform(std::execution::par_unseq, seeds.begin(), seeds.end(), p_Is.begin(),
-                 [&](auto seed) {
-                   return generate_p_Is(N_community_connections, p_I_min, p_I_max, Nt, seed);
-                 });
-  return p_Is;
-}
-
-std::vector<std::vector<std::vector<std::vector<float>>>> generate_p_Is(uint32_t N_community_connections, uint32_t N_sims, uint32_t Ng, float p_I_min,
-                   float p_I_max, uint32_t Nt, uint32_t seed = 42) {
-  std::vector<uint32_t> seeds(Ng);
-  Static_RNG::default_rng rd(seed);
-  std::generate(seeds.begin(), seeds.end(), [&rd]() { return rd(); });
-  std::vector<std::vector<std::vector<std::vector<float>>>> p_Is(Ng);
-  std::transform(std::execution::par_unseq, seeds.begin(), seeds.end(), p_Is.begin(),
-                 [&](auto seed) {
-                   return generate_p_Is(N_community_connections, N_sims, p_I_min, p_I_max, Nt, seed);
-                 });
-  return p_Is;
-}
 
 
 void simulate_to_file(const SBM_Graph_t& G, const SIR_SBM_Param_t& param,

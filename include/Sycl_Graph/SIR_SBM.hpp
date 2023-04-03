@@ -13,13 +13,6 @@
 #include <Sycl_Graph/SBM_types.hpp>
 namespace Sycl_Graph::SBM
 {
-  enum SIR_State
-  {
-    SIR_INDIVIDUAL_S = 0,
-    SIR_INDIVIDUAL_I = 1,
-    SIR_INDIVIDUAL_R = 2
-  };
-
   template <typename T>
   void print_buffer(sycl::buffer<T, 1> &buf)
   {
@@ -79,17 +72,17 @@ namespace Sycl_Graph::SBM
     return community_state;
   }
 
-  template <typename T>
-  sycl::event copy_to_buffer(sycl::buffer<T, 1> &buf, const std::vector<T> &vec,
-                             sycl::queue &q)
-  {
-    sycl::buffer<T, 1> tmp(vec.data(), sycl::range<1>(vec.size()));
-    return q.submit([&](sycl::handler &h)
-                    {
-    auto tmp_acc = tmp.template get_access<sycl::access::mode::read>(h);
-    auto acc = buf.template get_access<sycl::access::mode::write>(h);
-    h.copy(tmp_acc, acc); });
-  }
+  // template <typename T>
+  // sycl::event copy_to_buffer(sycl::buffer<T, 1> &buf, const std::vector<T> &vec,
+  //                            sycl::queue &q)
+  // {
+  //   sycl::buffer<T, 1> tmp(vec.data(), sycl::range<1>(vec.size()));
+  //   return q.submit([&](sycl::handler &h)
+  //                   {
+  //   auto tmp_acc = tmp.template get_access<sycl::access::mode::read>(h);
+  //   auto acc = buf.template get_access<sycl::access::mode::write>(h);
+  //   h.copy(tmp_acc, acc); });
+  // }
 
   static constexpr uint32_t invalid_id = std::numeric_limits<uint32_t>::max();
   sycl::buffer<uint32_t, 1> generate_seeds(uint32_t N_rng, sycl::queue &q,

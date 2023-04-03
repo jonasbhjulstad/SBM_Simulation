@@ -1,4 +1,4 @@
-add_sycl_executable(planted_SIR_Simulation)
+# add_sycl_executable(planted_SIR_Simulation)
 add_sycl_executable(planted_SIR_Network)
 
 add_regression_executable(SBM_Regression)

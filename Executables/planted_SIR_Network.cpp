@@ -2,7 +2,7 @@
 #include <Sycl_Graph/SBM_Generation.hpp>
 #include <Sycl_Graph/SIR_SBM_Network.hpp>
 #include <Sycl_Graph/path_config.hpp>
-#include <Sycl_Graph/SBM_write.hpp>
+// #include <Sycl_Graph/SBM_write.hpp>
 #include <algorithm>
 #include <cstdint>
 #include <filesystem>
@@ -17,8 +17,8 @@ int main()
   uint32_t N_pop = 100;
   float p_in = 1.0f;
   float p_out = 0.2f;
-  uint32_t N_sims = 2;
-  uint32_t Ng = 2;
+  uint32_t N_sims = 1;
+  uint32_t Ng = 1;
   // sycl::queue q(sycl::gpu_selector_v);
   std::vector<std::vector<sycl::queue>> qs(Ng);
   for (int i = 0; i < Ng; i++)
