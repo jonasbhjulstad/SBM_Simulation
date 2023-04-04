@@ -26,7 +26,7 @@ namespace Sycl_Graph::SBM
 
   typedef std::vector<uint32_t> Node_List_t;
 
-  enum SIR_State
+  enum SIR_State: uint8_t
   {
     SIR_INDIVIDUAL_S = 0,
     SIR_INDIVIDUAL_I = 1,
