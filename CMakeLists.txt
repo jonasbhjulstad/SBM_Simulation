@@ -41,7 +41,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #Sycl warning suppression flags
-set(CMAKE_UNITY_BUILD ON)
+set(CMAKE_UNITY_BUILD OFF)
 add_compile_options("-O0")
 add_compile_options("-Wdeprecated-declarations")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -54,13 +54,10 @@ set(SYCL_GRAPH_LOG_DIR "${PROJECT_SOURCE_DIR}/log" CACHE INTERNAL "SYCL_GRAPH_LO
 set(SYCL_GRAPH_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include" CACHE INTERNAL "SYCL_GRAPH_INCLUDE_DIR")
 file(MAKE_DIRECTORY ${SYCL_GRAPH_DATA_DIR}/SIR_sim)
 
-add_library(Sycl_Graph INTERFACE)
-target_include_directories(Sycl_Graph INTERFACE ${PROJECT_SOURCE_DIR}/include)
-target_link_libraries(Sycl_Graph INTERFACE Static_RNG cppitertools)
 configure_file("${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.hpp.in" "${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.hpp")
 
 add_compile_options("-fcolor-diagnostics")
-
+add_subdirectory(src)
 add_subdirectory(test)
 add_subdirectory(Binders)
 add_subdirectory(Executables)

@@ -2,7 +2,7 @@
 #include <Sycl_Graph/SBM_Generation.hpp>
 #include <Sycl_Graph/SIR_SBM_Network.hpp>
 #include <Sycl_Graph/path_config.hpp>
-// #include <Sycl_Graph/SBM_write.hpp>
+#include <Sycl_Graph/SBM_write.hpp>
 #include <algorithm>
 #include <cstdint>
 #include <filesystem>

@@ -1,8 +1,9 @@
 #ifndef SYCL_GRAPH_SBM_TYPES_HPP
 #define SYCL_GRAPH_SBM_TYPES_HPP
-#include <tuple>
 #include <CL/sycl.hpp>
+#include <tuple>
 #include <vector>
+#include <fstream>
 namespace Sycl_Graph::SBM
 {
   typedef std::tuple<sycl::buffer<uint32_t, 1>, sycl::buffer<uint32_t, 1>,
@@ -32,67 +33,56 @@ namespace Sycl_Graph::SBM
     SIR_INDIVIDUAL_I = 1,
     SIR_INDIVIDUAL_R = 2
   };
+
   template <sycl::access_mode Mode, sycl::access::target Target = sycl::access::target::device>
-  struct Edge_Accessor_t
-  {
-    Edge_Accessor_t(sycl::handler &h) : to(h), from(h), self(h) {}
-    sycl::accessor<uint32_t, 1, Mode, Target> to;
-    sycl::accessor<uint32_t, 1, Mode, Target> from;
-    sycl::accessor<uint32_t, 1, Mode, Target> self;
-  };
+  struct Edge_Accessor_t;
 
   struct Edge_Buffer_t
   {
 
-    Edge_Buffer_t(uint32_t N_edges, uint32_t N_communities)
-        : to((sycl::range<1>(N_edges))),
-          from((sycl::range<1>(N_edges))),
-          self((sycl::range<1>(N_communities)))
-    {
-      auto to_acc = to.template get_access<sycl::access::mode::write>();
-      auto from_acc = from.template get_access<sycl::access::mode::write>();
-      auto self_acc = self.template get_access<sycl::access::mode::write>();
-      for (uint32_t i = 0; i < N_edges; i++)
-      {
-        to_acc[i] = invalid_id;
-        from_acc[i] = invalid_id;
-      }
-      for (uint32_t i = 0; i < N_communities; i++)
-      {
-        self_acc[i] = invalid_id;
-      }
-    }
-    Edge_Buffer_t(uint32_t N_edges) : Edge_Buffer_t(N_edges, 1) {}
+    Edge_Buffer_t(uint32_t N_edges, uint32_t N_communities);
+    Edge_Buffer_t(uint32_t N_edges);
     sycl::buffer<uint32_t, 1> to;
     sycl::buffer<uint32_t, 1> from;
     sycl::buffer<uint32_t, 1> self;
     static constexpr uint32_t invalid_id = std::numeric_limits<uint32_t>::max();
     template <sycl::access_mode Mode>
-    auto get_access(sycl::handler &h)
+    Edge_Accessor_t<Mode> get_access(sycl::handler &h)
     {
-      return Edge_Accessor_t<Mode>(h);
+      return Edge_Accessor_t<Mode>(*this, h);
     }
 
-    sycl::event fill(uint32_t val, sycl::queue &q)
-    {
-      return q.submit([&](sycl::handler &h)
-                      {
-      auto to_acc = to.template get_access<sycl::access::mode::write, sycl::access::target::device>(h);
-      auto from_acc = from.template get_access<sycl::access::mode::write, sycl::access::target::device>(h);
-      auto self_acc = self.template get_access<sycl::access::mode::write, sycl::access::target::device>(h);
-      h.parallel_for(to_acc.size(), [=](sycl::id<1> i){
-        to_acc[i] = val;
-        from_acc[i] = val;
-      }); });
-      q.submit([&](sycl::handler &h)
-               {
-      auto self_acc = self.template get_access<sycl::access::mode::write, sycl::access::target::device>(h);
-      h.parallel_for(self_acc.size(), [=](sycl::id<1> i){
-        self_acc[i] = val;
-      }); });
-    }
+    sycl::event fill(uint32_t val, sycl::queue &q);
+  };
+  template <sycl::access_mode Mode, sycl::access::target Target>
+  struct Edge_Accessor_t
+  {
+    Edge_Accessor_t(Edge_Buffer_t& buf, sycl::handler &h);
+    sycl::accessor<uint32_t, 1, Mode, Target> to;
+    sycl::accessor<uint32_t, 1, Mode, Target> from;
+    sycl::accessor<uint32_t, 1, Mode, Target> self;
+  };
+  typedef std::array<uint32_t, 3> State_t;
+  struct SBM_Graph_t
+  {
+    std::vector<Node_List_t> node_list;
+    std::vector<Edge_List_t> edge_lists;
+    std::vector<uint32_t> connection_targets;
+    std::vector<uint32_t> connection_sources;
+    uint32_t N_vertices() const;
+
+    uint32_t N_edges() const;
+
+    uint32_t N_connections() const;
+
+    uint32_t N_communities() const;
+
+    auto create_edge_buffer(sycl::queue &q) const;
+
+    auto create_community_buffer(sycl::queue &q);
   };
 
 }
+
 
 #endif
