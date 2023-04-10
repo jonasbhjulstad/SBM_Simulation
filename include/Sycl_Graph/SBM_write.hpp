@@ -21,26 +21,6 @@ namespace Sycl_Graph::SBM
 
   void linewrite(std::ofstream &file, const std::vector<Edge_t> &iter);
 
-  template <typename T>
-  std::vector<std::vector<T>> read_buffers(std::vector<sycl::buffer<T>> &bufs,
-                                           std::vector<sycl::event> &events,
-                                           uint32_t N, uint32_t N_elem)
-  {
-    auto data_vec = std::vector<std::vector<T>>(N_elem, std::vector<T>(N));
-    std::transform(bufs.begin(), bufs.end(),
-                   events.begin(), data_vec.begin(), [&](auto &buf, auto &event)
-                   {
-                   event.wait();
-                   auto buf_acc =
-                       buf.template get_access<sycl::access::mode::read>();
-                   std::vector<T> res(N);
-                   for (int i = 0; i < N; i++) {
-                     res[i] = buf_acc[i];
-                   }
-
-                   return res; });
-    return data_vec;
-  }
 
   void simulate_to_file(const SBM_Graph_t &G, const SIR_SBM_Param_t &param,
                         sycl::queue &q, const std::string &file_path,

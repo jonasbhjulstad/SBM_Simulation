@@ -1,4 +1,6 @@
-#include "Static_RNG/distributions.hpp"
+#define TBB_DEBUG 1
+#include <CL/sycl.hpp>
+#include <Static_RNG/distributions.hpp>
 #include <Sycl_Graph/SBM_Generation.hpp>
 #include <Sycl_Graph/SIR_SBM_Network.hpp>
 #include <Sycl_Graph/path_config.hpp>
@@ -7,7 +9,6 @@
 #include <cstdint>
 #include <filesystem>
 #include <string>
-#include <CL/sycl.hpp>
 
 using namespace Sycl_Graph::SBM;
 
@@ -34,11 +35,11 @@ int main()
 
   auto Gs =
       create_planted_SBMs(Ng, N_pop, N_clusters, p_in, p_out, N_threads, seed);
-  uint32_t N_community_connections = Gs[0].edge_lists.size();
+  uint32_t N_community_connections = Gs[0].N_connections;
 
-  float p_I_min = 1e-3f;
-  float p_I_max = 1e-2f;
-  float p_R = 1e-1f;
+  float p_I_min = 1e-2f;
+  float p_I_max = 1e-1f;
+  float p_R = 1e-3f;
 
   std::vector<std::string> output_dirs(Ng);
   std::transform(Gs.begin(), Gs.end(), output_dirs.begin(),
@@ -47,28 +48,10 @@ int main()
                    return std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_" + std::to_string(n++) + "/";
                  });
 
-  std::vector<uint32_t> G_e_sizes(Ng);
-  for(int i = 0; i < Ng; i++)
-  {
-    std::for_each(Gs[i].edge_lists.begin(), Gs[i].edge_lists.end(), [&](auto &e)
-                  {
-                    G_e_sizes[i] += e.size();
-                  });
-  }
-
   std::vector<uint32_t> cmap(Gs[0].node_list.size(), 0);
   cmap[2] = 1; cmap[4] = 1; cmap[3] = 1; cmap[0] = 1;
 
 
-  std::vector<uint32_t> G_e_after_sizes(Ng);
-  for(int i = 0; i < Ng; i++)
-  {
-    std::for_each(Gs[i].edge_lists.begin(), Gs[i].edge_lists.end(), [&](auto &e)
-                  {
-                    G_e_after_sizes[i] += e.size();
-                  });
-  }
-  assert(std::equal(G_e_sizes.begin(), G_e_sizes.end(), G_e_after_sizes.begin()));
 
   auto p_I_vec = generate_p_Is(N_community_connections, N_sims,Ng,  p_I_min, p_I_max, Nt, seed);
   std::filesystem::create_directory(

@@ -47,35 +47,6 @@ namespace Sycl_Graph::SBM
     }
 
 
-    auto SBM_Graph_t::create_edge_buffer(sycl::queue &q) const
-    {
-        std::vector<Edge_t> edges;
-        edges.reserve(N_edges());
-        for (auto &&edge_list : edge_lists)
-        {
-            edges.insert(edges.end(), edge_list.begin(), edge_list.end());
-        }
-        sycl::buffer<Edge_t> buf(edges.data(), edges.size());
-        auto event = copy_to_buffer(buf, edges, q);
-
-        return std::make_tuple(buf, event);
-    }
-
-    auto SBM_Graph_t::create_community_buffer(sycl::queue &q)
-    {
-        std::vector<uint32_t> community;
-        community.reserve(N_vertices());
-        for (uint32_t i = 0; i < N_communities(); i++)
-        {
-            for (auto &&node : node_list[i])
-            {
-                community.push_back(i);
-            }
-        }
-        sycl::buffer<uint32_t> buf(community.data(), community.size());
-        auto event = copy_to_buffer(buf, community, q);
-        return std::make_tuple(buf, event);
-    }
 
     SBM_Graph_t random_connect(const std::vector<Node_List_t> &nodelists,
                                float p_in, float p_out, bool self_loop , uint32_t N_threads,
@@ -84,7 +55,7 @@ namespace Sycl_Graph::SBM
         uint32_t N_node_pairs = n_choose_k(nodelists.size(), 2);
         N_node_pairs += self_loop ? nodelists.size() : 0;
         std::random_device rd;
-        std::vector<uint32_t> seeds(N_threads);
+        std::vector<uint32_t> seeds(N_node_pairs);
         std::generate(seeds.begin(), seeds.end(), [&rd]()
                       { return rd(); });
         std::vector<std::tuple<Node_List_t, Node_List_t, float, uint32_t>> node_pairs;
@@ -94,6 +65,9 @@ namespace Sycl_Graph::SBM
         for (auto &&comb : iter::combinations(nodelists, 2))
         {
             node_pairs.push_back(std::make_tuple(comb[0], comb[1], p_out, seeds[n]));
+            #ifdef DEBUG
+            assert(n < N_node_pairs.size());
+            #endif
             n++;
         }
         if (self_loop)
@@ -101,8 +75,12 @@ namespace Sycl_Graph::SBM
             for (auto &&nodelist : nodelists)
             {
                 node_pairs.push_back(std::make_tuple(nodelist, nodelist, p_in, seeds[n]));
+                n++;
             }
         }
+        #ifdef DEBUG
+        assert(node_pairs.size() == N_node_pairs);
+        #endif
         std::vector<Edge_List_t> edge_lists(N_node_pairs);
 
         std::transform(std::execution::par_unseq, node_pairs.begin(),
@@ -119,31 +97,20 @@ namespace Sycl_Graph::SBM
                        [](const auto &nodelist)
                        { return nodelist.size(); });
 
-        std::vector<uint32_t> community_idx(nodelists.size());
-        std::iota(community_idx.begin(), community_idx.end(), 0);
-        std::vector<uint32_t> connection_targets;
-        std::vector<uint32_t> connection_sources;
 
-        for (auto &&comb : iter::combinations(community_idx, 2))
+        uint32_t N_nodes = std::accumulate(community_sizes.begin(), community_sizes.end(), 0);
+        //flatten node and edge lists
+        std::vector<uint32_t> nodelist_flat;
+        nodelist_flat.reserve(N_nodes);
+        for(int i = 0; i < nodelists.size(); i++)
         {
-            connection_targets.push_back(comb[1]);
-            connection_sources.push_back(comb[0]);
-        }
-        if (self_loop)
-        {
-            for (auto &&idx : community_idx)
-            {
-                connection_targets.push_back(idx);
-                connection_sources.push_back(idx);
-            }
-        }
-        for (auto &&comb : iter::combinations(community_idx, 2))
-        {
-            connection_targets.push_back(comb[0]);
-            connection_sources.push_back(comb[1]);
+            nodelist_flat.insert(nodelist_flat.end(), nodelists[i].begin(), nodelists[i].end());
         }
 
-        return {nodelists, edge_lists, connection_targets, connection_sources};
+        uint32_t N_edges = std::accumulate(edge_lists.begin(), edge_lists.end(), 0,
+                                           [](uint32_t acc, const auto &edge_list)
+                                           { return acc + edge_list.size(); });
+        return SBM_Graph_t(nodelists, edge_lists);
     }
 
     // create pybind11 module

@@ -1,4 +1,5 @@
 #include <Sycl_Graph/SBM_write.hpp>
+#include <Sycl_Graph/Buffer_Routines.hpp>
 #include <Sycl_Graph/SIR_SBM_Network.hpp>
 #include <Static_RNG/distributions.hpp>
 #include <execution>
@@ -7,31 +8,29 @@ namespace Sycl_Graph::SBM
   template <>
   void linewrite<>(std::ofstream &file, const std::vector<uint32_t> &iter);
 
-  void linewrite(std::ofstream &file, const std::array<uint32_t, 3> &state_iter)
+  void linewrite(std::ofstream &file, const std::vector<uint32_t> &state_iter)
   {
-    for (auto &t_i_i : iter)
+    for (const auto &t_i_i : state_iter)
     {
-      file << t_i_i.from << "," << t_i_i.to;
-      if (&t_i_i != &iter.back())
+      file << t_i_i;
+      if (&t_i_i != &state_iter.back())
         file << ",";
       else
         file << "\n";
     }
   }
 
-  void linewrite(std::ofstream &file, const std::array<uint32_t, 3> &state_iter)
+  void linewrite(std::ofstream &file, const std::vector<std::array<uint32_t, 3>> &state_iter)
   {
-    for (auto &t_i : state_iter)
+    for (const auto &t_i : state_iter)
     {
-      for (auto &&t_i_i : iter)
+      for (const auto &t_i_i : t_i)
       {
         file << t_i_i;
-        if (&t_i_i != &iter.back())
-          file << ",";
-        else
-          file << "\n";
+        file << ",";
       }
     }
+    file << "\n";
   }
 
   void linewrite(std::ofstream &file, const std::vector<Edge_t> &iter)
@@ -46,10 +45,6 @@ namespace Sycl_Graph::SBM
     }
   }
 
-  template <>
-  std::vector<std::vector<uint32_t>> read_buffers(std::vector<sycl::buffer<uint32_t>> &bufs,
-                                                  std::vector<sycl::event> &events,
-                                                  uint32_t N, uint32_t N_elem);
 
   void simulate_to_file(const SBM_Graph_t &G, const SIR_SBM_Param_t &param,
                         sycl::queue &q, const std::string &file_path,
@@ -57,14 +52,29 @@ namespace Sycl_Graph::SBM
   {
     uint32_t Nt = param.p_I.size();
     SIR_SBM_Network network(G, param.p_I0, param.p_R, q, seed, param.p_R0);
-    auto [community_state_bufs, connection_events_bufs, acs_events] =
-        network.simulate(param);
+        auto sim_events = network.simulate(param);
+        std::for_each(sim_events.begin(), sim_events.end(),
+                      [&](auto &sim_event)
+                      {
+                        sim_event.wait();
+                      });
+    q.wait();
+    auto [community_trajectory, connection_events_trajectory] = network.read_trajectory();
 
-    auto community_trajectory = read_buffers(community_state_bufs, acs_events,
-                                             network.N_communities, Nt + 1);
+    // auto community_trajectory = read_buffers(community_state_bufs, acs_events,
+    //                                          Nt + 1, network.N_communities, q);
 
-    auto connection_events_trajectory = read_buffers(
-        connection_events_bufs, acs_events, network.N_connections, Nt);
+    // auto connection_events_trajectory = read_buffers(
+    // //     connection_events_bufs, acs_events, Nt, network.N_connections, q);
+    // std::vector<std::vector<State_t>> community_trajectory(community_state_bufs.size());
+    // std::vector<std::vector<Edge_t>> connection_events_trajectory(connection_events_bufs.size());
+
+
+
+
+
+    std::filesystem::create_directories(file_path);
+
 
     std::ofstream community_traj_f(file_path + "community_trajectory_" +
                                    std::to_string(sim_idx) + ".csv");
@@ -89,8 +99,12 @@ namespace Sycl_Graph::SBM
                                  const std::string &file_path, uint32_t N_sim,
                                  uint32_t seed)
   {
+    #ifdef DEBUG
     assert(params.size() == qs.size() &&
            "Number of parameters and queues must be equal");
+    assert(params[0].size() == G.N_connections && "Number of parameters must be equal to number of connections");
+    assert(qs.size() == N_sim && "Number of queues must be equal to number of simulations");
+    #endif
     uint32_t N_sims = params.size();
     std::vector<uint32_t> seeds(N_sims);
     Static_RNG::default_rng rng(seed);
@@ -119,10 +133,17 @@ namespace Sycl_Graph::SBM
       std::vector<std::vector<sycl::queue>> &qs,
       const std::vector<std::string> &file_paths, uint32_t seed)
   {
+    #ifdef DEBUG
     assert(Gs.size() == params.size() &&
            "Number of graphs and parameters must be equal");
     assert(Gs.size() == qs.size() && "Number of graphs and queues must be equal");
-
+    assert(file_paths.size() == Gs.size() &&
+           "Number of file paths and graphs must be equal");
+    assert(std::all_of(params.begin(), params.end(),
+                       [](auto p)
+                       { return p.size() == params[0].size(); }) &&
+           "Number of parameters must be equal for each graph");
+    #endif
     std::vector<uint32_t> seeds(Gs.size());
     std::mt19937 rd(seed);
     std::generate(seeds.begin(), seeds.end(), [&rd]()
@@ -146,6 +167,7 @@ namespace Sycl_Graph::SBM
     std::for_each(std::execution::par_unseq, zip.begin(), zip.end(),
                   [&](const auto &z)
                   {
+
                     parallel_simulate_to_file(*std::get<0>(z), *std::get<1>(z),
                                               *std::get<2>(z), std::get<3>(z),
                                               std::get<4>(z), std::get<5>(z));

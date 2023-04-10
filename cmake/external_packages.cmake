@@ -10,6 +10,16 @@ CPMFindPackage(
     BUILD_DOCS OFF
 )
 
+CPMFindPackage(
+    NAME tinymt
+    GITHUB_REPOSITORY tueda/tinymt-cpp
+    GIT_TAG master
+    OPTIONS
+    "BUILD_TESTING OFF"
+)
+
+# find_package(Static_RNG REQUIRED)
+
 
 set(cppitertools_INSTALL_CMAKE_DIR share)
 CPMFindPackage(

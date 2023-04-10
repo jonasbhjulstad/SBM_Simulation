@@ -1,4 +1,7 @@
 #include <Sycl_Graph/SBM_types.hpp>
+#include <Sycl_Graph/Buffer_Routines.hpp>
+#include <numeric>
+#include <itertools.hpp>
 namespace Sycl_Graph::SBM
 {
 
@@ -32,11 +35,6 @@ namespace Sycl_Graph::SBM
     Edge_Accessor_t<sycl::access_mode::write>::Edge_Accessor_t(Edge_Buffer_t &buf, sycl::handler &h) : to(buf.to.template get_access<sycl::access::mode::write, sycl::access::target::device>(h)), from(buf.from.template get_access<sycl::access::mode::write, sycl::access::target::device>(h)), self(buf.self.template get_access<sycl::access::mode::write, sycl::access::target::device>(h)) {}
 
     template <>
-    Edge_Accessor_t<sycl::access_mode::read_write> Edge_Buffer_t::get_access(sycl::handler &h)
-    {
-        return Edge_Accessor_t<sycl::access_mode::read_write>(*this, h);
-    }
-    template <>
     Edge_Accessor_t<sycl::access_mode::write> Edge_Buffer_t::get_access(sycl::handler &h)
     {
         return Edge_Accessor_t<sycl::access_mode::write>(*this, h);
@@ -66,33 +64,82 @@ namespace Sycl_Graph::SBM
       }); });
     }
 
-    uint32_t SBM_Graph_t::N_vertices() const
+    SBM_Graph_t::SBM_Graph_t(const std::vector<Node_List_t> &node_lists, const std::vector<Edge_List_t> &edge_lists)
     {
-        uint32_t N = 0;
-        for (auto &&nodelist : node_list)
+        community_sizes.resize(node_lists.size());
+        std::transform(node_lists.begin(), node_lists.end(), community_sizes.begin(),
+                       [](const Node_List_t &n)
+                       { return n.size(); });
+        connection_sizes.resize(edge_lists.size());
+        std::transform(edge_lists.begin(), edge_lists.end(), connection_sizes.begin(),
+                       [](const Edge_List_t &e)
+                       { return e.size(); });
+
+        N_vertices = std::accumulate(community_sizes.begin(), community_sizes.end(), 0);
+        N_edges = std::accumulate(connection_sizes.begin(), connection_sizes.end(), 0);
+        N_communities = node_lists.size();
+        N_connections = edge_lists.size();
+
+        node_list.reserve(N_vertices);
+        edge_list.reserve(N_edges);
+        for (int i = 0; i < node_lists.size(); i++)
         {
-            N += nodelist.size();
+            node_list.insert(node_list.end(), node_lists[i].begin(), node_lists[i].end());
         }
-        return N;
-    }
-
-    uint32_t SBM_Graph_t::N_edges() const
-    {
-        uint32_t N = 0;
-        for (auto &&edge_list : edge_lists)
+        for (int i = 0; i < edge_lists.size(); i++)
         {
-            N += edge_list.size();
+            edge_list.insert(edge_list.end(), edge_lists[i].begin(), edge_lists[i].end());
         }
-        return N;
+
+        create_connection_map();
+        create_ecm();
+        create_vcm();
     }
 
-    uint32_t SBM_Graph_t::N_connections() const
+    void SBM_Graph_t::create_connection_map()
     {
-        return edge_lists.size();
+
+        std::vector<uint32_t> community_idx(N_communities);
+        std::iota(community_idx.begin(), community_idx.end(), 0);
+        std::vector<uint32_t> connection_targets;
+        std::vector<uint32_t> connection_sources;
+
+        for (auto &&comb : iter::combinations(community_idx, 2))
+        {
+            connection_targets.push_back(comb[1]);
+            connection_sources.push_back(comb[0]);
+        }
+        for (auto &&idx : community_idx)
+        {
+            connection_targets.push_back(idx);
+            connection_sources.push_back(idx);
+        }
+        for (auto &&comb : iter::combinations(community_idx, 2))
+        {
+            connection_targets.push_back(comb[0]);
+            connection_sources.push_back(comb[1]);
+        }
     }
 
-    uint32_t SBM_Graph_t::N_communities() const
+    void SBM_Graph_t::create_ecm()
     {
-        return node_list.size();
+        ecm.reserve(N_edges);
+        uint32_t offset = 0;
+        for (int i = 0; i < N_connections; i++)
+        {
+            std::vector<uint32_t> con(connection_sizes[i], i);
+            ecm.insert(ecm.end(), con.begin(), con.end());
+        }
     }
-}
+
+    void SBM_Graph_t::create_vcm()
+    {
+        vcm.reserve(N_vertices);
+        uint32_t offset = 0;
+        for (int i = 0; i < N_communities; i++)
+        {
+            std::vector<uint32_t> com(community_sizes[i], i);
+            vcm.insert(vcm.end(), com.begin(), com.end());
+        }
+    }
+} // namespace Sycl_Graph::SBM

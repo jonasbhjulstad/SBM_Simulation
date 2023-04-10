@@ -36,10 +36,10 @@ int main()
   auto G0 = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER, G0_ids);
   auto G1 = generate_erdos_renyi<SIR_Metapopulation_Graph>(q, NV, p_ER, G1_ids);
 
-  std::cout << G0.N_vertices() << std::endl;
-  std::cout << G1.N_vertices() << std::endl;
-  // std::cout << G.N_vertices() << std::endl;
-  // std::cout << G.N_edges() << std::endl;
+  std::cout << G0.N_vertices << std::endl;
+  std::cout << G1.N_vertices << std::endl;
+  // std::cout << G.N_vertices << std::endl;
+  // std::cout << G.N_edges << std::endl;
 
   // std::filesystem::create_directory(Sycl_Graph_Sycl_GRAPH_DATA_DIR + std::string("/Edgelists"));
 

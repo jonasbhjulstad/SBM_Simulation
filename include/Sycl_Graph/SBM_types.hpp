@@ -4,6 +4,8 @@
 #include <tuple>
 #include <vector>
 #include <fstream>
+#include <limits>
+#include <cstdint>
 namespace Sycl_Graph::SBM
 {
   typedef std::tuple<sycl::buffer<uint32_t, 1>, sycl::buffer<uint32_t, 1>,
@@ -27,7 +29,7 @@ namespace Sycl_Graph::SBM
 
   typedef std::vector<uint32_t> Node_List_t;
 
-  enum SIR_State: uint8_t
+  enum SIR_State : unsigned char
   {
     SIR_INDIVIDUAL_S = 0,
     SIR_INDIVIDUAL_I = 1,
@@ -57,7 +59,7 @@ namespace Sycl_Graph::SBM
   template <sycl::access_mode Mode, sycl::access::target Target>
   struct Edge_Accessor_t
   {
-    Edge_Accessor_t(Edge_Buffer_t& buf, sycl::handler &h);
+    Edge_Accessor_t(Edge_Buffer_t &buf, sycl::handler &h);
     sycl::accessor<uint32_t, 1, Mode, Target> to;
     sycl::accessor<uint32_t, 1, Mode, Target> from;
     sycl::accessor<uint32_t, 1, Mode, Target> self;
@@ -65,24 +67,32 @@ namespace Sycl_Graph::SBM
   typedef std::array<uint32_t, 3> State_t;
   struct SBM_Graph_t
   {
-    std::vector<Node_List_t> node_list;
-    std::vector<Edge_List_t> edge_lists;
+
+    SBM_Graph_t(){};
+    SBM_Graph_t(const std::vector<Node_List_t> &node_lists, const std::vector<Edge_List_t> &edge_lists);
+
+    std::vector<uint32_t> node_list;
+    std::vector<Edge_t> edge_list;
+    std::vector<uint32_t> community_sizes;
+    std::vector<uint32_t> connection_sizes;
     std::vector<uint32_t> connection_targets;
     std::vector<uint32_t> connection_sources;
-    uint32_t N_vertices() const;
+    std::vector<uint32_t> ecm;
+    std::vector<uint32_t> vcm;
+    uint32_t N_vertices = 0;
+    uint32_t N_edges = 0;
+    uint32_t N_connections = 0;
+    uint32_t N_communities = 0;
 
-    uint32_t N_edges() const;
+    std::tuple<sycl::buffer<Edge_t>, sycl::event> create_edge_buffer(sycl::queue &q) const;
+    std::tuple<sycl::buffer<uint32_t>, sycl::event> create_community_buffer(sycl::queue &q);
 
-    uint32_t N_connections() const;
-
-    uint32_t N_communities() const;
-
-    auto create_edge_buffer(sycl::queue &q) const;
-
-    auto create_community_buffer(sycl::queue &q);
+  private:
+    void create_connection_map();
+    void create_ecm();
+    void create_vcm();
   };
 
 }
-
 
 #endif

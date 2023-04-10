@@ -1,0 +1,1 @@
+valgrind --leak-check=yes --suppressions=../.vscode/suppress_leaks.txt ../build/Executables/planted_SIR_Network 
