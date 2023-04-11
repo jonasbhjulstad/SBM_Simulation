@@ -84,9 +84,6 @@ namespace Sycl_Graph::SBM
     uint32_t N_connections = 0;
     uint32_t N_communities = 0;
 
-    std::tuple<sycl::buffer<Edge_t>, sycl::event> create_edge_buffer(sycl::queue &q) const;
-    std::tuple<sycl::buffer<uint32_t>, sycl::event> create_community_buffer(sycl::queue &q);
-
   private:
     void create_connection_map();
     void create_ecm();

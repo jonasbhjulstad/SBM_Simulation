@@ -18,7 +18,7 @@ int main()
   uint32_t N_pop = 100;
   float p_in = 1.0f;
   float p_out = 0.2f;
-  uint32_t N_sims = 1;
+  uint32_t N_sims = 100;
   uint32_t Ng = 1;
   // sycl::queue q(sycl::gpu_selector_v);
   std::vector<std::vector<sycl::queue>> qs(Ng);
@@ -37,9 +37,9 @@ int main()
       create_planted_SBMs(Ng, N_pop, N_clusters, p_in, p_out, N_threads, seed);
   uint32_t N_community_connections = Gs[0].N_connections;
 
-  float p_I_min = 1e-2f;
-  float p_I_max = 1e-1f;
-  float p_R = 1e-3f;
+  float p_I_min = 1e-4f;
+  float p_I_max = 1e-2f;
+  float p_R = 1e-1f;
 
   std::vector<std::string> output_dirs(Ng);
   std::transform(Gs.begin(), Gs.end(), output_dirs.begin(),
@@ -65,7 +65,7 @@ int main()
                    std::transform(p_I.begin(), p_I.end(), param_vec.begin(), [&](const auto &p)
                                   {
                   SIR_SBM_Param_t param;
-                  param.p_R = 1e-1f;
+                  param.p_R = p_R;
                   param.p_I0 = 0.1f;
                   param.p_R0 = 0.0f;
                   param.p_I = p;

@@ -9,16 +9,19 @@ Binder_path = Project_root + "/build/Binders"
 Data_dir = Project_root + "/data/SIR_sim/"
 sys.path.append(Binder_path)
 
-def create_planted(N_pop, N_clusters, p_in, p_out):
-    b = np.concatenate([np.ones(N_pop) for _ in range(N_clusters)])
-    p_SBM = np.zeros(shape=(N_pop, N_pop))
-    for i in range(N_pop):
-        for j in range(N_pop):
-            if b[i] == b[j]:
-                p_SBM[i, j] = p_in
-            else:
-                p_SBM[i, j] = p_out
-    return gt.generate_sbm(b, p_SBM, directed=False)
+from SIR_SBM import *
+# from libgraph_tool_SIR_SBM import *
+
+# def create_planted(N_pop, N_clusters, p_in, p_out):
+#     b = np.concatenate([np.ones(N_pop) for _ in range(N_clusters)])
+#     p_SBM = np.zeros(shape=(N_pop, N_pop))
+#     for i in range(N_pop):
+#         for j in range(N_pop):
+#             if b[i] == b[j]:
+#                 p_SBM[i, j] = p_in
+#             else:
+#                 p_SBM[i, j] = p_out
+#     return gt.generate_sbm(b, p_SBM, directed=False)
     
 
 
@@ -39,7 +42,13 @@ if __name__ == '__main__':
     np.random.seed(seed)
     seeds = np.random.randint(0, 100000, 11*11)
 
-    G = create_planted(N_pop, N_clusters, p_in, p_out[0])
+
+
+    G = create_planted_SBM(N_pop, N_clusters, p_in, p_out[0], 4, seeds[0])
+
+    gi = gt.Graph()
+    graph_convert(gi._Graph__graph.get_graph(), G)
+
 
     state = gt.minimize_nested_blockmodel_dl(G, deg_corr=False, B_min=2, B_max=2, mcmc_args=dict(niter=1000))         
 

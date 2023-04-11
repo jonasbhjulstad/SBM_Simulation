@@ -47,18 +47,22 @@ namespace Sycl_Graph::SBM
                                                      sycl::queue &q,
                                                      sycl::buffer<SIR_State, 2> &buf)
     {
-        // if (trajectory.size() == 0)
-        // {
-        //     trajectory.push_back(sycl::buffer<SIR_State, 1>(sycl::range<1>(N_vertices)));
-        // }
+        q.submit([&](sycl::handler &h)
+                 {
+        auto state_acc = buf.template get_access<sycl::access::mode::write
+                                                 >(h);
+        h.parallel_for(buf.get_range(), [=](sycl::id<2> id) {
+            state_acc[id] = SIR_INDIVIDUAL_S;
+        }); });
+
         auto N_vertices = this->N_vertices;
         return q.submit([&](sycl::handler &h)
                         {
-      auto state_acc = buf.template get_access<sycl::access::mode::write,
-                                               sycl::access::target::device>(h);
+      auto state_acc = buf.template get_access<sycl::access::mode::write
+                                               >(h);
       auto seed_acc =
-          seed_buf.template get_access<sycl::access::mode::read_write,
-                                       sycl::access::target::device>(h);
+          seed_buf.template get_access<sycl::access::mode::read_write
+                                       >(h);
       h.parallel_for(N_vertices, [=](sycl::id<1> id) {
         Static_RNG::default_rng rng(seed_acc[id]);
         seed_acc[id]++;
@@ -85,6 +89,7 @@ namespace Sycl_Graph::SBM
         auto cmap_buf =
             sycl::buffer<uint32_t>(cmap.data(), sycl::range<1>(cmap.size()));
 
+        N_communities = *std::max_element(cmap.begin(), cmap.end()) + 1;
         auto vcm_remap_event = q.submit([&](sycl::handler &h)
                                         {
       auto cmap_acc =
@@ -95,7 +100,6 @@ namespace Sycl_Graph::SBM
                                       sycl::access::target::device>(h);
       h.parallel_for(vcm_acc.size(),
                      [=](sycl::id<1> i) { vcm_acc[i] = cmap_acc[vcm_acc[i]]; }); });
-        N_communities = *std::max_element(cmap.begin(), cmap.end()) + 1;
         auto ecm_idx_map_new = create_ecm_index_map(N_communities);
         std::vector<uint32_t> ecm_new;
         auto ecm_acc = ecm_buf.template get_access<sycl::access::mode::read>();
@@ -145,20 +149,20 @@ namespace Sycl_Graph::SBM
                         {
       h.depends_on(dep_event);
       auto ecm_acc =
-          ecm_buf.template get_access<sycl::access::mode::read,
-                                      sycl::access::target::device>(h);
-      auto p_I_acc = p_I_buf.template get_access<sycl::access::mode::read,
-                                             sycl::access::target::device>(h);
+          ecm_buf.template get_access<sycl::access::mode::read
+                                >(h);
+      auto p_I_acc = p_I_buf.template get_access<sycl::access::mode::read
+                                        >(h);
       auto seed_acc =
-          seed_buf.template get_access<sycl::access_mode::read_write,
-                                       sycl::access::target::device>(h);
-      auto v_acc = trajectory.template get_access<sycl::access::mode::read_write,
-                                             sycl::access::target::device>(h);
+          seed_buf.template get_access<sycl::access_mode::read_write
+                                >(h);
+      auto v_acc = trajectory.template get_access<sycl::access::mode::read_write
+                                        >(h);
       auto edge_acc =
-          edges.template get_access<sycl::access::mode::read,
-                                    sycl::access::target::device>(h);
+          edges.template get_access<sycl::access::mode::read
+                            >(h);
       auto connection_events_acc = connection_events_buf.template get_access<
-          sycl::access::mode::write, sycl::access::target::device>(h);
+          sycl::access::mode::write>(h);
 
     //   sycl::stream out(1024, 256, h);
       h.parallel_for(edge_acc.size(), [=](sycl::id<1> id) {
@@ -185,31 +189,27 @@ namespace Sycl_Graph::SBM
     sycl::event SIR_SBM_Network::recover(uint32_t t, std::vector<sycl::event> &dep_event)
     {
         float p_R = this->p_R;
+        auto N_vertices = this->N_vertices;
         auto event = q.submit([&](sycl::handler &h)
                               {
       h.depends_on(dep_event);
       auto seed_acc =
-          seed_buf.template get_access<sycl::access_mode::read_write,
-                                       sycl::access::target::device>(h);
-      auto v_acc = trajectory.template get_access<sycl::access::mode::read_write,
-                                             sycl::access::target::device>(h);
-      h.parallel_for(v_acc.size(), [=](sycl::id<1> i) {
-        if (v_acc[t][i] == SIR_INDIVIDUAL_I) {
-          Static_RNG::default_rng rng(seed_acc[i]);
+          seed_buf.template get_access<sycl::access_mode::read_write>(h);
+      auto v_acc = trajectory.template get_access<sycl::access::mode::read_write>(h);
+    //   sycl::stream out(1024, 256, h);
+      h.parallel_for(N_vertices, [=](sycl::id<1> i) {
         
+        auto state_prev = v_acc[t][i];
+        v_acc[t+1][i] = state_prev;
+        if (state_prev == SIR_INDIVIDUAL_I) {
+          Static_RNG::default_rng rng(seed_acc[i]);
           seed_acc[i]++;
           Static_RNG::bernoulli_distribution<float> bernoulli_R(p_R);
           if (bernoulli_R(rng)) {
             v_acc[t+1][i] = SIR_INDIVIDUAL_R;
           }
         }
-            else
-          {
-            v_acc[t+1][i] = v_acc[t][i];
-          }
       }); });
-        event.wait();
-        q.wait();
         return event;
     }
 
@@ -226,35 +226,11 @@ namespace Sycl_Graph::SBM
         return infect_event;
     }
 
-    //     std::vector<sycl::event>
-    //     SIR_SBM_Network::accumulate_community_state(std::vector<sycl::buffer<State_t>> &result,
-    //                                                 std::vector<sycl::buffer<SIR_State>> &v_bufs,
-    //                                                 std::vector<sycl::event> dep_event)
-    //     {
-    // #ifdef DEBUG
-    //         assert(std::all_of(result.begin(), result.end(), [&](auto &buf)
-    //                            { return buf.size() == N_communities; }));
-    //         assert(std::all_of(v_bufs.begin(), v_bufs.end(),
-    //                            [&](auto &buf)
-    //                            { return buf.size() == N_vertices; }));
-    //         // assert that contents of Result are zeroed out
-    //         assert(std::all_of(result.begin(), result.end(), [&](auto &buf)
-    //                            {
-    //           auto acc = buf.template get_access<sycl::access::mode::read>();
-    //           bool res = 1;
-    //           for(int i = 0; i < acc.size(); i++)
-    //           {
-    //             res = res && ((acc[i][0] == 0) && (acc[i][1] == 0) && (acc[i][2] == 0));
-    //           }
-    //           return res; }));
-    // #endif
-
-    // std::vector<sycl::event> events(result.size());
 
     sycl::event SIR_SBM_Network::accumulate_community_state(std::vector<sycl::event> dep_event)
     {
-        auto N_communities = this->N_communities;
-        auto Nt = trajectory.get_range()[0]-1;
+        auto Nt = trajectory.get_range()[0] - 1;
+        auto N_vertices = this->N_vertices;
         return q.submit([&](sycl::handler &h)
                         {
         h.depends_on(dep_event);
@@ -273,7 +249,7 @@ namespace Sycl_Graph::SBM
             // {
             //     result_acc[row_id][i] = State_t{0,0,0};
             // }
-          for(int i = 0; i <  N_communities; i++)
+          for(int i = 0; i <  N_vertices; i++)
           {
             result_acc[row_id][vcm_acc[i]][v_acc[row_id][i]]++;
           }
@@ -285,10 +261,6 @@ namespace Sycl_Graph::SBM
     {
         const uint32_t Nt = p_Is.size();
 
-        // p_I_bufs.reserve(p_Is.size());
-        // std::transform(p_Is.begin(), p_Is.end(), std::back_inserter(p_I_bufs),
-        //                [&](const std::vector<float> &p_I)
-        //                { return sycl::buffer<float>(p_I.data(), p_I.size()); });
         p_I_buf = sycl::buffer<float, 2>(sycl::range<2>(Nt, N_communities));
         auto p_I_acc = p_I_buf.template get_access<sycl::access::mode::write>();
         for (int i = 0; i < Nt; i++)
@@ -299,39 +271,22 @@ namespace Sycl_Graph::SBM
             }
         }
 
-        // Edge_t* device_data = sycl::malloc_shared<Edge_t>(N_connections*Nt, q);
         connection_events_buf = sycl::buffer<Edge_t, 2>(sycl::range<2>(Nt, N_connections));
 
         buffer_fill(connection_events_buf, Edge_t{0, 0}, q);
 
-        //  = std::vector<sycl::buffer<Edge_t>>(Nt, sycl::buffer<Edge_t>(sycl::range<1>(N_connections)));
-        // std::for_each(connection_events_bufs.begin(), connection_events_bufs.end(),
-        //               [&](auto &buf)
-        //               {
-        //                   buffer_fill(buf, Edge_t{0, 0}, q);
-        //               });
-
-        // SIR_State* device_data = sycl::malloc_shared<SIR_State>((Nt+1)*N_vertices, q);
         trajectory = sycl::buffer<SIR_State, 2>(sycl::range<2>(Nt + 1, N_vertices));
 
-        //  = std::vector<sycl::buffer<SIR_State>>(Nt + 1, sycl::buffer<SIR_State>(sycl::range<1>(N_vertices)));
-
-        // community_state_bufs.reserve(Nt+1);
-
-        // State_t* device_data = sycl::malloc_shared<State_t>(N_communities, q);
         community_state_buf = sycl::buffer<State_t, 2>(sycl::range<2>(Nt + 1, N_communities));
-        // }
-        //  = std::vector<sycl::buffer<State_t>>(Nt + 1, sycl::buffer<State_t>(sycl::range<1>(N_communities)));
-        // std::for_each(community_state_bufs.begin(), community_state_bufs.end(),
-        //               [&](auto &buf)
-        //               {
-        //                   buffer_fill(buf, State_t{0, 0, 0}, q);
-        //               });
+
         buffer_fill(community_state_buf, State_t{0, 0, 0}, q);
     }
 
     std::vector<sycl::event> SIR_SBM_Network::simulate(const SIR_SBM_Param_t &param)
     {
+
+        static uint32_t N_sims = 0;
+        std::cout << "N_sims started: " << N_sims++ << std::endl;
         auto buf_size = sizeof(sycl::buffer<SIR_State>);
 
         uint32_t Nt = param.p_I.size();
@@ -339,21 +294,14 @@ namespace Sycl_Graph::SBM
         sim_init(param.p_I);
         auto vertex_init_event = initialize_vertices(p_I0, p_R0, q, trajectory);
         std::vector<sycl::event> advance_event = {vertex_init_event};
-        q.wait();
 
-        // auto evs = accumulate_community_state(community_state_buf, trajectory);
-        // auto community_init_state = read_buffer(community_state_buf[0], evs, N_communities);
-
-        // q.wait();
-        // advance_event[0] = accumulate_community_state(trajectory[0], community_state_bufs[0], advance_event);
         for (int i = 0; i < Nt; i++)
         {
             advance_event[0] = advance(i, advance_event);
-            q.wait();
+            auto state = read_buffer(trajectory);
         }
 
         advance_event[0] = accumulate_community_state(advance_event);
-        q.wait();
 
         return advance_event;
     }

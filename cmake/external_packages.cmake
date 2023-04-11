@@ -18,6 +18,15 @@ CPMFindPackage(
     "BUILD_TESTING OFF"
 )
 
+include(FindPkgConfig)
+pkg_check_modules(graph_tool REQUIRED graph-tool-py3.9)
+
+set(graph_tool_LIBRARY_DIR "/home/man/.conda/envs/py39/lib/python3.9/site-packages/graph_tool")
+
+set(graph_tool_libraries graph_tool_core)
+
+message(STATUS "graph-tool-py3.9_INCLUDE_DIRS: ${graph_tool_LIBRARIES}")
+find_package(Boost 1.78 REQUIRED HINTS /home/man/.conda/envs/py39/lib/cmake/)
 # find_package(Static_RNG REQUIRED)
 
 

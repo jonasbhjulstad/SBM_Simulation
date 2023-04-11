@@ -21,7 +21,6 @@ namespace Sycl_Graph::SBM
 
   void linewrite(std::ofstream &file, const std::vector<Edge_t> &iter);
 
-
   void simulate_to_file(const SBM_Graph_t &G, const SIR_SBM_Param_t &param,
                         sycl::queue &q, const std::string &file_path,
                         uint32_t sim_idx, uint32_t seed = 42);

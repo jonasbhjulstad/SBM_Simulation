@@ -58,20 +58,7 @@ namespace Sycl_Graph::SBM
                       {
                         sim_event.wait();
                       });
-    q.wait();
     auto [community_trajectory, connection_events_trajectory] = network.read_trajectory();
-
-    // auto community_trajectory = read_buffers(community_state_bufs, acs_events,
-    //                                          Nt + 1, network.N_communities, q);
-
-    // auto connection_events_trajectory = read_buffers(
-    // //     connection_events_bufs, acs_events, Nt, network.N_connections, q);
-    // std::vector<std::vector<State_t>> community_trajectory(community_state_bufs.size());
-    // std::vector<std::vector<Edge_t>> connection_events_trajectory(connection_events_bufs.size());
-
-
-
-
 
     std::filesystem::create_directories(file_path);
 
