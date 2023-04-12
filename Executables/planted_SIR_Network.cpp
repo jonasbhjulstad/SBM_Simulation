@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <string>
+#include <iostream>
 
 using namespace Sycl_Graph::SBM;
 
@@ -50,6 +51,22 @@ int main()
 
   std::vector<uint32_t> cmap(Gs[0].node_list.size(), 0);
   cmap[2] = 1; cmap[4] = 1; cmap[3] = 1; cmap[0] = 1;
+
+  std::cout << "map before: ";
+  std::for_each(Gs[0].vcm.begin(), Gs[0].vcm.end(), [](const auto &v)
+                {
+                  std::cout << v << " ";
+                });
+  std::cout << std::endl;
+  Gs[0].remap(cmap);
+
+  std::cout << "map after: ";
+  std::for_each(Gs[0].vcm.begin(), Gs[0].vcm.end(), [](const auto &v)
+                {
+                  std::cout << v << " ";
+                });
+  std::cout << std::endl;
+
 
 
 

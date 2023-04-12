@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 import multiprocessing as mp
+from collections import Counter
 Project_root = "/home/man/Documents/Sycl_Graph_Old/"
 Binder_path = Project_root + "/build/Binders"
 Data_dir = Project_root + "/data/SIR_sim/"
@@ -23,6 +24,18 @@ from SIR_SBM import *
 #                 p_SBM[i, j] = p_out
 #     return gt.generate_sbm(b, p_SBM, directed=False)
     
+def graph_convert(G):
+    G_gt = gt.Graph()
+    G_gt.add_vertex(len(G.node_list))
+    for e in G.edge_list:
+        G_gt.add_edge(e._from, e._to)
+
+    return G_gt
+
+
+
+
+
 
 
 if __name__ == '__main__':
@@ -46,12 +59,38 @@ if __name__ == '__main__':
 
     G = create_planted_SBM(N_pop, N_clusters, p_in, p_out[0], 4, seeds[0])
 
-    gi = gt.Graph()
-    graph_convert(gi._Graph__graph.get_graph(), G)
+    gi = graph_convert(G)
 
 
-    state = gt.minimize_nested_blockmodel_dl(G, deg_corr=False, B_min=2, B_max=2, mcmc_args=dict(niter=1000))         
 
-    state.draw(output='a.png')
+    state = gt.minimize_nested_blockmodel_dl(gi)         
+
+    entropies = [state.level_entropy(i) for i in range(len(state.get_levels()))]
+
+    entropy_tol = 80
+    idx = 0
+    for i, e in enumerate(entropies):
+        if e < entropy_tol:
+            idx = i-1
+            break
+    bmap = state.get_bs()[idx]
+    b_elem_prev = -1
+
+    # plt.plot(entropies)
+    # plt.show()
+
+    community_map = list(state.project_partition(idx, 0))
+    p_I0 = 0.1
+    p_R = 0.1
+    q = sycl_queue(gpu_selector())
+    network = SIR_SBM_Network(G, p_I0, p_R, q, seed)
+
+    network.remap(community_map)
+    levels = state.get_levels()
+    [x.draw(output="a_{}.png".format(i)) for i, x in enumerate(levels)]
+
+    state.draw(output="a.png")
+    #get entropies
+    a = 1
 
 

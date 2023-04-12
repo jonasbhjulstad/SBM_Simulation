@@ -6,6 +6,7 @@
 #include <fstream>
 #include <limits>
 #include <cstdint>
+#include <map>
 namespace Sycl_Graph::SBM
 {
   typedef std::tuple<sycl::buffer<uint32_t, 1>, sycl::buffer<uint32_t, 1>,
@@ -23,6 +24,19 @@ namespace Sycl_Graph::SBM
   {
     uint32_t from;
     uint32_t to;
+    bool operator==(const Edge_t &rhs) const
+    {
+      return from == rhs.from && to == rhs.to;
+    }
+    bool operator!=(const Edge_t &rhs) const
+    {
+      return !(*this == rhs);
+    }
+
+    bool operator<(const Edge_t &rhs) const
+    {
+      return from < rhs.from || (from == rhs.from && to < rhs.to);
+    }
   };
 
   typedef std::vector<Edge_t> Edge_List_t;
@@ -75,15 +89,15 @@ namespace Sycl_Graph::SBM
     std::vector<Edge_t> edge_list;
     std::vector<uint32_t> community_sizes;
     std::vector<uint32_t> connection_sizes;
-    std::vector<uint32_t> connection_targets;
-    std::vector<uint32_t> connection_sources;
+    std::vector<Edge_t> connection_map;
+    std::map<Edge_t, uint32_t> connection_idx_map;
     std::vector<uint32_t> ecm;
     std::vector<uint32_t> vcm;
     uint32_t N_vertices = 0;
     uint32_t N_edges = 0;
     uint32_t N_connections = 0;
     uint32_t N_communities = 0;
-
+    void remap(const std::vector<uint32_t> &map);
   private:
     void create_connection_map();
     void create_ecm();
