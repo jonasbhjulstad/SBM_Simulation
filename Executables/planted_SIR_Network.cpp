@@ -58,7 +58,7 @@ int main()
                   std::cout << v << " ";
                 });
   std::cout << std::endl;
-  Gs[0].remap(cmap);
+  // Gs[0].remap(cmap);
 
   std::cout << "map after: ";
   std::for_each(Gs[0].vcm.begin(), Gs[0].vcm.end(), [](const auto &v)

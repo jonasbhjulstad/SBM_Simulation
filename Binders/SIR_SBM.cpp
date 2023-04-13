@@ -14,9 +14,6 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 #include <utility>
-#ifdef ENABLE_GRAPH_TOOL
-#include "SIR_SBM_gt.hpp"
-#endif
 using namespace Sycl_Graph;
 using namespace Sycl_Graph::SBM;
 
@@ -39,6 +36,7 @@ PYBIND11_MODULE(SIR_SBM, m) {
 
   py::class_<Edge_t>(m, "Edge_t")
       .def(py::init<>())
+      .def(py::init<uint32_t, uint32_t>())
       .def_readwrite("_from", &Edge_t::from)
       .def_readwrite("_to", &Edge_t::to);
   py::class_<SIR_SBM_Param_t>(m, "SIR_SBM_Param_t")
@@ -53,15 +51,13 @@ PYBIND11_MODULE(SIR_SBM, m) {
                     const std::vector<Edge_List_t> &>())
       .def_readwrite("node_list", &SBM_Graph_t::node_list)
       .def_readwrite("edge_list", &SBM_Graph_t::edge_list)
-      .def_readwrite("community_sizes", &SBM_Graph_t::community_sizes)
-      .def_readwrite("connection_sizes", &SBM_Graph_t::connection_sizes)
-      .def_readwrite("connection_map", &SBM_Graph_t::connection_map)
       .def_readwrite("ecm", &SBM_Graph_t::ecm)
       .def_readwrite("vcm", &SBM_Graph_t::vcm)
       .def_readwrite("N_vertices", &SBM_Graph_t::N_vertices)
       .def_readwrite("N_edges", &SBM_Graph_t::N_edges)
       .def_readwrite("N_connections", &SBM_Graph_t::N_connections)
-      .def_readwrite("N_communities", &SBM_Graph_t::N_communities);
+      .def_readwrite("N_communities", &SBM_Graph_t::N_communities)
+      .def("remap", &SBM_Graph_t::remap);
   m.def("n_choose_k", &n_choose_k);
   m.def("create_SBM", &create_SBM);
   m.def("create_planted_SBM", &create_planted_SBM);
@@ -92,7 +88,7 @@ PYBIND11_MODULE(SIR_SBM, m) {
       .def_readwrite("G", &SIR_SBM_Network::G)
       .def_readwrite("seeds", &SIR_SBM_Network::seeds)
       .def("initialize_vertices", &SIR_SBM_Network::initialize_vertices)
-      .def("remap", &SIR_SBM_Network::remap)
+    //   .def("remap", &SIR_SBM_Network::remap)
       .def("recover", &SIR_SBM_Network::recover)
       .def("infect", &SIR_SBM_Network::infect)
       .def("advance", &SIR_SBM_Network::advance);

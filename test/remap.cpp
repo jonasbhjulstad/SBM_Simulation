@@ -38,11 +38,12 @@ int main()
       create_planted_SBM(N_pop, N_clusters, p_in, p_out, N_threads, seed);
   uint32_t N_community_connections = G.N_connections;
 
-  std::vector<uint32_t> cmap(G.node_list.size(), 0);
-//   cmap[0] = 3; cmap[1] = 2; cmap.back() = 1;
-    std::fill(cmap.begin(), cmap.begin() + 10, 3);
+//   std::vector<uint32_t> cmap(G.node_list.size(), 0);
+// //   cmap[0] = 3; cmap[1] = 2; cmap.back() = 1;
+//     std::fill(cmap.begin(), cmap.begin() + 10, 3);
+//     std::fill(cmap.begin()+10, cmap.begin() + 20, 2);
 
-    G.remap(cmap);
+//     G.remap(cmap);
 
     return 0;
 }
