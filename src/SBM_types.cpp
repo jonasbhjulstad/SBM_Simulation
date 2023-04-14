@@ -108,6 +108,35 @@ SBM_Graph_t::SBM_Graph_t(const std::vector<Node_List_t> &node_lists,
     edge_list.insert(edge_list.end(), edge_lists[i].begin(),
                      edge_lists[i].end());
   }
+  //for each edge list:
+
+  auto find_id_in_nodelist = [&](const uint32_t id)
+  {
+    auto it = std::find_if(node_lists.begin(), node_lists.end(), [&](const auto& n_list)
+    {
+      auto node_it = std::find_if(n_list.begin(), n_list.end(), [&](const auto& n)
+      {
+        return n==id;
+      });
+      return node_it != n_list.end();
+    });
+    return (uint32_t)std::distance(node_lists.begin(), it);
+  };
+
+  for(const auto& e_list: edge_lists)
+  {
+    auto first_edge = e_list[0];
+    auto to_community_id = find_id_in_nodelist(first_edge.to);
+    auto from_community_id = find_id_in_nodelist(first_edge.from);
+    connection_community_map.push_back(Edge_t{from_community_id, to_community_id});
+  }
+  for(const auto& e_list: edge_lists)
+  {
+    auto first_edge = e_list[0];
+    auto to_community_id = find_id_in_nodelist(first_edge.to);
+    auto from_community_id = find_id_in_nodelist(first_edge.from);
+    connection_community_map.push_back(Edge_t{to_community_id, from_community_id});
+  }
 
   create_ecm(connection_sizes);
   create_vcm();
@@ -119,7 +148,6 @@ void SBM_Graph_t::remap(const std::vector<uint32_t> &map, const std::vector<Edge
   std::iota(v_idx.begin(), v_idx.end(), 0);
   std::transform(v_idx.begin(), v_idx.end(), vcm.begin(),
                  [&](uint32_t &v) { 
-                  // std::cout << "v: " << v << ", remapped v: " << map[v] << std::endl;
                   return map[v]; });
 
   std::transform(edge_list.begin(), edge_list.end(), ecm.begin(), [&](Edge_t &e) {
@@ -129,46 +157,22 @@ void SBM_Graph_t::remap(const std::vector<uint32_t> &map, const std::vector<Edge
         return (uint32_t)std::distance(idx_connection_map.begin(), it); 
       auto from_mapped_edge = Edge_t{map[e.to], map[e.from]};
       it = std::find(idx_connection_map.begin(), idx_connection_map.end(), from_mapped_edge);
-        // std::cout << "it-idx: " << std::distance(idx_connection_map.begin(), it) << std::endl;
       assert(it != idx_connection_map.end() && "Could not find edge in connection map");
       return (uint32_t)std::distance(idx_connection_map.begin(), it);
   });
-  // std::cout << "idx_connection_map.size(): " << idx_connection_map.size() << std::endl;
-  // for(int i = 0; i < ecm.size(); i++) {
-    // assert(!std::none_of(ecm.begin(), ecm.end(), [&](uint32_t &e) { return e == i; }) && "Could not find edge in connection map");
-  // }
 
   N_connections = idx_connection_map.size();
   N_communities = *std::max_element(map.begin(), map.end()) + 1;
+  connection_community_map = idx_connection_map;
 }
-
-// std::tuple<std::vector<Edge_t>, std::map<Edge_t, uint32_t>>
-// SBM_Graph_t::create_connection_map(uint32_t N_communities) {
-
-//   std::vector<uint32_t> community_idx(N_communities);
-//   std::iota(community_idx.begin(), community_idx.end(), 0);
-//   uint32_t i = 0;
-
-//   std::vector<Edge_t> cm;
-//   std::map<Edge_t, uint32_t> cim;
-//   for (auto &&comb : iter::combinations(community_idx, 2)) {
-//     cm.push_back(Edge_t{comb[0], comb[1]});
-//     cim[Edge_t{comb[0], comb[1]}] = i;
-//     i++;
-//   }
-//   for (auto &&idx : community_idx) {
-//     cm.push_back(Edge_t{idx, idx});
-//     cim[Edge_t{idx, idx}] = i;
-//     i++;
-//   }
-//   for (auto &&comb : iter::combinations(community_idx, 2)) {
-//     cm.push_back(Edge_t{comb[1], comb[0]});
-//     cim[Edge_t{comb[1], comb[0]}] = i;
-//     i++;
-//   }
-
-//   return std::make_tuple(con_map, con_idx_map);
-// }
+void SBM_Graph_t::ccmap_write(const std::string& fpath)
+{
+  std::ofstream f(fpath);
+  for(const auto& e: connection_community_map)
+  {
+    f << e.from << " " << e.to << std::endl;
+  }
+}
 
 void SBM_Graph_t::create_ecm(const std::vector<uint32_t>& connection_sizes) {
   ecm.reserve(N_edges);

@@ -10,50 +10,11 @@ Project_root = "/home/man/Documents/Sycl_Graph_Old/"
 Binder_path = Project_root + "/build/Binders"
 Data_dir = Project_root + "/data/SIR_sim/"
 sys.path.append(Binder_path)
-
+from Community_Inference import *
 from SIR_SBM import *
-# from libgraph_tool_SIR_SBM import *
-
-# def create_planted(N_pop, N_clusters, p_in, p_out):
-#     b = np.concatenate([np.ones(N_pop) for _ in range(N_clusters)])
-#     p_SBM = np.zeros(shape=(N_pop, N_pop))
-#     for i in range(N_pop):
-#         for j in range(N_pop):
-#             if b[i] == b[j]:
-#                 p_SBM[i, j] = p_in
-#             else:
-#                 p_SBM[i, j] = p_out
-#     return gt.generate_sbm(b, p_SBM, directed=False)
-    
-fpath = "/home/man/Documents/Sycl_Graph_Old/data/SIR_sim/Graph_0/"
-def graph_convert(G):
-    G_gt = gt.Graph(directed=True)
-    G_gt.add_vertex(len(G.node_list))
-    for e in G.edge_list:
-        G_gt.add_edge(e._from, e._to)
-
-    return G_gt
-
-def remap(G, state, idx):
-    community_map = list(state.project_partition(idx, 0))
-    count = Counter(community_map)
-    N_count_keys = len(count.keys())
-    new_keys = list(range(N_count_keys))
-    idx_map = {k: v for k, v in zip(count.keys(), new_keys)}
-    #replace indices with linspace(0, N_count_keys, N_count_keys)
-    for i, c in enumerate(community_map):
-        community_map[i] = int(idx_map[c])
-
-    edge_idx_map = []
-    for e in state.get_levels()[idx+1].g.get_edges():
-        edge_idx_map.append(Edge_t(idx_map[e[0]], idx_map[e[1]]))
-
-    G.remap(community_map, edge_idx_map)
-    return G
 
 
-
-
+fpath = Data_dir + "Graph_0/"
 
 if __name__ == '__main__':
 

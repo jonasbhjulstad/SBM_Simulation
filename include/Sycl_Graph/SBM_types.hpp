@@ -81,14 +81,17 @@ struct SBM_Graph_t {
   std::vector<uint32_t> community_sizes;
   std::vector<uint32_t> ecm;
   std::vector<uint32_t> vcm;
+  std::vector<Edge_t> connection_community_map;
   uint32_t N_vertices = 0;
   uint32_t N_edges = 0;
   uint32_t N_connections = 0;
   uint32_t N_communities = 0;
   void remap(const std::vector<uint32_t> &map,
              const std::vector<Edge_t> &idx_connection_map);
+
+  void ccmap_write(const std::string& fpath);
 private:
-void SBM_Graph_t::create_ecm(const std::vector<uint32_t>& connection_sizes);
+void create_ecm(const std::vector<uint32_t>& connection_sizes);
 
   void create_vcm();
 };

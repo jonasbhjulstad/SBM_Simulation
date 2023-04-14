@@ -1,4 +1,4 @@
-// #include <Sycl_Graph/Regression.hpp>
+#include <Sycl_Graph/Regression.hpp>
 #include "Sycl_Graph/SBM_types.hpp"
 #include <Sycl_Graph/SBM_Generation.hpp>
 #include <Sycl_Graph/SBM_write.hpp>
@@ -57,6 +57,8 @@ PYBIND11_MODULE(SIR_SBM, m) {
       .def_readwrite("N_edges", &SBM_Graph_t::N_edges)
       .def_readwrite("N_connections", &SBM_Graph_t::N_connections)
       .def_readwrite("N_communities", &SBM_Graph_t::N_communities)
+      .def_readwrite("connection_community_map", &SBM_Graph_t::connection_community_map)
+      .def("ccmap_write", &SBM_Graph_t::ccmap_write)
       .def("remap", &SBM_Graph_t::remap);
   m.def("n_choose_k", &n_choose_k);
   m.def("create_SBM", &create_SBM);
@@ -109,8 +111,8 @@ PYBIND11_MODULE(SIR_SBM, m) {
                              const std::vector<std::string> &, uint32_t)>(
             &parallel_simulate_to_file));
 
-#ifdef ENABLE_GRAPH_TOOL
 
-//   m.def("graph_convert", &convert_bind);
-#endif
+    m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>> (*)(const std::string &, uint32_t, float, uint32_t)>(&regression_on_datasets));
+    m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>> (*)(const std::vector<std::string> &, uint32_t, float, uint32_t)>(&regression_on_datasets));
+    m.def("load_N_datasets", &load_N_datasets);
 }

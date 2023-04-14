@@ -19,7 +19,7 @@ int main()
   uint32_t N_pop = 100;
   float p_in = 1.0f;
   float p_out = 0.2f;
-  uint32_t N_sims = 100;
+  uint32_t N_sims = 2;
   uint32_t Ng = 1;
   // sycl::queue q(sycl::gpu_selector_v);
   std::vector<std::vector<sycl::queue>> qs(Ng);
@@ -49,23 +49,6 @@ int main()
                    return std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_" + std::to_string(n++) + "/";
                  });
 
-  std::vector<uint32_t> cmap(Gs[0].node_list.size(), 0);
-  cmap[2] = 1; cmap[4] = 1; cmap[3] = 1; cmap[0] = 1;
-
-  std::cout << "map before: ";
-  std::for_each(Gs[0].vcm.begin(), Gs[0].vcm.end(), [](const auto &v)
-                {
-                  std::cout << v << " ";
-                });
-  std::cout << std::endl;
-  // Gs[0].remap(cmap);
-
-  std::cout << "map after: ";
-  std::for_each(Gs[0].vcm.begin(), Gs[0].vcm.end(), [](const auto &v)
-                {
-                  std::cout << v << " ";
-                });
-  std::cout << std::endl;
 
 
 

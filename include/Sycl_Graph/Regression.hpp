@@ -46,11 +46,10 @@ namespace Sycl_Graph
         return Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(matrixEntries.data(), matrixRowNumber, matrixEntries.size() / matrixRowNumber);
     }
 
-    std::pair<Mat, Mat> connection_regression(const std::string datapath, uint32_t idx)
+    std::pair<Mat, Mat> load_beta_regression(const std::string datapath, uint32_t idx)
     {
         Mat connection_infs = openData(datapath + connection_infs_filename(idx));
-        Mat connection_targets = openData(datapath + connection_targets_filename(idx));
-        Mat connection_sources = openData(datapath + connection_sources_filename(idx));
+        Mat connection_community_map = openData(datapath + connection_community_map_filename());
         Mat community_traj = openData(datapath + community_traj_filename(idx));
 
         assert((connection_infs.array() <= 1000).all());
@@ -59,18 +58,15 @@ namespace Sycl_Graph
         auto N_connections = connection_infs.cols();
         auto Nt = community_traj.rows() - 1;
         uint32_t N_communities = community_traj.cols() / 3;
-        Mat p_Is_to = openData(datapath + p_Is_filename(idx));
+        Mat p_Is = openData(datapath + p_Is_filename(idx));
 
-        Mat p_Is_from = p_Is_to(Eigen::all, Eigen::seq(0, Eigen::last - N_communities));
-        Mat p_Is(Nt, N_connections);
-        p_Is << p_Is_to, p_Is_from;
         std::vector<float> thetas_LS(N_connections);
         std::vector<float> thetas_QR(N_connections);
         Mat F_beta_rs_mat(Nt, N_connections);
-        for (int i = 0; i < connection_targets.cols(); i++)
+        for (int i = 0; i < connection_community_map.rows(); i++)
         {
-            auto target_idx = connection_targets(0, i);
-            auto source_idx = connection_sources(0, i);
+            auto target_idx = connection_community_map(i, 1);
+            auto source_idx = connection_community_map(i, 0);
             // community_traj[:, 3*target_idx:3*target_idx+3]
             Mat target_traj = community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * target_idx, 3));
             Mat source_traj = community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * source_idx, 3));
@@ -94,13 +90,13 @@ namespace Sycl_Graph
         return std::make_pair(F_beta_rs_mat, connection_infs);
     }
 
-    std::tuple<Mat, Mat, Vec, Vec> load_N_datasets(const std::string &datapath, uint32_t N, uint32_t offset = 0)
+    std::tuple<Mat, Mat> load_N_datasets(const std::string &datapath, uint32_t N, uint32_t offset = 0)
     {
         std::vector<uint32_t> idx(N);
         std::iota(idx.begin(), idx.end(), offset);
         std::vector<std::pair<Mat, Mat>> datasets;
         std::transform(idx.begin(), idx.end(), std::back_inserter(datasets), [&](auto idx)
-                       { return connection_regression(datapath, idx); });
+                       { return load_beta_regression(datapath, idx); });
 
         std::vector<std::pair<uint32_t, uint32_t>> sizes;
         std::transform(datasets.begin(), datasets.end(), std::back_inserter(sizes), [](auto &dataset)
@@ -112,10 +108,6 @@ namespace Sycl_Graph
         Mat F_beta_rs_mat(tot_rows, cols);
         // fill mats with datasets
         uint32_t row_offset = 0;
-
-        Vec y_recovery(tot_rows);
-        Vec x_recovery(tot_rows);
-        uint32_t rec_offset = 0;
         for (int i = 0; i < datasets.size(); i++)
         {
             auto &dataset = datasets[i];
@@ -124,18 +116,11 @@ namespace Sycl_Graph
             F_beta_rs_mat(Eigen::seqN(row_offset, size.first), Eigen::all) = dataset.first;
             row_offset += size.first;
 
-            Mat tot_traj = openData(datapath + tot_traj_filename(i));
-            uint32_t N_elems = tot_traj.rows() - 1;
-            x_recovery(Eigen::seqN(rec_offset, N_elems)) = tot_traj.col(1).head(N_elems);
-            y_recovery(Eigen::seqN(rec_offset, N_elems)) = tot_traj.col(2).tail(N_elems) - tot_traj.col(2).head(N_elems);
-            rec_offset += N_elems;
-
-            Vec x = tot_traj.col(1).head(tot_traj.rows() - 1);
         }
         assert(F_beta_rs_mat.array().sum() != 0);
         assert(connection_infs_tot.array().sum() != 0);
 
-        return std::make_tuple(F_beta_rs_mat, connection_infs_tot, x_recovery, y_recovery);
+        return std::make_tuple(F_beta_rs_mat, connection_infs_tot);
     }
 
     std::pair<std::vector<float>, std::vector<float>> beta_regression(const Mat &F_beta_rs_mat, const Mat &connection_infs, float tau)
@@ -158,17 +143,17 @@ namespace Sycl_Graph
         return y.dot(x) / x.dot(x);
     }
 
-    std::tuple<float, std::vector<float>, std::vector<float>> regression_on_datasets(const std::string &datapath, uint32_t N, float tau, uint32_t offset)
+    std::tuple<std::vector<float>, std::vector<float>> regression_on_datasets(const std::string &datapath, uint32_t N, float tau, uint32_t offset)
     {
-        auto [F_beta_rs_mat, connection_infs, x_recovery, y_recovery] = load_N_datasets(datapath, N, offset);
-        float alpha = alpha_regression(x_recovery, y_recovery);
+        auto [F_beta_rs_mat, connection_infs] = load_N_datasets(datapath, N, offset);
+        // float alpha = alpha_regression(x_recovery, y_recovery);
         auto [thetas_LS, thetas_QR] = beta_regression(F_beta_rs_mat, connection_infs, tau);
-        return std::make_tuple(alpha, thetas_LS, thetas_QR);
+        return std::make_tuple(thetas_LS, thetas_QR);
     }
 
-    std::tuple<float, std::vector<float>, std::vector<float>> regression_on_datasets(const std::vector<std::string> &datapaths, uint32_t N, float tau, uint32_t offset = 0)
+    std::tuple<std::vector<float>, std::vector<float>> regression_on_datasets(const std::vector<std::string> &datapaths, uint32_t N, float tau, uint32_t offset = 0)
     {
-        std::vector<std::tuple<Mat, Mat, Vec, Vec>> datasets(datapaths.size());
+        std::vector<std::tuple<Mat, Mat>> datasets(datapaths.size());
         std::transform(datapaths.begin(), datapaths.end(), datasets.begin(), [&](auto &datapath)
                        { return load_N_datasets(datapath, N, offset); });
 
@@ -176,8 +161,6 @@ namespace Sycl_Graph
 
         Mat F_beta_rs_mat_tot;
         Mat connection_infs_tot;
-        Vec x_recovery_tot;
-        Vec y_recovery_tot;
 
         uint32_t row_offset = 0;
         //stack datasets
@@ -186,20 +169,15 @@ namespace Sycl_Graph
             auto &dataset = datasets[i];
             auto &F_beta_rs_mat = std::get<0>(dataset);
             auto &connection_infs = std::get<1>(dataset);
-            auto &x_recovery = std::get<2>(dataset);
-            auto &y_recovery = std::get<3>(dataset);
             uint32_t N_rows = F_beta_rs_mat.rows();
 
             F_beta_rs_mat_tot(Eigen::seqN(row_offset, N_rows), Eigen::all) = F_beta_rs_mat;
             connection_infs_tot(Eigen::seqN(row_offset, N_rows), Eigen::all) = connection_infs;
-            x_recovery_tot(Eigen::seqN(row_offset, N_rows)) = x_recovery;
-            y_recovery_tot(Eigen::seqN(row_offset, N_rows)) = y_recovery;
             row_offset += N_rows;
         }
 
-        float alpha = alpha_regression(x_recovery_tot, y_recovery_tot);
         auto [thetas_LS, thetas_QR] = beta_regression(F_beta_rs_mat_tot, connection_infs_tot, tau);
-        return std::make_tuple(alpha, thetas_LS, thetas_QR);
+        return std::make_tuple(thetas_LS, thetas_QR);
     }
 
 }

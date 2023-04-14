@@ -33,6 +33,7 @@ SIR_SBM_Network::SIR_SBM_Network(const SBM_Graph_t &_G, float p_I0, float p_R,
       p_I0(p_I0), p_R0(p_R0), seeds(generate_seeds(_G.N_edges, seed)),
       seed_buf(seeds.data(), sycl::range<1>(_G.N_edges)),
       trajectory(sycl::range<2>(1, 1)),
+      community_recoveries_buf(sycl::range<2>(1, 1)),
       connection_events_buf(sycl::range<2>(1, 1)),
       community_state_buf(sycl::range<2>(1, 1)), p_I_buf(sycl::range<2>(1, 1)) {
 }
@@ -165,15 +166,18 @@ sycl::event SIR_SBM_Network::recover(uint32_t t,
                                      std::vector<sycl::event> &dep_event) {
   float p_R = this->p_R;
   auto N_vertices = this->N_vertices;
+  sycl::buffer<bool> rec_buf(N_vertices);
   auto event = q.submit([&](sycl::handler &h) {
     h.depends_on(dep_event);
     auto seed_acc =
         seed_buf.template get_access<sycl::access_mode::read_write>(h);
     auto v_acc =
         trajectory.template get_access<sycl::access::mode::read_write>(h);
+    auto rec_acc = rec_buf.template get_access<sycl::access::mode::write>(h);
     //   sycl::stream out(1024, 256, h);
     h.parallel_for(N_vertices, [=](sycl::id<1> i) {
       auto state_prev = v_acc[t][i];
+      rec_acc[i] = false;
       v_acc[t + 1][i] = state_prev;
       if (state_prev == SIR_INDIVIDUAL_I) {
         Static_RNG::default_rng rng(seed_acc[i]);
@@ -181,11 +185,28 @@ sycl::event SIR_SBM_Network::recover(uint32_t t,
         Static_RNG::bernoulli_distribution<float> bernoulli_R(p_R);
         if (bernoulli_R(rng)) {
           v_acc[t + 1][i] = SIR_INDIVIDUAL_R;
+          rec_acc[i] = true;
         }
       }
     });
   });
-  return event;
+
+  auto rec_count_event = q.submit([&](sycl::handler &h) {
+    h.depends_on(event);
+    auto rec_acc = rec_buf.template get_access<sycl::access::mode::read>(h);
+    auto vcm_acc = vcm_buf.template get_access<sycl::access::mode::read>(h);
+    auto community_rec_acc =
+        community_recoveries_buf.template get_access<sycl::access::mode::write>(h);
+    h.parallel_for(N_communities, [=](sycl::id<1> id) {
+      community_rec_acc[t][id] = 0;
+      for (int i = 0; i < N_vertices; i++) {
+        if (vcm_acc[i] == id[0] && rec_acc[i]) {
+          community_rec_acc[t][id] += 1;
+        }
+      }
+    });
+  });
+  return rec_count_event;
 }
 
 sycl::event SIR_SBM_Network::advance(uint32_t t,
@@ -216,10 +237,6 @@ sycl::event SIR_SBM_Network::accumulate_community_state(
                                                sycl::access::target::device>(h);
     sycl::stream out(1024, 256, h);
     h.parallel_for(Nt + 1, [=](sycl::id<1> row_id) {
-      // for(int i = 0;i < N_communities; i++)
-      // {
-      //     result_acc[row_id][i] = State_t{0,0,0};
-      // }
       for (int i = 0; i < N_vertices; i++) {
         result_acc[row_id][vcm_acc[i]][v_acc[row_id][i]]++;
       }
@@ -244,7 +261,8 @@ void SIR_SBM_Network::sim_init(const std::vector<std::vector<float>> &p_Is) {
   buffer_fill(connection_events_buf, Edge_t{0, 0}, q);
 
   trajectory = sycl::buffer<SIR_State, 2>(sycl::range<2>(Nt + 1, N_vertices));
-
+  community_recoveries_buf =
+      sycl::buffer<uint32_t, 2>(sycl::range<2>(Nt, N_communities));
   community_state_buf =
       sycl::buffer<State_t, 2>(sycl::range<2>(Nt + 1, N_communities));
 
@@ -255,7 +273,6 @@ std::vector<sycl::event>
 SIR_SBM_Network::simulate(const SIR_SBM_Param_t &param) {
 
   static uint32_t N_sims = 0;
-  std::cout << "N_sims started: " << N_sims++ << std::endl;
   auto buf_size = sizeof(sycl::buffer<SIR_State>);
 
   uint32_t Nt = param.p_I.size();
@@ -274,13 +291,99 @@ SIR_SBM_Network::simulate(const SIR_SBM_Param_t &param) {
   return advance_event;
 }
 
-std::tuple<std::vector<std::vector<State_t>>, std::vector<std::vector<Edge_t>>>
+std::tuple<std::vector<std::vector<State_t>>, std::vector<std::vector<Edge_t>>,
+           std::vector<std::vector<Edge_t>>>
 SIR_SBM_Network::read_trajectory() {
   auto community_state = read_buffer(community_state_buf);
   auto connection_events = read_buffer(connection_events_buf);
-  return {community_state, connection_events};
+  auto community_recoveries = read_buffer(community_recoveries_buf);
+  auto connection_infections = sample_connection_infections(
+      community_state, connection_events, community_recoveries, seeds.back());
+  return {community_state, connection_events, connection_infections};
 }
 
+std::vector<Edge_t> SIR_SBM_Network::sample_connection_infections(
+    uint32_t community_idx, uint32_t N_infected,
+    const std::vector<Edge_t> &connection_events,
+    uint32_t seed) {
+  std::mt19937 rng(seed);
+
+  std::vector<uint32_t> connection_weights(G.connection_community_map.size());
+  std::transform(G.connection_community_map.begin(),
+                 G.connection_community_map.end(), connection_weights.begin(),
+                 [&](const Edge_t &e) {
+                   return e.to == community_idx ? e.to : 0;
+                 });
+
+  std::discrete_distribution<uint32_t> dist(connection_weights.begin(),
+                                            connection_weights.end());
+  std::vector<Edge_t> connection_infections(N_connections, Edge_t{0, 0});
+  for (int i = 0; i < N_infected; i++) {
+    auto idx = dist(rng);
+    if (idx % 2 == 0) {
+      connection_infections[idx / 2].to++;
+    } else {
+      connection_infections[idx / 2].from++;
+    }
+  }
+  return connection_infections;
+}
+
+std::vector<std::vector<Edge_t>> SIR_SBM_Network::sample_connection_infections(
+    const std::vector<std::vector<State_t>> &community_trajectory,
+    const std::vector<std::vector<Edge_t>> &connection_events, 
+    const std::vector<std::vector<uint32_t>> &community_recoveries,
+    uint32_t seed) {
+  uint32_t Nt = community_trajectory.size() - 1;
+  std::vector<std::vector<Edge_t>> connection_infections(Nt);
+  std::vector<std::vector<int>> delta_Is(
+      Nt, std::vector<int>(N_communities, 0));
+
+  for (int i = 0; i < Nt; i++) {
+    for (int j = 0; j < N_communities; j++) {
+      delta_Is[i][j] =
+          community_trajectory[i + 1][j][1] - community_trajectory[i][j][1] + community_recoveries[i][j];
+      #ifdef DEBUG
+      assert(community_trajectory[i + 1][j][1] <= N_vertices);
+      assert(delta_Is[i][j] >= 0);
+      #endif
+    }
+  }
+
+  std::vector<uint32_t> community_idx(N_communities);
+  std::iota(community_idx.begin(), community_idx.end(), 0);
+
+  std::vector<uint32_t> rngs = generate_seeds(Nt, seed);
+
+  for (int i = 0; i < Nt; i++) {
+    auto seed = rngs[i];
+    auto delta_I = delta_Is[i];
+    auto c_events = connection_events[i];
+    std::vector<std::vector<Edge_t>> infections_t(
+        N_communities, std::vector<Edge_t>(N_connections, Edge_t{0, 0}));
+    std::vector<uint32_t> seeds = generate_seeds(N_communities, seed);
+    std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> zip(N_communities);
+    for (int i = 0; i < N_communities; i++) {
+      infections_t[i] = sample_connection_infections(i, delta_I[i], c_events, seeds[i]);
+    }
+
+    std::vector<Edge_t> accumulated_infections(N_connections, Edge_t{0, 0});
+    for (int i = 0; i < N_communities; i++) {
+      for (int j = 0; j < N_connections; j++) {
+        accumulated_infections[j].to += infections_t[i][j].to;
+        accumulated_infections[j].from += infections_t[i][j].from;
+      }
+    }
+    #ifdef DEBUG
+    uint32_t total_infections = std::accumulate(
+        accumulated_infections.begin(), accumulated_infections.end(), 0,
+        [](uint32_t a, Edge_t b) { return a + b.to + b.from; });
+    assert(total_infections == std::accumulate(delta_I.begin(), delta_I.end(), 0));
+    #endif
+    connection_infections[i] = accumulated_infections;
+  }
+  return connection_infections;
+}
 std::vector<uint32_t> SIR_SBM_Network::generate_seeds(uint32_t N_rng,
                                                       uint32_t seed) {
   std::mt19937 gen(seed);
