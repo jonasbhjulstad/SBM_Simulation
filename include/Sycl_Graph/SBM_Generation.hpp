@@ -7,7 +7,7 @@ namespace Sycl_Graph::SBM
 
   Edge_List_t
   random_connect(const Node_List_t &to_nodes, const Node_List_t &from_nodes,
-                 float p, bool self_loop = true, uint32_t N_threads = 4,
+                 float p, bool self_loop = false, uint32_t N_threads = 4,
                  uint32_t seed = 47);
 
   long long n_choose_k(int n, int k);
@@ -15,7 +15,7 @@ namespace Sycl_Graph::SBM
 
 
   SBM_Graph_t random_connect(const std::vector<Node_List_t> &nodelists,
-                             float p_in, float p_out, bool self_loop = true, uint32_t N_threads = 4,
+                             float p_in, float p_out, bool self_loop = false, uint32_t N_threads = 4,
                              uint32_t seed = 47);
 
   // create pybind11 module

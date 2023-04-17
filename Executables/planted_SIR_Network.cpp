@@ -18,7 +18,7 @@ int main()
   uint32_t N_clusters = 10;
   uint32_t N_pop = 100;
   float p_in = 1.0f;
-  float p_out = 0.2f;
+  float p_out = 1.0f;
   uint32_t N_sims = 2;
   uint32_t Ng = 1;
   // sycl::queue q(sycl::gpu_selector_v);

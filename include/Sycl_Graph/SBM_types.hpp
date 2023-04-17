@@ -75,7 +75,6 @@ struct SBM_Graph_t {
   SBM_Graph_t(){};
   SBM_Graph_t(const std::vector<Node_List_t> &node_lists,
               const std::vector<Edge_List_t> &edge_lists);
-
   std::vector<uint32_t> node_list;
   std::vector<Edge_t> edge_list;
   std::vector<uint32_t> community_sizes;
