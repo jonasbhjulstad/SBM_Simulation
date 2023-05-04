@@ -55,7 +55,7 @@ long long n_choose_k(int n, int k) {
 SBM_Graph_t random_connect(const std::vector<Node_List_t> &nodelists,
                            float p_in, float p_out, bool self_loop,
                            uint32_t N_threads, uint32_t seed) {
-  uint32_t N_node_pairs = n_choose_k(nodelists.size(), 2);
+  uint32_t N_node_pairs = n_choose_k(nodelists.size(), 2) + nodelists.size();
 #ifdef DEBUG
   std::for_each(nodelists.begin(), nodelists.end(), [&](const auto &n_vec) {
     assert(n_vec.size() < RANDOM_CONNECT_MAX_NODE_SIZE);
@@ -215,4 +215,5 @@ generate_p_Is(uint32_t N_community_connections, uint32_t N_sims, uint32_t Ng,
                  });
   return p_Is;
 }
+
 } // namespace Sycl_Graph::SBM

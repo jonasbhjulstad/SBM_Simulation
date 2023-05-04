@@ -17,17 +17,22 @@ def generate_planted_graph(N_clusters, N_pop, p_out):
     #expected number of randomly connected edges between two groups with N_pop members and p_in probability of connection
     # p_in = N_pop*p_in
     cmap = np.concatenate([np.ones(N_pop)*i for i in range(N_clusters)])
-    N_out_edges = comb(N_pop, 2)*p_out
+    #convert to int
+    cmap = cmap.astype(int)
+    #max number of edges between vertex groups of N_pop members
+    N_out_edges = int(N_pop*(N_pop-1)*p_out)
+
     #fill matrix probs
     for i in range(N_clusters):
         for j in range(N_clusters):
             if i == j:
                 p_mat[i][j] = N_pop*(N_pop-1)
             else:
-                p_mat[i][j] = N_out_edges
+                p_mat[i][j] = N_pop*N_pop/2
 
 
-    g = gt.generate_sbm(cmap, p_mat)
+    g = gt.generate_sbm(cmap, p_mat, micro_ers=True, directed=False)
+    gt.remove_self_loops(g)
 
     clabels = g.new_vertex_property("int")
     clabels.a = cmap
@@ -70,8 +75,8 @@ if __name__ == '__main__':
     p_outs = np.linspace(0,1.0,11)
     pool = mp.Pool(mp.cpu_count())
 
-    community_states = pool.starmap(generate_compute, [(N_clusters, N_pop, p_out) for p_out in p_outs])
-    # community_states = [generate_compute(N_clusters, N_pop, p_out) for p_out in reversed(p_outs)]
+    # community_states = pool.starmap(generate_compute, [(N_clusters, N_pop, p_out) for p_out in p_outs])
+    community_states = [generate_compute(N_clusters, N_pop, p_out) for p_out in reversed(p_outs)]
 
     N_communities = [s.get_nonempty_B() for s in community_states]
 

@@ -38,6 +38,6 @@ namespace Sycl_Graph::SBM
 
   std::vector<std::vector<std::vector<std::vector<float>>>> generate_p_Is(uint32_t N_community_connections, uint32_t N_sims, uint32_t Ng, float p_I_min,
                                                                           float p_I_max, uint32_t Nt, uint32_t seed = 42);
-  
+
 }
 #endif
