@@ -308,30 +308,19 @@ std::vector<Edge_t> SIR_SBM_Network::sample_connection_infections(
     uint32_t seed) {
   std::mt19937 rng(seed);
 
-  std::vector<uint32_t> connection_weights(G.connection_community_map.size());
-  std::transform(G.connection_community_map.begin(),
-                 G.connection_community_map.end(), connection_weights.begin(),
-                 [&](const Edge_t &e) {
-                   return e.to == community_idx ? e.to : 0;
-                 });
+  std::vector<uint32_t> connection_sizes(N_connections);
 
   std::discrete_distribution<uint32_t> dist(connection_weights.begin(),
                                             connection_weights.end());
   std::vector<Edge_t> connection_infections(N_connections, Edge_t{0, 0});
-  for (int i = 0; i < N_infected; i++) {
-    auto idx = dist(rng);
-    if (idx % 2 == 0) {
-      connection_infections[idx / 2].to++;
-    } else {
-      connection_infections[idx / 2].from++;
-    }
-  }
+
+  uint32_t N_inf_samples = 0;
   return connection_infections;
 }
 
 std::vector<std::vector<Edge_t>> SIR_SBM_Network::sample_connection_infections(
     const std::vector<std::vector<State_t>> &community_trajectory,
-    const std::vector<std::vector<Edge_t>> &connection_events, 
+    const std::vector<std::vector<Edge_t>> &connection_events,
     const std::vector<std::vector<uint32_t>> &community_recoveries,
     uint32_t seed) {
   uint32_t Nt = community_trajectory.size() - 1;

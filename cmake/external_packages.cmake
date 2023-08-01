@@ -5,7 +5,7 @@ CPMFindPackage(
     GITHUB_REPOSITORY jonasbhjulstad/Static_RNG
     GIT_TAG master
     OPTIONS
-    STATIC_RNG_ENABLE_SYCL ON
+    STATIC_RNG_ENABLE_SYCL OFF
     BUILD_PYTHON_BINDERS OFF
     BUILD_DOCS OFF
 )
@@ -62,4 +62,3 @@ CPMFindPackage(
 # )
 
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
-

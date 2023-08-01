@@ -42,7 +42,7 @@ def delta_I(state_s, state_r, p_I, theta):
 
 
 def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max):
-    
+
     def community_delta_I(community_idx, c_states, c_p_Is):
         d_I = 0
         state_s = c_states[3*community_idx:3*community_idx+3]
@@ -109,7 +109,7 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
             for k in range(int(N_connections/2)):
                 f -= Wu/N_pop*(u_i[k] - u_max)
         return f, state
-    
+
     f, state = construct_objective(u)
 
     w = reshape(u, (u.shape[0]*int(N_connections/2), 1))
@@ -191,7 +191,7 @@ if __name__ == '__main__':
     np.savetxt(Data_dir + "QR/traj.csv", traj_QR)
     np.savetxt(Data_dir + "QR/u_opt_uniform.csv", u_opt_QR_uniform)
     np.savetxt(Data_dir + "QR/traj_uniform.csv", traj_QR_uniform)
-    
+
 
     solution_plot(traj_LS, u_opt_LS, f_LS, Data_dir + "LS/")
     solution_plot(traj_QR, u_opt_QR, f_QR, Data_dir + "QR/")

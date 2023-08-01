@@ -81,6 +81,7 @@ struct SBM_Graph_t {
   std::vector<uint32_t> ecm;
   std::vector<uint32_t> vcm;
   std::vector<Edge_t> connection_community_map;
+  std::vector<uint32_t> connection_sizes;
   uint32_t N_vertices = 0;
   uint32_t N_edges = 0;
   uint32_t N_connections = 0;

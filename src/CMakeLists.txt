@@ -1,6 +1,6 @@
 function(add_sycl_library source_file)
     add_library(${source_file} STATIC "${source_file}.cpp")
-    target_link_libraries(${source_file} PUBLIC Sycl_Graph Static_RNG TBB::tbb cppitertools)
+    target_link_libraries(${source_file} PUBLIC Sycl_Graph Static_RNG::Static_RNG TBB::tbb cppitertools)
     target_compile_options(${source_file} PUBLIC ${SYCL_COMPILE_OPTIONS})
     target_compile_options(${source_file} PUBLIC ${DEFAULT_WARNING_FLAGS})
     target_compile_options(${source_file} PRIVATE ${DPCPP_FLAGS} -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda)

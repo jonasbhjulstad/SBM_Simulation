@@ -75,18 +75,12 @@ SBM_Graph_t random_connect(const std::vector<Node_List_t> &nodelists,
 
   for (auto &&comb : iter::combinations(nodelists, 2)) {
     node_pairs.push_back(std::make_tuple(comb[0], comb[1], p_out, seeds[n]));
-#ifdef DEBUG
-    assert(n < N_node_pairs.size());
-#endif
     n++;
   }
   for (auto &&nodelist : nodelists) {
     node_pairs.push_back(std::make_tuple(nodelist, nodelist, p_in, seeds[n]));
     n++;
   }
-#ifdef DEBUG
-  assert(node_pairs.size() == N_node_pairs);
-#endif
   std::vector<Edge_List_t> edge_lists(N_node_pairs);
 
   std::transform(std::execution::par_unseq, node_pairs.begin(),
