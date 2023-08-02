@@ -58,7 +58,6 @@ PYBIND11_MODULE(SIR_SBM, m) {
       .def_readwrite("N_connections", &SBM_Graph_t::N_connections)
       .def_readwrite("N_communities", &SBM_Graph_t::N_communities)
       .def_readwrite("connection_community_map", &SBM_Graph_t::connection_community_map)
-      .def("ccmap_write", &SBM_Graph_t::ccmap_write)
       .def("remap", &SBM_Graph_t::remap);
   m.def("n_choose_k", &n_choose_k);
   m.def("create_SBM", &create_SBM);

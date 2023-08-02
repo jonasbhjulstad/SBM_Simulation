@@ -34,6 +34,7 @@ int main()
   uint32_t seed = 47;
   uint32_t N_threads = 10;
 
+
   auto Gs =
       create_planted_SBMs(Ng, N_pop, N_clusters, p_in, p_out, N_threads, seed);
   uint32_t N_community_connections = Gs[0].N_connections;

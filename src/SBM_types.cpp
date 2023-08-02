@@ -92,73 +92,59 @@ namespace Sycl_Graph::SBM
   SBM_Graph_t::SBM_Graph_t(const std::vector<Node_List_t> &node_lists,
                            const std::vector<Edge_List_t> &edge_lists)
   {
-    community_sizes.resize(node_lists.size());
-    std::transform(node_lists.begin(), node_lists.end(), community_sizes.begin(),
-                   [](const Node_List_t &n)
-                   { return n.size(); });
-    connection_sizes.resize(edge_lists.size()*2 - node_lists.size());
-    std::transform(edge_lists.begin(), edge_lists.end(), connection_sizes.begin(),
-                   [](const Edge_List_t &e)
-                   { return e.size(); });
+    N_vertices = std::accumulate(node_lists.begin(), node_lists.end(), 0,
+                                 [](int sum, const Node_List_t &list)
+                                 {
+                                   return sum + list.size();
+                                 });
 
-    N_vertices =
-        std::accumulate(community_sizes.begin(), community_sizes.end(), 0);
     N_edges =
-        std::accumulate(connection_sizes.begin(), connection_sizes.end(), 0);
+        std::accumulate(edge_lists.begin(), edge_lists.end(), 0,
+                        [](int sum, const Edge_List_t &list)
+                        {
+                          return sum + list.size();
+                        });
     N_communities = node_lists.size();
     N_connections = edge_lists.size();
+    std::vector<uint32_t> connection_sizes(N_connections);
+    std::transform(edge_lists.begin(), edge_lists.end(), connection_sizes.begin(),
+                   [](const Edge_List_t &list)
+                   {
+                     return list.size();
+                   });
 
-    node_list.reserve(N_vertices);
-    edge_list.reserve(N_edges);
-    for (int i = 0; i < node_lists.size(); i++)
+    connection_community_map.resize(N_connections);
+    std::vector<uint32_t> community_idx(N_communities);
+    std::iota(community_idx.begin(), community_idx.end(), 0);
+    uint32_t idx = 0;
+    for (auto comb : iter::combinations_with_replacement(community_idx, 2))
     {
-      node_list.insert(node_list.end(), node_lists[i].begin(),
-                       node_lists[i].end());
-    }
-    for (int i = 0; i < edge_lists.size(); i++)
-    {
-      edge_list.insert(edge_list.end(), edge_lists[i].begin(),
-                       edge_lists[i].end());
-    }
-    // for each edge list:
-
-    auto find_id_in_nodelist = [&](const uint32_t id)
-    {
-      auto it = std::find_if(node_lists.begin(), node_lists.end(), [&](const auto &n_list)
-                             {
-      auto node_it = std::find_if(n_list.begin(), n_list.end(), [&](const auto& n)
-      {
-        return n==id;
-      });
-      return node_it != n_list.end(); });
-      return (uint32_t)std::distance(node_lists.begin(), it);
-    };
-
-    for (const auto &e_list : edge_lists)
-    {
-      auto first_edge = e_list[0];
-      auto to_community_id = find_id_in_nodelist(first_edge.to);
-      auto from_community_id = find_id_in_nodelist(first_edge.from);
-      if (to_community_id != from_community_id)
-      connection_community_map.push_back(Edge_t{from_community_id, to_community_id});
-    }
-    for (const auto &e_list : edge_lists)
-    {
-      auto first_edge = e_list[0];
-      auto to_community_id = find_id_in_nodelist(first_edge.to);
-      auto from_community_id = find_id_in_nodelist(first_edge.from);
-      connection_community_map.push_back(Edge_t{to_community_id, from_community_id});
+      connection_community_map[idx] = Edge_t(comb[0], comb[1], connection_sizes[idx]);
+      idx++;
     }
 
-    for(int i = 0; i < N_communities; i++)
+    for(int i = 0; i < node_lists.size(); i++)
     {
-      connection_community_map.push_back(Edge_t{i, i});
+      std::vector<uint32_t> idx(node_lists[i].size(), i);
+      vcm.insert(vcm.end(), idx.begin(), idx.end());
     }
-    std::transform(edge_lists.begin(), edge_lists.end(), connection_sizes.begin(), [&](const Edge_List_t &e_list)
-                   { return e_list.size(); });
 
-    create_ecm(connection_sizes);
-    create_vcm();
+    for(int i = 0; i < edge_lists.size(); i++)
+    {
+      std::vector<uint32_t> idx(edge_lists[i].size(), i);
+      ecm.insert(ecm.end(), idx.begin(), idx.end());
+    }
+
+    std::vector<Edge_t> flattened_edge_list;
+
+    //fill with edge lists
+    for (auto &list : edge_lists)
+    {
+      flattened_edge_list.insert(flattened_edge_list.end(), list.begin(), list.end());
+    }
+    this->edge_list = flattened_edge_list;
+
+
   }
 
   void SBM_Graph_t::remap(const std::vector<uint32_t> &map, const std::vector<Edge_t> &idx_connection_map)
@@ -183,36 +169,7 @@ namespace Sycl_Graph::SBM
 
     N_connections = idx_connection_map.size();
     N_communities = *std::max_element(map.begin(), map.end()) + 1;
-    connection_community_map = idx_connection_map;
-  }
-  void SBM_Graph_t::ccmap_write(const std::string &fpath)
-  {
-    std::ofstream f(fpath);
-    for (const auto &e : connection_community_map)
-    {
-      f << e.from << " " << e.to << std::endl;
-    }
   }
 
-  void SBM_Graph_t::create_ecm(const std::vector<uint32_t> &connection_sizes)
-  {
-    ecm.reserve(N_edges);
-    uint32_t offset = 0;
-    for (int i = 0; i < N_connections; i++)
-    {
-      std::vector<uint32_t> con(connection_sizes[i], i);
-      ecm.insert(ecm.end(), con.begin(), con.end());
-    }
-  }
 
-  void SBM_Graph_t::create_vcm()
-  {
-    vcm.reserve(N_vertices);
-    uint32_t offset = 0;
-    for (int i = 0; i < N_communities; i++)
-    {
-      std::vector<uint32_t> com(community_sizes[i], i);
-      vcm.insert(vcm.end(), com.begin(), com.end());
-    }
-  }
 } // namespace Sycl_Graph::SBM

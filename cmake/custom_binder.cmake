@@ -1,6 +1,6 @@
 function(add_custom_binder source_file)
     pybind11_add_module(${source_file} "${source_file}.cpp")
-    target_link_directories(${source_file} PUBLIC ${Boost_LIBRARY_DIR_DEBUG} ${graph_tool_LIBRARY_DIR})
+    target_link_directories(${source_file} PUBLIC ${Boost_LIBRARY_DIR_DEBUG})
     target_link_libraries(${source_file} PUBLIC Sycl_Graph Static_RNG::Static_RNG Tracy::TracyClient TBB::tbb Eigen3::Eigen ${Boost_LIBRARIES} graph_tool_core ortools::ortools)
     target_compile_options(${source_file} PUBLIC ${SYCL_COMPILE_OPTIONS})
     target_compile_options(${source_file} PUBLIC "-Wdeprecated-declarations")

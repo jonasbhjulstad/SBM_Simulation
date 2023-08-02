@@ -22,7 +22,7 @@ def get_edgelists(g, cmap, N_clusters):
     connection_map = {}
     for c in combs:
         connection_map[c] = []
-    
+
 
     ecm = [(int(cmap[e[0]]), int(cmap[e[1]])) for e in g.iter_edges()]
     edges = g.get_edges()
@@ -55,10 +55,10 @@ def generate_planted_graph(N_clusters, N_pop, p_out):
         g = gt.graph_union(g, k)
     #binomial sample number of edges
     N_pop_tot = N_pop*N_clusters
-    
+
     N_out_edges = np.random.binomial(N_pop_tot*(N_pop_tot-1)/2, p_out) - N_clusters*N_k_edges
     gt.add_random_edges(g, N_out_edges, self_loops=False)
-    
+
     # g = gt.generate_sbm(cmap, p_mat, directed=False, self_loops=False)
     edgelists = get_edgelists(g, cmap, N_clusters)
     nodes = g.get_vertices()
@@ -108,7 +108,7 @@ if __name__ == '__main__':
         Gs.append(SBM_Graph_t(r[0], r[1]))
         gis.append(r[2])
     # gis = pool.starmap(generate_planted_graph, [(N_clusters, N_pop, p_in, p_out) for _ in range(Ng)])
-    
+
 
     # Gs = [Sycl_Graph_t(gi, tau) for gi in gis]
 
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     _ = [gi.save(odir + "/base_graph.gt") for gi, odir in zip(gis, output_dirs)]
 
     #call gt.minimize nested blockmodel dl on each graph
-    Bs = [gt.BlockState(G, deg_corr=False) for G in gis] 
+    Bs = [gt.BlockState(G, deg_corr=False) for G in gis]
 
     def gt_minimize_wrapper(g, b):
         gt.minimize_nested_blockmodel_dl(g, state_args=dict(deg_corr=False))
@@ -131,9 +131,9 @@ if __name__ == '__main__':
 
     # _ = [state.draw(output_dir="a_{}.png".format(i)) for i, state in enumerate(states)]
     # level_entropies = [[state.level_entropy(i) for i in range(len(state.get_levels()))] for state in states]
-    
+
     # entropy_tol = 80
-    
+
     # entropy_tol_indices = []
     # for entropies, state in zip(level_entropies, states):
     #     idx = 0
@@ -150,9 +150,8 @@ if __name__ == '__main__':
 
     # for i in range(len(Gs)):
     #     Gs[i] = remap(Gs[i], states[i], entropy_tol_indices[i])
-    
+
     #array to file
-    _ = [G.ccmap_write(odir + "ccmap.csv") for G, odir in zip(Gs, output_dirs)]
     p_R = 0.1
 
 

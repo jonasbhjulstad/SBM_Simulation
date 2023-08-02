@@ -46,12 +46,11 @@ void columnwrite(std::ofstream &file, const std::vector<Edge_t> &iter) {
 
 void simulate_to_file(const SBM_Graph_t &G, const SIR_SBM_Param_t &param,
                       sycl::queue &q, const std::string &file_path,
-                      uint32_t sim_idx, uint32_t seed) {
+                      uint32_t sim_idx, uint32_t seed, uint32_t N_wg) {
   uint32_t Nt = param.p_I.size();
-  SIR_SBM_Network network(G, param.p_I0, param.p_R, q, seed, param.p_R0);
-  auto sim_events = network.simulate(param);
-  std::for_each(sim_events.begin(), sim_events.end(),
-                [&](auto &sim_event) { sim_event.wait(); });
+  SIR_SBM_Network network(G, param.p_I0, param.p_R, q, seed, N_wg, param.p_R0);
+  auto sim_event = network.simulate(param);
+  sim_event.wait();
   auto [community_trajectory, connection_events_trajectory,
         connection_infections_trajectory] = network.read_trajectory();
 
@@ -123,9 +122,6 @@ void parallel_simulate_to_file(const SBM_Graph_t &G,
     simulate_to_file(*std::get<0>(z), *std::get<1>(z), *std::get<2>(z),
                      std::get<3>(z), std::get<4>(z), std::get<5>(z));
   });
-  std::ofstream connection_community_map_f(file_path +
-                                           "connection_community_map.csv");
-  columnwrite(connection_community_map_f, G.connection_community_map);
 }
 
 void parallel_simulate_to_file(

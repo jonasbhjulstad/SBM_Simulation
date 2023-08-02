@@ -21,8 +21,10 @@ struct SIR_SBM_Param_t {
 struct Edge_t {
   uint32_t from;
   uint32_t to;
+  uint32_t weight = std::numeric_limits<uint32_t>::max();
   Edge_t(){}
   Edge_t(uint32_t _from, uint32_t _to): from(_from), to(_to) {}
+  Edge_t(uint32_t _from, uint32_t _to, uint32_t weight): from(_from), to(_to), weight(weight) {}
   bool operator==(const Edge_t &rhs) const {
     return from == rhs.from && to == rhs.to;
   }
@@ -77,11 +79,9 @@ struct SBM_Graph_t {
               const std::vector<Edge_List_t> &edge_lists);
   std::vector<uint32_t> node_list;
   std::vector<Edge_t> edge_list;
-  std::vector<uint32_t> community_sizes;
+  std::vector<Edge_t> connection_community_map;
   std::vector<uint32_t> ecm;
   std::vector<uint32_t> vcm;
-  std::vector<Edge_t> connection_community_map;
-  std::vector<uint32_t> connection_sizes;
   uint32_t N_vertices = 0;
   uint32_t N_edges = 0;
   uint32_t N_connections = 0;
@@ -89,11 +89,9 @@ struct SBM_Graph_t {
   void remap(const std::vector<uint32_t> &map,
              const std::vector<Edge_t> &idx_connection_map);
 
-  void ccmap_write(const std::string& fpath);
 private:
 void create_ecm(const std::vector<uint32_t>& connection_sizes);
 
-  void create_vcm();
 };
 
 } // namespace Sycl_Graph::SBM

@@ -23,7 +23,7 @@ namespace Sycl_Graph::SBM
 
   void simulate_to_file(const SBM_Graph_t &G, const SIR_SBM_Param_t &param,
                         sycl::queue &q, const std::string &file_path,
-                        uint32_t sim_idx, uint32_t seed = 42);
+                        uint32_t sim_idx, uint32_t seed = 42, uint32_t N_wg = 1024);
   void parallel_simulate_to_file(const SBM_Graph_t &G,
                                  const std::vector<SIR_SBM_Param_t> &params,
                                  std::vector<sycl::queue> &qs,
