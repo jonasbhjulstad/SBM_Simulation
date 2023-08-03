@@ -43,7 +43,7 @@ namespace Sycl_Graph::SBM
         trajectory(sycl::range<2>(1, 1)),
         community_recoveries_buf(sycl::range<2>(1, 1)),
         connection_events_buf(sycl::range<2>(1, 1)),
-        community_state_buf(sycl::range<2>(1, 1)), p_I_buf(sycl::range<2>(1,1))
+        community_state_buf(sycl::range<2>(1, 1)), p_I_buf(sycl::range<2>(1, 1))
   {
   }
 
@@ -146,6 +146,9 @@ namespace Sycl_Graph::SBM
     uint32_t Nt = this->Nt;
     uint32_t N_edges = G.N_edges;
     uint32_t N_wg = this->N_wg;
+
+    assert(ecm_buf.size() == N_edges);
+    return sycl::event{};
     return q.submit([&](sycl::handler &h)
                     {
     h.depends_on(dep_event);
@@ -251,7 +254,8 @@ namespace Sycl_Graph::SBM
       sycl::event dep_event)
   {
 
-    assert(std::all_of(G.vcm.begin(), G.vcm.end(), [this](auto id){return id < N_communities;}));
+    assert(std::all_of(G.vcm.begin(), G.vcm.end(), [this](auto id)
+                       { return id < N_communities; }));
     auto N_vertices = this->N_vertices;
     return q.submit([&](sycl::handler &h)
                     {
@@ -261,12 +265,11 @@ namespace Sycl_Graph::SBM
     auto result_acc = community_state_buf.template get_access<
         sycl::access::mode::read_write>(h);
     auto vcm_acc = vcm_buf.template get_access<sycl::access::mode::read>(h);
-    sycl::stream out(1024, 256, h);
+    sycl::stream out { 1024, 256, h };
     h.parallel_for(Nt + 1, [=](sycl::id<1> row_id) {
       for (int i = 0; i < N_vertices; i++) {
         result_acc[row_id][vcm_acc[i]][v_acc[row_id][i]]++;
       }
-      out << "row: " << row_id << "complete" << sycl::endl;
     }); });
   }
 
@@ -375,7 +378,7 @@ namespace Sycl_Graph::SBM
       // auto state = read_buffer(trajectory);
     }
 
-    advance_event = accumulate_community_state(advance_event);
+    // advance_event = accumulate_community_state(advance_event);
 
     return advance_event;
   }
@@ -484,13 +487,6 @@ namespace Sycl_Graph::SBM
           accumulated_infections[j].from += infections_t[i][j].from;
         }
       }
-#ifdef DEBUG
-      uint32_t total_infections = std::accumulate(
-          accumulated_infections.begin(), accumulated_infections.end(), 0,
-          [](uint32_t a, Edge_t b)
-          { return a + b.to + b.from; });
-      assert(total_infections == std::accumulate(delta_I.begin(), delta_I.end(), 0));
-#endif
       connection_infections[i] = accumulated_infections;
     }
     return connection_infections;

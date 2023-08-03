@@ -51,43 +51,43 @@ void simulate_to_file(const SBM_Graph_t &G, const SIR_SBM_Param_t &param,
   SIR_SBM_Network network(G, param.p_I0, param.p_R, q, seed, N_wg, param.p_R0);
   auto sim_event = network.simulate(param);
   sim_event.wait();
-  auto [community_trajectory, connection_events_trajectory,
-        connection_infections_trajectory] = network.read_trajectory();
+  // auto [community_trajectory, connection_events_trajectory,
+  //       connection_infections_trajectory] = network.read_trajectory();
 
-  std::filesystem::create_directories(file_path);
+  // std::filesystem::create_directories(file_path);
 
-  std::ofstream community_traj_f(file_path + "community_trajectory_" +
-                                 std::to_string(sim_idx) + ".csv");
-  std::ofstream connection_events_f(file_path + "connection_events_" +
-                                    std::to_string(sim_idx) + ".csv");
+  // std::ofstream community_traj_f(file_path + "community_trajectory_" +
+  //                                std::to_string(sim_idx) + ".csv");
+  // std::ofstream connection_events_f(file_path + "connection_events_" +
+  //                                   std::to_string(sim_idx) + ".csv");
 
-  std::ofstream connection_infections_f(file_path + "connection_infections_" +
-                                        std::to_string(sim_idx) + ".csv");
+  // std::ofstream connection_infections_f(file_path + "connection_infections_" +
+  //                                       std::to_string(sim_idx) + ".csv");
 
-  std::for_each(community_trajectory.begin(), community_trajectory.end(),
-                [&](auto &community_trajectory_i) {
-                  linewrite(community_traj_f, community_trajectory_i);
-                });
-  std::for_each(connection_events_trajectory.begin(),
-                connection_events_trajectory.end(),
-                [&](auto &connection_events_i) {
-                  linewrite(connection_events_f, connection_events_i);
-                });
+  // std::for_each(community_trajectory.begin(), community_trajectory.end(),
+  //               [&](auto &community_trajectory_i) {
+  //                 linewrite(community_traj_f, community_trajectory_i);
+  //               });
+  // std::for_each(connection_events_trajectory.begin(),
+  //               connection_events_trajectory.end(),
+  //               [&](auto &connection_events_i) {
+  //                 linewrite(connection_events_f, connection_events_i);
+  //               });
 
-  std::for_each(connection_infections_trajectory.begin(),
-                connection_infections_trajectory.end(),
-                [&](auto &connection_infections_i) {
-                  linewrite(connection_infections_f, connection_infections_i);
-                });
-  std::ofstream p_I_f(file_path + "p_Is_" + std::to_string(sim_idx) + ".csv");
-  std::vector<std::vector<float>> p_I_duplicated;
-  std::transform(param.p_I.begin(), param.p_I.end(),
-                 std::back_inserter(p_I_duplicated),
-                 [&](const auto &p_I_i) { std::vector<float> p_I_dup = p_I_i;
-                 p_I_dup.insert(p_I_dup.end(), p_I_i.begin(), p_I_i.end());
-                 return p_I_dup;});
-  std::for_each(p_I_duplicated.begin(), p_I_duplicated.end(),
-                [&](auto &p_I_i) { linewrite(p_I_f, p_I_i); });
+  // std::for_each(connection_infections_trajectory.begin(),
+  //               connection_infections_trajectory.end(),
+  //               [&](auto &connection_infections_i) {
+  //                 linewrite(connection_infections_f, connection_infections_i);
+  //               });
+  // std::ofstream p_I_f(file_path + "p_Is_" + std::to_string(sim_idx) + ".csv");
+  // std::vector<std::vector<float>> p_I_duplicated;
+  // std::transform(param.p_I.begin(), param.p_I.end(),
+  //                std::back_inserter(p_I_duplicated),
+  //                [&](const auto &p_I_i) { std::vector<float> p_I_dup = p_I_i;
+  //                p_I_dup.insert(p_I_dup.end(), p_I_i.begin(), p_I_i.end());
+  //                return p_I_dup;});
+  // std::for_each(p_I_duplicated.begin(), p_I_duplicated.end(),
+  //               [&](auto &p_I_i) { linewrite(p_I_f, p_I_i); });
 }
 
 void parallel_simulate_to_file(const SBM_Graph_t &G,
