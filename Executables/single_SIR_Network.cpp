@@ -100,8 +100,7 @@ std::tuple<sycl::buffer<T, 1>, sycl::event> buffer_create_1D(sycl::queue &q, con
                           {
                 auto tmp_acc = tmp.template get_access<sycl::access::mode::read>(h);
                 auto res_acc = result.template get_access<sycl::access::mode::write>(h);
-                h.parallel_for(result.get_range(), [=](sycl::id<1> idx)
-                              { res_acc[idx] = tmp_acc[idx]; }); });
+                h.copy(tmp_acc, res_acc); });
     return std::make_tuple(result, event);
 }
 
@@ -193,11 +192,10 @@ sycl::event initialize_vertices(float p_I0, float p_R0, sycl::queue &q,
     }); });
 }
 
-sycl::event recover(sycl::queue &q, uint32_t t, sycl::event &dep_event, float p_R, auto &seed_buf, auto &trajectory, auto &community_recoveries, auto &vcm_buf)
+sycl::event recover(sycl::queue &q, uint32_t t, sycl::event &dep_event, float p_R, auto &seed_buf, auto &trajectory, auto &vcm_buf)
 {
     uint32_t N_vertices = trajectory.get_range()[1];
     uint32_t N_seeds = seed_buf.size();
-    uint32_t N_communities = community_recoveries.get_range()[1];
     sycl::buffer<bool> rec_buf(N_vertices);
     uint32_t N_threads = std::min({N_vertices, N_seeds});
     uint32_t N_vertex_per_thread = N_vertices / N_threads + 1;
@@ -208,47 +206,30 @@ sycl::event recover(sycl::queue &q, uint32_t t, sycl::event &dep_event, float p_
         seed_buf.template get_access<sycl::access_mode::atomic>(h);
     auto v_acc =
         trajectory.template get_access<sycl::access::mode::read_write>(h);
-    auto rec_acc = rec_buf.template get_access<sycl::access::mode::write>(h);
     //   sycl::stream out(1024, 256, h);
     h.parallel_for(N_threads, [=](sycl::id<1> id) {
-        uint32_t seed = sycl::atomic_fetch_add<uint32_t>(seed_acc[id], 1);
-
+        // uint32_t seed = sycl::atomic_fetch_add<uint32_t>(seed_acc[id], 1);
+        uint32_t seed = 0;
         Static_RNG::default_rng rng(seed);
         for(int i = 0; i < N_vertex_per_thread; i++)
         {
             auto v_idx = N_vertex_per_thread*id[0] + i;
+            if(v_idx >= N_vertices)
+                break;
       auto state_prev = v_acc[t][v_idx];
-      rec_acc[v_idx] = false;
       v_acc[t + 1][v_idx] = state_prev;
       if (state_prev == SIR_INDIVIDUAL_I) {
         Static_RNG::bernoulli_distribution<float> bernoulli_R(p_R);
         if (bernoulli_R(rng)) {
           v_acc[t + 1][v_idx] = SIR_INDIVIDUAL_R;
-          rec_acc[v_idx] = true;
         }
       }
         }
     }); });
-
-    auto rec_count_event = q.submit([&](sycl::handler &h)
-                                    {
-    h.depends_on(event);
-    auto rec_acc = rec_buf.template get_access<sycl::access::mode::read>(h);
-    auto vcm_acc = vcm_buf.template get_access<sycl::access::mode::read>(h);
-    auto community_rec_acc =
-        community_recoveries.template get_access<sycl::access::mode::write>(h);
-    h.parallel_for(N_communities, [=](sycl::id<1> id) {
-      community_rec_acc[t][id] = 0;
-      for (int i = 0; i < N_vertices; i++) {
-        if (vcm_acc[i] == id[0] && rec_acc[i]) {
-          community_rec_acc[t][id] += 1;
-        }
-      }
-    }); });
-    return rec_count_event;
+    return event;
 }
 
-sycl::event infect(sycl::queue &q, auto &ecm_buf, auto &p_I_buf, auto &seed_buf, auto &connection_events_buf, auto &trajectory, auto &edges, uint32_t N_wg, uint32_t t, auto dep_event)
+sycl::event infect(sycl::queue &q, auto &ecm_buf, auto &p_I_buf, auto &seed_buf, auto &connection_events_buf, auto &trajectory, auto &edges, uint32_t N_wg, uint32_t t, uint32_t N_connections, auto dep_event)
 {
     uint32_t N_edges = ecm_buf.size();
     std::vector<uint32_t> infection_indices_init(N_edges, std::numeric_limits<uint32_t>::max());
@@ -289,7 +270,6 @@ sycl::event infect(sycl::queue &q, auto &ecm_buf, auto &p_I_buf, auto &seed_buf,
       }
     }); });
 
-    uint32_t N_connections = connection_events_buf.size();
     auto accumulate_event = q.submit([&](sycl::handler &h)
                                      {
                                         auto infection_indices_acc = infection_indices_buf.template get_access<sycl::access::mode::read>(h);
@@ -318,28 +298,37 @@ sycl::event infect(sycl::queue &q, auto &ecm_buf, auto &p_I_buf, auto &seed_buf,
 }
 
 template <typename T>
-std::vector<std::vector<T>> read_buffer(sycl::buffer<T, 2> &buf,
-                                        std::vector<sycl::event> events = {})
+std::vector<std::vector<T>> read_buffer(sycl::queue &q, sycl::buffer<T, 2> &buf,
+                           auto events = {})
 {
 
-    std::for_each(events.begin(), events.end(), [](auto &event)
-                  { event.wait(); });
-    auto buf_acc =
-        buf.template get_access<sycl::access::mode::read>();
     auto range = buf.get_range();
     auto rows = range[0];
     auto cols = range[1];
 
-    std::vector<std::vector<T>> res(rows, std::vector<T>(cols));
+    std::vector<T> data(cols * rows);
+    T *p_data = data.data();
+
+    q.submit([&](sycl::handler &h)
+             {
+        //create accessor
+        h.depends_on(events);
+        auto acc = buf.template get_access<sycl::access::mode::read>(h);
+        h.copy(acc, p_data); })
+        .wait();
+
+    //transform to 2D vector
+    std::vector<std::vector<T>> data_2d(rows);
     for (int i = 0; i < rows; i++)
     {
+        data_2d[i] = std::vector<T>(cols);
         for (int j = 0; j < cols; j++)
         {
-            res[i][j] = buf_acc[i][j];
+            data_2d[i][j] = data[i * cols + j];
         }
     }
 
-    return res;
+    return data_2d;
 }
 
 std::vector<Edge_t> sample_connection_infections(
@@ -485,7 +474,7 @@ int main()
     uint32_t N_sims = 2;
     uint32_t Ng = 1;
     // sycl::queue q(sycl::gpu_selector_v);
-    sycl::queue q(sycl::gpu_selector_v);
+    sycl::queue q(sycl::cpu_selector_v);
     // get work group size
     auto device = q.get_device();
     auto N_wg = device.get_info<sycl::info::device::max_work_group_size>();
@@ -513,13 +502,11 @@ int main()
     auto trajectory = sycl::buffer<SIR_State, 2>(sycl::range<2>(Nt + 1, N_pop_tot));
     std::vector<std::vector<float>> p_I_vec = generate_p_Is(G.N_connections, p_I_min, p_I_max, Nt, seed);
     auto [p_I_buf, e3] = buffer_create_2D(q, p_I_vec);
-    std::vector<std::vector<uint32_t>> community_recoveries_init(Nt + 1, std::vector<uint32_t>(N_clusters, 0));
-    auto [community_recoveries_buf, e4] = buffer_create_2D(q, community_recoveries_init);
     std::vector<std::vector<Edge_t>> connection_events_init(Nt + 1, std::vector<Edge_t>(G.N_connections, {0, 0}));
     auto [connection_events_buf, e5] = buffer_create_2D(q, connection_events_init);
     std::vector<std::vector<State_t>> community_state_init(Nt + 1, std::vector<State_t>(N_clusters, {0, 0, 0}));
     auto [community_state_buf, e6] = buffer_create_2D(q, community_state_init);
-    std::vector<sycl::event> buffer_creation_events = {e0, e1, e2, e3, e4, e5, e6};
+    std::vector<sycl::event> buffer_creation_events = {e0, e1, e2, e3, e5, e6};
 
     auto advance_event = initialize_vertices(p_I0, p_R0, q, trajectory, seed_buf, buffer_creation_events);
 
@@ -531,12 +518,12 @@ int main()
 
     for (int t = 0; t < Nt; t++)
     {
-        auto rec_event = recover(q, t, inf_event, p_R, seed_buf, trajectory, community_recoveries_buf, vcm_buf);
+        auto rec_event = recover(q, t, inf_event, p_R, seed_buf, trajectory, vcm_buf);
 
-        auto inf_event = infect(q, ecm_buf, p_I_buf, seed_buf, connection_events_buf, trajectory, edges, N_wg, t, rec_event);
+        inf_event = infect(q, ecm_buf, p_I_buf, seed_buf, connection_events_buf, trajectory, edges, N_wg, t, G.N_connections, rec_event);
     }
     inf_event.wait();
-    auto vertex_state = read_buffer(trajectory);
+    auto vertex_state = read_buffer(q, trajectory, inf_event);
 
     std::vector<std::vector<State_t>> community_state(Nt + 1, std::vector<State_t>(N_clusters, {0, 0, 0}));
     std::transform(std::execution::par_unseq, vertex_state.begin(), vertex_state.end(), community_state.begin(), [=](auto v_state)
@@ -550,10 +537,17 @@ int main()
         }
         return state; });
 
-    advance_event.wait();
+    std::vector<std::vector<uint32_t>> community_recoveries(Nt, std::vector<uint32_t>(N_clusters, 0));
+    for(int t = 0; t < Nt; t++)
+    {
+        for(int j = 0; j < N_clusters; j++)
+        {
+            community_recoveries[t][j] = community_state[t+1][j][2] - community_state[t][j][2];
+        }
+    }
+    auto connection_events = read_buffer(q, connection_events_buf, inf_event);
 
-    auto connection_events = read_buffer(connection_events_buf);
-    auto community_recoveries = read_buffer(community_recoveries_buf);
+
 
     auto connection_infections = sample_connection_infections(community_state, connection_events, community_recoveries, G.connection_community_map, seed);
     std::string output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_" + std::to_string(0) + "/";
