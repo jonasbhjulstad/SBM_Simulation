@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <execution>
 #include <filesystem>
+#include <functional>
 #include <iostream>
 #include <string>
 
@@ -70,42 +71,22 @@ void linewrite(std::ofstream &file,
     file << "\n";
 }
 
-void linewrite(std::ofstream &file, const std::vector<Edge_t> &iter)
-{
-    for (auto &t_i_i : iter)
-    {
-        file << t_i_i.from << "," << t_i_i.to;
-        if (&t_i_i != &iter.back())
-            file << ",";
-        else
-            file << "\n";
-    }
-}
-
-void columnwrite(std::ofstream &file, const std::vector<Edge_t> &iter)
-{
-    for (auto &t_i_i : iter)
-    {
-        file << t_i_i.from << "," << t_i_i.to << "\n";
-    }
-}
-
 template <typename T>
-std::tuple<sycl::buffer<T, 1>, sycl::event> buffer_create_1D(sycl::queue &q, const std::vector<T> &data)
+sycl::buffer<T, 1> buffer_create_1D(sycl::queue &q, const std::vector<T> &data, sycl::event &res_event)
 {
     sycl::buffer<T> tmp(data.data(), data.size());
     sycl::buffer<T> result(sycl::range<1>(data.size()));
 
-    auto event = q.submit([&](sycl::handler &h)
-                          {
+    res_event = q.submit([&](sycl::handler &h)
+                         {
                 auto tmp_acc = tmp.template get_access<sycl::access::mode::read>(h);
                 auto res_acc = result.template get_access<sycl::access::mode::write>(h);
                 h.copy(tmp_acc, res_acc); });
-    return std::make_tuple(result, event);
+    return result;
 }
 
 template <typename T>
-std::tuple<sycl::buffer<T, 2>, sycl::event> buffer_create_2D(sycl::queue &q, const std::vector<std::vector<T>> &data)
+sycl::buffer<T, 2> buffer_create_2D(sycl::queue &q, const std::vector<std::vector<T>> &data, sycl::event &res_event)
 {
     assert(std::all_of(data.begin(), data.end(), [&](const auto subdata)
                        { return subdata.size() == data[0].size(); }));
@@ -118,14 +99,14 @@ std::tuple<sycl::buffer<T, 2>, sycl::event> buffer_create_2D(sycl::queue &q, con
 
     sycl::buffer<T, 2> tmp(data_flat.data(), sycl::range<2>(data.size(), data[0].size()));
     sycl::buffer<T, 2> result(sycl::range<2>(data.size(), data[0].size()));
-    auto event = q.submit([&](sycl::handler &h)
-                          {
+    res_event = q.submit([&](sycl::handler &h)
+                         {
         auto tmp_acc = tmp.template get_access<sycl::access::mode::read>(h);
         auto res_acc = result.template get_access<sycl::access::mode::write>(h);
         h.parallel_for(result.get_range(), [=](sycl::id<2> idx)
                        { res_acc[idx] = tmp_acc[idx]; }); });
 
-    return std::make_tuple(result, event);
+    return result;
 }
 sycl::buffer<uint32_t> generate_seeds(sycl::queue &q, uint32_t N_rng,
                                       uint32_t seed)
@@ -208,9 +189,9 @@ sycl::event recover(sycl::queue &q, uint32_t t, sycl::event &dep_event, float p_
         trajectory.template get_access<sycl::access::mode::read_write>(h);
     //   sycl::stream out(1024, 256, h);
     h.parallel_for(N_threads, [=](sycl::id<1> id) {
-        // uint32_t seed = sycl::atomic_fetch_add<uint32_t>(seed_acc[id], 1);
-        uint32_t seed = 0;
+        uint32_t seed = sycl::atomic_fetch_add<uint32_t>(seed_acc[id], 1);
         Static_RNG::default_rng rng(seed);
+        Static_RNG::bernoulli_distribution<float> bernoulli_R(p_R);
         for(int i = 0; i < N_vertex_per_thread; i++)
         {
             auto v_idx = N_vertex_per_thread*id[0] + i;
@@ -219,7 +200,6 @@ sycl::event recover(sycl::queue &q, uint32_t t, sycl::event &dep_event, float p_
       auto state_prev = v_acc[t][v_idx];
       v_acc[t + 1][v_idx] = state_prev;
       if (state_prev == SIR_INDIVIDUAL_I) {
-        Static_RNG::bernoulli_distribution<float> bernoulli_R(p_R);
         if (bernoulli_R(rng)) {
           v_acc[t + 1][v_idx] = SIR_INDIVIDUAL_R;
         }
@@ -229,11 +209,12 @@ sycl::event recover(sycl::queue &q, uint32_t t, sycl::event &dep_event, float p_
     return event;
 }
 
-sycl::event infect(sycl::queue &q, auto &ecm_buf, auto &p_I_buf, auto &seed_buf, auto &connection_events_buf, auto &trajectory, auto &edges, uint32_t N_wg, uint32_t t, uint32_t N_connections, auto dep_event)
+sycl::event infect(sycl::queue &q, auto &ecm_buf, auto &p_I_buf, auto &seed_buf, auto &event_from_buf, auto &event_to_buf, auto &trajectory, auto &edge_from_buf, auto &edge_to_buf, uint32_t N_wg, uint32_t t, uint32_t N_connections, auto dep_event)
 {
     uint32_t N_edges = ecm_buf.size();
     std::vector<uint32_t> infection_indices_init(N_edges, std::numeric_limits<uint32_t>::max());
-    auto [infection_indices_buf, ii_event] = buffer_create_1D(q, infection_indices_init);
+    sycl::event ii_event;
+    auto infection_indices_buf = buffer_create_1D(q, infection_indices_init, ii_event);
     auto inf_event = q.submit([&](sycl::handler &h)
 
                               {
@@ -245,7 +226,8 @@ sycl::event infect(sycl::queue &q, auto &ecm_buf, auto &p_I_buf, auto &seed_buf,
         seed_buf.template get_access<sycl::access_mode::atomic>(h);
     auto v_acc =
         trajectory.template get_access<sycl::access::mode::read_write>(h);
-    auto edge_acc = edges.template get_access<sycl::access::mode::read>(h);
+    auto edge_from_acc = edge_from_buf.template get_access<sycl::access::mode::read>(h);
+    auto edge_to_acc = edge_to_buf.template get_access<sycl::access::mode::read>(h);
     auto infection_indices_acc = infection_indices_buf.template get_access<sycl::access::mode::write>(h);
     h.parallel_for(N_wg, [=](sycl::id<1> id) {
       auto seed = sycl::atomic_fetch_add<uint32_t>(seed_acc[id], 1);
@@ -255,8 +237,8 @@ sycl::event infect(sycl::queue &q, auto &ecm_buf, auto &p_I_buf, auto &seed_buf,
         auto edge_idx = id * N_edge_per_wg + i;
         if (edge_idx >= N_edges)
           break;
-      auto id_from = edge_acc[edge_idx].from;
-      auto id_to = edge_acc[edge_idx].to;
+      auto id_from = edge_from_acc[edge_idx];
+      auto id_to = edge_to_acc[edge_idx];
       auto [sus_id, direction] = get_susceptible_id_if_infected(v_acc[t], id_from, id_to);
       if (sus_id != std::numeric_limits<uint32_t>::max()) {
         Static_RNG::default_rng rng(seed);
@@ -273,24 +255,24 @@ sycl::event infect(sycl::queue &q, auto &ecm_buf, auto &p_I_buf, auto &seed_buf,
     auto accumulate_event = q.submit([&](sycl::handler &h)
                                      {
                                         auto infection_indices_acc = infection_indices_buf.template get_access<sycl::access::mode::read>(h);
-                                        auto events_acc = connection_events_buf.template get_access<sycl::access::mode::read_write>(h);
+                                        auto event_from_acc = event_from_buf.template get_access<sycl::access::mode::read_write>(h);
+                                        auto event_to_acc = event_to_buf.template get_access<sycl::access::mode::read_write>(h);
                                         auto ecm_acc = ecm_buf.template get_access<sycl::access::mode::read>(h);
                                         h.parallel_for(N_connections, [=](sycl::id<1> id)
                                                        {
-                                                        events_acc[t][id].from = 0;
-                                                        events_acc[t][id].to = 0;
+                                                        event_from_acc[t][id] = 0;
+                                                        event_to_acc[t][id] = 0;
                                                         for(int i = 0; i < N_edges; i++)
                                                         {
-                                                            if (infection_indices_acc[i] != std::numeric_limits<uint32_t>::max())
+                                                            if ((infection_indices_acc[i] != std::numeric_limits<uint32_t>::max()) && (ecm_acc[i] == id))
                                                             {
                                                                 if (infection_indices_acc[i] == 0)
-                                                                    {
-                                                                        events_acc[t][id].from++;
-                                                                    }
+                                                                {
+                                                                    event_from_acc[t][id]++;
+                                                            }
                                                                 else
-                                                                    {
-                                                                        events_acc[t][id].to++;
-                                                                    }
+                                                                {
+                                                                    event_to_acc[t][id]++;}
                                                             }
                                                         }
                                                        }); });
@@ -299,7 +281,7 @@ sycl::event infect(sycl::queue &q, auto &ecm_buf, auto &p_I_buf, auto &seed_buf,
 
 template <typename T>
 std::vector<std::vector<T>> read_buffer(sycl::queue &q, sycl::buffer<T, 2> &buf,
-                           auto events = {})
+                                        auto events = {})
 {
 
     auto range = buf.get_range();
@@ -317,7 +299,7 @@ std::vector<std::vector<T>> read_buffer(sycl::queue &q, sycl::buffer<T, 2> &buf,
         h.copy(acc, p_data); })
         .wait();
 
-    //transform to 2D vector
+    // transform to 2D vector
     std::vector<std::vector<T>> data_2d(rows);
     for (int i = 0; i < rows; i++)
     {
@@ -331,141 +313,186 @@ std::vector<std::vector<T>> read_buffer(sycl::queue &q, sycl::buffer<T, 2> &buf,
     return data_2d;
 }
 
-std::vector<Edge_t> sample_connection_infections(
-    uint32_t community_idx, uint32_t N_infected,
-    const std::vector<Edge_t> &connection_events, const auto &ccm,
-    uint32_t seed)
-{
-    if (N_infected == 0)
-        return std::vector<Edge_t>(ccm.size() * 2, Edge_t(0, 0, 0));
-    std::mt19937 rng(seed);
-
-    std::vector<uint32_t> flattened_connection_events(2 * connection_events.size());
-    for (int i = 0; i < connection_events.size(); i++)
-    {
-        flattened_connection_events[2 * i] = connection_events[i].from;
-        flattened_connection_events[2 * i + 1] = connection_events[i].to;
-    }
-
-    std::vector<uint32_t> connection_weights(ccm.size() * 2, 0);
-
-    for (int i = 0; i < ccm.size(); i++)
-    {
-        if ((ccm[i].from == community_idx) && flattened_connection_events[2 * i])
-        {
-            connection_weights[2 * i] = ccm[i].weight;
-        }
-        if ((ccm[i].to == community_idx) && flattened_connection_events[2 * i + 1])
-        {
-            connection_weights[2 * i + 1] = ccm[i].weight;
-        }
-    }
-
-    if (std::all_of(connection_weights.begin(), connection_weights.end(), [](auto &w)
-                    { return w == 0; }))
-    {
-        return std::vector<Edge_t>(ccm.size() * 2, Edge_t(0, 0, 0));
-    }
-
-    std::discrete_distribution<uint32_t> discrete_dist(connection_weights.begin(), connection_weights.end());
-    uint32_t N_samples = 0;
-
-    std::vector<uint32_t> sampled_infections(2 * ccm.size(), 0);
-
-    while (N_samples < N_infected)
-    {
-        auto idx = discrete_dist(rng);
-        if (sampled_infections[idx] >= flattened_connection_events[idx])
-        {
-            connection_weights[idx] = 0;
-            continue;
-        }
-        else
-        {
-            sampled_infections[idx]++;
-            N_samples++;
-        }
-    }
-
-    std::vector<Edge_t> result(ccm.size() * 2, Edge_t(0, 0, 0));
-    // transform sampled_infections into result
-    for (int i = 0; i < ccm.size(); i++)
-    {
-        result[i].from = sampled_infections[2 * i];
-        result[i].to = sampled_infections[2 * i + 1];
-    }
-
-    return result;
-}
-
 struct Inf_Sample_Data_t
 {
     uint32_t community_idx;
     uint32_t N_infected;
     uint32_t seed;
-    std::vector<Edge_t> connection_events;
-
-    static std::vector<Inf_Sample_Data_t> make(const auto &c_idx, const auto &N_infs, const auto &seeds, const auto &c_events)
-    {
-        std::vector<Inf_Sample_Data_t> res(c_idx.size());
-        for (int i = 0; i < c_idx.size(); i++)
-        {
-            res[i].community_idx = c_idx[i];
-            res[i].N_infected = N_infs[i];
-            res[i].seed = seeds[i];
-            res[i].connection_events = c_events[i];
-        }
-        return res;
-    }
+    std::vector<uint32_t> connection_events;
+    std::vector<uint32_t> connection_indices;
+    std::vector<uint32_t> connection_weights;
 };
 
-std::vector<std::vector<Edge_t>> sample_connection_infections(
-    const std::vector<std::vector<State_t>> &community_trajectory,
-    const std::vector<std::vector<Edge_t>> &connection_events,
-    const std::vector<std::vector<uint32_t>> &community_recoveries,
-    const auto &ccm,
-    uint32_t seed)
+template <typename T>
+std::vector<std::vector<T>> diff(const std::vector<std::vector<T>> &v)
 {
-    uint32_t N_communities = community_trajectory[1].size();
-    uint32_t Nt = community_trajectory.size() - 1;
-    uint32_t N_connections = connection_events[0].size();
+    std::vector<std::vector<T>> res(v.size() - 1, std::vector<T>(v[0].size()));
+    for (int i = 0; i < v.size() - 1; i++)
+    {
+        for (int j = 0; j < v[i].size(); j++)
+        {
+            res[i][j] = v[i + 1][j] - v[i][j];
+        }
+    }
+    return res;
+}
 
-    std::vector<std::vector<Edge_t>> connection_infections(Nt);
-    std::vector<std::vector<int>> delta_Is(
-        Nt, std::vector<int>(N_communities, 0));
+std::vector<std::vector<int>> get_delta_Is(const std::vector<std::vector<State_t>> &community_state)
+{
+    uint32_t N_communities = community_state[0].size();
+    std::vector<std::vector<int>> I_trajectories(community_state.size(), std::vector<int>(N_communities));
+    std::vector<std::vector<int>> R_trajectories(community_state.size(), std::vector<int>(N_communities));
 
-    for (int i = 0; i < Nt; i++)
+    for (int i = 0; i < community_state.size(); i++)
     {
         for (int j = 0; j < N_communities; j++)
         {
-            delta_Is[i][j] =
-                community_trajectory[i + 1][j][1] - community_trajectory[i][j][1] + community_recoveries[i][j];
+            I_trajectories[i][j] = community_state[i][j][1];
+            R_trajectories[i][j] = community_state[i][j][2];
         }
     }
 
-    std::vector<uint32_t> community_idx(N_communities);
+    std::vector<std::vector<int>> delta_R = diff(R_trajectories);
+    std::vector<std::vector<int>> delta_I = diff(I_trajectories);
+
+    for (int i = 0; i < delta_I.size(); i++)
+    {
+        for (int j = 0; j < delta_I[i].size(); j++)
+        {
+            delta_I[i][j] += delta_R[i][j];
+        }
+    }
+
+    assert(std::all_of(delta_I.begin(), delta_I.end(), [](auto &v)
+                       { return std::all_of(v.begin(), v.end(), [](auto &x)
+                                            { return x >= 0; }); }));
+    assert(std::all_of(delta_R.begin(), delta_R.end(), [](auto &v)
+                       { return std::all_of(v.begin(), v.end(), [](auto &x)
+                                            { return x >= 0; }); }));
+
+    return delta_I;
+}
+
+std::vector<uint32_t> sample_connection_infections(Inf_Sample_Data_t &z)
+{
+    std::mt19937 rng(z.seed);
+    std::vector<uint32_t> inf_samples(z.connection_weights.size(), 0);
+    std::discrete_distribution<uint32_t> dist(z.connection_weights.begin(), z.connection_weights.end());
+
+    uint32_t N_sampled = 0;
+    if (z.N_infected == 0)
+        return inf_samples;
+    while (N_sampled < z.N_infected)
+    {
+        uint32_t idx = dist(rng);
+        uint32_t connection_idx = z.connection_indices[idx];
+        if (inf_samples[idx] < z.connection_events[connection_idx])
+        {
+            inf_samples[idx]++;
+            N_sampled++;
+        }
+        else
+        {
+            z.connection_weights[idx] = 0;
+        }
+    }
+
+    std::cout << "Samples for community " << z.community_idx << ": " << std::endl;
+    for (int i = 0; i < inf_samples.size(); i++)
+    {
+        std::cout << "Index " << z.connection_indices[i] << ": " << inf_samples[i];
+    }
+    std::cout << std::endl;
+
+    return inf_samples;
+}
+
+std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_Is, const auto &from_events, const auto &to_events, const std::vector<uint32_t> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_connections, uint32_t seed)
+{
+    uint32_t N_communities = delta_Is.size();
+    std::mt19937 rng(seed);
+    std::vector<uint32_t> seeds(N_communities);
+    std::generate(seeds.begin(), seeds.end(), [&rng]()
+                  { return rng(); });
+    std::cout << "Infections : \n";
+    for (int i = 0; i < to_events.size(); i++)
+    {
+        std::cout << ccm[2 * i] << " <- " << ccm[2 * i + 1] << " : " << from_events[i] << "\n";
+        std::cout << ccm[2 * i] << " -> " << ccm[2 * i + 1] << " : " << to_events[i] << "\n";
+    }
+
+    std::vector<Inf_Sample_Data_t> zs(N_communities);
+    for (int i = 0; i < zs.size(); i++)
+    {
+        for (int j = 0; j < ccm.size(); j++)
+        {
+            if (ccm[j] == i)
+            {
+                zs[i].connection_indices.push_back(j);
+                zs[i].connection_weights.push_back(ccm_weights[j]);
+            }
+        }
+
+        zs[i].connection_events.resize(from_events.size() * 2);
+        for (int j = 0; j < from_events.size(); j++)
+        {
+            zs[i].connection_events[2 * j] = from_events[j];
+            zs[i].connection_events[2 * j + 1] = to_events[j];
+        }
+
+        zs[i].N_infected = delta_Is[i];
+        zs[i].community_idx = i;
+        zs[i].seed = seeds[i];
+    }
+
+    std::vector<std::vector<uint32_t>> connection_infections(N_communities);
+
+    std::transform(zs.begin(), zs.end(), connection_infections.begin(), [](auto &z)
+                   { return sample_connection_infections(z); });
+    std::vector<uint32_t> merged_infections(N_connections);
+    for (int i = 0; i < N_connections; i++)
+    {
+        for (int j = 0; j < N_communities; j++)
+        {
+            merged_infections[2 * i] += connection_infections[j][2 * i];
+            merged_infections[2 * i + 1] += connection_infections[j][2 * i + 1];
+        }
+    }
+    return merged_infections;
+}
+
+std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vector<State_t>> &community_state, const auto &from_events, const auto &to_events, const std::vector<uint32_t> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t seed)
+{
+    std::vector<uint32_t> community_idx(community_state.size());
     std::iota(community_idx.begin(), community_idx.end(), 0);
 
-    auto generate_seeds = [](uint32_t N, uint32_t seed)
+    std::vector<std::vector<int>> delta_Is = get_delta_Is(community_state);
+
+    std::vector<uint32_t> I_sample_seeds(delta_Is.size());
+    std::mt19937 rng(seed);
+    std::generate(I_sample_seeds.begin(), I_sample_seeds.end(), [&rng]()
+                  { return rng(); });
+
+    uint32_t N_connections = from_events[0].size();
+
+    std::vector<std::tuple<std::vector<int>, std::vector<uint32_t>, std::vector<uint32_t>, uint32_t>> zip(delta_Is.size());
+    for (int i = 0; i < zip.size(); i++)
     {
-        std::vector<uint32_t> seeds(N);
-        std::mt19937 rng(seed);
-        std::generate(seeds.begin(), seeds.end(), [&rng]()
-                      { return rng(); });
-        return seeds;
-    };
+        zip[i] = std::make_tuple(delta_Is[i], from_events[i], to_events[i], I_sample_seeds[i]);
+    }
 
-    auto rngs = generate_seeds(Nt, seed);
+    std::vector<std::vector<uint32_t>> sampled_infections(delta_Is.size());
 
-    auto zip = Inf_Sample_Data_t::make(community_idx, delta_Is[0], rngs, connection_events);
-    std::transform(zip.begin(), zip.end(), connection_infections.begin(), [ccm](auto &z)
-                   { return sample_connection_infections(z.community_idx, z.N_infected, z.connection_events, ccm, z.seed); });
+    std::transform(zip.begin(), zip.end(), sampled_infections.begin(), [ccm, ccm_weights, N_connections](const auto &z)
+                   { return sample_timestep_infections(std::get<0>(z), std::get<1>(z), std::get<2>(z), ccm, ccm_weights, N_connections, std::get<3>(z)); });
 
-    return connection_infections;
+    return sampled_infections;
 }
 
 int main()
 {
+    std::string output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_" + std::to_string(0) + "/";
+
     uint32_t N_clusters = 2;
     uint32_t N_pop = 100;
     uint32_t N_pop_tot = N_pop * N_clusters;
@@ -479,7 +506,7 @@ int main()
     auto device = q.get_device();
     auto N_wg = device.get_info<sycl::info::device::max_work_group_size>();
 
-    uint32_t Nt = 3;
+    uint32_t Nt = 10;
     uint32_t seed = 100;
     uint32_t N_threads = 10;
 
@@ -494,21 +521,28 @@ int main()
 
     auto p_I0 = 0.1f;
     auto p_R0 = 0.0f;
-    auto [edges, e0] = buffer_create_1D(q, G.edge_list);
-    auto seed_buf = generate_seeds(q, N_wg, seed);
-    auto [ecm_buf, e1] = buffer_create_1D(q, G.ecm);
-    auto [vcm_buf, e2] = buffer_create_1D(q, G.vcm);
-
-    auto trajectory = sycl::buffer<SIR_State, 2>(sycl::range<2>(Nt + 1, N_pop_tot));
-    std::vector<std::vector<float>> p_I_vec = generate_p_Is(G.N_connections, p_I_min, p_I_max, Nt, seed);
-    auto [p_I_buf, e3] = buffer_create_2D(q, p_I_vec);
-    std::vector<std::vector<Edge_t>> connection_events_init(Nt + 1, std::vector<Edge_t>(G.N_connections, {0, 0}));
-    auto [connection_events_buf, e5] = buffer_create_2D(q, connection_events_init);
+    std::vector<uint32_t> edge_from_init(G.edge_list.size());
+    std::vector<uint32_t> edge_to_init(G.edge_list.size());
+    std::transform(G.edge_list.begin(), G.edge_list.end(), edge_from_init.begin(), [](auto &e)
+                   { return e.from; });
+    std::transform(G.edge_list.begin(), G.edge_list.end(), edge_to_init.begin(), [](auto &e)
+                   { return e.to; });
+    std::vector<std::vector<uint32_t>> connection_events_init(Nt, std::vector<uint32_t>(G.N_connections, 0));
     std::vector<std::vector<State_t>> community_state_init(Nt + 1, std::vector<State_t>(N_clusters, {0, 0, 0}));
-    auto [community_state_buf, e6] = buffer_create_2D(q, community_state_init);
-    std::vector<sycl::event> buffer_creation_events = {e0, e1, e2, e3, e5, e6};
+    std::vector<std::vector<float>> p_I_vec = generate_p_Is(G.N_connections, p_I_min, p_I_max, Nt, seed);
+    auto seed_buf = generate_seeds(q, N_wg, seed);
+    auto trajectory = sycl::buffer<SIR_State, 2>(sycl::range<2>(Nt + 1, N_pop_tot));
+    std::vector<sycl::event> b_events(8);
+    auto edge_from_buf = buffer_create_1D(q, edge_from_init, b_events[0]);
+    auto edge_to_buf = buffer_create_1D(q, edge_to_init, b_events[1]);
+    auto ecm_buf = buffer_create_1D(q, G.ecm, b_events[2]);
+    auto vcm_buf = buffer_create_1D(q, G.vcm, b_events[3]);
+    auto p_I_buf = buffer_create_2D(q, p_I_vec, b_events[4]);
+    auto event_to_buf = buffer_create_2D(q, connection_events_init, b_events[5]);
+    auto event_from_buf = buffer_create_2D(q, connection_events_init, b_events[6]);
+    auto community_state_buf = buffer_create_2D(q, community_state_init, b_events[7]);
 
-    auto advance_event = initialize_vertices(p_I0, p_R0, q, trajectory, seed_buf, buffer_creation_events);
+    auto advance_event = initialize_vertices(p_I0, p_R0, q, trajectory, seed_buf, b_events);
 
     // recovery
     uint32_t t = 0;
@@ -520,7 +554,7 @@ int main()
     {
         auto rec_event = recover(q, t, inf_event, p_R, seed_buf, trajectory, vcm_buf);
 
-        inf_event = infect(q, ecm_buf, p_I_buf, seed_buf, connection_events_buf, trajectory, edges, N_wg, t, G.N_connections, rec_event);
+        inf_event = infect(q, ecm_buf, p_I_buf, seed_buf, event_from_buf, event_to_buf, trajectory, edge_from_buf, edge_to_buf, N_wg, t, G.N_connections, rec_event);
     }
     inf_event.wait();
     auto vertex_state = read_buffer(q, trajectory, inf_event);
@@ -537,20 +571,32 @@ int main()
         }
         return state; });
 
-    std::vector<std::vector<uint32_t>> community_recoveries(Nt, std::vector<uint32_t>(N_clusters, 0));
-    for(int t = 0; t < Nt; t++)
+    auto from_events = read_buffer(q, event_from_buf, inf_event);
+    auto to_events = read_buffer(q, event_to_buf, inf_event);
+
+    std::vector<uint32_t> ccm(G.N_connections * 2);
+    std::vector<uint32_t> ccm_weights(G.N_connections * 2);
+    for (int i = 0; i < G.N_connections; i++)
     {
-        for(int j = 0; j < N_clusters; j++)
+        ccm[2 * i] = G.connection_community_map[i].from;
+        ccm[2 * i + 1] = G.connection_community_map[i].to;
+        ccm_weights[2 * i] = G.connection_community_map[i].weight;
+        ccm_weights[2 * i + 1] = G.connection_community_map[i].weight;
+    }
+
+    auto connection_infections = sample_infections(community_state, from_events, to_events, ccm, ccm_weights, seed);
+
+    std::vector<std::vector<uint32_t>> connection_events(from_events.size(), std::vector<uint32_t>(from_events[0].size()));
+
+    for (int t = 0; t < from_events.size(); t++)
+    {
+        for (int i = 0; i < from_events.size(); i++)
         {
-            community_recoveries[t][j] = community_state[t+1][j][2] - community_state[t][j][2];
+            connection_events[t][2 * i] = from_events[t][i];
+            connection_events[t][2 * i + 1] = to_events[t][i];
         }
     }
-    auto connection_events = read_buffer(q, connection_events_buf, inf_event);
 
-
-
-    auto connection_infections = sample_connection_infections(community_state, connection_events, community_recoveries, G.connection_community_map, seed);
-    std::string output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_" + std::to_string(0) + "/";
     std::filesystem::create_directory(
         std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/");
     std::filesystem::create_directories(output_dir);
