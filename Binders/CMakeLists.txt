@@ -1,11 +1,1 @@
-# enable fPIC for custom_binder
 add_custom_binder(SIR_SBM)
-if(${ENABLE_GRAPH_TOOL})
-    # add_custom_library(graph_tool_SIR_SBM)
-    target_compile_definitions(SIR_SBM PRIVATE -DENABLE_GRAPH_TOOL)
-    # target_link_libraries(SIR_SBM PUBLIC "-lgraph_tool_core")
-    # target_link_directories(graph_tool_SIR_SBM PUBLIC ${graph_tool_LIBRARY_DIR})
-    # target_include_directories(graph_tool_SIR_SBM PRIVATE graph_tool_core)
-    # target_include_directories(SIR_SBM PRIVATE ${graph_tool_INCLUDE_DIRECTORIES})
-    # target_link_libraries(SIR_SBM ${graph_tool_LIBRARIES})
-endif()

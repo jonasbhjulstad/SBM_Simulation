@@ -1,4 +1,4 @@
-#include <Sycl_Graph/Buffer_Utils.hpp>
+#include "Sycl_Graph/Buffer_Utils_impl.hpp"
 #include <random>
 void linewrite(std::ofstream &file, const std::vector<uint32_t> &state_iter)
 {
@@ -83,16 +83,16 @@ std::vector<std::pair<uint32_t, uint32_t>> vec_to_pairlist(const std::vector<uin
     return res;
 }
 
+template std::vector<uint32_t> merge_vectors(const std::vector<std::vector<uint32_t>>&);
+template std::vector<int> merge_vectors(const std::vector<std::vector<int>>&);
+template std::vector<float> merge_vectors(const std::vector<std::vector<float>>&);
 
 template std::vector<std::vector<uint32_t>> read_buffer(sycl::queue &q, sycl::buffer<uint32_t, 2> &buf,
                                                         sycl::event events);
 template std::vector<std::vector<float>> read_buffer(sycl::queue &q, sycl::buffer<float, 2> &buf, sycl::event events);
 
-
-
 template std::vector<std::vector<uint32_t>> diff(const std::vector<std::vector<uint32_t>> &v);
 template std::vector<std::vector<int>> diff(const std::vector<std::vector<int>> &v);
-
 
 template sycl::buffer<uint32_t, 1> buffer_create_1D(sycl::queue &q, const std::vector<uint32_t> &data, sycl::event &res_event);
 template sycl::buffer<uint32_t, 2> buffer_create_2D(sycl::queue &q, const std::vector<std::vector<uint32_t>> &data, sycl::event &res_event);

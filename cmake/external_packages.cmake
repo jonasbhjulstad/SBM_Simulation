@@ -18,11 +18,12 @@ CPMFindPackage(
     "BUILD_TESTING OFF"
 )
 
-CPMFindPackage(
-    NAME pybind11
-    GITHUB_REPOSITORY pybind/pybind11
-    GIT_TAG master
-)
+find_package(pybind11 CONFIG)
+# CPMFindPackage(
+#     NAME pybind11
+#     GITHUB_REPOSITORY pybind/pybind11
+#     GIT_TAG master
+# )
 # include(FindPkgConfig)
 # pkg_check_modules(graph_tool REQUIRED graph-tool-py3.9)
 

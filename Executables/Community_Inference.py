@@ -6,8 +6,8 @@ from matplotlib import pyplot as plt
 import multiprocessing as mp
 from collections import Counter
 import json
-Project_root = "/home/man/Documents/Sycl_Graph_Old/"
-Binder_path = Project_root + "/build/Binders"
+Project_root = "/home/man/Documents/ER_Bernoulli_Robust_MPC/"
+Binder_path = Project_root + "/build/Binders/"
 Data_dir = Project_root + "/data/SIR_sim/"
 sys.path.append(Binder_path)
 

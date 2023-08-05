@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 import multiprocessing as mp
 from collections import Counter
 import json
-Project_root = "/home/man/Documents/Sycl_Graph_Old/"
+Project_root = "/home/man/Documents/ER_Bernoulli_Robust_MPC/"
 Binder_path = Project_root + "/build/Binders"
 Data_dir = Project_root + "/data/SIR_sim/"
 sys.path.append(Binder_path)
@@ -34,14 +34,14 @@ if __name__ == '__main__':
 
 
 
-    G = create_planted_SBM(N_pop, N_clusters, p_in, p_out[0], 4, seeds[0])
+    G = generate_planted_SBM(N_pop, N_clusters, p_in, p_out[0], seed)
 
     gi = graph_convert(G)
 
     #write to file
     gi.save(fpath + "/base_graph.gt")
 
-    state = gt.minimize_nested_blockmodel_dl(gi)         
+    state = gt.minimize_nested_blockmodel_dl(gi)
 
 
     entropies = [state.level_entropy(i) for i in range(len(state.get_levels()))]
@@ -84,5 +84,3 @@ if __name__ == '__main__':
     # state.draw(output="a.png")
     # #get entropies
     # a = 1
-
-

@@ -19,7 +19,7 @@ endif()
 # list(APPEND CMAKE_MODULE_PATH "/home/arch/Downloads/cmake-checks-cache/CMakeChecksCache/")
 set(SPIR_FORMAT __DEVICE_SPIR64__)
 
-# set(PYBIND11_PYTHON_VERSION "3.9")
+set(PYBIND11_PYTHON_VERSION "3.9")
 include(FindPython3)
 find_package(Python3 COMPONENTS Interpreter Development)
 option(SYCL_GRAPH_USE_CUDA "Use CUDA" OFF)

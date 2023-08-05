@@ -45,7 +45,30 @@ std::vector<uint32_t> dupe_vec(const std::vector<uint32_t>& vec)
         res[2*i] = vec[i];
         res[2*i+1] = vec[i];
     }
+    return res;
 }
+
+std::vector<uint32_t> events_combine(const std::vector<uint32_t>& from_events, const std::vector<uint32_t>& to_events)
+{
+    std::vector<uint32_t> comb(from_events.size() + to_events.size());
+    for(int i = 0; i < from_events.size(); i++)
+    {
+        comb[2*i] = from_events[i];
+        comb[2*i+1] = to_events[i];
+    }
+    return comb;
+}
+std::vector<std::vector<uint32_t>> events_combine(const std::vector<std::vector<uint32_t>>& from_events, const std::vector<std::vector<uint32_t>>& to_events)
+{
+    std::vector<std::vector<uint32_t>> comb(from_events.size(), std::vector<uint32_t>(from_events[0].size()*2));
+    std::transform(from_events.begin(), from_events.end(), to_events.begin(), comb.begin(), [&](const auto& from, const auto& to)
+    {
+        return events_combine(from, to);
+    });
+    return comb;
+}
+
+
 
 std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_Is, const std::vector<uint32_t> &from_events, const std::vector<uint32_t> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_connections, uint32_t seed)
 {
@@ -63,21 +86,23 @@ std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_I
     auto duped_ccm_weights = dupe_vec(ccm_weights);
 
     std::vector<Inf_Sample_Data_t> zs(N_communities);
+    auto flat_events = events_combine(from_events, to_events);
     std::vector<uint32_t> community_events(N_communities, 0);
     for (int i = 0; i < zs.size(); i++)
     {
-        zs[i].events.resize(ccm.size());
-        for (int j = 0; j < ccm_flat.size(); j++)
+        zs[i].events = flat_events;
+        for (int j = 0; j < ccm.size(); j++)
         {
+
             if (ccm_flat[2*j] == i)
             {
-                zs[i].indices.push_back(j);
-                zs[i].weights.push_back(duped_ccm_weights[j]);
+                zs[i].indices.push_back(2*j);
+                zs[i].weights.push_back(duped_ccm_weights[2*j]);
             }
             if(ccm_flat[2*j+1] == i)
             {
-                zs[i].indices.push_back(j);
-                zs[i].weights.push_back(duped_ccm_weights[j]);
+                zs[i].indices.push_back(2*j+1);
+                zs[i].weights.push_back(duped_ccm_weights[2*j+1]);
             }
         }
 
