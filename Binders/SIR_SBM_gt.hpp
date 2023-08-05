@@ -7,7 +7,7 @@ using namespace boost;
 
 
 namespace Sycl_Graph::SBM
-{   
+{
     // //template function alias
     struct graph_conv_bind
     {
@@ -22,7 +22,7 @@ namespace Sycl_Graph::SBM
 
         std::for_each(G.edge_list.begin(), G.edge_list.end(), [&](const auto& edge)
         {
-            add_edge(vertex(edge.from, gi), vertex(edge.to, gi), gi);
+            add_edge(vertex(edge.first, gi), vertex(edge.second, gi), gi);
         });
         };
     };
@@ -37,7 +37,7 @@ namespace Sycl_Graph::SBM
     // {
     //     // auto gi = Gi.get_graph();
     //     // GraphInterface& Gi = boost::python::extract<GraphInterface&>(po);
-        
+
     //     auto gi = Gi.get_graph();
     //     std::for_each(G.node_list.begin(), G.node_list.end(), [&](const auto& node)
     //     {
@@ -46,7 +46,7 @@ namespace Sycl_Graph::SBM
 
     //     std::for_each(G.edge_list.begin(), G.edge_list.end(), [&](const auto& edge)
     //     {
-    //         add_edge(vertex(edge.from, gi), vertex(edge.to, gi), gi);
+    //         add_edge(vertex(edge.first, gi), vertex(edge.second, gi), gi);
     //     });
     // }
 

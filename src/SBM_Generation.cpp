@@ -37,7 +37,7 @@ namespace Sycl_Graph::SBM
     if (!self_loop)
       edge_list.erase(std::remove_if(edge_list.begin(), edge_list.end(),
                                      [&](auto &e)
-                                     { return e.from == e.to; }),
+                                     { return e.first == e.second; }),
                       edge_list.end());
     if (p == 1)
       return edge_list;

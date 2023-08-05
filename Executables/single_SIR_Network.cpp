@@ -1,11 +1,11 @@
 #define TBB_DEBUG 1
 #include <CL/sycl.hpp>
 #include <Static_RNG/distributions.hpp>
-#include <Sycl_Graph/SBM_Generation.hpp>
+#include <Sycl_Graph/Graph.hpp>
 #include <Sycl_Graph/path_config.hpp>
 #include <Sycl_Graph/SIR_Dynamics.hpp>
 #include <Sycl_Graph/SIR_Infection_Sampling.hpp>
-#include <Sycl_Graph/buffer_utils.hpp>
+#include <Sycl_Graph/Buffer_Utils.hpp>
 #include <algorithm>
 #include <execution>
 #include <filesystem>
@@ -13,10 +13,23 @@
 #include <iostream>
 #include <string>
 
-using namespace Sycl_Graph::SBM;
 
-
-
+template <typename T>
+auto merge_vectors(const std::vector<std::vector<T>> &vectors)
+{
+    std::vector<T> merged;
+    uint32_t size = 0;
+    for(int i = 0; i < vectors.size(); i++)
+    {
+        size += vectors[i].size();
+    }
+    merged.reserve(size);
+    for (auto &v : vectors)
+    {
+        merged.insert(merged.end(), v.begin(), v.end());
+    }
+    return merged;
+}
 
 int main()
 {
@@ -39,38 +52,46 @@ int main()
     uint32_t seed = 100;
     uint32_t N_threads = 10;
 
-    auto G =
-        create_planted_SBM(N_pop, N_clusters, p_in, p_out, N_threads, seed);
+
+    auto [edge_lists, node_lists] = generate_planted_SBM_edges(N_pop, N_clusters, p_in, p_out, seed);
+
+    auto edge_list = merge_vectors(edge_lists);
+
+    auto ccm = complete_ccm(N_clusters);
+    auto ecm = create_ecm(edge_lists);
+    auto vcm = create_vcm(node_lists);
+    std::vector<uint32_t> ccm_weights(edge_lists.size());
+    std::transform(edge_lists.begin(), edge_lists.end(), ccm_weights.begin(), [&ccm](auto &e)
+                   { return e.size(); });
+
+    uint32_t N_connections = edge_lists.size();
 
     float p_I_min = 1e-3f;
     float p_I_max = 1e-2f;
     float p_R = 1e-1f;
-    SIR_SBM_Param_t param;
-    param.p_R = p_R;
 
     auto p_I0 = 0.1f;
     auto p_R0 = 0.0f;
-    std::vector<uint32_t> edge_from_init(G.edge_list.size());
-    std::vector<uint32_t> edge_to_init(G.edge_list.size());
-    std::transform(G.edge_list.begin(), G.edge_list.end(), edge_from_init.begin(), [](auto &e)
-                   { return e.from; });
-    std::transform(G.edge_list.begin(), G.edge_list.end(), edge_to_init.begin(), [](auto &e)
-                   { return e.to; });
-    std::vector<std::vector<uint32_t>> connection_events_init(Nt, std::vector<uint32_t>(G.N_connections, 0));
+    std::vector<uint32_t> edge_from_init(edge_list.size());
+    std::vector<uint32_t> edge_to_init(edge_list.size());
+    std::transform(edge_list.begin(), edge_list.end(), edge_from_init.begin(), [](auto &e)
+                   { return e.first; });
+    std::transform(edge_list.begin(), edge_list.end(), edge_to_init.begin(), [](auto &e)
+                   { return e.second; });
+    std::vector<std::vector<uint32_t>> connection_events_init(Nt, std::vector<uint32_t>(N_connections, 0));
     std::vector<std::vector<State_t>> community_state_init(Nt + 1, std::vector<State_t>(N_clusters, {0, 0, 0}));
-    std::vector<std::vector<float>> p_I_vec = generate_p_Is(G.N_connections, p_I_min, p_I_max, Nt, seed);
+    std::vector<std::vector<float>> p_I_vec = generate_p_Is(N_connections, p_I_min, p_I_max, Nt, seed);
     auto seed_buf = generate_seeds(q, N_wg, seed);
     auto trajectory = sycl::buffer<SIR_State, 2>(sycl::range<2>(Nt + 1, N_pop_tot));
     std::vector<sycl::event> b_events(8);
     auto edge_from_buf = buffer_create_1D(q, edge_from_init, b_events[0]);
     auto edge_to_buf = buffer_create_1D(q, edge_to_init, b_events[1]);
-    auto ecm_buf = buffer_create_1D(q, G.ecm, b_events[2]);
-    auto vcm_buf = buffer_create_1D(q, G.vcm, b_events[3]);
+    auto ecm_buf = buffer_create_1D(q, ecm, b_events[2]);
+    auto vcm_buf = buffer_create_1D(q, vcm, b_events[3]);
     auto p_I_buf = buffer_create_2D(q, p_I_vec, b_events[4]);
     auto event_to_buf = buffer_create_2D(q, connection_events_init, b_events[5]);
     auto event_from_buf = buffer_create_2D(q, connection_events_init, b_events[6]);
     auto community_state_buf = buffer_create_2D(q, community_state_init, b_events[7]);
-
     auto advance_event = initialize_vertices(p_I0, p_R0, q, trajectory, seed_buf, b_events);
 
     // recovery
@@ -83,7 +104,7 @@ int main()
     {
         auto rec_event = recover(q, t, inf_event, p_R, seed_buf, trajectory, vcm_buf);
 
-        inf_event = infect(q, ecm_buf, p_I_buf, seed_buf, event_from_buf, event_to_buf, trajectory, edge_from_buf, edge_to_buf, N_wg, t, G.N_connections, rec_event);
+        inf_event = infect(q, ecm_buf, p_I_buf, seed_buf, event_from_buf, event_to_buf, trajectory, edge_from_buf, edge_to_buf, N_wg, t, N_connections, rec_event);
     }
     inf_event.wait();
     auto vertex_state = read_buffer(q, trajectory, inf_event);
@@ -95,23 +116,13 @@ int main()
         std::vector<State_t> state(N_clusters, {0, 0, 0});
         for(int i = 0; i < v_state.size(); i++)
         {
-            auto community_idx = G.vcm[i];
+            auto community_idx = vcm[i];
             state[community_idx][v_state[i]]++;
         }
         return state; });
 
     auto from_events = read_buffer(q, event_from_buf, inf_event);
     auto to_events = read_buffer(q, event_to_buf, inf_event);
-
-    std::vector<uint32_t> ccm(G.N_connections * 2);
-    std::vector<uint32_t> ccm_weights(G.N_connections * 2);
-    for (int i = 0; i < G.N_connections; i++)
-    {
-        ccm[2 * i] = G.connection_community_map[i].from;
-        ccm[2 * i + 1] = G.connection_community_map[i].to;
-        ccm_weights[2 * i] = G.connection_community_map[i].weight;
-        ccm_weights[2 * i + 1] = G.connection_community_map[i].weight;
-    }
 
     auto connection_infections = sample_infections(community_state, from_events, to_events, ccm, ccm_weights, seed);
 
@@ -158,15 +169,7 @@ int main()
                       linewrite(connection_infections_f, connection_infections_i);
                   });
     std::ofstream p_I_f(output_dir + "p_Is_" + std::to_string(sim_idx) + ".csv");
-    std::vector<std::vector<float>> p_I_duplicated;
-    std::transform(param.p_I.begin(), param.p_I.end(),
-                   std::back_inserter(p_I_duplicated),
-                   [&](const auto &p_I_i)
-                   {
-        std::vector<float> p_I_dup = p_I_i;
-        p_I_dup.insert(p_I_dup.end(), p_I_i.begin(), p_I_i.end());
-        return p_I_dup; });
-    std::for_each(p_I_duplicated.begin(), p_I_duplicated.end(),
+    std::for_each(p_I_vec.begin(), p_I_vec.end(),
                   [&](auto &p_I_i)
                   { linewrite(p_I_f, p_I_i); });
 

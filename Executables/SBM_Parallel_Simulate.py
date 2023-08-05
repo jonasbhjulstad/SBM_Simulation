@@ -182,9 +182,9 @@ if __name__ == '__main__':
         parallel_simulate_to_file(G, p, qs, output_dirs[i], N_sims, seed)
         theta_LS, theta_QR = regression_on_datasets(output_dirs[i], N_sims, tau, 0)
         #write alpha, theta_LS, theta_QR to files in output_dir
-        # np.array(alpha).tofile(output_dir + "alpha.csv", sep=",")
-        np.array(theta_LS).tofile(output_dir + "theta_LS.csv", sep=",")
-        np.array(theta_QR).tofile(output_dir + "theta_QR.csv", sep=",")
+        # np.array(alpha).secondfile(output_dir + "alpha.csv", sep=",")
+        np.array(theta_LS).secondfile(output_dir + "theta_LS.csv", sep=",")
+        np.array(theta_QR).secondfile(output_dir + "theta_QR.csv", sep=",")
 
 
     with open(fpath + "param.json", "w") as f:

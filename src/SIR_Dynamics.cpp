@@ -1,7 +1,9 @@
-#include <Sycl_Graph/SIR_Dynamics.hpp>
 #include <Static_RNG/distributions.hpp>
+#include <Sycl_Graph/Buffer_Utils.hpp>
+#include <Sycl_Graph/SIR_Dynamics.hpp>
 #include <random>
-std::tuple<uint32_t, uint32_t> get_susceptible_id_if_infected(const sycl::accessor<SIR_State, 1> &v_acc, uint32_t id_from,
+#include <execution>
+std::tuple<uint32_t, uint32_t> get_susceptible_id_if_infected(const auto &v_acc, uint32_t id_from,
                                                               uint32_t id_to)
 {
     if (((v_acc[id_to] == SIR_INDIVIDUAL_S) &&
@@ -21,7 +23,7 @@ std::tuple<uint32_t, uint32_t> get_susceptible_id_if_infected(const sycl::access
 }
 
 sycl::event initialize_vertices(float p_I0, float p_R0, sycl::queue &q,
-                                sycl::buffer<SIR_State, 2> &buf, sycl::buffer<uint32_t> &seed_buf, sycl::event event)
+                                sycl::buffer<SIR_State, 2> &buf, sycl::buffer<uint32_t> &seed_buf, std::vector<sycl::event> event)
 {
     uint32_t N_vertices = buf.get_range()[1];
     uint32_t N_seeds = seed_buf.get_range()[0];
@@ -120,6 +122,8 @@ sycl::event infect(sycl::queue &q, sycl::buffer<uint32_t> &ecm_buf, sycl::buffer
     auto infection_indices_acc = infection_indices_buf.template get_access<sycl::access::mode::write>(h);
     h.parallel_for(N_wg, [=](sycl::id<1> id) {
       auto seed = sycl::atomic_fetch_add<uint32_t>(seed_acc[id], 1);
+        Static_RNG::default_rng rng(seed);
+    Static_RNG::bernoulli_distribution<float> bernoulli_I(0.0f);
       uint32_t N_edge_per_wg = (N_edges / N_wg) + 1;
       for(int i = 0; i < N_edge_per_wg; i++)
       {
@@ -129,15 +133,14 @@ sycl::event infect(sycl::queue &q, sycl::buffer<uint32_t> &ecm_buf, sycl::buffer
       auto id_from = edge_from_acc[edge_idx];
       auto id_to = edge_to_acc[edge_idx];
       auto [sus_id, direction] = get_susceptible_id_if_infected(v_acc[t], id_from, id_to);
-      if (sus_id != std::numeric_limits<uint32_t>::max()) {
-        Static_RNG::default_rng rng(seed);
-        auto p_I = p_I_acc[t][ecm_acc[edge_idx]];
-        Static_RNG::bernoulli_distribution<float> bernoulli_I(p_I);
-        if (bernoulli_I(rng)) {
-          v_acc[t + 1][sus_id] = SIR_INDIVIDUAL_I;
-            infection_indices_acc[edge_idx] = direction;
-        }
-      }
+      if (sus_id == std::numeric_limits<uint32_t>::max())
+        continue;
+    auto p_I = p_I_acc[t][ecm_acc[edge_idx]];
+    bernoulli_I.p = p_I;
+    if (bernoulli_I(rng)) {
+        v_acc[t + 1][sus_id] = SIR_INDIVIDUAL_I;
+        infection_indices_acc[edge_idx] = direction;
+    }
       }
     }); });
 
@@ -165,19 +168,79 @@ sycl::event infect(sycl::queue &q, sycl::buffer<uint32_t> &ecm_buf, sycl::buffer
                                                             }
                                                         }
                                                        }); });
-    accumulate_event = q.submit([&](sycl::handler& h)
-    {
-        sycl::stream out (1024, 256, h);
-        h.depends_on(accumulate_event);
-        auto event_from_acc = event_from_buf.template get_access<sycl::access::mode::read>(h);
-        auto event_to_acc = event_to_buf.template get_access<sycl::access::mode::read>(h);
+    // accumulate_event = q.submit([&](sycl::handler& h)
+    // {
+    //     sycl::stream out (1024, 256, h);
+    //     h.depends_on(accumulate_event);
+    //     auto event_from_acc = event_from_buf.template get_access<sycl::access::mode::read>(h);
+    //     auto event_to_acc = event_to_buf.template get_access<sycl::access::mode::read>(h);
 
-        h.single_task([=](){
-            for(int i = 0; i < event_from_buf.size(); i++)
-            {
+    //     h.single_task([=](){
+    //         for(int i = 0; i < event_from_buf.size(); i++)
+    //         {
 
-            }
-        });
-    });
+    //         }
+    //     });
+    // });
     return accumulate_event;
 }
+
+  std::vector<std::vector<float>> generate_p_Is(uint32_t N_community_connections,
+                                                float p_I_min, float p_I_max,
+                                                uint32_t Nt, uint32_t seed)
+  {
+    std::vector<Static_RNG::default_rng> rngs(Nt);
+    Static_RNG::default_rng rd(seed);
+    std::vector<uint32_t> seeds(Nt);
+    std::generate(seeds.begin(), seeds.end(), [&rd]()
+                  { return rd(); });
+    std::transform(seeds.begin(), seeds.end(), rngs.begin(),
+                   [](auto seed)
+                   { return Static_RNG::default_rng(seed); });
+
+    std::vector<std::vector<float>> p_Is(
+        Nt, std::vector<float>(N_community_connections));
+
+    std::transform(
+        std::execution::par_unseq, rngs.begin(), rngs.end(), p_Is.begin(),
+        [&](auto &rng)
+        {
+          Static_RNG::uniform_real_distribution<> dist(p_I_min, p_I_max);
+          std::vector<float> p_I(N_community_connections);
+          std::generate(p_I.begin(), p_I.end(), [&]()
+                        { return dist(rng); });
+          return p_I;
+        });
+
+    return p_Is;
+  }
+
+  std::vector<uint32_t> create_ecm(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_lists)
+  {
+    std::vector<uint32_t> list_sizes(edge_lists.size());
+    std::transform(edge_lists.begin(), edge_lists.end(), list_sizes.begin(), [](auto& edge_list){return edge_list.size();});
+    uint32_t N_edges = std::accumulate(list_sizes.begin(), list_sizes.end(), 0);
+    std::vector<uint32_t> ecm(N_edges);
+    uint32_t offset = 0;
+    for(int i = 0; i < edge_lists.size(); i++)
+    {
+        std::fill(ecm.begin() + offset, ecm.begin() + offset + list_sizes[i], i);
+        offset += list_sizes[i];
+    }
+    return ecm;
+  }
+
+  std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_lists)
+  {
+    std::vector<uint32_t> list_sizes(node_lists.size());
+    std::transform(node_lists.begin(), node_lists.end(), list_sizes.begin(), [](auto& node_list){return node_list.size();});
+    uint32_t N_nodes = std::accumulate(list_sizes.begin(), list_sizes.end(), 0);
+    std::vector<uint32_t> vcm(N_nodes);
+    uint32_t offset = 0;
+    for(int i = 0; i < node_lists.size(); i++)
+    {
+        std::fill(vcm.begin() + offset, vcm.begin() + offset + list_sizes[i], i);
+        offset += list_sizes[i];
+    }
+    return vcm;
+  }

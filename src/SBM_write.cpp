@@ -30,7 +30,7 @@ void linewrite(std::ofstream &file,
 
 void linewrite(std::ofstream &file, const std::vector<Edge_t> &iter) {
   for (auto &t_i_i : iter) {
-    file << t_i_i.from << "," << t_i_i.to;
+    file << t_i_i.first << "," << t_i_i.second;
     if (&t_i_i != &iter.back())
       file << ",";
     else
@@ -40,7 +40,7 @@ void linewrite(std::ofstream &file, const std::vector<Edge_t> &iter) {
 
 void columnwrite(std::ofstream &file, const std::vector<Edge_t> &iter) {
   for (auto &t_i_i : iter) {
-    file << t_i_i.from << "," << t_i_i.to << "\n";
+    file << t_i_i.first << "," << t_i_i.second << "\n";
   }
 }
 

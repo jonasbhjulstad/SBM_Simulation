@@ -1,12 +1,13 @@
 #include <Sycl_Graph/SIR_Infection_Sampling.hpp>
+#include <Sycl_Graph/Buffer_Utils.hpp>
 #include <random>
 #include <iostream>
 #include <algorithm>
 std::vector<uint32_t> sample_connection_infections(Inf_Sample_Data_t &z)
 {
     std::mt19937 rng(z.seed);
-    std::vector<uint32_t> inf_samples(z.connection_weights.size(), 0);
-    std::discrete_distribution<uint32_t> dist(z.connection_weights.begin(), z.connection_weights.end());
+    std::vector<uint32_t> inf_samples(z.weights.size(), 0);
+    std::discrete_distribution<uint32_t> dist(z.weights.begin(), z.weights.end());
 
     uint32_t N_sampled = 0;
     if (z.N_infected == 0)
@@ -14,72 +15,81 @@ std::vector<uint32_t> sample_connection_infections(Inf_Sample_Data_t &z)
     while (N_sampled < z.N_infected)
     {
         uint32_t idx = dist(rng);
-        uint32_t connection_idx = z.connection_indices[idx];
-        if (inf_samples[idx] < z.connection_events[connection_idx])
+        uint32_t connection_idx = z.indices[idx];
+        if (inf_samples[idx] < z.events[connection_idx])
         {
             inf_samples[idx]++;
             N_sampled++;
         }
         else
         {
-            z.connection_weights[idx] = 0;
+            z.weights[idx] = 0;
         }
     }
 
     std::cout << "Samples for community " << z.community_idx << ": " << std::endl;
     for (int i = 0; i < inf_samples.size(); i++)
     {
-        std::cout << "Index " << z.connection_indices[i] << ": " << inf_samples[i];
+        std::cout << "Index " << z.indices[i] << ": " << inf_samples[i];
     }
     std::cout << std::endl;
 
     return inf_samples;
 }
 
-std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_Is, const std::vector<uint32_t> &from_events, const std::vector<uint32_t> &to_events, const std::vector<uint32_t> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_connections, uint32_t seed)
+std::vector<uint32_t> dupe_vec(const std::vector<uint32_t>& vec)
+{
+    std::vector<uint32_t> res(vec.size()*2);
+    for(int i = 0; i < vec.size(); i++)
+    {
+        res[2*i] = vec[i];
+        res[2*i+1] = vec[i];
+    }
+}
+
+std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_Is, const std::vector<uint32_t> &from_events, const std::vector<uint32_t> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_connections, uint32_t seed)
 {
     uint32_t N_communities = delta_Is.size();
     std::mt19937 rng(seed);
     std::vector<uint32_t> seeds(N_communities);
     std::generate(seeds.begin(), seeds.end(), [&rng]()
                   { return rng(); });
-    std::cout << "Infections : \n";
-    for (int i = 0; i < to_events.size(); i++)
+    std::cout << "Infection-Events: \n";
+    for (int i = 0; i < ccm.size(); i++)
     {
-        std::cout << ccm[2 * i] << " <- " << ccm[2 * i + 1] << " : " << from_events[i] << "\n";
-        std::cout << ccm[2 * i] << " -> " << ccm[2 * i + 1] << " : " << to_events[i] << "\n";
+        std::cout << ccm[i].first << " -> " << ccm[i].second << " : " << from_events[i] << "\n";
     }
+    auto ccm_flat = pairlist_to_vec(ccm);
+    auto duped_ccm_weights = dupe_vec(ccm_weights);
 
     std::vector<Inf_Sample_Data_t> zs(N_communities);
     std::vector<uint32_t> community_events(N_communities, 0);
     for (int i = 0; i < zs.size(); i++)
     {
-        for (int j = 0; j < ccm.size(); j++)
+        zs[i].events.resize(ccm.size());
+        for (int j = 0; j < ccm_flat.size(); j++)
         {
-            if (ccm[j] == i)
+            if (ccm_flat[2*j] == i)
             {
-                zs[i].connection_indices.push_back(j);
-                zs[i].connection_weights.push_back(ccm_weights[j]);
+                zs[i].indices.push_back(j);
+                zs[i].weights.push_back(duped_ccm_weights[j]);
             }
-        }
-        zs[i].connection_events.resize(from_events.size() * 2);
-        for (int j = 0; j < from_events.size(); j++)
-        {
-            if (ccm[2*j] == i)
+            if(ccm_flat[2*j+1] == i)
             {
-                community_events[i] += from_events[j];
+                zs[i].indices.push_back(j);
+                zs[i].weights.push_back(duped_ccm_weights[j]);
             }
-            if (ccm[2*j+1] == i)
-            {
-                community_events[i] += to_events[j];
-            }
-            zs[i].connection_events[2 * j] = from_events[j];
-            zs[i].connection_events[2 * j + 1] = to_events[j];
         }
 
         zs[i].N_infected = delta_Is[i];
         zs[i].community_idx = i;
         zs[i].seed = seeds[i];
+    }
+
+    std::cout << "Community Infections/Events: \n";
+    for (int i = 0; i < community_events.size(); i++)
+    {
+        std::cout << "Community " << i << ": " << zs[i].N_infected << ", " << community_events[i] << "\n";
     }
 
     std::vector<std::vector<uint32_t>> connection_infections(N_communities);
@@ -134,7 +144,7 @@ std::vector<std::vector<int>> get_delta_Is(const std::vector<std::vector<State_t
     return delta_I;
 }
 
-std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vector<State_t>> &community_state, const std::vector<std::vector<uint32_t>> &from_events, const std::vector<std::vector<uint32_t>> &to_events, const std::vector<uint32_t> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t seed)
+std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vector<State_t>> &community_state, const std::vector<std::vector<uint32_t>> &from_events, const std::vector<std::vector<uint32_t>> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t seed)
 {
     std::vector<uint32_t> community_idx(community_state.size());
     std::iota(community_idx.begin(), community_idx.end(), 0);

@@ -7,6 +7,7 @@
 #include <map>
 #include <tuple>
 #include <vector>
+#include <Sycl_Graph/SIR_Types.hpp>
 namespace Sycl_Graph::SBM {
 typedef std::tuple<sycl::buffer<uint32_t, 1>, sycl::buffer<uint32_t, 1>,
                    std::vector<uint32_t>, std::vector<uint32_t>, sycl::event>
@@ -26,12 +27,12 @@ struct Edge_t {
   Edge_t(uint32_t _from, uint32_t _to): from(_from), to(_to) {}
   Edge_t(uint32_t _from, uint32_t _to, uint32_t weight): from(_from), to(_to), weight(weight) {}
   bool operator==(const Edge_t &rhs) const {
-    return from == rhs.from && to == rhs.to;
+    return from == rhs.first && to == rhs.second;
   }
   bool operator!=(const Edge_t &rhs) const { return !(*this == rhs); }
 
   bool operator<(const Edge_t &rhs) const {
-    return from < rhs.from || (from == rhs.from && to < rhs.to);
+    return from < rhs.first || (from == rhs.first && to < rhs.second);
   }
 };
 
@@ -39,11 +40,6 @@ typedef std::vector<Edge_t> Edge_List_t;
 
 typedef std::vector<uint32_t> Node_List_t;
 
-enum SIR_State : unsigned char {
-  SIR_INDIVIDUAL_S = 0,
-  SIR_INDIVIDUAL_I = 1,
-  SIR_INDIVIDUAL_R = 2
-};
 
 template <sycl::access_mode Mode,
           sycl::access::target Target = sycl::access::target::device>

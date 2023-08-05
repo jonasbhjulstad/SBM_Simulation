@@ -10,9 +10,9 @@ struct Inf_Sample_Data_t
     uint32_t community_idx;
     uint32_t N_infected;
     uint32_t seed;
-    std::vector<uint32_t> connection_events;
-    std::vector<uint32_t> connection_indices;
-    std::vector<uint32_t> connection_weights;
+    std::vector<uint32_t> events;
+    std::vector<uint32_t> indices;
+    std::vector<uint32_t> weights;
 };
 enum SIR_State : unsigned char {
   SIR_INDIVIDUAL_S = 0,

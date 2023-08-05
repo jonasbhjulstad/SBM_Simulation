@@ -28,9 +28,9 @@ namespace Sycl_Graph::SBM
   template <>
   Edge_Accessor_t<sycl::access_mode::read_write>::Edge_Accessor_t(
       Edge_Buffer_t &buf, sycl::handler &h)
-      : to(buf.to.template get_access<sycl::access::mode::read_write,
+      : to(buf.second.template get_access<sycl::access::mode::read_write,
                                       sycl::access::target::device>(h)),
-        from(buf.from.template get_access<sycl::access::mode::read_write,
+        from(buf.first.template get_access<sycl::access::mode::read_write,
                                           sycl::access::target::device>(h)),
         self(buf.self.template get_access<sycl::access::mode::read_write,
                                           sycl::access::target::device>(h)) {}
@@ -38,9 +38,9 @@ namespace Sycl_Graph::SBM
   template <>
   Edge_Accessor_t<sycl::access_mode::read>::Edge_Accessor_t(Edge_Buffer_t &buf,
                                                             sycl::handler &h)
-      : to(buf.to.template get_access<sycl::access::mode::read,
+      : to(buf.second.template get_access<sycl::access::mode::read,
                                       sycl::access::target::device>(h)),
-        from(buf.from.template get_access<sycl::access::mode::read,
+        from(buf.first.template get_access<sycl::access::mode::read,
                                           sycl::access::target::device>(h)),
         self(buf.self.template get_access<sycl::access::mode::read,
                                           sycl::access::target::device>(h)) {}
@@ -48,9 +48,9 @@ namespace Sycl_Graph::SBM
   template <>
   Edge_Accessor_t<sycl::access_mode::write>::Edge_Accessor_t(Edge_Buffer_t &buf,
                                                              sycl::handler &h)
-      : to(buf.to.template get_access<sycl::access::mode::write,
+      : to(buf.second.template get_access<sycl::access::mode::write,
                                       sycl::access::target::device>(h)),
-        from(buf.from.template get_access<sycl::access::mode::write,
+        from(buf.first.template get_access<sycl::access::mode::write,
                                           sycl::access::target::device>(h)),
         self(buf.self.template get_access<sycl::access::mode::write,
                                           sycl::access::target::device>(h)) {}
@@ -158,11 +158,11 @@ namespace Sycl_Graph::SBM
 
     std::transform(edge_list.begin(), edge_list.end(), ecm.begin(), [&](Edge_t &e)
                    {
-      auto to_mapped_edge = Edge_t{map[e.from], map[e.to]};
+      auto to_mapped_edge = Edge_t{map[e.first], map[e.second]};
       auto it = std::find(idx_connection_map.begin(), idx_connection_map.end(), to_mapped_edge);
       if(it != idx_connection_map.end())
         return (uint32_t)std::distance(idx_connection_map.begin(), it);
-      auto from_mapped_edge = Edge_t{map[e.to], map[e.from]};
+      auto from_mapped_edge = Edge_t{map[e.second], map[e.first]};
       it = std::find(idx_connection_map.begin(), idx_connection_map.end(), from_mapped_edge);
       assert(it != idx_connection_map.end() && "Could not find edge in connection map");
       return (uint32_t)std::distance(idx_connection_map.begin(), it); });
