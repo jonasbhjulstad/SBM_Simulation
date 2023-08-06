@@ -1,3 +1,4 @@
+
 #include <Sycl_Graph/Simulation.hpp>
 
 #include <Static_RNG/distributions.hpp>
@@ -22,7 +23,7 @@ std::vector<uint32_t> count_ecm(const std::vector<uint32_t> &ecm)
     return result;
 }
 
-void excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, float p_I_min, float p_I_max, const std::string output_dir)
+void excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, float p_I_min, float p_I_max, const std::string output_dir, bool debug_flag)
 {
     // forwarding
     uint32_t Nt = p.Nt;
@@ -37,15 +38,23 @@ void excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const
     uint32_t sim_idx = p.sim_idx;
     uint32_t N_pop_tot = N_pop * N_clusters;
 
+    if (debug_flag)
+        std::cout << "Initializing Simulation" << std::endl;
+
     sycl::queue q(sycl::gpu_selector_v);
     auto device = q.get_device();
     // get work group size
     auto N_wg = device.get_info<sycl::info::device::max_work_group_size>();
+    if (debug_flag)
+        std::cout << "Work group size: " << N_wg << std::endl;
+
     auto ecm = ecm_from_vcm(edge_list, vcm);
     uint32_t N_connections = std::max_element(ecm.begin(), ecm.end())[0] + 1;
 
     auto ccm = complete_ccm(p.N_clusters);
     auto ccm_weights = count_ecm(ecm);
+    if (debug_flag)
+        std::cout << "Initializing Buffers" << std::endl;
 
     std::vector<uint32_t> edge_from_init(edge_list.size());
     std::vector<uint32_t> edge_to_init(edge_list.size());
@@ -73,6 +82,8 @@ void excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const
 
     sycl::event rec_event;
     sycl::event inf_event;
+    if (debug_flag)
+        std::cout << "Enqueueing Kernels" << std::endl;
 
     for (int t = 0; t < Nt; t++)
     {
@@ -81,6 +92,9 @@ void excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const
         inf_event = infect(q, ecm_buf, p_I_buf, seed_buf, event_from_buf, event_to_buf, trajectory, edge_from_buf, edge_to_buf, N_wg, t, N_connections, rec_event);
     }
     inf_event.wait();
+    if (debug_flag)
+        std::cout << "Reading Buffers" << std::endl;
+
     auto vertex_state = read_buffer(q, trajectory, inf_event);
 
     std::vector<std::vector<State_t>> community_state(Nt + 1, std::vector<State_t>(N_clusters, {0, 0, 0}));
@@ -101,6 +115,9 @@ void excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const
     auto connection_infections = sample_infections(community_state, from_events, to_events, ccm, ccm_weights, seed);
 
     auto connection_events = events_combine(from_events, to_events);
+
+    if (debug_flag)
+        std::cout << "Writing to directory: " << output_dir << std::endl;
 
     std::filesystem::create_directories(output_dir);
 

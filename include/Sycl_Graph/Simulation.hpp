@@ -17,6 +17,6 @@ struct Sim_Param
     uint32_t sim_idx = 0;
     uint32_t seed = 47;
 };
-void excite_simulate(const Sim_Param& p, const std::vector<uint32_t>& vcm, const std::vector<std::pair<uint32_t, uint32_t>>& edge_list, float p_I_min, float p_I_max, const std::string output_dir = "./");
+void excite_simulate(const Sim_Param& p, const std::vector<uint32_t>& vcm, const std::vector<std::pair<uint32_t, uint32_t>>& edge_list, float p_I_min, float p_I_max, const std::string output_dir = "./", bool debug_flag = false);
 
 #endif

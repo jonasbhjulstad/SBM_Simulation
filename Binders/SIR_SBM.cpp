@@ -6,11 +6,11 @@
 #include <Sycl_Graph/Graph.hpp>
 #include <Sycl_Graph/Regression.hpp>
 #include <Sycl_Graph/Simulation.hpp>
-
 namespace py = pybind11;
 
 PYBIND11_MODULE(SIR_SBM, m)
 {
+
 
     py::class_<sycl::gpu_selector>(m, "gpu_selector").def(py::init<>());
     py::class_<sycl::cpu_selector>(m, "cpu_selector").def(py::init<>());

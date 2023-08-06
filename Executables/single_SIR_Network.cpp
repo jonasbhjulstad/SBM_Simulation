@@ -1,3 +1,7 @@
+
+//enable tbb debug
+#define TBB_USE_DEBUG 1
+
 #include <Sycl_Graph/path_config.hpp>
 #include <Sycl_Graph/Simulation.hpp>
 #include <Sycl_Graph/Graph.hpp>

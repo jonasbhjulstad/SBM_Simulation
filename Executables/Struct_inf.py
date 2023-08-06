@@ -30,8 +30,8 @@ if __name__ == '__main__':
 
 
 
-    N_pop = 10
-    N_clusters = 4
+    N_pop = 100
+    N_clusters = 2
     p_in = 1.0
     p_out = 0.5
     N_threads = 4
@@ -95,6 +95,6 @@ if __name__ == '__main__':
     p_I_min = 1e-3
     p_I_max = 1e-1
 
-    excite_simulate(p, new_idx, edge_list, p_I_min, p_I_max, fpath)
+    excite_simulate(p, new_idx, edge_list, p_I_min, p_I_max, fpath, True)
 
     a = 1

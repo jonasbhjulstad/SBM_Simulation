@@ -1,14 +1,15 @@
 include(${PROJECT_SOURCE_DIR}/cmake/CPM.cmake)
 
-CPMFindPackage(
-    NAME Static_RNG
-    GITHUB_REPOSITORY jonasbhjulstad/Static_RNG
-    GIT_TAG master
-    OPTIONS
-    STATIC_RNG_ENABLE_SYCL OFF
-    BUILD_PYTHON_BINDERS OFF
-    BUILD_DOCS OFF
-)
+# CPMFindPackage(
+#     NAME Static_RNG
+#     GITHUB_REPOSITORY jonasbhjulstad/Static_RNG
+#     GIT_TAG master
+#     OPTIONS
+#     STATIC_RNG_ENABLE_SYCL OFF
+#     BUILD_PYTHON_BINDERS OFF
+#     BUILD_DOCS OFF
+# )
+find_package(Static_RNG REQUIRED)
 
 CPMFindPackage(
     NAME tinymt

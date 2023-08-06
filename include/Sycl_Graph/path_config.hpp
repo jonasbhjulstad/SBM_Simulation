@@ -1,8 +1,9 @@
 #ifndef Sycl_Graph_Path_CONFIG_HPP
 #define Sycl_Graph_Path_CONFIG_HPP
-#include <cstdint>
+
 #include <string>
 #include <sstream>
+#include <cstdint>
 
 namespace Sycl_Graph {
 // const char *SYCL_GRAPH_ROOT_DIR = "";
