@@ -1,6 +1,6 @@
 #ifndef Sycl_Graph_Path_CONFIG_HPP
 #define Sycl_Graph_Path_CONFIG_HPP
-
+#include <cstdint>
 #include <string>
 #include <sstream>
 

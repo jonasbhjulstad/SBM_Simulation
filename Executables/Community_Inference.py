@@ -12,13 +12,7 @@ Data_dir = Project_root + "/data/SIR_sim/"
 sys.path.append(Binder_path)
 
 from SIR_SBM import *
-def graph_convert(G):
-    G_gt = gt.Graph(directed=True)
-    G_gt.add_vertex(len(G.node_list))
-    for e in G.edge_list:
-        G_gt.add_edge(e._from, e._to)
 
-    return G_gt
 
 def remap(G, state, idx):
     community_map = list(state.project_partition(idx, 0))

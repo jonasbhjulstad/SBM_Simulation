@@ -4,10 +4,18 @@
 #include <Sycl_Graph/SIR_SBM_Network.hpp>
 #include <execution>
 namespace Sycl_Graph::SBM {
-template <>
-void linewrite<>(std::ofstream &file, const std::vector<uint32_t> &iter);
 
 void linewrite(std::ofstream &file, const std::vector<uint32_t> &state_iter) {
+  for (const auto &t_i_i : state_iter) {
+    file << t_i_i;
+    if (&t_i_i != &state_iter.back())
+      file << ",";
+    else
+      file << "\n";
+  }
+}
+
+void linewrite(std::ofstream &file, const std::vector<float> &state_iter) {
   for (const auto &t_i_i : state_iter) {
     file << t_i_i;
     if (&t_i_i != &state_iter.back())

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <random>
 #include <tuple>
+#include <unordered_map>
 std::vector<std::pair<uint32_t, uint32_t>> random_connect(const std::vector<uint32_t> &to_nodes,
                                                           const std::vector<uint32_t> &from_nodes, float p, uint32_t connection_idx, uint32_t seed)
 {
@@ -113,5 +114,65 @@ std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities)
     }
 
     return ccm;
+}
 
+  std::vector<uint32_t> create_ecm(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_lists)
+  {
+    std::vector<uint32_t> list_sizes(edge_lists.size());
+    std::transform(edge_lists.begin(), edge_lists.end(), list_sizes.begin(), [](auto& edge_list){return edge_list.size();});
+    uint32_t N_edges = std::accumulate(list_sizes.begin(), list_sizes.end(), 0);
+    std::vector<uint32_t> ecm(N_edges);
+    uint32_t offset = 0;
+    for(int i = 0; i < edge_lists.size(); i++)
+    {
+        std::fill(ecm.begin() + offset, ecm.begin() + offset + list_sizes[i], i);
+        offset += list_sizes[i];
+    }
+    return ecm;
+  }
+
+  std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_lists)
+  {
+    std::vector<uint32_t> list_sizes(node_lists.size());
+    std::transform(node_lists.begin(), node_lists.end(), list_sizes.begin(), [](auto& node_list){return node_list.size();});
+    uint32_t N_nodes = std::accumulate(list_sizes.begin(), list_sizes.end(), 0);
+    std::vector<uint32_t> vcm(N_nodes);
+    uint32_t offset = 0;
+    for(int i = 0; i < node_lists.size(); i++)
+    {
+        std::fill(vcm.begin() + offset, vcm.begin() + offset + list_sizes[i], i);
+        offset += list_sizes[i];
+    }
+    return vcm;
+  }
+
+
+std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>>& edges, const std::vector<uint32_t>& vcm)
+{
+    std::vector<uint32_t> ecm(edges.size());
+    auto get_edge_communities = [vcm](auto edge)
+    {
+        return std::make_pair(vcm[edge.first], vcm[edge.second]);
+    };
+    uint32_t N_communities = *std::max_element(vcm.begin(), vcm.end())+1;
+    std::vector<uint32_t> community_idx(N_communities);
+    std::iota(community_idx.begin(), community_idx.end(), 0);
+    std::vector<std::pair<uint32_t, uint32_t>> connection_pairs;
+    uint32_t N_connections = 0;
+
+    for(auto&& comb : iter::combinations_with_replacement(community_idx, 2))
+    {
+        connection_pairs.push_back(std::make_pair(comb[0], comb[1]));
+        N_connections++;
+    }
+
+    std::transform(edges.begin(), edges.end(), ecm.begin(), [&](const auto& edge)
+    {
+        auto edge_communities = get_edge_communities(edge);
+        //find index of edge_communities in connection_pairs
+        auto it = std::find(connection_pairs.begin(), connection_pairs.end(), edge_communities);
+        return std::distance(connection_pairs.begin(), it);
+    });
+
+    return ecm;
 }

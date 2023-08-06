@@ -78,7 +78,6 @@ sycl::event recover(sycl::queue &q, uint32_t t, sycl::event &dep_event, float p_
         seed_buf.template get_access<sycl::access_mode::atomic>(h);
     auto v_acc =
         trajectory.template get_access<sycl::access::mode::read_write>(h);
-    //   sycl::stream out(1024, 256, h);
     h.parallel_for(N_threads, [=](sycl::id<1> id) {
         uint32_t seed = sycl::atomic_fetch_add<uint32_t>(seed_acc[id], 1);
         Static_RNG::default_rng rng(seed);
@@ -168,20 +167,6 @@ sycl::event infect(sycl::queue &q, sycl::buffer<uint32_t> &ecm_buf, sycl::buffer
                                                             }
                                                         }
                                                        }); });
-    // accumulate_event = q.submit([&](sycl::handler& h)
-    // {
-    //     sycl::stream out (1024, 256, h);
-    //     h.depends_on(accumulate_event);
-    //     auto event_from_acc = event_from_buf.template get_access<sycl::access::mode::read>(h);
-    //     auto event_to_acc = event_to_buf.template get_access<sycl::access::mode::read>(h);
-
-    //     h.single_task([=](){
-    //         for(int i = 0; i < event_from_buf.size(); i++)
-    //         {
-
-    //         }
-    //     });
-    // });
     return accumulate_event;
 }
 
@@ -213,34 +198,4 @@ sycl::event infect(sycl::queue &q, sycl::buffer<uint32_t> &ecm_buf, sycl::buffer
         });
 
     return p_Is;
-  }
-
-  std::vector<uint32_t> create_ecm(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_lists)
-  {
-    std::vector<uint32_t> list_sizes(edge_lists.size());
-    std::transform(edge_lists.begin(), edge_lists.end(), list_sizes.begin(), [](auto& edge_list){return edge_list.size();});
-    uint32_t N_edges = std::accumulate(list_sizes.begin(), list_sizes.end(), 0);
-    std::vector<uint32_t> ecm(N_edges);
-    uint32_t offset = 0;
-    for(int i = 0; i < edge_lists.size(); i++)
-    {
-        std::fill(ecm.begin() + offset, ecm.begin() + offset + list_sizes[i], i);
-        offset += list_sizes[i];
-    }
-    return ecm;
-  }
-
-  std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_lists)
-  {
-    std::vector<uint32_t> list_sizes(node_lists.size());
-    std::transform(node_lists.begin(), node_lists.end(), list_sizes.begin(), [](auto& node_list){return node_list.size();});
-    uint32_t N_nodes = std::accumulate(list_sizes.begin(), list_sizes.end(), 0);
-    std::vector<uint32_t> vcm(N_nodes);
-    uint32_t offset = 0;
-    for(int i = 0; i < node_lists.size(); i++)
-    {
-        std::fill(vcm.begin() + offset, vcm.begin() + offset + list_sizes[i], i);
-        offset += list_sizes[i];
-    }
-    return vcm;
   }

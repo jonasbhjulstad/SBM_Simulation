@@ -14,8 +14,4 @@ std::vector<std::vector<float>> generate_p_Is(uint32_t N_community_connections,
                                               float p_I_min, float p_I_max,
                                               uint32_t Nt, uint32_t seed);
 
-std::vector<uint32_t> create_ecm(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_lists);
-
-std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_lists);
-
 #endif

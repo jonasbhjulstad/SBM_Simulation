@@ -1,8 +1,8 @@
-#include <Sycl_Graph/SIR_Infection_Sampling.hpp>
 #include <Sycl_Graph/Buffer_Utils.hpp>
-#include <random>
-#include <iostream>
+#include <Sycl_Graph/SIR_Infection_Sampling.hpp>
 #include <algorithm>
+#include <iostream>
+#include <random>
 std::vector<uint32_t> sample_connection_infections(Inf_Sample_Data_t &z)
 {
     std::mt19937 rng(z.seed);
@@ -27,48 +27,46 @@ std::vector<uint32_t> sample_connection_infections(Inf_Sample_Data_t &z)
         }
     }
 
+#ifdef SIR_INFECT_SAMPLE_DEBUG
     std::cout << "Samples for community " << z.community_idx << ": " << std::endl;
     for (int i = 0; i < inf_samples.size(); i++)
     {
         std::cout << "Index " << z.indices[i] << ": " << inf_samples[i];
     }
     std::cout << std::endl;
+#endif
 
     return inf_samples;
 }
 
-std::vector<uint32_t> dupe_vec(const std::vector<uint32_t>& vec)
+std::vector<uint32_t> dupe_vec(const std::vector<uint32_t> &vec)
 {
-    std::vector<uint32_t> res(vec.size()*2);
-    for(int i = 0; i < vec.size(); i++)
+    std::vector<uint32_t> res(vec.size() * 2);
+    for (int i = 0; i < vec.size(); i++)
     {
-        res[2*i] = vec[i];
-        res[2*i+1] = vec[i];
+        res[2 * i] = vec[i];
+        res[2 * i + 1] = vec[i];
     }
     return res;
 }
 
-std::vector<uint32_t> events_combine(const std::vector<uint32_t>& from_events, const std::vector<uint32_t>& to_events)
+std::vector<uint32_t> events_combine(const std::vector<uint32_t> &from_events, const std::vector<uint32_t> &to_events)
 {
     std::vector<uint32_t> comb(from_events.size() + to_events.size());
-    for(int i = 0; i < from_events.size(); i++)
+    for (int i = 0; i < from_events.size(); i++)
     {
-        comb[2*i] = from_events[i];
-        comb[2*i+1] = to_events[i];
+        comb[2 * i] = from_events[i];
+        comb[2 * i + 1] = to_events[i];
     }
     return comb;
 }
-std::vector<std::vector<uint32_t>> events_combine(const std::vector<std::vector<uint32_t>>& from_events, const std::vector<std::vector<uint32_t>>& to_events)
+std::vector<std::vector<uint32_t>> events_combine(const std::vector<std::vector<uint32_t>> &from_events, const std::vector<std::vector<uint32_t>> &to_events)
 {
-    std::vector<std::vector<uint32_t>> comb(from_events.size(), std::vector<uint32_t>(from_events[0].size()*2));
-    std::transform(from_events.begin(), from_events.end(), to_events.begin(), comb.begin(), [&](const auto& from, const auto& to)
-    {
-        return events_combine(from, to);
-    });
+    std::vector<std::vector<uint32_t>> comb(from_events.size(), std::vector<uint32_t>(from_events[0].size() * 2));
+    std::transform(from_events.begin(), from_events.end(), to_events.begin(), comb.begin(), [&](const auto &from, const auto &to)
+                   { return events_combine(from, to); });
     return comb;
 }
-
-
 
 std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_Is, const std::vector<uint32_t> &from_events, const std::vector<uint32_t> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_connections, uint32_t seed)
 {
@@ -77,11 +75,13 @@ std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_I
     std::vector<uint32_t> seeds(N_communities);
     std::generate(seeds.begin(), seeds.end(), [&rng]()
                   { return rng(); });
+#ifdef SIR_INFECT_SAMPLE_DEBUG
     std::cout << "Infection-Events: \n";
     for (int i = 0; i < ccm.size(); i++)
     {
         std::cout << ccm[i].first << " -> " << ccm[i].second << " : " << from_events[i] << "\n";
     }
+#endif
     auto ccm_flat = pairlist_to_vec(ccm);
     auto duped_ccm_weights = dupe_vec(ccm_weights);
 
@@ -94,15 +94,15 @@ std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_I
         for (int j = 0; j < ccm.size(); j++)
         {
 
-            if (ccm_flat[2*j] == i)
+            if (ccm_flat[2 * j] == i)
             {
-                zs[i].indices.push_back(2*j);
-                zs[i].weights.push_back(duped_ccm_weights[2*j]);
+                zs[i].indices.push_back(2 * j);
+                zs[i].weights.push_back(duped_ccm_weights[2 * j]);
             }
-            if(ccm_flat[2*j+1] == i)
+            if (ccm_flat[2 * j + 1] == i)
             {
-                zs[i].indices.push_back(2*j+1);
-                zs[i].weights.push_back(duped_ccm_weights[2*j+1]);
+                zs[i].indices.push_back(2 * j + 1);
+                zs[i].weights.push_back(duped_ccm_weights[2 * j + 1]);
             }
         }
 
@@ -111,11 +111,13 @@ std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_I
         zs[i].seed = seeds[i];
     }
 
+#ifdef SIR_INFECT_SAMPLE_DEBUG
     std::cout << "Community Infections/Events: \n";
     for (int i = 0; i < community_events.size(); i++)
     {
         std::cout << "Community " << i << ": " << zs[i].N_infected << ", " << community_events[i] << "\n";
     }
+#endif
 
     std::vector<std::vector<uint32_t>> connection_infections(N_communities);
 
