@@ -27,6 +27,12 @@ extern template std::vector<std::vector<uint32_t>> read_buffer<uint32_t>(sycl::q
                                                                          sycl::event events);
 extern template std::vector<std::vector<float>> read_buffer<float>(sycl::queue &q, sycl::buffer<float, 2> &buf, sycl::event events);
 
+extern template std::vector<std::vector<uint32_t>> read_buffer<uint32_t>(sycl::queue &q, sycl::buffer<uint32_t, 2> &buf,
+                                                        sycl::event events, std::ofstream&);
+extern template std::vector<std::vector<float>> read_buffer<float>(sycl::queue &q, sycl::buffer<float, 2> &buf, sycl::event events, std::ofstream&);
+
+
+
 extern template std::vector<std::vector<uint32_t>> diff<uint32_t>(const std::vector<std::vector<uint32_t>> &v);
 extern template std::vector<std::vector<int>> diff<int>(const std::vector<std::vector<int>> &v);
 

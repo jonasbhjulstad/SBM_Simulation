@@ -91,6 +91,11 @@ template std::vector<std::vector<uint32_t>> read_buffer(sycl::queue &q, sycl::bu
                                                         sycl::event events);
 template std::vector<std::vector<float>> read_buffer(sycl::queue &q, sycl::buffer<float, 2> &buf, sycl::event events);
 
+template std::vector<std::vector<uint32_t>> read_buffer(sycl::queue &q, sycl::buffer<uint32_t, 2> &buf,
+                                                        sycl::event events, std::ofstream&);
+template std::vector<std::vector<float>> read_buffer(sycl::queue &q, sycl::buffer<float, 2> &buf, sycl::event events, std::ofstream&);
+
+
 template std::vector<std::vector<uint32_t>> diff(const std::vector<std::vector<uint32_t>> &v);
 template std::vector<std::vector<int>> diff(const std::vector<std::vector<int>> &v);
 

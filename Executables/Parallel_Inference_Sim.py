@@ -12,9 +12,13 @@ Data_dir = Project_root + "/data/SIR_sim/"
 sys.path.append(Binder_path)
 from Community_Inference import *
 from SIR_SBM import *
-
+import os
 
 fpath = Data_dir + "Graph_0/"
+
+#make fpath directory
+if not os.path.exists(fpath):
+    os.makedirs(fpath)
 
 def remap(ccm_indices):
     old_indices = []
@@ -28,8 +32,19 @@ def remap(ccm_indices):
 
 if __name__ == '__main__':
 
+    queue = []
 
+    if len(sys.argv) > 1:
+        queue = create_sycl_device_queue(sys.argv[1], int(sys.argv[2]))
+    else:
+        queue = sycl_queue(gpu_selector())
 
+    queues = get_sycl_gpus()
+    device_infos = get_device_info(queues)
+
+    _ = [d.print() for d in device_infos]
+
+    N_sim = 100
     N_pop = 100
     N_clusters = 2
     p_in = 1.0
@@ -80,7 +95,7 @@ if __name__ == '__main__':
     new_idx, old_idx = remap(ccm_indices)
 
 
-    Nt = 70
+    Nt = 20
 
     p = Sim_Param()
     p.N_pop = N_pop
@@ -92,9 +107,10 @@ if __name__ == '__main__':
     p.p_I0 = 0.1
     p.sim_idx = 0
     p.seed = seed
-    p_I_min = 1e-3
-    p_I_max = 1e-1
+    p_I_min = 1e-6
+    p_I_max = 1e-2
+    p.p_R = 0.1
+    p.max_infection_samples = 1000
 
-    excite_simulate(p, new_idx, edge_list, p_I_min, p_I_max, fpath, True)
-
+    parallel_excite_simulate(p, new_idx, edge_list, p_I_min, p_I_max, fpath, N_sim, queue, True)
     a = 1

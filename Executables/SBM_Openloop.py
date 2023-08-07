@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-Project_root = "/home/man/Documents/Sycl_Graph_Old/"
+Project_root = "/home/man/Documents/ER_Bernoulli_Robust_MPC/"
 Binder_path = Project_root + "/build/Binders"
 Data_dir = Project_root + "/data/SIR_sim/"
 
@@ -170,7 +170,6 @@ if __name__ == '__main__':
     connection_community_map_path = dirpath + "ccmap.csv"
 
     ccmap = np.genfromtxt(connection_community_map_path, delimiter=" ")
-    ccmap = np.vstack([ccmap, ccmap])
     beta_LS, beta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt = load_data(dirpath, N_sims)
 
 

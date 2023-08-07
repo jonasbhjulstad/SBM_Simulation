@@ -3,7 +3,8 @@
 #include <algorithm>
 #include <iostream>
 #include <random>
-std::vector<uint32_t> sample_connection_infections(Inf_Sample_Data_t &z)
+
+std::vector<uint32_t> sample_connection_infections(Inf_Sample_Data_t &z, const uint32_t max_infection_samples)
 {
     std::mt19937 rng(z.seed);
     std::vector<uint32_t> inf_samples(z.weights.size(), 0);
@@ -12,6 +13,7 @@ std::vector<uint32_t> sample_connection_infections(Inf_Sample_Data_t &z)
     uint32_t N_sampled = 0;
     if (z.N_infected == 0)
         return inf_samples;
+    uint32_t N_attempts = 0;
     while (N_sampled < z.N_infected)
     {
         uint32_t idx = dist(rng);
@@ -24,6 +26,31 @@ std::vector<uint32_t> sample_connection_infections(Inf_Sample_Data_t &z)
         else
         {
             z.weights[idx] = 0;
+        }
+        N_attempts++;
+        if (N_attempts > max_infection_samples)
+        {
+            std::cout << "Warning: max infection samples exceeded" << std::endl;
+            std::cout << "N_infected: " << z.N_infected << std::endl;
+            std::cout << "Events: ";
+            for (int i = 0; i < z.events.size(); i++)
+            {
+                std::cout << z.events[i] << " ";
+            }
+            std::cout << std::endl;
+            std::cout << "Indices: ";
+            for (int i = 0; i < z.indices.size(); i++)
+            {
+                std::cout << z.indices[i] << " ";
+            }
+            std::cout << std::endl;
+            std::cout << "Weights: ";
+            for (int i = 0; i < z.weights.size(); i++)
+            {
+                std::cout << z.weights[i] << " ";
+            }
+            std::cout << std::endl;
+            break;
         }
     }
 
@@ -68,7 +95,7 @@ std::vector<std::vector<uint32_t>> events_combine(const std::vector<std::vector<
     return comb;
 }
 
-std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_Is, const std::vector<uint32_t> &from_events, const std::vector<uint32_t> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_connections, uint32_t seed)
+std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_Is, const std::vector<uint32_t> &from_events, const std::vector<uint32_t> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_connections, uint32_t seed, uint32_t max_infection_samples)
 {
     uint32_t N_communities = delta_Is.size();
     std::mt19937 rng(seed);
@@ -121,8 +148,8 @@ std::vector<uint32_t> sample_timestep_infections(const std::vector<int> &delta_I
 
     std::vector<std::vector<uint32_t>> connection_infections(N_communities);
 
-    std::transform(zs.begin(), zs.end(), connection_infections.begin(), [](auto &z)
-                   { return sample_connection_infections(z); });
+    std::transform(zs.begin(), zs.end(), connection_infections.begin(), [max_infection_samples](auto &z)
+                   { return sample_connection_infections(z, max_infection_samples); });
     std::vector<uint32_t> merged_infections(N_connections);
     for (int i = 0; i < N_connections; i++)
     {
@@ -171,7 +198,7 @@ std::vector<std::vector<int>> get_delta_Is(const std::vector<std::vector<State_t
     return delta_I;
 }
 
-std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vector<State_t>> &community_state, const std::vector<std::vector<uint32_t>> &from_events, const std::vector<std::vector<uint32_t>> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t seed)
+std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vector<State_t>> &community_state, const std::vector<std::vector<uint32_t>> &from_events, const std::vector<std::vector<uint32_t>> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t seed, uint32_t max_infection_samples)
 {
     std::vector<uint32_t> community_idx(community_state.size());
     std::iota(community_idx.begin(), community_idx.end(), 0);
@@ -193,8 +220,8 @@ std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vect
 
     std::vector<std::vector<uint32_t>> sampled_infections(delta_Is.size());
 
-    std::transform(zip.begin(), zip.end(), sampled_infections.begin(), [ccm, ccm_weights, N_connections](const auto &z)
-                   { return sample_timestep_infections(std::get<0>(z), std::get<1>(z), std::get<2>(z), ccm, ccm_weights, N_connections, std::get<3>(z)); });
+    std::transform(zip.begin(), zip.end(), sampled_infections.begin(), [ccm, ccm_weights, N_connections, max_infection_samples](const auto &z)
+                   { return sample_timestep_infections(std::get<0>(z), std::get<1>(z), std::get<2>(z), ccm, ccm_weights, N_connections, std::get<3>(z), max_infection_samples); });
 
     return sampled_infections;
 }
