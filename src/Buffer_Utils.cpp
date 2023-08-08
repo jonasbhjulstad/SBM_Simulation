@@ -38,20 +38,24 @@ void linewrite(std::ofstream &file,
     file << "\n";
 }
 
-
-sycl::buffer<uint32_t> generate_seeds(sycl::queue &q, uint32_t N_rng,
-                                      uint32_t seed)
+std::vector<uint32_t> generate_seeds(uint32_t N_rng, uint32_t seed)
 {
     std::mt19937 gen(seed);
     std::uniform_int_distribution<uint32_t> dis(0, 1000000);
     std::vector<uint32_t> rngs(N_rng);
     std::generate(rngs.begin(), rngs.end(), [&]()
                   { return dis(gen); });
+    return rngs;
+}
 
+sycl::buffer<uint32_t> generate_seeds(sycl::queue &q, uint32_t N_rng,
+                                      uint32_t seed, sycl::event& event)
+{
+    auto rngs = generate_seeds(N_rng, seed);
     sycl::buffer<uint32_t> tmp(rngs.data(), rngs.size());
     sycl::buffer<uint32_t> result(sycl::range<1>(rngs.size()));
 
-    q.submit([&](sycl::handler &h)
+    event = q.submit([&](sycl::handler &h)
              {
         auto tmp_acc = tmp.get_access<sycl::access::mode::read>(h);
         auto res_acc = result.get_access<sycl::access::mode::write>(h);
@@ -61,6 +65,8 @@ sycl::buffer<uint32_t> generate_seeds(sycl::queue &q, uint32_t N_rng,
 
     return result;
 }
+
+
 
 std::vector<uint32_t> pairlist_to_vec(const std::vector<std::pair<uint32_t, uint32_t>> &pairlist)
 {
@@ -105,3 +111,9 @@ template sycl::buffer<int, 1> buffer_create_1D(sycl::queue &q, const std::vector
 template sycl::buffer<int, 2> buffer_create_2D(sycl::queue &q, const std::vector<std::vector<int>> &data, sycl::event &res_event);
 template sycl::buffer<float, 1> buffer_create_1D(sycl::queue &q, const std::vector<float> &data, sycl::event &res_event);
 template sycl::buffer<float, 2> buffer_create_2D(sycl::queue &q, const std::vector<std::vector<float>> &data, sycl::event &res_event);
+template sycl::buffer<SIR_State, 2> buffer_create_2D(sycl::queue &q, const std::vector<std::vector<SIR_State>> &data, sycl::event &res_event);
+
+
+
+template std::shared_ptr<sycl::buffer<uint32_t, 1>> shared_buffer_create_1D(sycl::queue &q, const std::vector<uint32_t> &data, sycl::event &res_event);
+template std::shared_ptr<sycl::buffer<float, 1>> shared_buffer_create_1D(sycl::queue &q, const std::vector<float> &data, sycl::event &res_event);

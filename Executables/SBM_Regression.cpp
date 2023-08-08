@@ -3,7 +3,6 @@
 #include <Eigen/Dense>
 #include <Sycl_Graph/path_config.hpp>
 #include <Sycl_Graph/Regression.hpp>
-#include <Sycl_Graph/Quantile_Regression.hpp>
 #include <string>
 #include <sstream>
 using Mat = Eigen::MatrixXf;

@@ -45,13 +45,13 @@ std::pair<Eigen::MatrixXf, Eigen::MatrixXf> load_beta_regression(const std::stri
     auto community_traj_filename = [](uint32_t idx){return std::string("community_trajectory_" + std::to_string(idx) + ".csv");};
 
     auto infection_events_filename = [](uint32_t idx){return std::string("connection_events_" + std::to_string(idx) + ".csv");};
-    auto connection_community_map_filename = [](){return std::string("connection_community_map.csv");};
+    auto connection_community_map_filename = [](uint32_t idx){return std::string("ccm_" + std::to_string(idx) + ".csv");};
 
     auto p_Is_filename = [](uint32_t idx){return std::string("p_Is_" + std::to_string(idx) + ".csv");};
 
 
     Mat connection_infs = openData(datapath + connection_infs_filename(idx));
-    Mat connection_community_map = openData(datapath + connection_community_map_filename());
+    Mat connection_community_map = openData(datapath + connection_community_map_filename(idx));
     Mat community_traj = openData(datapath + community_traj_filename(idx));
 
     assert((connection_infs.array() <= 1000).all());

@@ -84,6 +84,7 @@ PYBIND11_MODULE(SIR_SBM, m)
     .def_readwrite("vcm", &Sim_Data::vcm);
 
     m.def("excite_simulate", &excite_simulate, "excite_simulate");
+    m.def("fixed_simulate", &fixed_simulate, "fixed_simulate");
     m.def("parallel_excite_simulate", &parallel_excite_simulate, "parallel_excite_simulate");
 
     m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>> (*)(const std::string &, uint32_t, float, uint32_t)>(&regression_on_datasets), "regression_on_datasets");

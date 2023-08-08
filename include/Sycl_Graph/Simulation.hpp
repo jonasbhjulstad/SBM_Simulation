@@ -8,13 +8,13 @@
 #include <vector>
 struct Sim_Data
 {
-    Sim_Data(): trajectory(sycl::range<2>(0, 0)), event_from_buf(sycl::range<2>(0, 0)), event_to_buf(sycl::range<2>(0, 0)) {}
+    Sim_Data(): trajectory(sycl::range<2>(0, 0)), events_from_buf(sycl::range<2>(0, 0)), events_to_buf(sycl::range<2>(0, 0)) {}
     Sim_Data(sycl::buffer<SIR_State, 2> &trajectory,
              sycl::buffer<uint32_t, 2> &event_from_buf,
-             sycl::buffer<uint32_t, 2> &event_to_buf) : trajectory(std::move(trajectory)), event_from_buf(std::move(event_from_buf)), event_to_buf(std::move(event_to_buf)) {}
+             sycl::buffer<uint32_t, 2> &event_to_buf) : trajectory(std::move(trajectory)), events_from_buf(std::move(event_from_buf)), events_to_buf(std::move(event_to_buf)) {}
     sycl::buffer<SIR_State, 2> trajectory;
-    sycl::buffer<uint32_t, 2> event_from_buf;
-    sycl::buffer<uint32_t, 2> event_to_buf;
+    sycl::buffer<uint32_t, 2> events_from_buf;
+    sycl::buffer<uint32_t, 2> events_to_buf;
     sycl::event event;
     std::string output_dir;
     uint32_t seed;
@@ -25,6 +25,7 @@ struct Sim_Data
     std::vector<uint32_t> vcm;
 };
 Sim_Data excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, float p_I_min, float p_I_max, const std::string output_dir = "./", bool debug_flag = false, sycl::queue q = sycl::queue(sycl::gpu_selector_v));
+Sim_Data fixed_simulate(sycl::queue &q, const Sim_Param &p, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, const std::vector<uint32_t> &vcm, const std::vector<std::vector<float>> &p_I_vec, const std::string &output_dir, bool debug_flag);
 void parallel_excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, float p_I_min, float p_I_max, const std::string output_dir, uint32_t N_simulations, sycl::queue q = sycl::queue(sycl::gpu_selector_v), bool debug_flag = false);
 
 #endif

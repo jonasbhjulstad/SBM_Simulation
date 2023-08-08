@@ -10,7 +10,7 @@ Project_root = "/home/man/Documents/ER_Bernoulli_Robust_MPC/"
 Binder_path = Project_root + "/build/Binders/"
 Data_dir = Project_root + "/data/SIR_sim/"
 sys.path.append(Binder_path)
-from Community_Inference import *
+# from Community_Inference import *
 from SIR_SBM import *
 import os
 
@@ -44,9 +44,9 @@ if __name__ == '__main__':
 
     _ = [d.print() for d in device_infos]
 
-    N_sim = 100
+    N_sim = 20
     N_pop = 100
-    N_clusters = 2
+    N_clusters = 4
     p_in = 1.0
     p_out = 0.5
     N_threads = 4

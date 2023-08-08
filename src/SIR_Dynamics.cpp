@@ -29,7 +29,7 @@ sycl::event initialize_vertices(float p_I0, float p_R0, sycl::queue &q,
     uint32_t N_seeds = seed_buf.get_range()[0];
     auto N_threads = std::min({N_vertices, N_seeds});
     uint32_t N_vertices_per_thread = N_vertices / N_threads + 1;
-    q.submit([&](sycl::handler &h)
+    auto S_event = q.submit([&](sycl::handler &h)
              {
                 h.depends_on(event);
     auto state_acc = buf.template get_access<sycl::access::mode::write>(h);
@@ -38,6 +38,7 @@ sycl::event initialize_vertices(float p_I0, float p_R0, sycl::queue &q,
 
     return q.submit([&](sycl::handler &h)
                     {
+    h.depends_on(S_event);
     auto state_acc = buf.template get_access<sycl::access::mode::write>(h);
     auto seed_acc =
         seed_buf.template get_access<sycl::access::mode::read_write>(h);
@@ -64,7 +65,7 @@ sycl::event initialize_vertices(float p_I0, float p_R0, sycl::queue &q,
     }); });
 }
 
-sycl::event recover(sycl::queue &q, uint32_t t, sycl::event &dep_event, float p_R, sycl::buffer<uint32_t> &seed_buf, sycl::buffer<SIR_State, 2> &trajectory, sycl::buffer<uint32_t> &vcm_buf)
+sycl::event recover(sycl::queue &q, uint32_t t, sycl::event &dep_event, float p_R, sycl::buffer<uint32_t> &seed_buf, sycl::buffer<SIR_State, 2> &trajectory)
 {
     uint32_t N_vertices = trajectory.get_range()[1];
     uint32_t N_seeds = seed_buf.size();
@@ -99,25 +100,23 @@ sycl::event recover(sycl::queue &q, uint32_t t, sycl::event &dep_event, float p_
     return event;
 }
 
-sycl::event infect(sycl::queue &q, sycl::buffer<uint32_t> &ecm_buf, sycl::buffer<float, 2> &p_I_buf, sycl::buffer<uint32_t> &seed_buf, sycl::buffer<uint32_t, 2> &event_from_buf, sycl::buffer<uint32_t, 2> &event_to_buf, sycl::buffer<SIR_State, 2> &trajectory, sycl::buffer<uint32_t, 1> &edge_from_buf, sycl::buffer<uint32_t, 1> &edge_to_buf, uint32_t N_wg, uint32_t t, uint32_t N_connections, sycl::event dep_event)
+sycl::event infect(sycl::queue &q, const std::shared_ptr<sycl::buffer<uint32_t>> &ecm_buf, sycl::buffer<float, 2> &p_I_buf, sycl::buffer<uint32_t> &seed_buf, sycl::buffer<uint32_t, 2> &event_from_buf, sycl::buffer<uint32_t, 2> &event_to_buf, sycl::buffer<SIR_State, 2> &trajectory, const std::shared_ptr<sycl::buffer<uint32_t>> &edge_from_buf, const std::shared_ptr<sycl::buffer<uint32_t>> &edge_to_buf, sycl::buffer<uint32_t>& infection_indices_buf, uint32_t t, uint32_t N_connections, sycl::event dep_event)
 {
-    uint32_t N_edges = ecm_buf.size();
-    std::vector<uint32_t> infection_indices_init(N_edges, std::numeric_limits<uint32_t>::max());
-    sycl::event ii_event;
-    auto infection_indices_buf = buffer_create_1D(q, infection_indices_init, ii_event);
+    uint32_t N_edges = ecm_buf->size();
+    uint32_t N_wg = seed_buf.size();
+    assert(infection_indices_buf.size() == N_edges);
     auto inf_event = q.submit([&](sycl::handler &h)
 
                               {
-                                  h.depends_on(ii_event);
     h.depends_on(dep_event);
-    auto ecm_acc = ecm_buf.template get_access<sycl::access::mode::read>(h);
+    auto ecm_acc = ecm_buf->template get_access<sycl::access::mode::read>(h);
     auto p_I_acc = p_I_buf.template get_access<sycl::access::mode::read>(h);
     auto seed_acc =
         seed_buf.template get_access<sycl::access_mode::atomic>(h);
     auto v_acc =
         trajectory.template get_access<sycl::access::mode::read_write>(h);
-    auto edge_from_acc = edge_from_buf.template get_access<sycl::access::mode::read>(h);
-    auto edge_to_acc = edge_to_buf.template get_access<sycl::access::mode::read>(h);
+    auto edge_from_acc = edge_from_buf->template get_access<sycl::access::mode::read>(h);
+    auto edge_to_acc = edge_to_buf->template get_access<sycl::access::mode::read>(h);
     auto infection_indices_acc = infection_indices_buf.template get_access<sycl::access::mode::write>(h);
     h.parallel_for(N_wg, [=](sycl::id<1> id) {
       auto seed = sycl::atomic_fetch_add<uint32_t>(seed_acc[id], 1);
@@ -140,6 +139,9 @@ sycl::event infect(sycl::queue &q, sycl::buffer<uint32_t> &ecm_buf, sycl::buffer
         v_acc[t + 1][sus_id] = SIR_INDIVIDUAL_I;
         infection_indices_acc[edge_idx] = direction;
     }
+    else{
+        infection_indices_acc[edge_idx] = std::numeric_limits<uint32_t>::max();
+    }
       }
     }); });
 
@@ -148,7 +150,7 @@ sycl::event infect(sycl::queue &q, sycl::buffer<uint32_t> &ecm_buf, sycl::buffer
                                         auto infection_indices_acc = infection_indices_buf.template get_access<sycl::access::mode::read>(h);
                                         auto event_from_acc = event_from_buf.template get_access<sycl::access::mode::read_write>(h);
                                         auto event_to_acc = event_to_buf.template get_access<sycl::access::mode::read_write>(h);
-                                        auto ecm_acc = ecm_buf.template get_access<sycl::access::mode::read>(h);
+                                        auto ecm_acc = ecm_buf->template get_access<sycl::access::mode::read>(h);
                                         h.parallel_for(N_connections, [=](sycl::id<1> id)
                                                        {
                                                         event_from_acc[t][id] = 0;

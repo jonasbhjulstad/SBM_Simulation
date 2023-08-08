@@ -11,10 +11,10 @@ sys.path.append(Binder_path)
 sys.path.append('/usr/local/lib')
 from SIR_SBM import *
 
-def get_avg_init_state(dirpath, N):
+def get_avg_init_state(Graph_dir, N):
     avg_init_state = None
     for i in range(N):
-        filename = dirpath + "community_trajectory_" + str(i) + ".csv"
+        filename = Graph_dir + "community_trajectory_" + str(i) + ".csv"
         with open(filename, 'r') as f:
             first_line = f.readline()
             if avg_init_state is None:
@@ -24,16 +24,16 @@ def get_avg_init_state(dirpath, N):
     return avg_init_state / N
 
 
-def load_data(dirpath, N_sims):
-        # c_sources = np.genfromtxt(dirpath + "connection_sources_0.csv", delimiter=",")
-    beta_LS = np.genfromtxt(dirpath + "theta_LS.csv", delimiter=",")
-    beta_QR = np.genfromtxt(dirpath + "theta_QR.csv", delimiter=",")
+def load_data(Graph_dir, N_sims):
+        # c_sources = np.genfromtxt(Graph_dir + "connection_sources_0.csv", delimiter=",")
+    beta_LS = np.genfromtxt(Graph_dir + "theta_LS.csv", delimiter=",")
+    beta_QR = np.genfromtxt(Graph_dir + "theta_QR.csv", delimiter=",")
     alpha = 0.1
-    community_traj = np.genfromtxt(dirpath + "community_trajectory_0.csv", delimiter=",")
+    community_traj = np.genfromtxt(Graph_dir + "community_trajectory_0.csv", delimiter=",")
     N_communities = int(community_traj.shape[1] / 3)
-    p_Is_data = np.genfromtxt(dirpath + "p_Is_0.csv", delimiter=",")
+    p_Is_data = np.genfromtxt(Graph_dir + "p_Is_0.csv", delimiter=",")
     N_connections = p_Is_data.shape[1]
-    init_state = get_avg_init_state(dirpath, N_sims)
+    init_state = get_avg_init_state(Graph_dir, N_sims)
     N_pop = np.sum(init_state)
     Nt = community_traj.shape[0]
     return beta_LS, beta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt
@@ -58,12 +58,12 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
 
     N_connections = ccmap.shape[0]
     c_states = MX.sym("c_states", 3*N_communities)
-    c_p_Is = MX.sym("c_p_Is", int(N_connections/2))
-    c_p_Is_duped = vertcat(*[c_p_Is for _ in range(2)])
+    c_p_Is = MX.sym("c_p_Is", N_connections)
+    # c_p_Is_duped = vertcat(*[c_p_Is for _ in range(2)])
     c_delta_I = []
     c_delta_R = []
     for i in range(N_communities):
-        c_delta_I.append(community_delta_I(i, c_states, c_p_Is_duped))
+        c_delta_I.append(community_delta_I(i, c_states, c_p_Is))
     c_delta_R = community_delta_Rs(c_states)
     c_delta_I = vertcat(*c_delta_I)
 
@@ -79,8 +79,8 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
 
     F = Function("f", [c_states, c_p_Is], [delta])
 
-    div_u = 7
-    u = MX.sym("u", (int(Nt/div_u)+1, int(N_connections / 2)))
+    div_u = 1
+    u = MX.sym("u", (int(Nt/div_u)+1, N_connections))
     u_unif = MX.sym("u_unif", (int(Nt/div_u)+1, 1))
     #repeat
     u_uniform = horzcat(*[u_unif for _ in range(int(N_connections/2))])
@@ -112,7 +112,7 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
 
     f, state = construct_objective(u)
 
-    w = reshape(u, (u.shape[0]*int(N_connections/2), 1))
+    w = reshape(u, (u.shape[0]*N_connections, 1))
     f_w_u = Function("f_w_u", [w], [u])
     f_traj = Function("f_traj", [w], [horzcat(*state)])
 
@@ -158,39 +158,39 @@ def solution_plot(traj, u_opt, obj_val, Data_dir):
     fig2.savefig(Data_dir + "/total_state.png")
 
 if __name__ == '__main__':
-    dirpath = Data_dir + "Graph_0/"
+    Graph_dir = Data_dir + "Graph_0/"
 
     N_sims = 2
-    tau = 0.8
-    Wu = 300
+    tau = 0.9
+    Wu = 5000
     u_max = 1e-2
     u_min = 1e-3
-    theta_LS, theta_QR = regression_on_datasets(dirpath, N_sims, tau, 0)
+    theta_LS, theta_QR = regression_on_datasets(Graph_dir, N_sims, tau, 0)
 
-    connection_community_map_path = dirpath + "ccmap.csv"
+    connection_community_map_path = Graph_dir + "ccm_0.csv"
 
-    ccmap = np.genfromtxt(connection_community_map_path, delimiter=" ")
-    beta_LS, beta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt = load_data(dirpath, N_sims)
-
+    ccmap = np.genfromtxt(connection_community_map_path, delimiter=",")
+    beta_LS, beta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt = load_data(Graph_dir, N_sims)
 
     u_opt_LS, traj_LS, f_LS, u_opt_LS_uniform, traj_LS_uniform, f_LS_uniform = solve_single_shoot(ccmap, beta_LS, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max)
 
     u_opt_QR, traj_QR, f_QR, u_opt_QR_uniform, traj_QR_uniform, f_QR_uniform = solve_single_shoot(ccmap, beta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max)
 
-    if not os.path.exists(Data_dir + "LS/"):
-       os.makedirs(Data_dir + "LS/")
-    if not os.path.exists(Data_dir + "QR/"):
-         os.makedirs(Data_dir + "QR/")
+
+    if not os.path.exists(Graph_dir + "LS/"):
+       os.makedirs(Graph_dir + "LS/")
+    if not os.path.exists(Graph_dir + "QR/"):
+         os.makedirs(Graph_dir + "QR/")
     #write all to file
-    np.savetxt(Data_dir + "LS/u_opt.csv", u_opt_LS)
-    np.savetxt(Data_dir + "LS/traj.csv", traj_LS)
-    np.savetxt(Data_dir + "LS/u_opt_uniform.csv", u_opt_LS_uniform)
-    np.savetxt(Data_dir + "LS/traj_uniform.csv", traj_LS_uniform)
-    np.savetxt(Data_dir + "QR/u_opt.csv", u_opt_QR)
-    np.savetxt(Data_dir + "QR/traj.csv", traj_QR)
-    np.savetxt(Data_dir + "QR/u_opt_uniform.csv", u_opt_QR_uniform)
-    np.savetxt(Data_dir + "QR/traj_uniform.csv", traj_QR_uniform)
+    np.savetxt(Graph_dir + "LS/u_opt.csv", u_opt_LS)
+    np.savetxt(Graph_dir + "LS/traj.csv", traj_LS)
+    np.savetxt(Graph_dir + "LS/u_opt_uniform.csv", u_opt_LS_uniform)
+    np.savetxt(Graph_dir + "LS/traj_uniform.csv", traj_LS_uniform)
+    np.savetxt(Graph_dir + "QR/u_opt.csv", u_opt_QR)
+    np.savetxt(Graph_dir + "QR/traj.csv", traj_QR)
+    np.savetxt(Graph_dir + "QR/u_opt_uniform.csv", u_opt_QR_uniform)
+    np.savetxt(Graph_dir + "QR/traj_uniform.csv", traj_QR_uniform)
 
 
-    solution_plot(traj_LS, u_opt_LS, f_LS, Data_dir + "LS/")
-    solution_plot(traj_QR, u_opt_QR, f_QR, Data_dir + "QR/")
+    solution_plot(traj_LS, u_opt_LS, f_LS, Graph_dir + "LS/")
+    solution_plot(traj_QR, u_opt_QR, f_QR, Graph_dir + "QR/")

@@ -22,6 +22,20 @@ std::vector<T> merge_vectors(const std::vector<std::vector<T>> &vectors)
     return merged;
 }
 template <typename T>
+std::shared_ptr<sycl::buffer<T, 1>> shared_buffer_create_1D(sycl::queue &q, const std::vector<T> &data, sycl::event &res_event)
+{
+    sycl::buffer<T> tmp(data.data(), data.size());
+    auto result = std::make_shared<sycl::buffer<T>>(sycl::buffer<T>(sycl::range<1>(data.size())));
+
+    res_event = q.submit([&](sycl::handler &h)
+                         {
+                auto tmp_acc = tmp.template get_access<sycl::access::mode::read>(h);
+                auto res_acc = result->template get_access<sycl::access::mode::write>(h);
+                h.copy(tmp_acc, res_acc); });
+    return result;
+}
+
+template <typename T>
 sycl::buffer<T, 1> buffer_create_1D(sycl::queue &q, const std::vector<T> &data, sycl::event &res_event)
 {
     sycl::buffer<T> tmp(data.data(), data.size());

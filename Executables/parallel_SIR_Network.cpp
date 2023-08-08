@@ -9,23 +9,22 @@
 
 int main()
 {
-    std::string output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_" + std::to_string(0) + "/";
+    std::string output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_0/";
 
-    uint32_t N_clusters = 2;
+    uint32_t N_clusters = 10;
     uint32_t N_pop = 100;
     Sim_Param p;
     p.N_clusters = N_clusters;
     p.N_pop = N_pop;
     p.p_in = 1.0f;
     p.p_out = 0.5f;
-    p.Nt = 10;
     p.p_R0 = 0.0f;
     p.p_I0 = 0.1f;
     p.p_R = 1e-1f;
     p.sim_idx = 0;
     p.seed = 47;
-    p.Nt = 1;
-    uint32_t N_sims = 2;
+    p.Nt = 20;
+    uint32_t N_sims = 20;
 
     float p_I_min = 1e-3f;
     float p_I_max = 1e-1f;
@@ -35,8 +34,8 @@ int main()
     auto vcm = create_vcm(vertex_lists);
 
     auto edge_list_flat = merge_vectors(edge_lists);
-
-    parallel_excite_simulate(p, vcm, edge_list_flat, p_I_min, p_I_max, output_dir, N_sims);
+    sycl::queue q(sycl::gpu_selector_v);
+    parallel_excite_simulate(p, vcm, edge_list_flat, p_I_min, p_I_max, output_dir, N_sims, q, true);
 
     return 0;
 }
