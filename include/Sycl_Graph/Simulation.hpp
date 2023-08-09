@@ -6,25 +6,26 @@
 #include <string>
 #include <tuple>
 #include <vector>
-struct Sim_Data
+struct Common_Buffers;
+
+struct Common_Buffers
 {
-    Sim_Data(): trajectory(sycl::range<2>(0, 0)), events_from_buf(sycl::range<2>(0, 0)), events_to_buf(sycl::range<2>(0, 0)) {}
-    Sim_Data(sycl::buffer<SIR_State, 2> &trajectory,
-             sycl::buffer<uint32_t, 2> &event_from_buf,
-             sycl::buffer<uint32_t, 2> &event_to_buf) : trajectory(std::move(trajectory)), events_from_buf(std::move(event_from_buf)), events_to_buf(std::move(event_to_buf)) {}
-    sycl::buffer<SIR_State, 2> trajectory;
-    sycl::buffer<uint32_t, 2> events_from_buf;
-    sycl::buffer<uint32_t, 2> events_to_buf;
-    std::vector<uint32_t> ccm;
-    std::vector<uint32_t> vcm;
-    sycl::event event;
-    std::string output_dir;
-    uint32_t seed;
-    uint32_t sim_idx;
+    Common_Buffers(sycl::queue &q, const std::vector<uint32_t> &edge_from_init, const std::vector<uint32_t> &edge_to_init, const std::vector<uint32_t> &ecm_init, const std::vector<uint32_t> &vcm_init, uint32_t N_clusters, uint32_t N_connections, uint32_t Nt, uint32_t seed);
+    Common_Buffers(const auto p_edge_from, const auto p_edge_to, const auto p_ecm, const auto p_vcm, const auto &ccm, const auto &ccm_weights, const std::vector<sycl::event> &events);
+    Common_Buffers(const Common_Buffers &other);
+
+    std::string get_sizes();
+
+    uint32_t N_connections() const;
+    std::vector<sycl::event> events = std::vector<sycl::event>(4);
+    std::shared_ptr<sycl::buffer<uint32_t>> edge_from;
+    std::shared_ptr<sycl::buffer<uint32_t>> edge_to;
+    std::shared_ptr<sycl::buffer<uint32_t>> ecm;
+    std::shared_ptr<sycl::buffer<uint32_t>> vcm;
+    std::vector<std::pair<uint32_t, uint32_t>> ccm;
     std::vector<uint32_t> ccm_weights;
 };
-Sim_Data excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, float p_I_min, float p_I_max, const std::string output_dir = "./", bool debug_flag = false, sycl::queue q = sycl::queue(sycl::gpu_selector_v));
-Sim_Data fixed_simulate(sycl::queue &q, const Sim_Param &p, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, const std::vector<uint32_t> &vcm, const std::vector<std::vector<float>> &p_I_vec, const std::string &output_dir, bool debug_flag);
-void parallel_excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, float p_I_min, float p_I_max, const std::string output_dir, uint32_t N_simulations, sycl::queue q = sycl::queue(sycl::gpu_selector_v), bool debug_flag = false);
+void simulate(sycl::queue &q, const Sim_Param &p, const Common_Buffers &cb, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, const std::vector<std::vector<float>> &p_Is, const std::string output_dir, uint32_t N_simulations, uint32_t seed);
+void excite_simulate(sycl::queue &q, const Sim_Param &p, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, float p_I_min, float p_I_max, const std::string output_dir, uint32_t N_simulations, uint32_t seed);
 
 #endif

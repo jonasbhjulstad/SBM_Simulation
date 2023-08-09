@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <random>
+#include <execution>
 
 std::vector<uint32_t> sample_connection_infections(Inf_Sample_Data_t &z, const uint32_t max_infection_samples)
 {
@@ -220,7 +221,7 @@ std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vect
 
     std::vector<std::vector<uint32_t>> sampled_infections(delta_Is.size());
 
-    std::transform(zip.begin(), zip.end(), sampled_infections.begin(), [ccm, ccm_weights, N_connections, max_infection_samples](const auto &z)
+    std::transform(std::execution::par_unseq, zip.begin(), zip.end(), sampled_infections.begin(), [ccm, ccm_weights, N_connections, max_infection_samples](const auto &z)
                    { return sample_timestep_infections(std::get<0>(z), std::get<1>(z), std::get<2>(z), ccm, ccm_weights, N_connections, std::get<3>(z), max_infection_samples); });
 
     return sampled_infections;

@@ -44,9 +44,9 @@ if __name__ == '__main__':
 
     _ = [d.print() for d in device_infos]
 
-    N_sim = 20
-    N_pop = 100
-    N_clusters = 4
+    N_sim = 2
+    N_pop = 10
+    N_clusters = 1
     p_in = 1.0
     p_out = 0.5
     N_threads = 4
@@ -106,11 +106,11 @@ if __name__ == '__main__':
     p.p_R0 = 0.0
     p.p_I0 = 0.1
     p.sim_idx = 0
-    p.seed = seed
     p_I_min = 1e-6
     p_I_max = 1e-2
     p.p_R = 0.1
     p.max_infection_samples = 1000
 
-    parallel_excite_simulate(p, new_idx, edge_list, p_I_min, p_I_max, fpath, N_sim, queue, True)
+
+    excite_simulate(queue, p, new_idx, edge_list, p_I_min, p_I_max, fpath, N_sim, seed)
     a = 1

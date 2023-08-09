@@ -41,5 +41,9 @@ extern template std::vector<std::vector<int>> diff<int>(const std::vector<std::v
 extern template std::shared_ptr<sycl::buffer<uint32_t, 1>> shared_buffer_create_1D<uint32_t>(sycl::queue &q, const std::vector<uint32_t> &data, sycl::event &res_event);
 extern template std::shared_ptr<sycl::buffer<float, 1>> shared_buffer_create_1D<float>(sycl::queue &q, const std::vector<float> &data, sycl::event &res_event);
 
+std::vector<std::vector<float>> generate_floats(uint32_t rows, uint32_t cols, float min, float max, uint32_t seed);
+std::vector<std::vector<std::vector<float>>> generate_floats(uint32_t N0, uint32_t N1, uint32_t N2, float min, float max, uint32_t seed);
+
+
 
 #endif

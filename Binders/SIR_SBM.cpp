@@ -70,23 +70,11 @@ PYBIND11_MODULE(SIR_SBM, m)
     .def_readwrite("p_R0", &Sim_Param::p_R0)
     .def_readwrite("p_I0", &Sim_Param::p_I0)
     .def_readwrite("sim_idx", &Sim_Param::sim_idx)
-    .def_readwrite("seed", &Sim_Param::seed)
     .def_readwrite("p_R", &Sim_Param::p_R)
     .def_readwrite("max_infection_samples", &Sim_Param::max_infection_samples);
 
-    py::class_<Sim_Data>(m, "Sim_Data").def(py::init<>())
-    .def_readwrite("output_dir", &Sim_Data::output_dir)
-    .def_readwrite("seed", &Sim_Data::seed)
-    .def_readwrite("sim_idx", &Sim_Data::sim_idx)
-    .def_readwrite("ccm", &Sim_Data::ccm)
-    .def_readwrite("ccm_weights", &Sim_Data::ccm_weights)
-    .def_readwrite("p_I_vec", &Sim_Data::p_I_vec)
-    .def_readwrite("vcm", &Sim_Data::vcm);
-
+    m.def("simulate", &simulate, "simulate");
     m.def("excite_simulate", &excite_simulate, "excite_simulate");
-    m.def("fixed_simulate", &fixed_simulate, "fixed_simulate");
-    m.def("parallel_excite_simulate", &parallel_excite_simulate, "parallel_excite_simulate");
-
     m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>> (*)(const std::string &, uint32_t, float, uint32_t)>(&regression_on_datasets), "regression_on_datasets");
     m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>> (*)(const std::vector<std::string> &, uint32_t, float, uint32_t)>(&regression_on_datasets), "regression_on_datasets");
 

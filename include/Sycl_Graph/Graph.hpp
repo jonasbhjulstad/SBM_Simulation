@@ -2,6 +2,7 @@
 #define GRAPH_GENERATION_HPP
 #include <cstdint>
 #include <vector>
+#include <fstream>
 
 std::vector<std::pair<uint32_t, uint32_t>> random_connect(const std::vector<uint32_t> &to_nodes,
                                                           const std::vector<uint32_t> &from_nodes, float p, uint32_t connection_idx, uint32_t seed);
@@ -16,5 +17,5 @@ std::vector<uint32_t> create_ecm(const std::vector<std::vector<std::pair<uint32_
 std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_lists);
 
 std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm);
-
+std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t>& ecm);
 #endif

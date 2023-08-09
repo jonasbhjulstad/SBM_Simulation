@@ -1,5 +1,6 @@
 #include "Sycl_Graph/Buffer_Utils_impl.hpp"
 #include <random>
+#include <execution>
 void linewrite(std::ofstream &file, const std::vector<uint32_t> &state_iter)
 {
     for (const auto &t_i_i : state_iter)
@@ -60,9 +61,10 @@ sycl::buffer<uint32_t> generate_seeds(sycl::queue &q, uint32_t N_rng,
         auto tmp_acc = tmp.get_access<sycl::access::mode::read>(h);
         auto res_acc = result.get_access<sycl::access::mode::write>(h);
 
-        h.parallel_for(result.get_range(), [=](sycl::id<1> idx)
-                       { res_acc[idx] = tmp_acc[idx]; }); });
-
+        h.copy(tmp_acc, res_acc);
+        // h.parallel_for(result.get_range(), [=](sycl::id<1> idx)
+        //                { res_acc[idx] = tmp_acc[idx]; }); });
+             });
     return result;
 }
 
@@ -88,6 +90,29 @@ std::vector<std::pair<uint32_t, uint32_t>> vec_to_pairlist(const std::vector<uin
     }
     return res;
 }
+std::vector<std::vector<float>> generate_floats(uint32_t rows, uint32_t cols, float min, float max, uint32_t seed)
+{
+    std::mt19937_64 rng(seed);
+    std::uniform_real_distribution<float> dist(min, max);
+    std::vector<std::vector<float>> floats(rows, std::vector<float>(cols));
+    std::for_each(floats.begin(), floats.end(), [&](auto& row){std::generate(row.begin(), row.end(), [&](){return dist(rng);});});
+    return floats;
+}
+
+std::vector<std::vector<std::vector<float>>> generate_floats(uint32_t N0, uint32_t N1, uint32_t N2, float min, float max, uint32_t seed)
+{
+    //generate p_Is
+    using p_I_mat = std::vector<std::vector<float>>;
+    std::vector<p_I_mat> p_Is(N0);
+    auto seeds = generate_seeds(N0, seed);
+
+    std::transform(std::execution::par_unseq, seeds.begin(), seeds.end(), p_Is.begin(), [=](auto seed)
+    {
+        return generate_floats(N1, N2, min, max, seed);
+    });
+    return p_Is;
+}
+
 
 template std::vector<uint32_t> merge_vectors(const std::vector<std::vector<uint32_t>>&);
 template std::vector<int> merge_vectors(const std::vector<std::vector<int>>&);

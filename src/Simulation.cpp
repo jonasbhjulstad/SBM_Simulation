@@ -14,6 +14,43 @@
 #include <iostream>
 #include <string>
 
+Common_Buffers::Common_Buffers(sycl::queue &q,
+                               const std::vector<uint32_t> &edge_from_init,
+                               const std::vector<uint32_t> &edge_to_init,
+                               const std::vector<uint32_t> &ecm_init,
+                               const std::vector<uint32_t> &vcm_init,
+                               uint32_t N_clusters, uint32_t N_connections,
+                               uint32_t Nt, uint32_t seed) : edge_from{shared_buffer_create_1D(q, edge_from_init, events[0])},
+                                                             edge_to{shared_buffer_create_1D(q, edge_to_init, events[1])},
+                                                             ecm{shared_buffer_create_1D(q, ecm_init, events[2])},
+                                                             vcm{shared_buffer_create_1D(q, vcm_init, events[3])},
+                                                             ccm{complete_ccm(N_clusters)},
+                                                             ccm_weights{ccm_weights_from_ecm(ecm_init)}
+{
+}
+Common_Buffers::Common_Buffers(const auto p_edge_from, const auto p_edge_to, const auto p_ecm, const auto p_vcm, const auto &ccm, const auto &ccm_weights, const std::vector<sycl::event> &events)
+    : edge_from{p_edge_from}, edge_to{p_edge_to}, ecm{p_ecm}, vcm{p_vcm}, ccm{ccm}, ccm_weights{ccm_weights}, events(events)
+{
+}
+Common_Buffers::Common_Buffers(const Common_Buffers &other) : Common_Buffers(other.edge_from, other.edge_to, other.ecm, other.vcm, other.ccm, other.ccm_weights, other.events) {}
+
+std::string Common_Buffers::get_sizes()
+{
+    std::stringstream ss;
+    ss << "edge_from: " << edge_from->size() << std::endl;
+    ss << "edge_to: " << edge_to->size() << std::endl;
+    ss << "ecm: " << ecm->size() << std::endl;
+    ss << "vcm: " << vcm->size() << std::endl;
+    ss << "ccm: " << ccm.size() << std::endl;
+    ss << "ccm_weights: " << ccm_weights.size() << std::endl;
+    return ss.str();
+}
+
+uint32_t Common_Buffers::N_connections() const
+{
+    return ccm.size();
+}
+
 std::vector<uint32_t> count_ecm(const std::vector<uint32_t> &ecm)
 {
     uint32_t max_idx = *std::max_element(ecm.begin(), ecm.end()) + 1;
@@ -35,8 +72,6 @@ void simulation_param_to_file(const Sim_Param &p, std::ofstream &log_file)
     log_file << "p_R0: " << p.p_R0 << std::endl;
     log_file << "p_I0: " << p.p_I0 << std::endl;
     log_file << "p_R: " << p.p_R << std::endl;
-    log_file << "seed: " << p.seed << std::endl;
-    log_file << "sim_idx: " << p.sim_idx << std::endl;
     log_file << "N_pop_tot: " << p.N_pop << std::endl;
     log_file << "max_infection_samples: " << p.max_infection_samples << std::endl;
 }
@@ -82,227 +117,117 @@ std::vector<std::vector<uint32_t>> column_zip_2D(const std::vector<std::vector<u
     return result;
 }
 
-Sim_Data excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, float p_I_min, float p_I_max, const std::string output_dir, bool debug_flag, sycl::queue q)
-{
-    auto ecm = ecm_from_vcm(edge_list, vcm);
-    uint32_t N_connections = std::max_element(ecm.begin(), ecm.end())[0] + 1;
-    auto p_I_vec = generate_p_Is(N_connections, p_I_min, p_I_max, p.Nt, p.seed);
-    return fixed_simulate(q, p, edge_list, vcm, p_I_vec, output_dir, debug_flag);
-}
-
-struct Simulation_Buffers
-{
-    Simulation_Buffers(sycl::queue &q, const std::vector<uint32_t> &edge_from_init, const std::vector<uint32_t> &edge_to_init, const std::vector<uint32_t> &ecm_init, const std::vector<uint32_t> &vcm_init, uint32_t N_clusters, uint32_t N_connections, uint32_t Nt, uint32_t seed) : edge_from{shared_buffer_create_1D(q, edge_from_init, events[0])},
-                                                                                                                                                                                                                                                                                        edge_to{shared_buffer_create_1D(q, edge_to_init, events[1])},
-                                                                                                                                                                                                                                                                                        ecm{shared_buffer_create_1D(q, ecm_init, events[2])},
-                                                                                                                                                                                                                                                                                        vcm{shared_buffer_create_1D(q, vcm_init, events[3])}, N_connections(N_connections)
-    {
-    }
-    Simulation_Buffers(const auto p_edge_from, const auto p_edge_to, const auto p_ecm, const auto p_vcm, const auto &ccm, const auto &ccm_weights, const std::vector<sycl::event> &events, uint32_t N_connections)
-        : edge_from{p_edge_from}, edge_to{p_edge_to}, ecm{p_ecm}, vcm{p_vcm}, ccm{ccm}, ccm_weights{ccm_weights}, events(events), N_connections(N_connections)
-    {
-    }
-    Simulation_Buffers(const Simulation_Buffers &other) : Simulation_Buffers(other.edge_from, other.edge_to, other.ecm, other.vcm, other.ccm, other.ccm_weights, other.events, other.N_connections) {}
-
-    std::vector<sycl::event> events = std::vector<sycl::event>(4);
-    std::shared_ptr<sycl::buffer<uint32_t>> edge_from;
-    std::shared_ptr<sycl::buffer<uint32_t>> edge_to;
-    std::shared_ptr<sycl::buffer<uint32_t>> ecm;
-    std::shared_ptr<sycl::buffer<uint32_t>> vcm;
-    std::vector<std::pair<uint32_t, uint32_t>> ccm;
-    std::vector<uint32_t> ccm_weights;
-    uint32_t N_connections;
-};
-Sim_Data enqueue_kernels(sycl::queue &q, const Sim_Param &p, const Simulation_Buffers &d,
-                         auto &seed_buf, auto &events_from_buf, auto &events_to_buf, auto &community_state_buf, auto &trajectory_buf, auto& p_I_buf, const std::vector<uint32_t>& ccm,
-                         const std::string &output_dir, bool debug_flag, sycl::event &dep_event)
-{
-    // forwarding
-    uint32_t Nt = p.Nt;
-    uint32_t N_clusters = p.N_clusters;
-    uint32_t N_pop = p.N_pop;
-    float p_in = p.p_in;
-    float p_out = p.p_out;
-    float p_R0 = p.p_R0;
-    float p_I0 = p.p_I0;
-    float p_R = p.p_R;
-    std::ofstream log_file;
-
-    auto& edge_from_buf = d.edge_from;
-    auto& edge_to_buf = d.edge_to;
-    auto& ecm_buf = d.ecm;
-    auto& vcm_buf = d.vcm;
-    auto& ccm_weights = d.ccm_weights;
-    uint32_t N_edges = ecm_buf->size();
-    uint32_t N_connections = d.N_connections;
-    std::chrono::time_point<std::chrono::steady_clock> start, end;
-
-    if (debug_flag)
-    {
-        std::filesystem::create_directories(output_dir);
-        log_file.open((output_dir + "/Simulation_Debug") + std::to_string(p.sim_idx) + ".log");
-        std::cout << "Initializing Simulation" << std::endl;
-        simulation_param_to_file(p, log_file);
-        std::cout << "Initializing Buffers" << std::endl;
-        start = std::chrono::steady_clock::now();
-        buffer_sizes_to_file(d.edge_from, d.edge_to, ecm_buf, vcm_buf, p_I_buf, events_to_buf, events_from_buf, community_state_buf, trajectory_buf, log_file);
-    }
-    std::vector<sycl::event> b_events(9);
-
-    uint32_t t = 0;
-
-    sycl::event rec_event;
-    sycl::event inf_event;
-    if (debug_flag)
-        std::cout << "Enqueueing Kernels" << std::endl;
-    sycl::buffer<uint32_t> infection_indices_buf((sycl::range<1>(N_edges)));
-    for (int t = 0; t < Nt; t++)
-    {
-        auto rec_event = recover(q, t, dep_event, p_R, seed_buf, trajectory_buf);
-
-        inf_event = infect(q, ecm_buf, p_I_buf, seed_buf, events_from_buf, events_to_buf, trajectory_buf, edge_from_buf, edge_to_buf, infection_indices_buf, t, N_connections, rec_event);
-    }
-
-    Sim_Data result(trajectory_buf, events_from_buf, events_to_buf);
-    result.event = inf_event;
-    result.output_dir = output_dir;
-    result.seed = p.seed;
-    result.sim_idx = p.sim_idx;
-    result.ccm_weights = ccm_weights;
-    result.ccm = ccm;
-    if (debug_flag)
-        {
-            end = std::chrono::steady_clock::now();
-            log_file << "Enqueue time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << std::endl;
-        }
-    return result;
-}
-
-Sim_Data fixed_simulate(sycl::queue &q, const Sim_Param &p, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, const std::vector<uint32_t> &vcm, const std::vector<std::vector<float>> &p_I_vec, const std::string &output_dir, bool debug_flag)
+Common_Buffers allocate_common_buffers(sycl::queue &q, const auto &edge_list, const auto &vcm, uint32_t Nt, uint32_t N_clusters, uint32_t seed)
 {
     auto ecm = ecm_from_vcm(edge_list, vcm);
     uint32_t N_connections = std::max_element(ecm.begin(), ecm.end())[0] + 1;
 
-    std::ofstream log_file;
-    std::chrono::steady_clock::time_point begin, end;
-    if (debug_flag)
-    {
-        log_file.open(output_dir + "/simulation_buffer_init_" + std::to_string(p.sim_idx) + ".log");
-        begin = std::chrono::steady_clock::now();
-    }
-    //Initialize Common Buffers
+    // Initialize Common Buffers
     std::vector<uint32_t> edge_from_init(edge_list.size());
     std::vector<uint32_t> edge_to_init(edge_list.size());
     std::transform(edge_list.begin(), edge_list.end(), edge_from_init.begin(), [](auto &e)
                    { return e.first; });
     std::transform(edge_list.begin(), edge_list.end(), edge_to_init.begin(), [](auto &e)
                    { return e.second; });
-    Simulation_Buffers data(q, edge_from_init, edge_to_init, ecm, vcm, p.N_clusters, N_connections, p.Nt, p.seed);
-    auto device = q.get_device();
-
-
-    // get work group size
-    auto N_wg = device.get_info<sycl::info::device::max_work_group_size>();
-    if (debug_flag)
-        std::cout << "Work group size: " << N_wg << std::endl;
-    auto ccm = complete_ccm(p.N_clusters);
-    auto ccm_weights = count_ecm(ecm);
-
-    //Write to file
-    std::ofstream p_I_f(output_dir + "/p_Is_" + std::to_string(p.sim_idx) + ".csv");
-    std::for_each(p_I_vec.begin(), p_I_vec.end(), [&](const auto& pv)
-    {
-        linewrite(p_I_f, pv);
-    });
-
-    std::ofstream ccm_f(output_dir + "/ccm.csv");
-    std::for_each(ccm.begin(), ccm.end(), [&](const auto& p){ccm_f << p.first << "," << p.second << std::endl;});
-    if (debug_flag)
-    {
-        end = std::chrono::steady_clock::now();
-        log_file << "Common buffers construction time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;
-        begin = std::chrono::steady_clock::now();
-    }
-
-    //Initialize individual buffers
-
-    std::vector<sycl::event> events(9);
-    sycl::buffer<uint32_t> seed_buf = generate_seeds(q, N_connections, p.seed, events[0]);
-    sycl::buffer<uint32_t, 2> events_to_buf = buffer_create_2D(q, std::vector<std::vector<uint32_t>>(p.Nt, std::vector<uint32_t>(N_connections, 0)), events[1]);
-    sycl::buffer<uint32_t, 2> events_from_buf = buffer_create_2D(q, std::vector<std::vector<uint32_t>>(p.Nt, std::vector<uint32_t>(N_connections, 0)), events[2]);
-    sycl::buffer<State_t, 2> community_state_buf = buffer_create_2D(q, std::vector<std::vector<State_t>>(p.Nt + 1, std::vector<State_t>(p.N_clusters, {0, 0, 0})), events[3]);
-    sycl::buffer<SIR_State, 2> trajectory_buf = buffer_create_2D(q, std::vector<std::vector<SIR_State>>(p.Nt + 1, std::vector<SIR_State>(p.N_clusters * p.N_pop)), events[4]);
-    sycl::buffer<float, 2> p_I_buf = buffer_create_2D(q, p_I_vec, events[5]);
-    auto init_event = initialize_vertices(p.p_I0, p.p_R0, q, trajectory_buf, seed_buf, events);
-
-    if (debug_flag)
-    {
-        end = std::chrono::steady_clock::now();
-        log_file << "Inidividual buffers construction time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;
-    }
-
-    return enqueue_kernels(q, p, data, seed_buf, events_from_buf, events_to_buf, community_state_buf, trajectory_buf, p_I_buf, ccm,
-                           output_dir, debug_flag, init_event);
+    return Common_Buffers(q, edge_from_init, edge_to_init, ecm, vcm, N_clusters, N_connections, Nt, seed);
 }
 
-void write_multiple_p_Is(const auto& p_I_vec, const std::string& output_dir)
+struct Individual_Buffers
 {
-    auto write_p_Is = [&, n=0](const auto& piv) mutable
-    {
-    std::ofstream p_I_f(output_dir + "/p_Is_" + std::to_string(n) + ".csv");
-    std::for_each(piv.begin(), piv.end(), [&](const auto& pv)
-    {
-        linewrite(p_I_f, pv);
-    });
-    n++;
-    };
+    Individual_Buffers(sycl::queue &q, const std::vector<std::vector<float>> &p_Is, uint32_t N_connections, uint32_t Nt, uint32_t N_clusters, uint32_t N_pop, uint32_t N_edges, uint32_t N_wg, uint32_t seed)
 
-    std::for_each(p_I_vec.begin(), p_I_vec.end(), write_p_Is);
+        : events(2), seeds{generate_seeds(q, N_wg, seed, events[0])}, events_to{sycl::buffer<uint32_t, 2>(sycl::range<2>(Nt, N_connections))},
+          trajectory{sycl::buffer<SIR_State, 2>(sycl::range<2>(Nt + 1, N_pop * N_clusters))},
+          events_from{sycl::buffer<uint32_t, 2>(sycl::range<2>(Nt, N_connections))},
+          infection_indices{sycl::range<1>(N_edges)},
+          p_Is{buffer_create_2D(q, p_Is, events[1])}
+    {
+    }
+    // default copy constructor
+    Individual_Buffers(const Individual_Buffers &) = default;
+    std::vector<sycl::event> events = std::vector<sycl::event>(2);
+
+    sycl::buffer<uint32_t> seeds;
+    sycl::buffer<SIR_State, 2> trajectory;
+    sycl::buffer<uint32_t, 2> events_from;
+    sycl::buffer<uint32_t, 2> events_to;
+    sycl::buffer<uint32_t> infection_indices;
+    sycl::buffer<float, 2> p_Is;
+
+    sycl::event initialize_trajectory(sycl::queue &q, float p_I0, float p_R0, std::vector<sycl::event> dep_event)
+    {
+        return initialize_vertices(p_I0, p_R0, q, trajectory, seeds, dep_event);
+    }
+
+    static std::vector<Individual_Buffers> make(sycl::queue &q, const std::vector<std::vector<std::vector<float>>> &p_Is_vec, uint32_t N_connections, uint32_t Nt, uint32_t N_clusters, uint32_t N_pop, uint32_t N_edges, uint32_t N_wg, const std::vector<uint32_t> &init_seeds)
+    {
+        std::vector<Individual_Buffers> result;
+        result.reserve(init_seeds.size());
+        std::transform(p_Is_vec.begin(), p_Is_vec.end(), init_seeds.begin(), std::back_inserter(result), [&](const auto &p_Is, uint32_t init_seed)
+                       { return Individual_Buffers(q, p_Is, N_connections, Nt, N_clusters, N_pop, N_edges, N_wg, init_seed); });
+        return result;
+    }
+
+    static std::vector<Individual_Buffers> make(sycl::queue &q, const std::vector<std::vector<float>> &p_Is, uint32_t N_connections, uint32_t Nt, uint32_t N_clusters, uint32_t N_pop, uint32_t N_edges, uint32_t N_wg, const std::vector<uint32_t> &init_seeds)
+    {
+        std::vector<Individual_Buffers> result;
+        result.reserve(init_seeds.size());
+        std::transform(init_seeds.begin(), init_seeds.end(), std::back_inserter(result), [&](uint32_t init_seed)
+                       { return Individual_Buffers(q, p_Is, N_connections, Nt, N_clusters, N_pop, N_edges, N_wg, init_seed); });
+        return result;
+    }
+};
+
+sycl::event enqueue_timeseries(sycl::queue &q, const Sim_Param &p, const Common_Buffers &cb, Individual_Buffers &ib, sycl::event dep_event)
+{
+    sycl::event inf_event;
+    for (int t = 0; t < p.Nt; t++)
+    {
+        auto rec_event = recover(q, t, dep_event, p.p_R, ib.seeds, ib.trajectory);
+
+        inf_event = infect(q, cb.ecm, ib.p_Is, ib.seeds, ib.events_from, ib.events_to, ib.trajectory, cb.edge_from, cb.edge_to, ib.infection_indices, t, cb.N_connections(), rec_event);
+    }
+    return inf_event;
 }
 
-
-void excite_simulation_read_to_files(const Sim_Param &p, sycl::queue &q, Sim_Data &d, const std::vector<uint32_t>& vcm, bool debug_flag)
+std::vector<std::vector<State_t>> read_community_state(sycl::queue &q, sycl::buffer<SIR_State, 2> &trajectory, const std::vector<uint32_t> &vcm, sycl::event dep_event)
 {
-    uint32_t N_clusters = p.N_clusters;
-    uint32_t Nt = d.trajectory.get_range()[0] - 1;
-    std::ofstream log_file;
-    if (debug_flag)
-        log_file.open(d.output_dir + "/Simulation_Debug.log");
-    std::cout << "Reading Buffers" << std::endl;
-
-    auto vertex_state = read_buffer(q, d.trajectory, d.event, log_file);
-
+    auto vertex_state = read_buffer(q, trajectory, dep_event);
+    uint32_t Nt = vertex_state.size() - 1;
+    uint32_t N_clusters = std::max_element(vcm.begin(), vcm.end())[0] + 1;
     std::vector<std::vector<State_t>> community_state(Nt + 1, std::vector<State_t>(N_clusters, {0, 0, 0}));
     std::transform(std::execution::par_unseq, vertex_state.begin(), vertex_state.end(), community_state.begin(), [=](auto v_state)
                    {
 
-        std::vector<State_t> state(N_clusters, {0, 0, 0});
-        for(int i = 0; i < v_state.size(); i++)
-        {
-            auto community_idx = d.vcm[i];
-            state[community_idx][v_state[i]]++;
-        }
-        return state; });
+            std::vector<State_t> state(N_clusters, {0, 0, 0});
+            for(int i = 0; i < v_state.size(); i++)
+            {
+                auto community_idx = vcm[i];
+                state[community_idx][v_state[i]]++;
+            }
+            return state; });
+    return community_state;
+}
 
-    auto from_events = read_buffer(q, d.events_from_buf, d.event, log_file);
-    auto to_events = read_buffer(q, d.events_to_buf, d.event, log_file);
+void write_to_file(sycl::queue &q, const Sim_Param &p, const Common_Buffers &cb, Individual_Buffers &ib, const std::vector<uint32_t> &vcm, const std::string &output_dir, sycl::event dep_event, uint32_t sim_idx, uint32_t seed)
+{
 
-    auto connection_infections = sample_infections(community_state, from_events, to_events, d.ccm, d.ccm_weights, d.seed, p.max_infection_samples);
+    auto community_state = read_community_state(q, ib.trajectory, vcm, dep_event);
+    auto from_events = read_buffer(q, ib.events_from, dep_event);
+    auto to_events = read_buffer(q, ib.events_to, dep_event);
+
+    auto connection_infections = sample_infections(community_state, from_events, to_events, cb.ccm, cb.ccm_weights, seed, p.max_infection_samples);
 
     auto connection_events = column_zip_2D(from_events, to_events);
+    std::filesystem::create_directories(output_dir);
 
-    if (debug_flag)
-        std::cout << "Writing to directory: " << d.output_dir << std::endl;
+    std::ofstream community_traj_f(output_dir + "community_trajectory_" +
+                                   std::to_string(sim_idx) + ".csv");
+    std::ofstream connection_events_f(output_dir + "connection_events_" +
+                                      std::to_string(sim_idx) + ".csv");
 
-    std::filesystem::create_directories(d.output_dir);
-
-    std::ofstream community_traj_f(d.output_dir + "community_trajectory_" +
-                                   std::to_string(d.sim_idx) + ".csv");
-    std::ofstream connection_events_f(d.output_dir + "connection_events_" +
-                                      std::to_string(d.sim_idx) + ".csv");
-
-    std::ofstream connection_infections_f(d.output_dir + "connection_infections_" +
-                                          std::to_string(d.sim_idx) + ".csv");
+    std::ofstream connection_infections_f(output_dir + "connection_infections_" +
+                                          std::to_string(sim_idx) + ".csv");
 
     std::for_each(community_state.begin(), community_state.end(),
                   [&](auto &community_trajectory_i)
@@ -324,25 +249,67 @@ void excite_simulation_read_to_files(const Sim_Param &p, sycl::queue &q, Sim_Dat
                   });
 }
 
-void parallel_excite_simulate(const Sim_Param &p, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, float p_I_min, float p_I_max, const std::string output_dir, uint32_t N_simulations, sycl::queue q, bool debug_flag)
+sycl::event single_enqueue(sycl::queue &q, const Sim_Param &p, const Common_Buffers &cb, Individual_Buffers &ib, const std::string output_dir)
 {
-    std::mt19937_64 rng(p.seed);
+    auto dep_event = ib.initialize_trajectory(q, p.p_I0, p.p_R0, ib.events);
+    return enqueue_timeseries(q, p, cb, ib, dep_event);
+}
+uint32_t max_work_group_size(sycl::queue &q)
+{
+    auto device = q.get_device();
+    auto max_wg_size = device.get_info<sycl::info::device::max_work_group_size>();
+    return max_wg_size;
+}
 
-    std::vector<Sim_Param> sim_params(N_simulations, p);
+void simulate(sycl::queue &q, const Sim_Param &p, const Common_Buffers &cb, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, const std::vector<std::vector<float>> &p_Is, const std::string output_dir, uint32_t N_simulations, uint32_t seed)
+{
+    auto N_edges = edge_list.size();
+    auto N_wg = max_work_group_size(q);
+    std::vector<sycl::event> events(N_simulations);
+
+    auto seeds = generate_seeds(N_simulations, seed);
+    std::vector<Individual_Buffers> ibs;
+    ibs.reserve(N_simulations);
+
+    std::generate_n(std::back_inserter(ibs), N_simulations, [&, n = 0]() mutable
+                    { return Individual_Buffers(q, p_Is, cb.N_connections(), p.Nt, p.N_clusters, p.N_pop, N_edges, N_wg, seed); });
+    std::transform(ibs.begin(), ibs.end(), events.begin(), [&](auto &ib)
+                   { return single_enqueue(q, p, cb, ib, output_dir); });
+
+
     for (int i = 0; i < N_simulations; i++)
     {
-        sim_params[i].seed = rng();
-        sim_params[i].sim_idx = i;
+        write_to_file(q, p, cb, ibs[i], vcm, output_dir, events[i], i, seeds[i]);
     }
-    std::vector<Sim_Data> simdata(N_simulations);
+}
 
-    std::transform(sim_params.begin(), sim_params.end(), simdata.begin(), [&](const Sim_Param &p)
-                   { if(debug_flag)
-                    std::cout << "Enqueuing Simulation " << p.sim_idx << std::endl;
-                    return excite_simulate(p, vcm, edge_list, p_I_min, p_I_max, output_dir, debug_flag, q); });
+void excite_simulate(sycl::queue &q, const Sim_Param &p, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, float p_I_min, float p_I_max, const std::string output_dir, uint32_t N_simulations, uint32_t seed)
+{
+    std::chrono::steady_clock::time_point begin, end;
 
-    std::for_each(simdata.begin(), simdata.end(), [&](auto &d)
-                  { if (debug_flag)
-                    std::cout << "Reading Simulation " << d.sim_idx << std::endl;
-                    excite_simulation_read_to_files(p, q, d, vcm, debug_flag); });
+    begin = std::chrono::steady_clock::now();
+    auto N_edges = edge_list.size();
+    auto N_wg = max_work_group_size(q);
+    auto seeds = generate_seeds(N_simulations, seed);
+    std::vector<sycl::event> events(N_simulations);
+    auto cb = allocate_common_buffers(q, edge_list, vcm, p.Nt, p.N_clusters, seed);
+    uint32_t N_connections = cb.N_connections();
+    auto p_Is_vec = generate_floats(N_simulations, N_connections, p.Nt, p_I_min, p_I_max, seed);
+    auto ibs = Individual_Buffers::make(q, p_Is_vec, N_connections, p.Nt, p.N_clusters, p.N_pop, N_edges, N_wg, seeds);
+    end = std::chrono::steady_clock::now();
+    std::cout << "Buffer construction: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;
+
+    begin = std::chrono::steady_clock::now();
+    std::transform(ibs.begin(), ibs.end(), events.begin(), [&](auto &ib)
+                   { return single_enqueue(q, p, cb, ib, output_dir); });
+    end = std::chrono::steady_clock::now();
+    std::cout << "Enqueue: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;
+
+    begin = std::chrono::steady_clock::now();
+    for (int i = 0; i < N_simulations; i++)
+    {
+        write_to_file(q, p, cb, ibs[i], vcm, output_dir, events[i], i, seeds[i]);
+    }
+    end = std::chrono::steady_clock::now();
+    std::cout << "Write to file: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;
 }

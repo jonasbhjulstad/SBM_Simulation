@@ -26,5 +26,4 @@ struct Device_Info
 std::vector<Device_Info> get_device_info(std::vector<sycl::queue> &qs);
 std::vector<uint32_t> determine_device_workload(const Sim_Param& p, uint32_t N_sims, std::vector<sycl::queue>& qs);
 
-
 #endif

@@ -31,7 +31,6 @@ struct Sim_Param
     float p_I0;
     float p_R;
     uint32_t sim_idx = 0;
-    uint32_t seed = 47;
     uint32_t max_infection_samples = 1000;
 };
 
