@@ -172,6 +172,7 @@ sycl::event infect(sycl::queue &q, const std::shared_ptr<sycl::buffer<uint32_t>>
     return accumulate_event;
 }
 
+
   std::vector<std::vector<float>> generate_p_Is(uint32_t N_community_connections,
                                                 float p_I_min, float p_I_max,
                                                 uint32_t Nt, uint32_t seed)

@@ -74,74 +74,7 @@ sycl::buffer<T, 2> buffer_create_2D(sycl::queue &q, const std::vector<std::vecto
 }
 
 
-template <typename T>
-std::vector<std::vector<T>> read_buffer(sycl::queue &q, sycl::buffer<T, 2> &buf,
-                                        sycl::event event)
-{
 
-    auto range = buf.get_range();
-    auto rows = range[0];
-    auto cols = range[1];
-
-    std::vector<T> data(cols * rows);
-    T *p_data = data.data();
-
-    q.submit([&](sycl::handler &h)
-             {
-        //create accessor
-        h.depends_on(event);
-        auto acc = buf.template get_access<sycl::access::mode::read>(h);
-        h.copy(acc, p_data); })
-        .wait();
-
-    // transform to 2D vector
-    std::vector<std::vector<T>> data_2d(rows);
-    for (int i = 0; i < rows; i++)
-    {
-        data_2d[i] = std::vector<T>(cols);
-        for (int j = 0; j < cols; j++)
-        {
-            data_2d[i][j] = data[i * cols + j];
-        }
-    }
-
-    return data_2d;
-}
-
-template <typename T>
-std::vector<std::vector<T>> read_buffer(sycl::queue &q, sycl::buffer<T, 2> &buf,
-                                        sycl::event event, std::ofstream& log_file)
-{
-
-    auto range = buf.get_range();
-    auto rows = range[0];
-    auto cols = range[1];
-
-    std::vector<T> data(cols * rows);
-    T *p_data = data.data();
-
-    q.submit([&](sycl::handler &h)
-             {
-        //create accessor
-        h.depends_on(event);
-        auto acc = buf.template get_access<sycl::access::mode::read>(h);
-        h.copy(acc, p_data); })
-        .wait();
-    if(log_file.is_open())
-        log_file << "2D buffer read of size " << rows << "x" << cols << std::endl;
-    // transform to 2D vector
-    std::vector<std::vector<T>> data_2d(rows);
-    for (int i = 0; i < rows; i++)
-    {
-        data_2d[i] = std::vector<T>(cols);
-        for (int j = 0; j < cols; j++)
-        {
-            data_2d[i][j] = data[i * cols + j];
-        }
-    }
-
-    return data_2d;
-}
 
 template <typename T>
 std::vector<std::vector<T>> diff(const std::vector<std::vector<T>> &v)

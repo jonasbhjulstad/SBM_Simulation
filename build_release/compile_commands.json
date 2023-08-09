@@ -1,0 +1,80 @@
+[
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -isystem /usr/local/include/Static_RNG -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIC -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda -fsycl-targets=nvptx64-nvidia-cuda -o src/CMakeFiles/SBM_types.dir/SBM_types.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/src/SBM_types.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/src/SBM_types.cpp",
+  "output": "src/CMakeFiles/SBM_types.dir/SBM_types.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -isystem /usr/local/include/Static_RNG -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIC -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda -fsycl-targets=nvptx64-nvidia-cuda -o src/CMakeFiles/SBM_Generation.dir/SBM_Generation.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/src/SBM_Generation.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/src/SBM_Generation.cpp",
+  "output": "src/CMakeFiles/SBM_Generation.dir/SBM_Generation.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIC -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -o src/CMakeFiles/Graph.dir/Graph.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/src/Graph.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/src/Graph.cpp",
+  "output": "src/CMakeFiles/Graph.dir/Graph.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -isystem /usr/local/include/Static_RNG -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIC -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda -fsycl-targets=nvptx64-nvidia-cuda -o src/CMakeFiles/Buffer_Utils.dir/Buffer_Utils.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/src/Buffer_Utils.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/src/Buffer_Utils.cpp",
+  "output": "src/CMakeFiles/Buffer_Utils.dir/Buffer_Utils.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -isystem /usr/local/include/coin -isystem /usr/local/include/eigen3 -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIC -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fwrapv -o src/CMakeFiles/Regression.dir/Regression.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/src/Regression.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/src/Regression.cpp",
+  "output": "src/CMakeFiles/Regression.dir/Regression.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -isystem /usr/local/include/Static_RNG -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIC -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda -fsycl-targets=nvptx64-nvidia-cuda -o src/CMakeFiles/SIR_Dynamics.dir/SIR_Dynamics.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/src/SIR_Dynamics.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/src/SIR_Dynamics.cpp",
+  "output": "src/CMakeFiles/SIR_Dynamics.dir/SIR_Dynamics.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -isystem /usr/local/include/Static_RNG -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIC -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda -fsycl-targets=nvptx64-nvidia-cuda -o src/CMakeFiles/SIR_Infection_Sampling.dir/SIR_Infection_Sampling.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/src/SIR_Infection_Sampling.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/src/SIR_Infection_Sampling.cpp",
+  "output": "src/CMakeFiles/SIR_Infection_Sampling.dir/SIR_Infection_Sampling.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -isystem /usr/local/include/Static_RNG -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIC -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda -fsycl-targets=nvptx64-nvidia-cuda -o src/CMakeFiles/Simulation.dir/Simulation.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/src/Simulation.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/src/Simulation.cpp",
+  "output": "src/CMakeFiles/Simulation.dir/Simulation.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -isystem /usr/local/include/Static_RNG -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIC -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda -fsycl-targets=nvptx64-nvidia-cuda -o src/CMakeFiles/Profiling.dir/Profiling.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/src/Profiling.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/src/Profiling.cpp",
+  "output": "src/CMakeFiles/Profiling.dir/Profiling.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DSIR_SBM_EXPORTS -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -isystem /usr/include/python3.11 -isystem /home/man/mambaforge/envs/gt/lib/python3.11/site-packages/pybind11/include -isystem /usr/local/include/Static_RNG -isystem /opt/intel/oneapi/tbb/2021.10.0/include -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIC -fvisibility=hidden -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda -fPIC -fsycl-targets=nvptx64-nvidia-cuda -fwrapv -o Binders/CMakeFiles/SIR_SBM.dir/SIR_SBM.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/Binders/SIR_SBM.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/Binders/SIR_SBM.cpp",
+  "output": "Binders/CMakeFiles/SIR_SBM.dir/SIR_SBM.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -isystem /usr/local/include/Static_RNG -isystem /opt/intel/oneapi/tbb/2021.10.0/include -isystem /usr/local/include/eigen3 -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIE -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda -fPIC -fsycl-targets=nvptx64-nvidia-cuda -o Executables/CMakeFiles/single_SIR_Network.dir/single_SIR_Network.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/Executables/single_SIR_Network.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/Executables/single_SIR_Network.cpp",
+  "output": "Executables/CMakeFiles/single_SIR_Network.dir/single_SIR_Network.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -isystem /usr/local/include/Static_RNG -isystem /opt/intel/oneapi/tbb/2021.10.0/include -isystem /usr/local/include/eigen3 -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIE -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fsycl -Wno-linker-warnings -Rno-debug-disables-optimization -sycl-std=2020 -std=c++20 -fsycl-unnamed-lambda -fPIC -fsycl-targets=nvptx64-nvidia-cuda -o Executables/CMakeFiles/parallel_SIR_Network.dir/parallel_SIR_Network.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/Executables/parallel_SIR_Network.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/Executables/parallel_SIR_Network.cpp",
+  "output": "Executables/CMakeFiles/parallel_SIR_Network.dir/parallel_SIR_Network.cpp.o"
+},
+{
+  "directory": "/home/man/Documents/ER_Bernoulli_Robust_MPC/build_release",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -DHAVE_CONFIG_H -DOR_TOOLS_AS_DYNAMIC_LIB -DUSE_BOP -DUSE_CBC -DUSE_CLP -DUSE_GLOP -DUSE_LP_PARSER -DUSE_PDLP -DUSE_SCIP -I/home/man/Documents/ER_Bernoulli_Robust_MPC/include -I/home/man/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -isystem /usr/local/include/Static_RNG -isystem /opt/intel/oneapi/tbb/2021.10.0/include -isystem /usr/local/include/eigen3 -isystem /usr/local/include/coin -stdlib=libstdc++ -O3 -DNDEBUG -std=gnu++20 -fPIE -O0 -Wno-deprecated-declarations -Wno-unknown-cuda-version -fcolor-diagnostics -fwrapv -o Executables/CMakeFiles/SBM_Regression.dir/SBM_Regression.cpp.o -c /home/man/Documents/ER_Bernoulli_Robust_MPC/Executables/SBM_Regression.cpp",
+  "file": "/home/man/Documents/ER_Bernoulli_Robust_MPC/Executables/SBM_Regression.cpp",
+  "output": "Executables/CMakeFiles/SBM_Regression.dir/SBM_Regression.cpp.o"
+}
+]
