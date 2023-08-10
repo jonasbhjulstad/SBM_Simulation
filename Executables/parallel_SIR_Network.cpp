@@ -12,7 +12,7 @@ int main()
 {
     std::string output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_0/";
 
-    uint32_t N_clusters = 2;
+    uint32_t N_clusters = 10;
     uint32_t N_pop = 100;
     Sim_Param p;
     p.N_clusters = N_clusters;
@@ -23,9 +23,9 @@ int main()
     p.p_I0 = 0.1f;
     p.p_R = 1e-1f;
     p.sim_idx = 0;
-    p.Nt = 1;
+    p.Nt = 56;
     uint32_t seed = 238;
-    uint32_t N_sims = 1;
+    uint32_t N_sims = 100;
 
     float p_I_min = 1e-3f;
     float p_I_max = 1e-1f;

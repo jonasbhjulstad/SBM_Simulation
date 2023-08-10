@@ -154,8 +154,8 @@ std::vector<std::vector<T>> read_pointer(const std::shared_ptr<T> &p, uint32_t r
 struct Individual_Buffer_Data
 {
     std::vector<std::vector<SIR_State>> vertex_state;
-    std::vector<uint32_t> from_events;
-    std::vector<uint32_t> to_events;
+    std::vector<std::vector<uint32_t>> from_events;
+    std::vector<std::vector<uint32_t>> to_events;
 };
 
 struct Individual_Buffers
@@ -206,28 +206,36 @@ struct Individual_Buffers
     {
 
         std::vector<sycl::event> read_events(3);
-        auto p_vertex_state = read_buffer(q, this->trajectory, dep_event);
+        auto p_vertex_state = read_buffer(q, this->trajectory, dep_event, read_events[0]);
         auto p_from_events = read_buffer(q, this->events_from, dep_event, read_events[1]);
         auto p_to_events = read_buffer(q, this->events_to, dep_event, read_events[2]);
 
-        std::for_each(read_events.begin(), read_events.end(), [](auto& e){
-            e.wait();}
+        std::for_each(read_events.begin(), read_events.end(), [](auto &e)
+                      { e.wait(); });
         return {read_pointer(p_vertex_state, this->trajectory.get_range()[0], this->trajectory.get_range()[1]),
-,           read_pointer(p_from_events, this->events_from.get_range()[0], this->events_from.get_range()[1]),
-            read_pointer(p_to_events, this->events_to.get_range()[0], this->events_to.get_range()[1])};
+                read_pointer(p_from_events, this->events_from.get_range()[0], this->events_from.get_range()[1]),
+                read_pointer(p_to_events, this->events_to.get_range()[0], this->events_to.get_range()[1])};
     };
 };
 
 sycl::event enqueue_timeseries(sycl::queue &q, const Sim_Param &p, const Common_Buffers &cb, Individual_Buffers &ib, sycl::event dep_event)
 {
     sycl::event inf_event, rec_event;
+    std::chrono::steady_clock::time_point begin, end;
+    std::cout << "Enqueueing timeseries..." << std::endl;
     for (int t = 0; t < p.Nt; t++)
     {
         std::cout << "Enqueueing timestep " << t << " of " << p.Nt << "..." << std::endl;
-        std::cout << "Recovery, ";
+        std::cout << "Recovery [";
+        begin = std::chrono::steady_clock::now();
         rec_event = recover(q, t, dep_event, p.p_R, ib.seeds, ib.trajectory);
-        std::cout << "Infection" << std::endl;
+        end = std::chrono::steady_clock::now();
+        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms]" << std::endl;
+        std::cout << "Infection [" << std::endl;
+        begin = std::chrono::steady_clock::now();
         inf_event = infect(q, cb.ecm, ib.p_Is, ib.seeds, ib.events_from, ib.events_to, ib.trajectory, cb.edge_from, cb.edge_to, ib.infection_indices, t, cb.N_connections(), rec_event);
+        end = std::chrono::steady_clock::now();
+        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms]" << std::endl;
     }
     return inf_event;
 }
@@ -250,40 +258,17 @@ std::vector<std::vector<State_t>> to_community_state(sycl::queue &q, const std::
     return community_state;
 }
 
-template <typename T>
-std::tuple<std::shared_ptr<T>, sycl::event> read_buffer(sycl::queue &q, sycl::buffer<T, 2> &buf,
-                                                        sycl::event &dep_event)
-{
-
-    auto range = buf.get_range();
-    auto rows = range[0];
-    auto cols = range[1];
-
-    std::shared_ptr<T> p_data(new T[cols * rows]);
-
-    auto event = q.submit([&](sycl::handler &h)
-                          {
-        //create accessor
-        h.depends_on(dep_event);
-        auto acc = buf.template get_access<sycl::access::mode::read>(h);
-        h.copy(acc, p_data); });
-
-    return std::make_tuple(p_data, event);
-}
 
 void write_to_file(sycl::queue &q, const Sim_Param &p, const Common_Buffers &cb, Individual_Buffers &ib, const std::vector<uint32_t> &vcm, const std::string &output_dir, sycl::event dep_event, uint32_t sim_idx, uint32_t seed)
 {
 
     std::vector<sycl::event> read_events(3);
-    auto buffers = ib.read_buffers(q, dep_event);
-    auto community_state = to_community_state(q, buffers.vertex_state, vcm, dep_event);
-    auto vertex_state = read_buffer(q, ib.trajectory, dep_event);
-    auto from_events = read_buffer(q, ib.events_from, dep_event, read_events[1]);
-    auto to_events = read_buffer(q, ib.events_to, dep_event, read_events[2]);
+    auto buffer_data = ib.read_buffers(q, dep_event);
+    auto community_state = to_community_state(q, buffer_data.vertex_state, vcm, dep_event);
 
-    auto connection_infections = sample_infections(community_state, from_events, to_events, cb.ccm, cb.ccm_weights, seed, p.max_infection_samples);
+    auto connection_infections = sample_infections(community_state, buffer_data.from_events, buffer_data.to_events, cb.ccm, cb.ccm_weights, seed, p.max_infection_samples);
 
-    auto connection_events = column_zip_2D(from_events, to_events);
+    auto connection_events = column_zip_2D(buffer_data.from_events, buffer_data.to_events);
     std::filesystem::create_directories(output_dir);
 
     std::ofstream community_traj_f(output_dir + "community_trajectory_" +
@@ -358,7 +343,7 @@ void excite_simulate(sycl::queue &q, const Sim_Param &p, const std::vector<uint3
     std::vector<sycl::event> events(N_simulations);
     auto cb = allocate_common_buffers(q, edge_list, vcm, p.Nt, p.N_clusters, seed);
     uint32_t N_connections = cb.N_connections();
-    auto p_Is_vec = generate_floats(N_simulations, N_connections, p.Nt, p_I_min, p_I_max, seed);
+    auto p_Is_vec = generate_floats(N_simulations, p.Nt, N_connections, p_I_min, p_I_max, seed);
     auto ibs = Individual_Buffers::make(q, p_Is_vec, N_connections, p.Nt, p.N_clusters, p.N_pop, N_edges, N_wg, seeds);
     end = std::chrono::steady_clock::now();
     std::cout << "Buffer construction: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;

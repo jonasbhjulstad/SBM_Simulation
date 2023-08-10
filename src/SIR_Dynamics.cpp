@@ -104,24 +104,25 @@ sycl::event infect(sycl::queue &q, const std::shared_ptr<sycl::buffer<uint32_t>>
 {
     uint32_t N_edges = ecm_buf->size();
     uint32_t N_wg = seed_buf.size();
+    uint32_t N_vertices = trajectory.get_range()[1];
     assert(infection_indices_buf.size() == N_edges);
     auto inf_event = q.submit([&](sycl::handler &h)
 
                               {
     h.depends_on(dep_event);
     auto ecm_acc = ecm_buf->template get_access<sycl::access::mode::read>(h);
-    auto p_I_acc = p_I_buf.template get_access<sycl::access::mode::read>(h);
+    auto p_I_acc = sycl::accessor<float, 2, sycl::access::mode::read>(p_I_buf, h, sycl::range<2>(1, N_connections), sycl::range<2>(t, 0));
     auto seed_acc =
         seed_buf.template get_access<sycl::access_mode::atomic>(h);
-    auto v_acc =
-        trajectory.template get_access<sycl::access::mode::read_write>(h);
+    auto v_acc = sycl::accessor<SIR_State, 2, sycl::access::mode::read_write>(trajectory, h, sycl::range<2>(2, N_vertices), sycl::range<2>(t, 0));
+
     auto edge_from_acc = edge_from_buf->template get_access<sycl::access::mode::read>(h);
     auto edge_to_acc = edge_to_buf->template get_access<sycl::access::mode::read>(h);
     auto infection_indices_acc = infection_indices_buf.template get_access<sycl::access::mode::write>(h);
     h.parallel_for(N_wg, [=](sycl::id<1> id) {
       auto seed = sycl::atomic_fetch_add<uint32_t>(seed_acc[id], 1);
         Static_RNG::default_rng rng(seed);
-    Static_RNG::bernoulli_distribution<float> bernoulli_I(0.0f);
+        Static_RNG::bernoulli_distribution<float> bernoulli_I(0.0f);
       uint32_t N_edge_per_wg = (N_edges / N_wg) + 1;
       for(int i = 0; i < N_edge_per_wg; i++)
       {
@@ -130,13 +131,13 @@ sycl::event infect(sycl::queue &q, const std::shared_ptr<sycl::buffer<uint32_t>>
           break;
       auto id_from = edge_from_acc[edge_idx];
       auto id_to = edge_to_acc[edge_idx];
-      auto [sus_id, direction] = get_susceptible_id_if_infected(v_acc[t], id_from, id_to);
+      auto [sus_id, direction] = get_susceptible_id_if_infected(v_acc[0], id_from, id_to);
       if (sus_id == std::numeric_limits<uint32_t>::max())
         continue;
-    auto p_I = p_I_acc[t][ecm_acc[edge_idx]];
+    auto p_I = p_I_acc[0][ecm_acc[edge_idx]];
     bernoulli_I.p = p_I;
     if (bernoulli_I(rng)) {
-        v_acc[t + 1][sus_id] = SIR_INDIVIDUAL_I;
+        v_acc[1][sus_id] = SIR_INDIVIDUAL_I;
         infection_indices_acc[edge_idx] = direction;
     }
     else{
@@ -148,8 +149,8 @@ sycl::event infect(sycl::queue &q, const std::shared_ptr<sycl::buffer<uint32_t>>
     auto accumulate_event = q.submit([&](sycl::handler &h)
                                      {
                                         auto infection_indices_acc = infection_indices_buf.template get_access<sycl::access::mode::read>(h);
-                                        auto event_from_acc = event_from_buf.template get_access<sycl::access::mode::read_write>(h);
-                                        auto event_to_acc = event_to_buf.template get_access<sycl::access::mode::read_write>(h);
+                                        auto event_from_acc = sycl::accessor<uint32_t, 2, sycl::access::mode::read_write>(event_from_buf, h, sycl::range<2>(1, N_connections), sycl::range<2>(t, 0));
+                                        auto event_to_acc = sycl::accessor<uint32_t, 2, sycl::access::mode::read_write>(event_to_buf, h, sycl::range<2>(1, N_connections), sycl::range<2>(t, 0));
                                         auto ecm_acc = ecm_buf->template get_access<sycl::access::mode::read>(h);
                                         h.parallel_for(N_connections, [=](sycl::id<1> id)
                                                        {
