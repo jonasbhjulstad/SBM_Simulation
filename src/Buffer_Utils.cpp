@@ -124,6 +124,15 @@ std::vector<std::pair<uint32_t, uint32_t>> vec_to_pairlist(const std::vector<uin
     }
     return res;
 }
+std::vector<float> generate_floats(uint32_t N, float min, float max, uint32_t seed)
+{
+    std::mt19937_64 rng(seed);
+    std::uniform_real_distribution<float> dist(min, max);
+    std::vector<float> result(N);
+    std::generate(result.begin(), result.end(), [&](){return dist(rng);});
+    return result;
+}
+
 std::vector<std::vector<float>> generate_floats(uint32_t rows, uint32_t cols, float min, float max, uint32_t seed)
 {
     std::mt19937_64 rng(seed);
@@ -165,5 +174,5 @@ template sycl::buffer<float, 3> create_device_buffer<float, 3>(sycl::queue& q, c
 
 template sycl::buffer<SIR_State, 3> create_device_buffer<SIR_State, 3>(sycl::queue& q, const std::vector<SIR_State> &host_data, const sycl::range<3>& range, sycl::event& event);
 
-template std::vector<SIR_State> read_buffer<SIR_State, 3>(cl::sycl::buffer<SIR_State,3>& buf, cl::sycl::queue& q, cl::sycl::event& event);
-template std::vector<State_t> read_buffer<State_t, 3>(cl::sycl::buffer<State_t,3>& buf, cl::sycl::queue& q, cl::sycl::event& event);
+template std::vector<SIR_State> read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, sycl::event& event);
+template std::vector<State_t> read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, sycl::event& event);

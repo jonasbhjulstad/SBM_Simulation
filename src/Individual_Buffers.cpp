@@ -1,5 +1,4 @@
 #include <Sycl_Graph/Individual_Buffers.hpp>
-#include <Sycl_Graph/SIR_Dynamics.hpp>
 #include <algorithm>
 
 

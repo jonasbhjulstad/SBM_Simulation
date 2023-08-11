@@ -32,6 +32,7 @@ struct Sim_Param
     float p_R0 = .0f;
     float p_I0;
     float p_R;
+    uint32_t N_threads = 1024;
     uint32_t seed = 238;
     uint32_t max_infection_samples = 1000;
     std::string output_dir;

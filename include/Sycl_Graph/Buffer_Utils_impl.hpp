@@ -23,19 +23,31 @@ std::vector<T> merge_vectors(const std::vector<std::vector<T>> &vectors)
     return merged;
 }
 template <typename T, std::size_t N>
-std::vector<T> read_buffer(cl::sycl::buffer<T,N>& buf, cl::sycl::queue& q, cl::sycl::event& event)
+std::vector<T> read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, sycl::event& event)
 {
     std::vector<T> host_data(buf.get_count());
-    event = q.submit([&](cl::sycl::handler& h)
+    event = q.submit([&](sycl::handler& h)
     {
-        auto acc = buf.template get_access<cl::sycl::access::mode::read>(h);
+        auto acc = buf.template get_access<sycl::access::mode::read>(h);
+        h.copy(acc, host_data.data());
+    });
+    return host_data;
+}
+
+template <typename T>
+std::vector<T> read_buffer(sycl::buffer<T>& buf, sycl::queue& q, sycl::event& event)
+{
+    std::vector<T> host_data(buf.get_count());
+    event = q.submit([&](sycl::handler& h)
+    {
+        auto acc = buf.template get_access<sycl::access::mode::read>(h);
         h.copy(acc, host_data.data());
     });
     return host_data;
 }
 
 
-template <typename T>
+template <typename T, std::size_t N = 1>
 cl::sycl::buffer<T> create_device_buffer(sycl::queue& q, const std::vector<T> &host_buffer, sycl::event& event)
 {
     cl::sycl::buffer<T, N> result(host_buffer.size());

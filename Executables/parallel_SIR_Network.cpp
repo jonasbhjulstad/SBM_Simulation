@@ -22,10 +22,9 @@ int main()
     p.p_R0 = 0.0f;
     p.p_I0 = 0.1f;
     p.p_R = 1e-1f;
-    p.sim_idx = 0;
     p.Nt = 2;
+    p.N_sims = 64;
     uint32_t seed = 238;
-    uint32_t N_sims = 40;
 
     float p_I_min = 1e-4f;
     float p_I_max = 1e-2f;
@@ -39,6 +38,7 @@ int main()
     sycl::queue q(sycl::gpu_selector_v, {cl::sycl::property::queue::enable_profiling{}});
     auto device_info = get_device_info(q);
     device_info.print();
-    excite_simulate(q, p, vcm, edge_list_flat, p_I_min, p_I_max, output_dir, N_sims, seed);
+    auto sim = make_SIR_simulation(q, p, edge_list_flat, vcm, p_I_min, p_I_max);
+    sim.run();
     return 0;
 }
