@@ -11,10 +11,10 @@ int main()
 {
     std::string output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_" + std::to_string(0) + "/";
 
-    uint32_t N_clusters = 2;
+    uint32_t N_communities = 2;
     uint32_t N_pop = 100;
     Sim_Param p;
-    p.N_clusters = N_clusters;
+    p.N_communities = N_communities;
     p.N_pop = N_pop;
     p.p_in = 1.0f;
     p.p_out = 0.5f;
@@ -34,7 +34,7 @@ int main()
     float p_I_min = 1e-3f;
     float p_I_max = 1e-1f;
 
-    auto [edge_lists, vertex_lists] = generate_planted_SBM_edges(N_pop, N_clusters, p.p_in, p.p_out, p.seed);
+    auto [edge_lists, vertex_lists] = generate_planted_SBM_edges(N_pop, N_communities, p.p_in, p.p_out, p.seed);
 
     auto vcm = create_vcm(vertex_lists);
 

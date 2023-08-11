@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     N_sim = 2
     N_pop = 10
-    N_clusters = 1
+    N_communities = 1
     p_in = 1.0
     p_out = 0.5
     N_threads = 4
@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
 
 
-    edge_lists, node_lists = generate_planted_SBM_edges(N_pop, N_clusters, p_in, p_out, seed)
+    edge_lists, node_lists = generate_planted_SBM_edges(N_pop, N_communities, p_in, p_out, seed)
     edge_list = [x for y in edge_lists for x in y]
 
     G = gt.Graph(directed=False)
@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     p = Sim_Param()
     p.N_pop = N_pop
-    p.N_clusters = N_clusters
+    p.N_communities = N_communities
     p.p_in = p_in
     p.p_out = p_out
     p.Nt = Nt

@@ -23,7 +23,11 @@ struct Device_Info
     std::tuple<uint32_t, uint32_t, uint32_t> max_work_item_sizes_3D;
     void print();
 };
+Device_Info get_device_info(sycl::queue& q);
+
 std::vector<Device_Info> get_device_info(std::vector<sycl::queue> &qs);
 std::vector<uint32_t> determine_device_workload(const Sim_Param& p, uint32_t N_sims, std::vector<sycl::queue>& qs);
+
+uint32_t get_event_execution_time(sycl::event& event);
 
 #endif

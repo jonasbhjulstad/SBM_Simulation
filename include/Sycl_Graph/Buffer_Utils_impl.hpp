@@ -3,6 +3,7 @@
 #include <fstream>
 #include <Sycl_Graph/SIR_Types.hpp>
 #include <CL/sycl.hpp>
+#include <Static_RNG/distributions.hpp>
 
 
 template <typename T>
@@ -21,59 +22,42 @@ std::vector<T> merge_vectors(const std::vector<std::vector<T>> &vectors)
     }
     return merged;
 }
-template <typename T>
-std::shared_ptr<sycl::buffer<T, 1>> shared_buffer_create_1D(sycl::queue &q, const std::vector<T> &data, sycl::event &res_event)
+template <typename T, std::size_t N>
+std::vector<T> read_buffer(cl::sycl::buffer<T,N>& buf, cl::sycl::queue& q, cl::sycl::event& event)
 {
-    sycl::buffer<T> tmp(data.data(), data.size());
-    auto result = std::make_shared<sycl::buffer<T>>(sycl::buffer<T>(sycl::range<1>(data.size())));
-
-    res_event = q.submit([&](sycl::handler &h)
-                         {
-                auto tmp_acc = tmp.template get_access<sycl::access::mode::read>(h);
-                auto res_acc = result->template get_access<sycl::access::mode::write>(h);
-                h.copy(tmp_acc, res_acc); });
-    return result;
-}
-
-template <typename T>
-sycl::buffer<T, 1> buffer_create_1D(sycl::queue &q, const std::vector<T> &data, sycl::event &res_event)
-{
-    sycl::buffer<T> tmp(data.data(), data.size());
-    sycl::buffer<T> result(sycl::range<1>(data.size()));
-
-    res_event = q.submit([&](sycl::handler &h)
-                         {
-                auto tmp_acc = tmp.template get_access<sycl::access::mode::read>(h);
-                auto res_acc = result.template get_access<sycl::access::mode::write>(h);
-                h.copy(tmp_acc, res_acc); });
-    return result;
-}
-
-template <typename T>
-sycl::buffer<T, 2> buffer_create_2D(sycl::queue &q, const std::vector<std::vector<T>> &data, sycl::event &res_event)
-{
-    assert(std::all_of(data.begin(), data.end(), [&](const auto subdata)
-                       { return subdata.size() == data[0].size(); }));
-
-    std::vector<T> data_flat(data.size() * data[0].size());
-    for (uint32_t i = 0; i < data.size(); ++i)
+    std::vector<T> host_data(buf.get_count());
+    event = q.submit([&](cl::sycl::handler& h)
     {
-        std::copy(data[i].begin(), data[i].end(), data_flat.begin() + i * data[0].size());
-    }
-
-    sycl::buffer<T, 2> tmp(data_flat.data(), sycl::range<2>(data.size(), data[0].size()));
-    sycl::buffer<T, 2> result(sycl::range<2>(data.size(), data[0].size()));
-    res_event = q.submit([&](sycl::handler &h)
-                         {
-        auto tmp_acc = tmp.template get_access<sycl::access::mode::read>(h);
-        auto res_acc = result.template get_access<sycl::access::mode::write>(h);
-        h.parallel_for(result.get_range(), [=](sycl::id<2> idx)
-                       { res_acc[idx] = tmp_acc[idx]; }); });
-
-    return result;
+        auto acc = buf.template get_access<cl::sycl::access::mode::read>(h);
+        h.copy(acc, host_data.data());
+    });
+    return host_data;
 }
 
 
+template <typename T>
+cl::sycl::buffer<T> create_device_buffer(sycl::queue& q, const std::vector<T> &host_buffer, sycl::event& event)
+{
+    cl::sycl::buffer<T, N> result(host_buffer.size());
+    event = q.submit([&](sycl::handler& h)
+    {
+        auto acc = result.template get_access<sycl::access::mode::discard_write>(h);
+        h.copy(host_buffer.data(), acc);
+    });
+    return result;
+}
+
+template <typename T, std::size_t N>
+cl::sycl::buffer<T, N> create_device_buffer(sycl::queue& q, const std::vector<T> &host_buffer, const sycl::range<N>& range, sycl::event& event)
+{
+    cl::sycl::buffer<T, N> result(range);
+    event = q.submit([&](sycl::handler& h)
+    {
+        auto acc = result.template get_access<sycl::access::mode::discard_write>(h);
+        h.copy(host_buffer.data(), acc);
+    });
+    return result;
+}
 
 
 template <typename T>

@@ -88,9 +88,9 @@ std::vector<std::vector<std::pair<uint32_t, uint32_t>>> random_connect(const std
     return edge_lists;
 }
 
-std::tuple<std::vector<std::vector<std::pair<uint32_t, uint32_t>>>,std::vector<std::vector<uint32_t>>> generate_planted_SBM_edges(uint32_t N_pop, uint32_t N_clusters, float p_in, float p_out, uint32_t seed)
+std::tuple<std::vector<std::vector<std::pair<uint32_t, uint32_t>>>,std::vector<std::vector<uint32_t>>> generate_planted_SBM_edges(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed)
 {
-    std::vector<std::vector<uint32_t>> nodelists(N_clusters);
+    std::vector<std::vector<uint32_t>> nodelists(N_communities);
     std::generate(nodelists.begin(), nodelists.end(), [N_pop, offset = 0]()
                    mutable {
                     std::vector<uint32_t> nodes(N_pop);

@@ -68,6 +68,40 @@ sycl::buffer<uint32_t> generate_seeds(sycl::queue &q, uint32_t N_rng,
     return result;
 }
 
+sycl::buffer<Static_RNG::default_rng> generate_rngs(sycl::queue& q, uint32_t N_rng, uint32_t seed, sycl::event& event)
+{
+    auto seeds = generate_seeds(N_rng, seed);
+    std::vector<Static_RNG::default_rng> rngs;
+    rngs.reserve(N_rng);
+    std::transform(seeds.begin(), seeds.end(), std::back_inserter(rngs), [](auto seed){return Static_RNG::default_rng(seed);});
+    sycl::buffer<Static_RNG::default_rng> result((sycl::range<1>(rngs.size())));
+    event = q.submit([&](sycl::handler &h)
+             {
+        auto res_acc = result.get_access<sycl::access::mode::discard_write>(h);
+
+        h.copy(rngs.data(), res_acc);
+             });
+    return result;
+}
+
+sycl::buffer<Static_RNG::default_rng, 2> generate_rngs(sycl::queue& q, sycl::range<2> size, uint32_t seed, sycl::event& event)
+{
+    uint32_t N_rngs = size[0] * size[1];
+    auto seeds = generate_seeds(N_rngs, seed);
+    std::vector<Static_RNG::default_rng> rngs;
+    rngs.reserve(N_rngs);
+    std::transform(seeds.begin(), seeds.end(), std::back_inserter(rngs), [](auto seed){return Static_RNG::default_rng(seed);});
+    sycl::buffer<Static_RNG::default_rng, 2> result(size);
+    event = q.submit([&](sycl::handler &h)
+             {
+        auto res_acc = result.get_access<sycl::access::mode::discard_write>(h);
+
+        h.copy(rngs.data(), res_acc);
+             });
+    return result;
+}
+
+
 
 
 std::vector<uint32_t> pairlist_to_vec(const std::vector<std::pair<uint32_t, uint32_t>> &pairlist)
@@ -118,27 +152,18 @@ template std::vector<uint32_t> merge_vectors(const std::vector<std::vector<uint3
 template std::vector<int> merge_vectors(const std::vector<std::vector<int>>&);
 template std::vector<float> merge_vectors(const std::vector<std::vector<float>>&);
 
-// template std::vector<std::vector<uint32_t>> read_buffer(sycl::queue &q, sycl::buffer<uint32_t, 2> &buf,
-//                                                         sycl::event events);
-// template std::vector<std::vector<float>> read_buffer(sycl::queue &q, sycl::buffer<float, 2> &buf, sycl::event events);
-
-// template std::vector<std::vector<uint32_t>> read_buffer(sycl::queue &q, sycl::buffer<uint32_t, 2> &buf,
-//                                                         sycl::event events, std::ofstream&);
-// template std::vector<std::vector<float>> read_buffer(sycl::queue &q, sycl::buffer<float, 2> &buf, sycl::event events, std::ofstream&);
-
-
 template std::vector<std::vector<uint32_t>> diff(const std::vector<std::vector<uint32_t>> &v);
 template std::vector<std::vector<int>> diff(const std::vector<std::vector<int>> &v);
 
-template sycl::buffer<uint32_t, 1> buffer_create_1D(sycl::queue &q, const std::vector<uint32_t> &data, sycl::event &res_event);
-template sycl::buffer<uint32_t, 2> buffer_create_2D(sycl::queue &q, const std::vector<std::vector<uint32_t>> &data, sycl::event &res_event);
-template sycl::buffer<int, 1> buffer_create_1D(sycl::queue &q, const std::vector<int> &data, sycl::event &res_event);
-template sycl::buffer<int, 2> buffer_create_2D(sycl::queue &q, const std::vector<std::vector<int>> &data, sycl::event &res_event);
-template sycl::buffer<float, 1> buffer_create_1D(sycl::queue &q, const std::vector<float> &data, sycl::event &res_event);
-template sycl::buffer<float, 2> buffer_create_2D(sycl::queue &q, const std::vector<std::vector<float>> &data, sycl::event &res_event);
-template sycl::buffer<SIR_State, 2> buffer_create_2D(sycl::queue &q, const std::vector<std::vector<SIR_State>> &data, sycl::event &res_event);
+template sycl::buffer<uint32_t, 1> create_device_buffer<uint32_t, 1>(sycl::queue& q, const std::vector<uint32_t> &host_data, const sycl::range<1>& range, sycl::event& event);
+template sycl::buffer<uint32_t, 2> create_device_buffer<uint32_t, 2>(sycl::queue& q, const std::vector<uint32_t> &host_data, const sycl::range<2>& range, sycl::event& event);
+template sycl::buffer<uint32_t, 3> create_device_buffer<uint32_t, 3>(sycl::queue& q, const std::vector<uint32_t> &host_data, const sycl::range<3>& range, sycl::event& event);
 
+template sycl::buffer<float, 1> create_device_buffer<float, 1>(sycl::queue& q, const std::vector<float> &host_data, const sycl::range<1>& range, sycl::event& event);
+template sycl::buffer<float, 2> create_device_buffer<float, 2>(sycl::queue& q, const std::vector<float> &host_data, const sycl::range<2>& range, sycl::event& event);
+template sycl::buffer<float, 3> create_device_buffer<float, 3>(sycl::queue& q, const std::vector<float> &host_data, const sycl::range<3>& range, sycl::event& event);
 
+template sycl::buffer<SIR_State, 3> create_device_buffer<SIR_State, 3>(sycl::queue& q, const std::vector<SIR_State> &host_data, const sycl::range<3>& range, sycl::event& event);
 
-template std::shared_ptr<sycl::buffer<uint32_t, 1>> shared_buffer_create_1D(sycl::queue &q, const std::vector<uint32_t> &data, sycl::event &res_event);
-template std::shared_ptr<sycl::buffer<float, 1>> shared_buffer_create_1D(sycl::queue &q, const std::vector<float> &data, sycl::event &res_event);
+template std::vector<SIR_State> read_buffer<SIR_State, 3>(cl::sycl::buffer<SIR_State,3>& buf, cl::sycl::queue& q, cl::sycl::event& event);
+template std::vector<State_t> read_buffer<State_t, 3>(cl::sycl::buffer<State_t,3>& buf, cl::sycl::queue& q, cl::sycl::event& event);

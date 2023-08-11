@@ -22,6 +22,18 @@ void Device_Info::print()
     std::cout << "max_work_item_sizes_3D: " << std::get<0>(max_work_item_sizes_3D) << ", " << std::get<1>(max_work_item_sizes_3D) << ", " << std::get<2>(max_work_item_sizes_3D) << std::endl;
 }
 
+Device_Info get_device_info(sycl::queue& q)
+{
+    auto qs = std::vector<sycl::queue>({q});
+    return get_device_info(qs)[0];
+}
+uint32_t get_event_execution_time(sycl::event& event)
+{
+    auto start = event.get_profiling_info<sycl::info::event_profiling::command_start>();
+    auto end = event.get_profiling_info<sycl::info::event_profiling::command_end>();
+    //return in ms
+    return (uint32_t)(end - start);
+}
 std::vector<Device_Info> get_device_info(std::vector<sycl::queue> &qs)
 {
     std::vector<Device_Info> device_infos(qs.size(), Device_Info{});

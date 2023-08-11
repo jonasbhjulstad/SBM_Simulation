@@ -12,19 +12,19 @@ from itertools import combinations, combinations_with_replacement
 from math import comb
 
 
-def generate_planted_graph(N_clusters, N_pop, p_out):
-    p_mat = np.zeros((N_clusters, N_clusters))
+def generate_planted_graph(N_communities, N_pop, p_out):
+    p_mat = np.zeros((N_communities, N_communities))
     #expected number of randomly connected edges between two groups with N_pop members and p_in probability of connection
     # p_in = N_pop*p_in
-    cmap = np.concatenate([np.ones(N_pop)*i for i in range(N_clusters)])
+    cmap = np.concatenate([np.ones(N_pop)*i for i in range(N_communities)])
     #convert to int
     cmap = cmap.astype(int)
     #max number of edges between vertex groups of N_pop members
     N_out_edges = int(N_pop*(N_pop-1)*p_out)
 
     #fill matrix probs
-    for i in range(N_clusters):
-        for j in range(N_clusters):
+    for i in range(N_communities):
+        for j in range(N_communities):
             if i == j:
                 p_mat[i][j] = N_pop*(N_pop-1)
             else:
@@ -36,22 +36,22 @@ def generate_planted_graph(N_clusters, N_pop, p_out):
 
     clabels = g.new_vertex_property("int")
     clabels.a = cmap
-    
+
     # g = gt.generate_sbm(cmap, p_mat, directed=False, self_loops=False)
     return g, clabels
 
 
 
-def gt_minimize_wrapper(g, b_init, clabel, N_clusters):
-    state = gt.minimize_blockmodel_dl(g, state_args=dict(deg_corr=True, b=b_init, B = N_clusters, clabel=clabel))
+def gt_minimize_wrapper(g, b_init, clabel, N_communities):
+    state = gt.minimize_blockmodel_dl(g, state_args=dict(deg_corr=True, b=b_init, B = N_communities, clabel=clabel))
 
     return gt.minimize_blockmodel_dl(state.get_bg(), state_args=dict(deg_corr=True)), state
 
-def generate_compute(N_clusters, N_pop, p_out):
-    G, clabel = generate_planted_graph(N_clusters, N_pop, p_out)
-    # Gs = pool.starmap(generate_planted_graph, [(N_clusters, N_pop, p_out) for p_out in p_outs])
+def generate_compute(N_communities, N_pop, p_out):
+    G, clabel = generate_planted_graph(N_communities, N_pop, p_out)
+    # Gs = pool.starmap(generate_planted_graph, [(N_communities, N_pop, p_out) for p_out in p_outs])
 
-    state = gt.minimize_blockmodel_dl(G, state_args=dict(deg_corr=True, b=clabel, B = N_clusters, clabel=clabel)).get_block_state()
+    state = gt.minimize_blockmodel_dl(G, state_args=dict(deg_corr=True, b=clabel, B = N_communities, clabel=clabel)).get_block_state()
     c_graph = state.get_bg()
 
     weights = c_graph.new_edge_property("int")
@@ -70,13 +70,13 @@ def generate_compute(N_clusters, N_pop, p_out):
 
 if __name__ == '__main__':
 
-    N_clusters = 10
+    N_communities = 10
     N_pop = 100
     p_outs = np.linspace(0,1.0,11)
     pool = mp.Pool(mp.cpu_count())
 
-    # community_states = pool.starmap(generate_compute, [(N_clusters, N_pop, p_out) for p_out in p_outs])
-    community_states = [generate_compute(N_clusters, N_pop, p_out) for p_out in reversed(p_outs)]
+    # community_states = pool.starmap(generate_compute, [(N_communities, N_pop, p_out) for p_out in p_outs])
+    community_states = [generate_compute(N_communities, N_pop, p_out) for p_out in reversed(p_outs)]
 
     N_communities = [s.get_nonempty_B() for s in community_states]
 

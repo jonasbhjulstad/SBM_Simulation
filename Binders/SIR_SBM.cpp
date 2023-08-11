@@ -63,7 +63,7 @@ PYBIND11_MODULE(SIR_SBM, m)
     m.def("generate_planted_SBM_edges", &generate_planted_SBM_edges, "generate_planted_SBM_edges");
     py::class_<Sim_Param>(m, "Sim_Param").def(py::init<>())
     .def_readwrite("N_pop", &Sim_Param::N_pop)
-    .def_readwrite("N_clusters", &Sim_Param::N_clusters)
+    .def_readwrite("N_communities", &Sim_Param::N_communities)
     .def_readwrite("p_in", &Sim_Param::p_in)
     .def_readwrite("p_out", &Sim_Param::p_out)
     .def_readwrite("Nt", &Sim_Param::Nt) //p_R0, p_I0, sim_idx, seed
