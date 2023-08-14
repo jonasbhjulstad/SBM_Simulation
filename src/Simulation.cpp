@@ -93,6 +93,7 @@ std::vector<sycl::event> Simulator::recover(uint32_t t, std::vector<sycl::event>
     const float p_R = this->p_R;
     uint32_t N_vertices = this->N_vertices;
     auto [compute_range, wg_range] = get_work_group_ranges();
+    // auto event = dep_event[0];
     auto event = q.submit([&](sycl::handler &h)
                           {
     h.depends_on(dep_event);
@@ -120,6 +121,10 @@ std::vector<sycl::event> Simulator::recover(uint32_t t, std::vector<sycl::event>
             if (state_prev == SIR_INDIVIDUAL_I) {
                 if (bernoulli_R(rng_acc_glob[sim_id])) {
                 v_acc_glob[sim_id][1][v_idx] = SIR_INDIVIDUAL_R;
+                }
+                else
+                {
+                    v_acc_glob[sim_id][1][v_idx] = v_acc_glob[sim_id][0][v_idx];
                 }
             }
             }
@@ -168,10 +173,11 @@ sycl::event Simulator::initialize_vertices()
     auto event = q.submit([&](sycl::handler &h)
                     {
     h.depends_on(alloc_events);
-    auto v_acc = sycl::accessor<SIR_State, 3, sycl::access_mode::write>(trajectory,h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0,0,0));
+    // auto v_acc = sycl::accessor<SIR_State, 3, sycl::access_mode::write>(trajectory,h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0,0,0));
+    auto v_acc = trajectory.template get_access<sycl::access_mode::write>(h);
     auto rng_acc =
         rngs.template get_access<sycl::access::mode::read_write>(h);
-    h.parallel_for_work_group(compute_range, [=](sycl::group<1> gr) {
+    h.parallel_for_work_group(compute_range, wg_range, [=](sycl::group<1> gr) {
         gr.parallel_for_work_item([&](sycl::h_item<1> it)
         {
             auto sim_id = it.get_global_id(0);
@@ -218,7 +224,25 @@ std::vector<sycl::event> Simulator::infect(uint32_t t, std::vector<sycl::event> 
     uint32_t N_edges = this->N_edges;
     uint32_t N_vertices = this->N_vertices;
     uint32_t N_sims = this->N_sims;
-    // sycl::event inf_event;
+
+    assert(N_vertices == 200);
+    assert(N_sims == 8);
+    assert(N_connections = 3);
+    assert(ecm.size() == N_edges);
+    assert(vcm.size() == N_vertices);
+    assert(p_Is.get_range()[0] == N_sims);
+    assert(p_Is.get_range()[1] == Nt);
+    assert(p_Is.get_range()[2] == N_connections);
+    assert(rngs.size() == N_sims);
+    assert(trajectory.get_range()[0] == N_sims);
+    assert(trajectory.get_range()[1] == (Nt+1));
+    assert(trajectory.get_range()[2] == N_vertices);
+    assert(events_to.get_range()[0] == N_sims);
+    assert(events_to.get_range()[1] == Nt);
+    assert(events_to.get_range()[2] == N_connections);
+    assert(events_from.get_range()[0] == N_sims);
+    assert(events_from.get_range()[1] == Nt);
+    assert(events_from.get_range()[2] == N_connections);
     auto inf_event = q.submit([&](sycl::handler &h)
                               {
         h.depends_on(dep_event);
@@ -337,32 +361,32 @@ std::vector<std::vector<std::vector<State_t>>> Simulator::accumulate_community_s
         });
     }));
     std::vector<std::vector<std::vector<State_t>>> community_state(N_sims, std::vector<std::vector<State_t>>(Nt + 1, std::vector<State_t>(N_communities)));
-    // std::transform(std::execution::par_unseq, vertex_trajectory.begin(), vertex_trajectory.end(), community_state.begin(),
-    //                [&](const auto &sim_traj)
-    //                {
-    //                    std::vector<std::vector<State_t>> sim_community_state(Nt + 1, std::vector<State_t>(N_communities));
-    //                    std::transform(sim_traj.begin(), sim_traj.end(), sim_community_state.begin(), [&](const auto &vertex_state_t)
-    //                                   {
-    //                         std::vector<State_t> community_state(N_communities, {0, 0, 0});
-    //                         for (int i = 0; i < N_vertices; i++)
-    //                         {
-    //                             if (vcm_vec[i] > community_state.size())
-    //                                 throw std::runtime_error("Community index out of bounds");
-    //                             community_state[vcm_vec[i]][vertex_state_t[i]]++;
-    //                         }
-    //                         return community_state; });
-    //                    return sim_community_state;
-    //                });
-    for(int sim_idx = 0; sim_idx < N_sims; sim_idx++)
-    {
-        for(int t = 0; t < Nt + 1; t++)
-        {
-            for(int v_idx = 0; v_idx < N_vertices; v_idx++)
-            {
-                community_state[sim_idx][t][vcm_vec[v_idx]][vertex_trajectory[sim_idx][t][v_idx]]++;
-            }
-        }
-    }
+    std::transform(std::execution::par_unseq, vertex_trajectory.begin(), vertex_trajectory.end(), community_state.begin(),
+                   [&](const auto &sim_traj)
+                   {
+                       std::vector<std::vector<State_t>> sim_community_state(Nt + 1, std::vector<State_t>(N_communities));
+                       std::transform(sim_traj.begin(), sim_traj.end(), sim_community_state.begin(), [&](const auto &vertex_state_t)
+                                      {
+                            std::vector<State_t> community_state(N_communities, {0, 0, 0});
+                            for (int i = 0; i < N_vertices; i++)
+                            {
+                                if (vcm_vec[i] > community_state.size())
+                                    throw std::runtime_error("Community index out of bounds");
+                                community_state[vcm_vec[i]][vertex_state_t[i]]++;
+                            }
+                            return community_state; });
+                       return sim_community_state;
+                   });
+    // for(int sim_idx = 0; sim_idx < N_sims; sim_idx++)
+    // {
+    //     for(int t = 0; t < Nt + 1; t++)
+    //     {
+    //         for(int v_idx = 0; v_idx < N_vertices; v_idx++)
+    //         {
+    //             community_state[sim_idx][t][vcm_vec[v_idx]][vertex_trajectory[sim_idx][t][v_idx]]++;
+    //         }
+    //     }
+    // }
     return community_state;
 }
 
@@ -458,10 +482,8 @@ Simulator make_SIR_simulation(sycl::queue &q, const Sim_Param &p, const std::vec
     uint32_t N_connections = std::max_element(ecm_init.begin(), ecm_init.end())[0] + 1;
 
     uint32_t N_vertices = vcm_init.size();
-    auto trajectory = cl::sycl::buffer<SIR_State, 3>(sycl::range<3>(p.N_sims, p.Nt + 1, N_vertices));
-    auto events_from = cl::sycl::buffer<uint32_t, 3>(sycl::range<3>(p.N_sims, p.Nt, N_connections));
-    auto events_to = cl::sycl::buffer<uint32_t, 3>(sycl::range<3>(p.N_sims, p.Nt, N_connections));
-    std::vector<sycl::event> alloc_events(7);
+    // auto trajectory = cl::sycl::buffer<SIR_State, 3>(sycl::range<3>(p.N_sims, p.Nt + 1, N_vertices));
+    std::vector<sycl::event> alloc_events(10);
     auto p_Is = create_device_buffer<float, 3>(q, p_Is_init, sycl::range<3>(p.N_sims, p.Nt, N_connections), alloc_events[0]);
     auto rngs = generate_rngs(q, p.N_sims, p.seed, alloc_events[6]);
 
@@ -479,6 +501,11 @@ Simulator make_SIR_simulation(sycl::queue &q, const Sim_Param &p, const std::vec
     auto vcm = create_device_buffer<uint32_t>(q, vcm_init, alloc_events[4]);
     std::vector<State_t> community_state_init(p.N_communities * p.N_sims * (p.Nt + 1), {0, 0, 0});
     auto community_state = create_device_buffer<State_t, 3>(q, community_state_init, sycl::range<3>(p.N_sims, p.Nt + 1, p.N_communities), alloc_events[5]);
+    std::vector<SIR_State> traj_init(p.N_sims*(p.Nt+1)*N_vertices, SIR_INDIVIDUAL_S);
+    auto trajectory = create_device_buffer<SIR_State, 3>(q, traj_init, sycl::range<3>(p.N_sims, p.Nt+1, N_vertices), alloc_events[7]);
+    std::vector<uint32_t> event_init(p.N_sims*N_connections*p.Nt, 0);
+    auto events_from = create_device_buffer<uint32_t, 3>(q, event_init, sycl::range<3>(p.N_sims, p.Nt, N_connections), alloc_events[8]);
+    auto events_to = create_device_buffer<uint32_t, 3>(q, event_init, sycl::range<3>(p.N_sims, p.Nt, N_connections), alloc_events[9]);
 
     auto ccm = complete_ccm(p.N_communities);
     auto ccm_weights = ccm_weights_from_ecm(ecm_init);

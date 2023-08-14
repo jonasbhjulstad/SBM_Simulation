@@ -31,8 +31,8 @@ int main()
     p.output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_0/";
     uint32_t seed = 238;
 
-    float p_I_min = 1e-4f;
-    float p_I_max = 1e-2f;
+    float p_I_min = 1e-6f;
+    float p_I_max = 1e-4f;
 
     auto [edge_lists, vertex_lists] = generate_planted_SBM_edges(N_pop, N_communities, p.p_in, p.p_out, seed);
 

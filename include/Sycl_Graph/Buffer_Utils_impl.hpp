@@ -25,12 +25,13 @@ std::vector<T> merge_vectors(const std::vector<std::vector<T>> &vectors)
 template <typename T, std::size_t N>
 std::vector<T> read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, sycl::event& event)
 {
-    std::vector<T> host_data(buf.get_count());
+    std::vector<T> host_data(buf.size());
     event = q.submit([&](sycl::handler& h)
     {
         auto acc = buf.template get_access<sycl::access::mode::read>(h);
         h.copy(acc, host_data.data());
     });
+    event.wait();
     return host_data;
 }
 
