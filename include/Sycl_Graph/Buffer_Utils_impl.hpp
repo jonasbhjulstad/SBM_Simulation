@@ -59,6 +59,18 @@ cl::sycl::buffer<T> create_device_buffer(sycl::queue& q, const std::vector<T> &h
     return result;
 }
 
+template <typename T, std::size_t N = 1>
+cl::sycl::buffer<T> create_local_buffer(sycl::queue& q, const std::vector<T> &host_buffer, sycl::event& event)
+{
+    cl::sycl::buffer<T, N> result(host_buffer.size());
+    event = q.submit([&](sycl::handler& h)
+    {
+        auto acc = sycl::local_accessor<T, N>(host_buffer, h);
+        h.copy(host_buffer.data(), acc);
+    });
+    return result;
+}
+
 template <typename T, std::size_t N>
 cl::sycl::buffer<T, N> create_device_buffer(sycl::queue& q, const std::vector<T> &host_buffer, const sycl::range<N>& range, sycl::event& event)
 {

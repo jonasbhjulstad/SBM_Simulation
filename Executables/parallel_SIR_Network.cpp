@@ -10,7 +10,6 @@
 
 int main()
 {
-    std::string output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_0/";
 
     uint32_t N_communities = 2;
     uint32_t N_pop = 100;
@@ -23,7 +22,13 @@ int main()
     p.p_I0 = 0.1f;
     p.p_R = 1e-1f;
     p.Nt = 2;
-    p.N_sims = 64;
+    sycl::queue q(sycl::cpu_selector_v, {cl::sycl::property::queue::enable_profiling{}});
+    auto device_info = get_device_info(q);
+    device_info.print();
+
+    // p.N_sims = device_info.max_compute_units*device_info.max_work_group_size;
+    p.N_sims = 8;
+    p.output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_0/";
     uint32_t seed = 238;
 
     float p_I_min = 1e-4f;
@@ -35,9 +40,6 @@ int main()
 
     auto edge_list_flat = merge_vectors(edge_lists);
 
-    sycl::queue q(sycl::gpu_selector_v, {cl::sycl::property::queue::enable_profiling{}});
-    auto device_info = get_device_info(q);
-    device_info.print();
     auto sim = make_SIR_simulation(q, p, edge_list_flat, vcm, p_I_min, p_I_max);
     sim.run();
     return 0;
