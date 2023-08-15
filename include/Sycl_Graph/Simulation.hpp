@@ -150,7 +150,10 @@ struct Simulator
     std::vector<sycl::event> enqueue();
     void run();
     sycl::event initialize_vertices();
-    sycl::event read_reset_buffers(uint32_t t, std::vector<sycl::event>& dep_events);
+    std::vector<sycl::event> read_end_buffers(uint32_t t, std::vector<sycl::event> &dep_events);
+
+    sycl::event read_reset_buffers(uint32_t t, std::vector<sycl::event> &dep_events);
+
     std::vector<sycl::event> recover(uint32_t t, std::vector<sycl::event> &dep_event);
     std::vector<sycl::event> infect(uint32_t t, std::vector<sycl::event> &dep_event);
     void write_to_files(std::vector<sycl::event> &dep_events);
@@ -164,7 +167,7 @@ private:
     std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(const std::vector<std::vector<std::vector<State_t>>> &community_state, const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
                                                                                   const std::vector<std::vector<std::vector<uint32_t>>> &to_events);
 
-    sycl::event accumulate_community_state(std::vector<sycl::event> &events);
+    sycl::event accumulate_community_state(std::vector<sycl::event> &events, uint32_t t_max);
 
     uint32_t get_work_group_size() const;
     std::tuple<sycl::range<1>, sycl::range<1>> get_work_group_ranges() const;

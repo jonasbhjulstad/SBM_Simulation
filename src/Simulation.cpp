@@ -98,13 +98,14 @@ std::vector<sycl::event> Simulator::recover(uint32_t t, std::vector<sycl::event>
     const float p_R = this->p_R;
     uint32_t N_vertices = this->N_vertices;
     auto [compute_range, wg_range] = get_work_group_ranges();
+    uint32_t t_alloc = t % Nt_alloc;
     // auto event = dep_event[0];
     auto event = q.submit([&](sycl::handler &h)
                           {
     h.depends_on(dep_event);
     auto rng_acc_glob = rngs.template get_access<sycl::access_mode::read_write>(h);
-    auto v_glob_prev = sycl::accessor<SIR_State, 3, sycl::access_mode::read>(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0, t, 0));
-    auto v_glob_next = sycl::accessor<SIR_State, 3, sycl::access_mode::write>(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0, t+1, 0));
+    auto v_glob_prev = sycl::accessor<SIR_State, 3, sycl::access_mode::read>(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0, t_alloc, 0));
+    auto v_glob_next = sycl::accessor<SIR_State, 3, sycl::access_mode::write>(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0, t_alloc + 1, 0));
     sycl::local_accessor<Static_RNG::default_rng> rng_acc(wg_range, h);
     sycl::local_accessor<SIR_State, 2> v_prev(sycl::range<2>(wg_range[0], N_vertices), h);
     sycl::local_accessor<SIR_State, 2> v_next(sycl::range<2>(wg_range[0], N_vertices), h);
@@ -160,16 +161,20 @@ std::vector<sycl::event> Simulator::enqueue()
     logger.profile_f << "Enqueueing kernels..." << std::endl;
     // std::vector<sycl::event> dep_events = {};
     std::vector<sycl::event> dep_events = {this->initialize_vertices()};
-    uint32_t t_step = 0;
-    for (int t = 0; t < Nt; t++)
+    uint32_t t;
+    for (t = 0; t < Nt; t++)
     {
-        if (!(t % Nt_alloc))
+        if ((!(t % Nt_alloc)) && (t != 0))
         {
             dep_events.push_back(read_reset_buffers(t, dep_events));
+            q.wait();
         }
-        dep_events = recover(t % Nt_alloc, dep_events);
-        dep_events = infect(t % Nt_alloc, dep_events);
+        dep_events = recover(t, dep_events);
+        dep_events = infect(t, dep_events);
+        q.wait();
     }
+
+    dep_events = read_end_buffers(t % Nt_alloc, dep_events);
     logger.log_end();
 
     return dep_events;
@@ -241,7 +246,7 @@ std::vector<sycl::event> Simulator::infect(uint32_t t, std::vector<sycl::event> 
     uint32_t N_edges = this->N_edges;
     uint32_t N_vertices = this->N_vertices;
     uint32_t N_sims = this->N_sims;
-
+    uint32_t t_alloc = t % Nt_alloc;
     assert(N_vertices == 200);
     // assert(N_sims == 8);
     // assert(N_connections = 3);
@@ -266,11 +271,11 @@ std::vector<sycl::event> Simulator::infect(uint32_t t, std::vector<sycl::event> 
         auto ecm_acc = ecm.template get_access<sycl::access::mode::read>(h);
         auto p_I_acc_glob = sycl::accessor<float, 3, sycl::access::mode::read>(p_Is, h, sycl::range<3>(N_sims, 1, N_connections), sycl::range<3>(0, t, 0));
         auto rng_acc_glob = rngs.template get_access<sycl::access::mode::read_write>(h);
-        sycl::accessor<SIR_State, 3, sycl::access_mode::write> v_glob_next(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0, t+1, 0));
+        sycl::accessor<SIR_State, 3, sycl::access_mode::write> v_glob_next(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0, t_alloc + 1, 0));
         auto e_acc_0 = edge_to.template get_access<sycl::access::mode::read>(h);
         auto e_acc_1 = edge_from.template get_access<sycl::access::mode::read>(h);
-        auto event_to_acc_glob = sycl::accessor<uint32_t, 3, sycl::access::mode::write>(events_to, h, sycl::range<3>(N_sims, 1, N_connections), sycl::range<3>(0, t, 0));
-        auto event_from_acc_glob = sycl::accessor<uint32_t, 3, sycl::access::mode::write>(events_from, h, sycl::range<3>(N_sims, 1, N_connections), sycl::range<3>(0, t, 0));
+        auto event_to_acc_glob = sycl::accessor<uint32_t, 3, sycl::access::mode::write>(events_to, h, sycl::range<3>(N_sims, 1, N_connections), sycl::range<3>(0, t_alloc, 0));
+        auto event_from_acc_glob = sycl::accessor<uint32_t, 3, sycl::access::mode::write>(events_from, h, sycl::range<3>(N_sims, 1, N_connections), sycl::range<3>(0, t_alloc, 0));
         sycl::local_accessor<Static_RNG::default_rng> rng_acc(wg_range, h);
         sycl::local_accessor<SIR_State, 2> v_prev(sycl::range<2>(wg_range[0], N_vertices), h);
         sycl::local_accessor<SIR_State, 2> v_next(sycl::range<2>(wg_range[0], N_vertices), h);
@@ -280,7 +285,7 @@ std::vector<sycl::event> Simulator::infect(uint32_t t, std::vector<sycl::event> 
         auto local_mem_size_used = rng_acc.byte_size() + v_prev.byte_size() + v_next.byte_size() + p_I_acc.byte_size() + event_to_acc.byte_size() + event_from_acc.byte_size();
         auto lms = this->local_mem_size();
         assert(local_mem_size_used < lms);
-        // sycl::stream out(1024*10, 256, h);
+        sycl::stream out(1024*10, 256, h);
         h.parallel_for_work_group(compute_range, wg_range, [=](sycl::group<1> gr)
                                   {
                                     // Copy to local accessor
@@ -353,7 +358,7 @@ std::vector<sycl::event> Simulator::infect(uint32_t t, std::vector<sycl::event> 
                                               }
 
                                           }
-                                        //   out << "N_inf for sim " << sim_id << ":\t" << N_inf << sycl::endl;
+                                          out << "N_inf for sim " << sim_id << ":\t" << N_inf << sycl::endl;
                                            });
                                     gr.parallel_for_work_item([&](sycl::h_item<1> it)
                                                                   {
@@ -402,9 +407,9 @@ std::size_t Simulator::local_mem_size() const
     return max_local_mem_size;
 }
 
-sycl::event Simulator::accumulate_community_state(std::vector<sycl::event> &events)
+sycl::event Simulator::accumulate_community_state(std::vector<sycl::event> &events, uint32_t t_max)
 {
-    uint32_t Nt_alloc = this->Nt_alloc;
+    uint32_t t_end = std::min({this->Nt_alloc, t_max});
     uint32_t N_vertices = this->N_vertices;
     auto [compute_range, wg_range] = get_work_group_ranges();
     return q.submit([&](sycl::handler &h)
@@ -419,7 +424,7 @@ sycl::event Simulator::accumulate_community_state(std::vector<sycl::event> &even
             {
                 auto sim_id = it.get_global_id(0);
                 auto lid = it.get_local_id(0);
-                for(int t = 0; t < Nt_alloc + 1; t++)
+                for(int t = 0; t < t_end + 1; t++)
                 {
                     for(int v_idx = 0; v_idx < N_vertices; v_idx++)
                     {
@@ -454,20 +459,54 @@ std::vector<std::vector<std::vector<uint32_t>>> Simulator::sample_from_connectio
     return infections;
 }
 
+std::vector<sycl::event> Simulator::read_end_buffers(uint32_t t, std::vector<sycl::event> &dep_events)
+{
+    std::vector<sycl::event> read_events(4);
+    auto t_end = t % Nt_alloc + 1;
+    read_events[0] = accumulate_community_state(dep_events, t_end);
+    uint32_t event_offset = (t - Nt_alloc) * N_sims * N_connections;
+    // return sycl::event{};
+    read_events[0] = q.submit([&](sycl::handler& h)
+    {
+        h.depends_on(dep_events);
+        auto acc = sycl::accessor<SIR_State, 3, sycl::access::mode::read>(trajectory, h, sycl::range<3>(N_sims, t_end+1, N_vertices), sycl::range<3>(0,0,0));
+        h.copy(acc, &community_state_flat[event_offset]);
+    });
+
+    read_events[1] = q.submit([&](sycl::handler& h)
+    {
+        h.depends_on(dep_events);
+        auto acc = sycl::accessor<uint32_t, 3, sycl::access::mode::read>(events_from, h, sycl::range<3>(N_sims, t_end, N_connections), sycl::range<3>(0,0,0));
+        h.copy(acc, &events_from_flat[event_offset]);
+    });
+
+    read_events[2] = q.submit([&](sycl::handler& h)
+    {
+        h.depends_on(dep_events);
+        auto acc = sycl::accessor<uint32_t, 3, sycl::access::mode::read>(events_to, h, sycl::range<3>(N_sims, t_end, N_connections), sycl::range<3>(0,0,0));
+        h.copy(acc, &events_to_flat[event_offset]);
+    });
+    read_events.insert(read_events.end(), dep_events.begin(), dep_events.end());
+    return read_events;
+}
+
 sycl::event Simulator::read_reset_buffers(uint32_t t, std::vector<sycl::event> &dep_events)
 {
     std::vector<sycl::event> read_events(4);
-    read_events[0] = accumulate_community_state(dep_events);
-    uint32_t event_offset = t * N_sims * N_connections;
+    read_events[0] = accumulate_community_state(dep_events, Nt_alloc);
+    uint32_t event_offset = (t - Nt_alloc) * N_sims * N_connections;
+    auto t_end = Nt % Nt_alloc;
     uint32_t Nt_alloc = this->Nt_alloc;
+    // return sycl::event{};
     read_events[1] = read_buffer<State_t, 3>(community_state, q, &community_state_flat[event_offset], dep_events);
-    read_events[1] = read_buffer<uint32_t, 3>(events_from, q, &events_from_flat[event_offset], dep_events);
-    read_events[2] = read_buffer<uint32_t, 3>(events_to, q, &events_to_flat[event_offset], dep_events);
+    read_events[2] = read_buffer<uint32_t, 3>(events_from, q, &events_from_flat[event_offset], dep_events);
+    read_events[3] = read_buffer<uint32_t, 3>(events_to, q, &events_to_flat[event_offset], dep_events);
+    read_events.insert(read_events.end(), dep_events.begin(), dep_events.end());
     return q.submit([&](sycl::handler &h)
                     {
         h.depends_on(read_events);
-        sycl::accessor<SIR_State, 3, sycl::access::mode::read, sycl::access::target::device> v_end(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0,Nt_alloc,0));
-        sycl::accessor<SIR_State, 3, sycl::access::mode::write, sycl::access::target::device> v_start(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0,0,0));
+        sycl::accessor<SIR_State, 3, sycl::access::mode::read> v_end(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0,t_end + 1,0));
+        sycl::accessor<SIR_State, 3, sycl::access::mode::write> v_start(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0,0,0));
         h.copy(v_end, v_start); });
 }
 

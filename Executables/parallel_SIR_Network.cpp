@@ -23,7 +23,7 @@ int main()
     p.p_R = 1e-1f;
     p.Nt = 8;
     p.Nt_alloc = 4;
-    sycl::queue q(sycl::gpu_selector_v, {cl::sycl::property::queue::enable_profiling{}});
+    sycl::queue q(sycl::cpu_selector_v, {cl::sycl::property::queue::enable_profiling{}});
     auto device_info = get_device_info(q);
     device_info.print();
 
