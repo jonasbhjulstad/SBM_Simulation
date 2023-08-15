@@ -21,18 +21,18 @@ int main()
     p.p_R0 = 0.0f;
     p.p_I0 = 0.1f;
     p.p_R = 1e-1f;
-    p.Nt = 2;
-    sycl::queue q(sycl::cpu_selector_v, {cl::sycl::property::queue::enable_profiling{}});
+    p.Nt = 50;
+    sycl::queue q(sycl::gpu_selector_v, {cl::sycl::property::queue::enable_profiling{}});
     auto device_info = get_device_info(q);
     device_info.print();
 
     // p.N_sims = device_info.max_compute_units*device_info.max_work_group_size;
-    p.N_sims = 8;
+    p.N_sims = 32;
     p.output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_0/";
     uint32_t seed = 238;
 
-    float p_I_min = 1e-6f;
-    float p_I_max = 1e-4f;
+    float p_I_min = 1e-5f;
+    float p_I_max = 1e-3f;
 
     auto [edge_lists, vertex_lists] = generate_planted_SBM_edges(N_pop, N_communities, p.p_in, p.p_out, seed);
 

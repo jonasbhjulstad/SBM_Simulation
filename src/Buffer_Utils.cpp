@@ -77,10 +77,11 @@ sycl::buffer<Static_RNG::default_rng> generate_rngs(sycl::queue& q, uint32_t N_r
     sycl::buffer<Static_RNG::default_rng> result((sycl::range<1>(rngs.size())));
     event = q.submit([&](sycl::handler &h)
              {
-        auto res_acc = result.get_access<sycl::access::mode::discard_write>(h);
+        auto res_acc = result.get_access<sycl::access::mode::write>(h);
 
         h.copy(rngs.data(), res_acc);
              });
+    event.wait();
     return result;
 }
 

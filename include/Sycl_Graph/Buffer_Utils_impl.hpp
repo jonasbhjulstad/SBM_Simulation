@@ -57,6 +57,7 @@ cl::sycl::buffer<T> create_device_buffer(sycl::queue& q, const std::vector<T> &h
         auto acc = result.template get_access<sycl::access::mode::discard_write>(h);
         h.copy(host_buffer.data(), acc);
     });
+    event.wait();
     return result;
 }
 
