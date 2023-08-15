@@ -121,7 +121,7 @@ struct Simulator
               const uint32_t N_connections,
               const uint32_t N_vertices,
               const uint32_t N_sims,
-              const float p_I0, const float p_R0, const float p_R,
+              const float p_I0, const float p_R0, const float p_R, const uint32_t N_t_alloc, const uint32_t N_sim_alloc,
               std::vector<sycl::event> alloc_events);
     sycl::queue &q;
     cl::sycl::buffer<Static_RNG::default_rng> rngs;
@@ -137,31 +137,37 @@ struct Simulator
     const std::vector<uint32_t> vcm_vec;
     cl::sycl::buffer<State_t, 3> community_state;
     std::vector<std::pair<uint32_t, uint32_t>> ccm;
+    std::vector<std::vector<std::vector<State_t>>> community_state_vec;
+
+    std::vector<std::vector<std::vector<uint32_t>>> connection_events_to_vec;
+    std::vector<std::vector<std::vector<uint32_t>>> connection_events_from_vec;
     std::vector<uint32_t> ccm_weights;
     // std::vector<sycl::event> events;
     Simulation_Logger logger;
     std::string output_dir;
-    const uint32_t Nt, N_communities, N_pop, N_edges, N_threads, seed, N_connections, N_vertices, N_sims;
+    const uint32_t Nt, N_communities, N_pop, N_edges, N_threads, seed, N_connections, N_vertices, N_sims, N_t_alloc, N_sim_alloc;
     const float p_I0, p_R0, p_R;
     std::vector<sycl::event> alloc_events;
     const uint32_t max_infection_samples = 1000;
     std::vector<sycl::event> enqueue();
     void run();
     sycl::event initialize_vertices();
+    sycl::event read_reset_buffers(uint32_t t, std::vector<sycl::event> &events);
 
     std::vector<sycl::event> recover(uint32_t t, std::vector<sycl::event> &dep_event);
     std::vector<sycl::event> infect(uint32_t t, std::vector<sycl::event> &dep_event);
     void write_to_files(std::vector<sycl::event> &dep_events);
-uint32_t byte_size() const;
+    uint32_t byte_size() const;
 
     uint32_t N_vertex_per_thread() const;
     uint32_t N_edge_per_thread() const;
     std::size_t local_mem_size() const;
+
 private:
     std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(const std::vector<std::vector<std::vector<State_t>>> &community_state, const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
                                                                                   const std::vector<std::vector<std::vector<uint32_t>>> &to_events);
 
-    std::vector<std::vector<std::vector<State_t>>> accumulate_community_state(std::vector<sycl::event> &events, sycl::event &res_event);
+    std::vector<std::vector<std::vector<State_t>>> accumulate_community_state(std::vector<sycl::event> &events);
     uint32_t get_work_group_size() const;
     std::tuple<sycl::range<1>, sycl::range<1>> get_work_group_ranges() const;
     std::ofstream profiling_f;

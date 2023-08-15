@@ -35,6 +35,8 @@ struct Sim_Param
     uint32_t N_threads = 1024;
     uint32_t seed = 238;
     uint32_t max_infection_samples = 1000;
+    uint32_t N_t_alloc = 4;
+    uint32_t N_sim_alloc = 64;
     std::string output_dir;
 };
 

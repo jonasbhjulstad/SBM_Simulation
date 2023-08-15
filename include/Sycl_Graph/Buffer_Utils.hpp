@@ -36,8 +36,8 @@ extern template sycl::buffer<float, 2> create_device_buffer<float, 2>(sycl::queu
 extern template sycl::buffer<float, 3> create_device_buffer<float, 3>(sycl::queue& q, const std::vector<float> &host_data, const sycl::range<3>& range, sycl::event& event);
 
 extern template sycl::buffer<SIR_State, 3> create_device_buffer<SIR_State, 3>(sycl::queue& q, const std::vector<SIR_State> &host_data, const sycl::range<3>& range, sycl::event& event);
-extern template std::vector<SIR_State> read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, sycl::event& event);
-extern template std::vector<State_t> read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, sycl::event& event);
+extern template std::vector<SIR_State> read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q);
+extern template std::vector<State_t> read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q);
 
 
 #endif
