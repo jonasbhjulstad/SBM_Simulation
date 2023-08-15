@@ -27,17 +27,16 @@ std::vector<float> generate_floats(uint32_t N, float min, float max, uint32_t se
 std::vector<std::vector<float>> generate_floats(uint32_t rows, uint32_t cols, float min, float max, uint32_t seed);
 std::vector<std::vector<std::vector<float>>> generate_floats(uint32_t N0, uint32_t N1, uint32_t N2, float min, float max, uint32_t seed);
 
-extern template sycl::buffer<uint32_t, 1> create_device_buffer<uint32_t, 1>(sycl::queue& q, const std::vector<uint32_t> &host_data, const sycl::range<1>& range, sycl::event& event);
-extern template sycl::buffer<uint32_t, 2> create_device_buffer<uint32_t, 2>(sycl::queue& q, const std::vector<uint32_t> &host_data, const sycl::range<2>& range, sycl::event& event);
-extern template sycl::buffer<uint32_t, 3> create_device_buffer<uint32_t, 3>(sycl::queue& q, const std::vector<uint32_t> &host_data, const sycl::range<3>& range, sycl::event& event);
+extern template sycl::event initialize_device_buffer<uint32_t, 1>(sycl::queue& q, const std::vector<uint32_t> &host_data, sycl::buffer<uint32_t, 1>& buf);
+extern template sycl::event initialize_device_buffer<uint32_t, 2>(sycl::queue& q, const std::vector<uint32_t> &host_data, sycl::buffer<uint32_t, 2>& buf);
+extern template sycl::event initialize_device_buffer<uint32_t, 3>(sycl::queue& q, const std::vector<uint32_t> &host_data, sycl::buffer<uint32_t, 3>& buf);
 
-extern template sycl::buffer<float, 1> create_device_buffer<float, 1>(sycl::queue& q, const std::vector<float> &host_data, const sycl::range<1>& range, sycl::event& event);
-extern template sycl::buffer<float, 2> create_device_buffer<float, 2>(sycl::queue& q, const std::vector<float> &host_data, const sycl::range<2>& range, sycl::event& event);
-extern template sycl::buffer<float, 3> create_device_buffer<float, 3>(sycl::queue& q, const std::vector<float> &host_data, const sycl::range<3>& range, sycl::event& event);
+extern template sycl::event initialize_device_buffer<float, 1>(sycl::queue& q, const std::vector<float> &host_data, sycl::buffer<float, 1>& buf);
+extern template sycl::event initialize_device_buffer<float, 2>(sycl::queue& q, const std::vector<float> &host_data, sycl::buffer<float, 2>& buf);
+extern template sycl::event initialize_device_buffer<float, 3>(sycl::queue& q, const std::vector<float> &host_data, sycl::buffer<float, 3>& buf);
 
 extern template sycl::buffer<SIR_State, 3> create_device_buffer<SIR_State, 3>(sycl::queue& q, const std::vector<SIR_State> &host_data, const sycl::range<3>& range, sycl::event& event);
-extern template std::vector<SIR_State> read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, sycl::event& event);
-extern template std::vector<State_t> read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, sycl::event& event);
-
+extern template sycl::event read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, SIR_State* result, std::vector<sycl::event>& dep_events);
+extern template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, State_t* result, std::vector<sycl::event>& dep_events);
 
 #endif

@@ -165,15 +165,14 @@ template std::vector<float> merge_vectors(const std::vector<std::vector<float>>&
 template std::vector<std::vector<uint32_t>> diff(const std::vector<std::vector<uint32_t>> &v);
 template std::vector<std::vector<int>> diff(const std::vector<std::vector<int>> &v);
 
-template sycl::buffer<uint32_t, 1> create_device_buffer<uint32_t, 1>(sycl::queue& q, const std::vector<uint32_t> &host_data, const sycl::range<1>& range, sycl::event& event);
-template sycl::buffer<uint32_t, 2> create_device_buffer<uint32_t, 2>(sycl::queue& q, const std::vector<uint32_t> &host_data, const sycl::range<2>& range, sycl::event& event);
-template sycl::buffer<uint32_t, 3> create_device_buffer<uint32_t, 3>(sycl::queue& q, const std::vector<uint32_t> &host_data, const sycl::range<3>& range, sycl::event& event);
+template sycl::event initialize_device_buffer<uint32_t, 1>(sycl::queue& q, const std::vector<uint32_t> &host_data, sycl::buffer<uint32_t, 1>& buf);
+template sycl::event initialize_device_buffer<uint32_t, 2>(sycl::queue& q, const std::vector<uint32_t> &host_data, sycl::buffer<uint32_t, 2>& buf);
+template sycl::event initialize_device_buffer<uint32_t, 3>(sycl::queue& q, const std::vector<uint32_t> &host_data, sycl::buffer<uint32_t, 3>& buf);
 
-template sycl::buffer<float, 1> create_device_buffer<float, 1>(sycl::queue& q, const std::vector<float> &host_data, const sycl::range<1>& range, sycl::event& event);
-template sycl::buffer<float, 2> create_device_buffer<float, 2>(sycl::queue& q, const std::vector<float> &host_data, const sycl::range<2>& range, sycl::event& event);
-template sycl::buffer<float, 3> create_device_buffer<float, 3>(sycl::queue& q, const std::vector<float> &host_data, const sycl::range<3>& range, sycl::event& event);
+template sycl::event initialize_device_buffer<float, 1>(sycl::queue& q, const std::vector<float> &host_data, sycl::buffer<float, 1>& buf);
+template sycl::event initialize_device_buffer<float, 2>(sycl::queue& q, const std::vector<float> &host_data, sycl::buffer<float, 2>& buf);
+template sycl::event initialize_device_buffer<float, 3>(sycl::queue& q, const std::vector<float> &host_data, sycl::buffer<float, 3>& buf);
 
-template sycl::buffer<SIR_State, 3> create_device_buffer<SIR_State, 3>(sycl::queue& q, const std::vector<SIR_State> &host_data, const sycl::range<3>& range, sycl::event& event);
 
-template std::vector<SIR_State> read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, sycl::event& event);
-template std::vector<State_t> read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, sycl::event& event);
+template sycl::event read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, SIR_State* result, std::vector<sycl::event>& dep_events);
+template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, State_t* result, std::vector<sycl::event>& dep_events);

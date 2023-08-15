@@ -23,42 +23,25 @@ std::vector<T> merge_vectors(const std::vector<std::vector<T>> &vectors)
     return merged;
 }
 template <typename T, std::size_t N>
-std::vector<T> read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, sycl::event& event)
+sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, T* p_result, std::vector<sycl::event>& dep_events)
 {
-    std::vector<T> host_data(buf.size());
-    event = q.submit([&](sycl::handler& h)
+    return q.submit([&](sycl::handler& h)
     {
+        h.depends_on(dep_events);
         auto acc = buf.template get_access<sycl::access::mode::read>(h);
-        h.copy(acc, host_data.data());
+        h.copy(acc, p_result);
     });
-    event.wait();
-    return host_data;
-}
-
-template <typename T>
-std::vector<T> read_buffer(sycl::buffer<T>& buf, sycl::queue& q, sycl::event& event)
-{
-    std::vector<T> host_data(buf.get_count());
-    event = q.submit([&](sycl::handler& h)
-    {
-        auto acc = buf.template get_access<sycl::access::mode::read>(h);
-        h.copy(acc, host_data.data());
-    });
-    return host_data;
 }
 
 
 template <typename T, std::size_t N = 1>
-cl::sycl::buffer<T> create_device_buffer(sycl::queue& q, const std::vector<T> &host_buffer, sycl::event& event)
+sycl::event initialize_device_buffer(sycl::queue& q, const std::vector<T> &vec, cl::sycl::buffer<T, N>& buf)
 {
-    cl::sycl::buffer<T, N> result(host_buffer.size());
-    event = q.submit([&](sycl::handler& h)
+    return q.submit([&](sycl::handler& h)
     {
-        auto acc = result.template get_access<sycl::access::mode::discard_write>(h);
-        h.copy(host_buffer.data(), acc);
+        auto acc = buf.template get_access<sycl::access::mode::write, sycl::access::target::device>(h);
+        h.copy(vec.data(), acc);
     });
-    event.wait();
-    return result;
 }
 
 template <typename T, std::size_t N = 1>
