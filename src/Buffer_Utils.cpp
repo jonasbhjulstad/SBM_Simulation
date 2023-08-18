@@ -158,9 +158,9 @@ std::vector<std::vector<std::vector<float>>> generate_floats(uint32_t N0, uint32
 }
 
 
-template std::vector<uint32_t> merge_vectors(const std::vector<std::vector<uint32_t>>&);
-template std::vector<int> merge_vectors(const std::vector<std::vector<int>>&);
-template std::vector<float> merge_vectors(const std::vector<std::vector<float>>&);
+// template std::vector<uint32_t> merge_vectors(const std::vector<std::vector<uint32_t>>&);
+// template std::vector<int> merge_vectors(const std::vector<std::vector<int>>&);
+// template std::vector<float> merge_vectors(const std::vector<std::vector<float>>&);
 
 template std::vector<std::vector<uint32_t>> diff(const std::vector<std::vector<uint32_t>> &v);
 template std::vector<std::vector<int>> diff(const std::vector<std::vector<int>> &v);
@@ -174,5 +174,8 @@ template sycl::event initialize_device_buffer<float, 2>(sycl::queue& q, const st
 template sycl::event initialize_device_buffer<float, 3>(sycl::queue& q, const std::vector<float> &host_data, sycl::buffer<float, 3>& buf);
 
 
-template sycl::event read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, SIR_State* result, std::vector<sycl::event>& dep_events);
-template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, State_t* result, std::vector<sycl::event>& dep_events);
+template sycl::event read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, std::vector<SIR_State>& result, std::vector<sycl::event>& dep_events);
+template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, std::vector<State_t>& result, std::vector<sycl::event>& dep_events);
+
+template sycl::event read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, std::vector<SIR_State>& p_result, std::vector<sycl::event>& dep_events, sycl::range<3> range, sycl::range<3> offset);
+template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, std::vector<State_t>& p_result, std::vector<sycl::event>& dep_events, sycl::range<3> range, sycl::range<3> offset);

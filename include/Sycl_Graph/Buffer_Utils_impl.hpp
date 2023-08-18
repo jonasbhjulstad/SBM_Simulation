@@ -6,30 +6,25 @@
 #include <Static_RNG/distributions.hpp>
 
 
-template <typename T>
-std::vector<T> merge_vectors(const std::vector<std::vector<T>> &vectors)
-{
-    std::vector<T> merged;
-    uint32_t size = 0;
-    for(int i = 0; i < vectors.size(); i++)
-    {
-        size += vectors[i].size();
-    }
-    merged.reserve(size);
-    for (auto &v : vectors)
-    {
-        merged.insert(merged.end(), v.begin(), v.end());
-    }
-    return merged;
-}
 template <typename T, std::size_t N>
-sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, T* p_result, std::vector<sycl::event>& dep_events)
+sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, std::vector<T>& result, std::vector<sycl::event>& dep_events)
 {
     return q.submit([&](sycl::handler& h)
     {
         h.depends_on(dep_events);
-        auto acc = buf.template get_access<sycl::access::mode::read>(h);
-        h.copy(acc, p_result);
+        auto acc = sycl::accessor<T, N, sycl::access_mode::read>(buf, h, sycl::range<N>(buf.get_range()));
+        h.copy(acc, result.data());
+    });
+}
+
+template <typename T, std::size_t N>
+sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, std::vector<T>& result, std::vector<sycl::event>& dep_events, sycl::range<N> range, sycl::range<N> offset)
+{
+    return q.submit([&](sycl::handler& h)
+    {
+        h.depends_on(dep_events);
+        auto acc = sycl::accessor<T, N, sycl::access_mode::read>(buf, h, range, offset);
+        h.copy(acc, result.data());
     });
 }
 

@@ -189,12 +189,18 @@ std::vector<std::vector<int>> get_delta_Is(const std::vector<std::vector<State_t
         }
     }
 
-    assert(std::all_of(delta_I.begin(), delta_I.end(), [](auto &v)
-                       { return std::all_of(v.begin(), v.end(), [](auto &x)
-                                            { return x >= 0; }); }));
-    assert(std::all_of(delta_R.begin(), delta_R.end(), [](auto &v)
-                       { return std::all_of(v.begin(), v.end(), [](auto &x)
-                                            { return x >= 0; }); }));
+    #ifdef NDEBUG
+
+    for(int i = 0; i < delta_I.size();i++)
+    {
+        assert(delta_I[i] >= 0);
+    }
+
+    for(int i = 0; i < delta_R.size();i++)
+    {
+        assert(delta_R[i] >= 0);
+    }
+    #endif
 
     return delta_I;
 }

@@ -39,18 +39,17 @@ std::vector<std::vector<std::vector<T>>> vector_remap(std::vector<T> &input, siz
 
     std::vector<std::vector<std::vector<T>>> output(N0, std::vector<std::vector<T>>(N1, std::vector<T>(N2)));
 
-    size_t idx = 0;
-    for (size_t i = 0; i < N0; ++i)
+    // linear position defined by i2 + i1*n2 + i0*n1*n2
+    for (size_t i0 = 0; i0 < N0; i0++)
     {
-        for (size_t j = 0; j < N1; ++j)
+        for (size_t i1 = 0; i1 < N1; i1++)
         {
-            for (size_t k = 0; k < N2; ++k)
+            for (size_t i2 = 0; i2 < N2; i2++)
             {
-                output[i][j][k] = input[idx++];
+                output[i0][i1][i2] = input[i2 + i1 * N2 + i0 * N1 * N2];
             }
         }
     }
-
     return output;
 }
 
@@ -132,6 +131,9 @@ struct Simulator
     std::vector<uint32_t> events_to_flat;
     std::vector<uint32_t> events_from_flat;
     std::vector<State_t> community_state_flat;
+    std::vector<std::vector<std::vector<State_t>>> community_timeseries;
+    std::vector<std::vector<std::vector<uint32_t>>> events_from_timeseries;
+    std::vector<std::vector<std::vector<uint32_t>>> events_to_timeseries;
     cl::sycl::buffer<uint32_t> edge_from;
     cl::sycl::buffer<uint32_t> edge_to;
     cl::sycl::buffer<uint32_t> ecm;
@@ -150,9 +152,8 @@ struct Simulator
     std::vector<sycl::event> enqueue();
     void run();
     sycl::event initialize_vertices();
-    std::vector<sycl::event> read_end_buffers(uint32_t t, std::vector<sycl::event> &dep_events);
 
-    sycl::event read_reset_buffers(uint32_t t, std::vector<sycl::event> &dep_events);
+    std::vector<sycl::event> read_reset_buffers(uint32_t t, std::vector<sycl::event> &dep_events);
 
     std::vector<sycl::event> recover(uint32_t t, std::vector<sycl::event> &dep_event);
     std::vector<sycl::event> infect(uint32_t t, std::vector<sycl::event> &dep_event);
@@ -163,11 +164,16 @@ struct Simulator
     uint32_t N_edge_per_thread() const;
     std::size_t local_mem_size() const;
 
+    uint32_t timeseries_slice_size() const;
+
 private:
     std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(const std::vector<std::vector<std::vector<State_t>>> &community_state, const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
                                                                                   const std::vector<std::vector<std::vector<uint32_t>>> &to_events);
+    std::vector<std::vector<std::vector<State_t>>> reshape_community_state() const;
+    std::pair<std::vector<std::vector<std::vector<uint32_t>>>, std::vector<std::vector<std::vector<uint32_t>>>> reshape_events() const;
+    void community_state_to_timeseries(uint32_t t_offset, std::vector<sycl::event> &dep_events);
+    void connection_events_to_timeseries(uint32_t t_offset, std::vector<sycl::event>& dep_events);
 
-    sycl::event accumulate_community_state(std::vector<sycl::event> &events, uint32_t t_max);
 
     uint32_t get_work_group_size() const;
     std::tuple<sycl::range<1>, sycl::range<1>> get_work_group_ranges() const;

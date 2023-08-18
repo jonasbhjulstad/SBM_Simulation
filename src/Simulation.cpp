@@ -1,10 +1,10 @@
 
-#include <Sycl_Graph/Simulation.hpp>
-
 #include <Sycl_Graph/Buffer_Utils.hpp>
 #include <Sycl_Graph/Graph.hpp>
 #include <Sycl_Graph/Profiling.hpp>
 #include <Sycl_Graph/SIR_Infection_Sampling.hpp>
+#include <Sycl_Graph/Simulation.hpp>
+#include <Sycl_Graph/Community_State.hpp>
 #include <algorithm>
 #include <cmath>
 #include <execution>
@@ -16,6 +16,8 @@
 class init_kernel;
 class infection_kernel;
 class recovery__kernel;
+
+
 
 Simulator::Simulator(sycl::queue &q,
                      cl::sycl::buffer<Static_RNG::default_rng> &rngs,
@@ -53,9 +55,12 @@ Simulator::Simulator(sycl::queue &q,
                                                               Nt(Nt), N_communities(N_communities), N_pop(N_pop), N_edges(N_edges),
                                                               N_threads(N_threads), seed(seed), N_connections(N_connections),
                                                               N_vertices(N_vertices), N_sims(N_sims), p_I0(p_I0), p_R0(p_R0), p_R(p_R),
-                                                              alloc_events(alloc_events), max_infection_samples(1000), events_from_flat(N_sims * Nt * N_connections, 0),
-                                                              events_to_flat(N_sims * Nt * N_connections, 0),
-                                                              community_state_flat(N_sims * (Nt + 1) * N_communities), Nt_alloc(Nt_alloc)
+                                                              alloc_events(alloc_events), max_infection_samples(1000), events_from_flat(N_sims * Nt_alloc * N_connections, 0),
+                                                              events_to_flat(N_sims * Nt_alloc * N_connections, 0),
+                                                              community_state_flat(N_sims * (Nt_alloc) * N_communities), Nt_alloc(Nt_alloc),
+                                                              community_timeseries(std::vector<std::vector<std::vector<State_t>>>(N_sims, std::vector<std::vector<State_t>>(Nt+1, std::vector<State_t>(N_communities, {0,0,0})))),
+                                                            events_from_timeseries(std::vector<std::vector<std::vector<uint32_t>>>(N_sims, std::vector<std::vector<uint32_t>>(Nt, std::vector<uint32_t>(N_connections, 0)))),
+                                                            events_to_timeseries(std::vector<std::vector<std::vector<uint32_t>>>(N_sims, std::vector<std::vector<uint32_t>>(Nt, std::vector<uint32_t>(N_connections, 0))))
 {
     auto device = q.get_device();
     // get global mem size
@@ -93,68 +98,6 @@ uint32_t Simulator::N_edge_per_thread() const
     return static_cast<uint32_t>(std::ceil(static_cast<double>(N_edges) / static_cast<double>(N_threads)));
 }
 
-std::vector<sycl::event> Simulator::recover(uint32_t t, std::vector<sycl::event> &dep_event)
-{
-    const float p_R = this->p_R;
-    uint32_t N_vertices = this->N_vertices;
-    auto [compute_range, wg_range] = get_work_group_ranges();
-    uint32_t t_alloc = t % Nt_alloc;
-    // auto event = dep_event[0];
-    auto event = q.submit([&](sycl::handler &h)
-                          {
-    h.depends_on(dep_event);
-    auto rng_acc_glob = rngs.template get_access<sycl::access_mode::read_write>(h);
-    auto v_glob_prev = sycl::accessor<SIR_State, 3, sycl::access_mode::read>(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0, t_alloc, 0));
-    auto v_glob_next = sycl::accessor<SIR_State, 3, sycl::access_mode::write>(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0, t_alloc + 1, 0));
-    sycl::local_accessor<Static_RNG::default_rng> rng_acc(wg_range, h);
-    sycl::local_accessor<SIR_State, 2> v_prev(sycl::range<2>(wg_range[0], N_vertices), h);
-    sycl::local_accessor<SIR_State, 2> v_next(sycl::range<2>(wg_range[0], N_vertices), h);
-
-    h.parallel_for_work_group(compute_range, wg_range, [=](sycl::group<1> gr)
-    {
-        gr.parallel_for_work_item([&](sycl::h_item<1> it)
-        {
-            auto lid = it.get_local_id();
-            auto gid = it.get_global_id();
-            rng_acc[lid] = rng_acc_glob[gid];
-            for(int v_idx = 0; v_idx < N_vertices; v_idx++)
-            {
-                v_prev[lid][v_idx] = v_glob_prev[gid][0][v_idx];
-                v_next[lid][v_idx] = v_prev[lid][v_idx];
-            }
-        });
-        gr.parallel_for_work_item([&](sycl::h_item<1> it)
-        {
-            auto sim_id = it.get_global_id(0);
-            auto lid = it.get_local_id(0);
-
-        Static_RNG::bernoulli_distribution<float> bernoulli_R(p_R);
-        for(int v_idx = 0; v_idx < N_vertices; v_idx++)
-        {
-            auto state_prev = v_prev[lid][v_idx];
-            if (state_prev == SIR_INDIVIDUAL_I) {
-                if (bernoulli_R(rng_acc_glob[sim_id])) {
-                v_next[lid][v_idx] = SIR_INDIVIDUAL_R;
-                }
-            }
-            }
-        });
-        gr.parallel_for_work_item([&](sycl::h_item<1> it)
-        {
-            auto lid = it.get_local_id(0);
-            auto gid = it.get_global_id(0);
-            rng_acc_glob[gid] = rng_acc[lid];
-            for(int v_idx = 0; v_idx < N_vertices; v_idx++)
-            {
-                v_glob_next[gid][0][v_idx] = v_next[lid][v_idx];
-            }
-
-        });
-
-     }); });
-    return {event};
-}
-
 std::vector<sycl::event> Simulator::enqueue()
 {
     logger.log_start();
@@ -162,19 +105,20 @@ std::vector<sycl::event> Simulator::enqueue()
     // std::vector<sycl::event> dep_events = {};
     std::vector<sycl::event> dep_events = {this->initialize_vertices()};
     uint32_t t;
+    auto [compute_range, wg_range] = get_work_group_ranges();
+    q.wait();
     for (t = 0; t < Nt; t++)
     {
         if ((!(t % Nt_alloc)) && (t != 0))
         {
-            dep_events.push_back(read_reset_buffers(t, dep_events));
-            q.wait();
+            dep_events = (read_reset_buffers(t, dep_events));
         }
         dep_events = recover(t, dep_events);
         dep_events = infect(t, dep_events);
         q.wait();
     }
 
-    dep_events = read_end_buffers(t % Nt_alloc, dep_events);
+    dep_events = read_reset_buffers(t, dep_events);
     logger.log_end();
 
     return dep_events;
@@ -184,42 +128,7 @@ void Simulator::run()
 {
     auto dep_events = enqueue();
     write_to_files(dep_events);
-}
-
-sycl::event Simulator::initialize_vertices()
-{
-    uint32_t N_vertices = this->N_vertices;
-    float p_I0 = this->p_I0;
-    float p_R0 = this->p_R0;
-    auto [compute_range, wg_range] = get_work_group_ranges();
-    // sycl::event event;
-    auto event = q.submit([&](sycl::handler &h)
-                          {
-    h.depends_on(alloc_events);
-    // auto v_acc = sycl::accessor<SIR_State, 3, sycl::access_mode::write>(trajectory,h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0,0,0));
-    auto v_acc = trajectory.template get_access<sycl::access_mode::write>(h);
-    auto rng_acc =
-        rngs.template get_access<sycl::access::mode::read_write>(h);
-    h.parallel_for_work_group(compute_range, wg_range, [=](sycl::group<1> gr) {
-        gr.parallel_for_work_item([&](sycl::h_item<1> it)
-        {
-            auto sim_id = it.get_global_id(0);
-            auto lid = it.get_local_id(0);
-            for(int vertex_idx = 0; vertex_idx < N_vertices; vertex_idx++)
-            {
-            auto& rng = rng_acc[sim_id];
-            Static_RNG::bernoulli_distribution<float> bernoulli_I(p_I0);
-            Static_RNG::bernoulli_distribution<float> bernoulli_R(p_R0);
-            if (bernoulli_I(rng)) {
-                v_acc[sim_id][0][vertex_idx] = SIR_INDIVIDUAL_I;
-            } else if (bernoulli_R(rng)) {
-                v_acc[sim_id][0][vertex_idx] = SIR_INDIVIDUAL_R;
-            } else {
-                v_acc[sim_id][0][vertex_idx] = SIR_INDIVIDUAL_S;
-            }
-            }
-    }); }); });
-    return event;
+    q.wait();
 }
 
 std::tuple<sycl::range<1>, sycl::range<1>> Simulator::get_work_group_ranges() const
@@ -238,168 +147,6 @@ std::tuple<sycl::range<1>, sycl::range<1>> Simulator::get_work_group_ranges() co
     return std::make_tuple(sycl::range<1>(N_used_compute_units), sycl::range<1>(N_wg));
 }
 
-std::vector<sycl::event> Simulator::infect(uint32_t t, std::vector<sycl::event> &dep_event)
-{
-
-    auto [compute_range, wg_range] = get_work_group_ranges();
-    uint32_t N_connections = this->N_connections;
-    uint32_t N_edges = this->N_edges;
-    uint32_t N_vertices = this->N_vertices;
-    uint32_t N_sims = this->N_sims;
-    uint32_t t_alloc = t % Nt_alloc;
-    assert(N_vertices == 200);
-    // assert(N_sims == 8);
-    // assert(N_connections = 3);
-    assert(ecm.size() == N_edges);
-    assert(vcm.size() == N_vertices);
-    assert(p_Is.get_range()[0] == N_sims);
-    assert(p_Is.get_range()[1] == Nt);
-    assert(p_Is.get_range()[2] == N_connections);
-    assert(rngs.size() == N_sims);
-    assert(trajectory.get_range()[0] == N_sims);
-    // assert(trajectory.get_range()[1] == (Nt + 1));
-    assert(trajectory.get_range()[2] == N_vertices);
-    assert(events_to.get_range()[0] == N_sims);
-    // assert(events_to.get_range()[1] == Nt);
-    assert(events_to.get_range()[2] == N_connections);
-    assert(events_from.get_range()[0] == N_sims);
-    // assert(events_from.get_range()[1] == Nt);
-    assert(events_from.get_range()[2] == N_connections);
-    auto inf_event = q.submit([&](sycl::handler &h)
-                              {
-        h.depends_on(dep_event);
-        auto ecm_acc = ecm.template get_access<sycl::access::mode::read>(h);
-        auto p_I_acc_glob = sycl::accessor<float, 3, sycl::access::mode::read>(p_Is, h, sycl::range<3>(N_sims, 1, N_connections), sycl::range<3>(0, t, 0));
-        auto rng_acc_glob = rngs.template get_access<sycl::access::mode::read_write>(h);
-        sycl::accessor<SIR_State, 3, sycl::access_mode::write> v_glob_next(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0, t_alloc + 1, 0));
-        auto e_acc_0 = edge_to.template get_access<sycl::access::mode::read>(h);
-        auto e_acc_1 = edge_from.template get_access<sycl::access::mode::read>(h);
-        auto event_to_acc_glob = sycl::accessor<uint32_t, 3, sycl::access::mode::write>(events_to, h, sycl::range<3>(N_sims, 1, N_connections), sycl::range<3>(0, t_alloc, 0));
-        auto event_from_acc_glob = sycl::accessor<uint32_t, 3, sycl::access::mode::write>(events_from, h, sycl::range<3>(N_sims, 1, N_connections), sycl::range<3>(0, t_alloc, 0));
-        sycl::local_accessor<Static_RNG::default_rng> rng_acc(wg_range, h);
-        sycl::local_accessor<SIR_State, 2> v_prev(sycl::range<2>(wg_range[0], N_vertices), h);
-        sycl::local_accessor<SIR_State, 2> v_next(sycl::range<2>(wg_range[0], N_vertices), h);
-        sycl::local_accessor<float, 2> p_I_acc(sycl::range<2>(wg_range[0], N_connections), h);
-        sycl::local_accessor<uint32_t, 2> event_to_acc(sycl::range<2>(wg_range[0], N_connections), h);
-        sycl::local_accessor<uint32_t, 2> event_from_acc(sycl::range<2>(wg_range[0], N_connections), h);
-        auto local_mem_size_used = rng_acc.byte_size() + v_prev.byte_size() + v_next.byte_size() + p_I_acc.byte_size() + event_to_acc.byte_size() + event_from_acc.byte_size();
-        auto lms = this->local_mem_size();
-        assert(local_mem_size_used < lms);
-        sycl::stream out(1024*10, 256, h);
-        h.parallel_for_work_group(compute_range, wg_range, [=](sycl::group<1> gr)
-                                  {
-                                    // Copy to local accessor
-                                    gr.parallel_for_work_item([&](sycl::h_item<1> it)
-                                    {
-                                        auto sim_id = it.get_global_id(0);
-                                        auto lid = it.get_local_id(0);
-                                        for (int v_idx = 0; v_idx < N_vertices; v_idx++)
-                                        {
-                                            v_prev[lid][v_idx] = v_glob_next[sim_id][0][v_idx];
-                                            v_next[lid][v_idx] = v_glob_next[sim_id][0][v_idx];
-                                        }
-                                        for(int i = 0; i < N_connections; i++)
-                                        {
-                                            p_I_acc[lid][i] = p_I_acc_glob[sim_id][0][i];
-                                            event_from_acc[lid][i] = 0;
-                                            event_to_acc[lid][i] = 0;
-                                        }
-                                        rng_acc[lid] = rng_acc_glob[sim_id];
-                                    });
-
-                                    gr.parallel_for_work_item([&](sycl::h_item<1> it)
-                                                                  {
-                                        auto sim_id = it.get_global_id(0);
-                                        auto lid = it.get_local_id(0);
-                                        uint32_t N_inf = 0;
-                                          for (uint32_t edge_idx = 0; edge_idx < N_edges; edge_idx++)
-                                          {
-                                            auto connection_id = ecm_acc[edge_idx];
-                                            auto v_from_id = e_acc_0[edge_idx];
-                                            auto v_to_id = e_acc_1[edge_idx];
-                                            const auto v_prev_from = v_prev[lid][v_from_id];
-                                            const auto v_prev_to = v_prev[lid][v_to_id];
-
-
-                                              if ((v_prev_from == SIR_INDIVIDUAL_S) && (v_prev_to == SIR_INDIVIDUAL_I))
-                                              {
-                                                  float p_I = p_I_acc[lid][connection_id];
-                                                  Static_RNG::bernoulli_distribution<float> bernoulli_I(p_I);
-                                                  auto &rng = rng_acc[lid];
-                                                  bernoulli_I.p = p_I;
-                                                  if (bernoulli_I(rng))
-                                                  {
-                                                    // if (sim_id == 0)
-                                                    // {
-                                                    //     out << "infection from " << e_acc_0[edge_idx] << " to " << e_acc_1[edge_idx] << sycl::endl;
-                                                    // }
-                                                        N_inf++;
-                                                      v_next[lid][v_from_id] = SIR_INDIVIDUAL_I;
-                                                      event_to_acc[lid][connection_id]++;
-                                                  }
-                                              }
-                                              else if ((v_prev_from == SIR_INDIVIDUAL_I) && (v_prev_to == SIR_INDIVIDUAL_S))
-                                              {
-                                                  float p_I = p_I_acc[lid][ecm_acc[edge_idx]];
-                                                  Static_RNG::bernoulli_distribution<float> bernoulli_I(p_I);
-                                                  auto &rng = rng_acc[lid];
-                                                  bernoulli_I.p = p_I;
-                                                  if (bernoulli_I(rng))
-                                                  {
-
-                                                    // if (sim_id == 0)
-                                                    // {
-                                                    //     out << "infection from " << e_acc_1[edge_idx] << " to " << e_acc_0[edge_idx] << sycl::endl;
-                                                    // }
-                                                    N_inf++;
-                                                      v_next[lid][v_to_id] = SIR_INDIVIDUAL_I;
-                                                      event_from_acc[lid][connection_id]++;
-                                                  }
-                                              }
-
-                                          }
-                                          out << "N_inf for sim " << sim_id << ":\t" << N_inf << sycl::endl;
-                                           });
-                                    gr.parallel_for_work_item([&](sycl::h_item<1> it)
-                                                                  {
-                                        auto sim_id = it.get_global_id(0);
-                                        auto lid = it.get_local_id(0);
-                                        for(int v_idx = 0; v_idx < N_vertices; v_idx++)
-                                        {
-                                            v_glob_next[sim_id][0][v_idx] = v_next[lid][v_idx];
-
-                                        }
-                                        for(int i = 0; i < N_connections; i++)
-                                        {
-                                            event_from_acc_glob[sim_id][0][i] = event_from_acc[lid][i];
-                                            event_to_acc_glob[sim_id][0][i] = event_to_acc[lid][i];
-                                        }
-                                        rng_acc_glob[sim_id] = rng_acc[lid];
-                                                                  });
-
-
-                                           }); });
-
-    // const auto vertex_trajectory = vector_remap(read_buffer<SIR_State, 3>(trajectory, q, ev), N_sims, Nt + 1, N_vertices);
-    // if (t > 0)
-    // {
-    //     std::for_each(vertex_trajectory.begin(), vertex_trajectory.end(), [&](const auto &v)
-    //                   {
-    //     for (int i = 0; i < t; i++)
-    //     {
-    //         std::vector<std::pair<SIR_State, SIR_State>> comp(N_vertices);
-    //         for (int v_idx = 0; v_idx < N_vertices; v_idx++)
-    //         {
-    //             comp[v_idx] = std::make_pair(v[i][v_idx], v[i + 1][v_idx]);
-    //         }
-    //         assert(!std::all_of(comp.begin(), comp.end(), [&](const auto &vp)
-    //                             { return vp.first != vp.second; }));
-    //     } });
-    // }
-    std::cout << "Timestep " << t << " done\n";
-    return {inf_event};
-}
-
 std::size_t Simulator::local_mem_size() const
 {
     auto device = q.get_device();
@@ -407,41 +154,11 @@ std::size_t Simulator::local_mem_size() const
     return max_local_mem_size;
 }
 
-sycl::event Simulator::accumulate_community_state(std::vector<sycl::event> &events, uint32_t t_max)
-{
-    uint32_t t_end = std::min({this->Nt_alloc, t_max});
-    uint32_t N_vertices = this->N_vertices;
-    auto [compute_range, wg_range] = get_work_group_ranges();
-    return q.submit([&](sycl::handler &h)
-                    {
-                h.depends_on(events);
-        auto v_acc = trajectory.template get_access<sycl::access::mode::read>(h);
-        auto state_acc = community_state.template get_access<sycl::access::mode::read_write>(h);
-        auto vcm_acc = vcm.template get_access<sycl::access::mode::read>(h);
-        h.parallel_for_work_group(compute_range, wg_range, [=](sycl::group<1> gr)
-        {
-            gr.parallel_for_work_item([&](sycl::h_item<1> it)
-            {
-                auto sim_id = it.get_global_id(0);
-                auto lid = it.get_local_id(0);
-                for(int t = 0; t < t_end + 1; t++)
-                {
-                    for(int v_idx = 0; v_idx < N_vertices; v_idx++)
-                    {
-                        auto c_idx = vcm_acc[v_idx];
-                        auto v_state = v_acc[sim_id][t][v_idx];
-                        state_acc[sim_id][t][c_idx][v_state]++;
-                    }
-                }
-            });
-        }); });
-}
-
 std::vector<std::vector<std::vector<uint32_t>>> Simulator::sample_from_connection_events(const std::vector<std::vector<std::vector<State_t>>> &community_state,
                                                                                          const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
                                                                                          const std::vector<std::vector<std::vector<uint32_t>>> &to_events)
 {
-    std::vector<std::vector<std::vector<uint32_t>>> infections = std::vector<std::vector<std::vector<uint32_t>>>(N_sims, std::vector<std::vector<uint32_t>>(Nt, std::vector<uint32_t>(N_connections)));
+    std::vector<std::vector<std::vector<uint32_t>>> infections = std::vector<std::vector<std::vector<uint32_t>>>(N_sims, std::vector<std::vector<uint32_t>>(N_connections, std::vector<uint32_t>(Nt)));
 
     std::vector<std::tuple<std::vector<std::vector<State_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>>> sim_data(N_sims);
 
@@ -459,103 +176,86 @@ std::vector<std::vector<std::vector<uint32_t>>> Simulator::sample_from_connectio
     return infections;
 }
 
-std::vector<sycl::event> Simulator::read_end_buffers(uint32_t t, std::vector<sycl::event> &dep_events)
+auto merge(const std::vector<std::vector<std::vector<uint32_t>>>& t0, const std::vector<std::vector<std::vector<uint32_t>>>& t1)
 {
-    std::vector<sycl::event> read_events(4);
-    auto t_end = t % Nt_alloc + 1;
-    read_events[0] = accumulate_community_state(dep_events, t_end);
-    uint32_t event_offset = (t - Nt_alloc) * N_sims * N_connections;
-    // return sycl::event{};
-    read_events[0] = q.submit([&](sycl::handler& h)
-    {
-        h.depends_on(dep_events);
-        auto acc = sycl::accessor<SIR_State, 3, sycl::access::mode::read>(trajectory, h, sycl::range<3>(N_sims, t_end+1, N_vertices), sycl::range<3>(0,0,0));
-        h.copy(acc, &community_state_flat[event_offset]);
-    });
+    auto N_sims = t0.size();
+    auto Nt = t0[0].size();
+    auto N_cols = t0[0][0].size();
 
-    read_events[1] = q.submit([&](sycl::handler& h)
+    std::vector<std::vector<std::vector<uint32_t>>> merged(t0.size(), std::vector<std::vector<uint32_t>>(t0[0].size(), std::vector<uint32_t>(2*t0[0][0].size())));
+    for(int sim_idx = 0; sim_idx < N_sims; sim_idx++)
     {
-        h.depends_on(dep_events);
-        auto acc = sycl::accessor<uint32_t, 3, sycl::access::mode::read>(events_from, h, sycl::range<3>(N_sims, t_end, N_connections), sycl::range<3>(0,0,0));
-        h.copy(acc, &events_from_flat[event_offset]);
-    });
+        for(int t = 0; t < Nt; t++)
+        {
+            for(int col = 0; col < N_cols; col++)
+            {
+                merged[sim_idx][t][2*col] = t0[sim_idx][t][col];
+                merged[sim_idx][t][2*col+1] = t1[sim_idx][t][col];
+            }
+        }
+    }
+    return merged;
 
-    read_events[2] = q.submit([&](sycl::handler& h)
-    {
-        h.depends_on(dep_events);
-        auto acc = sycl::accessor<uint32_t, 3, sycl::access::mode::read>(events_to, h, sycl::range<3>(N_sims, t_end, N_connections), sycl::range<3>(0,0,0));
-        h.copy(acc, &events_to_flat[event_offset]);
-    });
-    read_events.insert(read_events.end(), dep_events.begin(), dep_events.end());
-    return read_events;
 }
 
-sycl::event Simulator::read_reset_buffers(uint32_t t, std::vector<sycl::event> &dep_events)
+void events_to_file(const std::vector<std::vector<std::vector<uint32_t>>>& e_to, const std::vector<std::vector<std::vector<uint32_t>>>& e_from, const std::string& abs_fname)
 {
-    std::vector<sycl::event> read_events(4);
-    read_events[0] = accumulate_community_state(dep_events, Nt_alloc);
-    uint32_t event_offset = (t - Nt_alloc) * N_sims * N_connections;
-    auto t_end = Nt % Nt_alloc;
-    uint32_t Nt_alloc = this->Nt_alloc;
-    // return sycl::event{};
-    read_events[1] = read_buffer<State_t, 3>(community_state, q, &community_state_flat[event_offset], dep_events);
-    read_events[2] = read_buffer<uint32_t, 3>(events_from, q, &events_from_flat[event_offset], dep_events);
-    read_events[3] = read_buffer<uint32_t, 3>(events_to, q, &events_to_flat[event_offset], dep_events);
-    read_events.insert(read_events.end(), dep_events.begin(), dep_events.end());
-    return q.submit([&](sycl::handler &h)
-                    {
-        h.depends_on(read_events);
-        sycl::accessor<SIR_State, 3, sycl::access::mode::read> v_end(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0,t_end + 1,0));
-        sycl::accessor<SIR_State, 3, sycl::access::mode::write> v_start(trajectory, h, sycl::range<3>(N_sims, 1, N_vertices), sycl::range<3>(0,0,0));
-        h.copy(v_end, v_start); });
+    auto merged = merge(e_to, e_from);
+    std::ofstream f;
+    std::for_each(merged.begin(), merged.end(), [&, n = 0](const auto& sim_ts) mutable
+                  {
+        f.open(abs_fname + "_" + std::to_string(n) + ".csv");
+        std::for_each(sim_ts.begin(), sim_ts.end(), [&](const auto& v)
+                      {
+            std::for_each(v.begin(), v.end(), [&](const auto& e)
+                          {
+                f << e << ",";
+            });
+            f << "\n";
+        });
+        f.close();
+        n++;
+    });
 }
+void timeseries_to_file(const std::vector<std::vector<std::vector<State_t>>>& ts, const std::string& abs_fname)
+{
+    std::ofstream f;
+    std::for_each(ts.begin(), ts.end(), [&, n = 0](const auto& sim_ts) mutable
+                  {
+        f.open(abs_fname + "_" + std::to_string(n) + ".csv");
+        std::for_each(sim_ts.begin(), sim_ts.end(), [&](const auto& v)
+                      {
+            std::for_each(v.begin(), v.end(), [&](const auto& e)
+                          {
+                f << e[0] << "," << e[1] << "," << e[2] << ",";
+            });
+            f << "\n";
+        });
+        f.close();
+        n++;
+    });
+}
+
+
 
 void Simulator::write_to_files(std::vector<sycl::event> &dep_events)
 {
     logger.profile_events(dep_events);
 
+    timeseries_to_file(community_timeseries, output_dir + "/community_trajectory");
+    events_to_file(events_to_timeseries, events_from_timeseries, output_dir + "/connection_events");
+
     logger.profile_f << "Sampling infections\n";
     logger.log_start();
-    auto community_state = vector_remap(community_state_flat, N_sims, Nt + 1, N_communities);
-    auto events_from_vec = vector_remap(events_from_flat, N_sims, Nt, N_connections);
-    auto events_to_vec = vector_remap(events_to_flat, N_sims, Nt, N_connections);
-    auto infections = sample_from_connection_events(community_state, events_from_vec, events_to_vec);
+    auto infections = sample_from_connection_events(community_timeseries, events_from_timeseries, events_to_timeseries);
     logger.log_end();
     logger.profile_f << "Writing to files\n";
 
     logger.log_start();
     std::filesystem::create_directories(output_dir);
-    std::ofstream community_traj_f;
-    std::ofstream connection_events_f;
-    std::ofstream connection_infections_f;
 
-    for (int sim_id = 0; sim_id < N_sims; sim_id++)
-    {
 
-        community_traj_f.open(output_dir + "community_trajectory_" +
-                              std::to_string(sim_id) + ".csv");
-        std::for_each(community_state[sim_id].begin(), community_state[sim_id].end(),
-                      [&](auto &community_trajectory_i)
-                      {
-                          linewrite(community_traj_f, community_trajectory_i);
-                      });
-        community_traj_f.close();
 
-        connection_events_f.open(output_dir + "connection_events_" +
-                                 std::to_string(sim_id) + ".csv");
-        for (int t = 0; t < Nt; t++)
-        {
-            std::vector<std::vector<uint32_t>> connection_pair = {{events_from_vec[sim_id][t], events_to_vec[sim_id][t]}};
-            auto connections = merge_vectors(connection_pair);
-            linewrite(connection_events_f, connections);
-        }
-        connection_events_f.close();
-        connection_infections_f.open(output_dir + "connection_infections_" +
-                                     std::to_string(sim_id) + ".csv");
-
-        std::for_each(infections[sim_id].begin(), infections[sim_id].end(), [&](auto &infections_i)
-                      { linewrite(connection_infections_f, infections_i); });
-    }
     logger.log_end();
 }
 uint32_t Simulator::get_work_group_size() const
@@ -595,15 +295,15 @@ Simulator make_SIR_simulation(sycl::queue &q, const Sim_Param &p, const std::vec
     std::transform(seeds.begin(), seeds.end(), std::back_inserter(rng_init), [](auto &seed)
                    { return Static_RNG::default_rng(seed); });
 
-    auto p_Is = sycl::buffer<float, 3>(sycl::range<3>(p.N_sims, p.Nt, N_connections));
+    auto p_Is = sycl::buffer<float, 3>(sycl::range<3>(p.Nt, p.N_sims, N_connections));
     auto edge_from = sycl::buffer<uint32_t>(sycl::range<1>(edge_from_init.size()));
     auto edge_to = sycl::buffer<uint32_t>(sycl::range<1>(edge_to_init.size()));
     auto ecm = sycl::buffer<uint32_t>(sycl::range<1>(ecm_init.size()));
     auto vcm = sycl::buffer<uint32_t>(sycl::range<1>(vcm_init.size()));
-    auto community_state = sycl::buffer<State_t, 3>(sycl::range<3>(p.N_sims, p.Nt_alloc + 1, p.N_communities));
-    auto trajectory = sycl::buffer<SIR_State, 3>(sycl::range<3>(p.N_sims, p.Nt_alloc + 1, N_vertices));
-    auto events_from = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.N_sims, p.Nt_alloc, N_connections));
-    auto events_to = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.N_sims, p.Nt_alloc, N_connections));
+    auto community_state = sycl::buffer<State_t, 3>(sycl::range<3>(p.Nt_alloc + 1, p.N_sims, p.N_communities));
+    auto trajectory = sycl::buffer<SIR_State, 3>(sycl::range<3>(p.Nt_alloc + 1, p.N_sims, N_vertices));
+    auto events_from = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.Nt_alloc, p.N_sims, N_connections));
+    auto events_to = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.Nt_alloc, p.N_sims, N_connections));
     auto rngs = sycl::buffer<Static_RNG::default_rng>(sycl::range<1>(rng_init.size()));
 
     std::vector<sycl::event> alloc_events(10);

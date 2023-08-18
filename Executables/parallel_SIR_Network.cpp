@@ -6,7 +6,22 @@
 #include <Sycl_Graph/Simulation.hpp>
 #include <Sycl_Graph/Profiling.hpp>
 #include <Sycl_Graph/Graph.hpp>
-#include <Sycl_Graph/Buffer_Utils.hpp>
+template <typename T>
+std::vector<T> merge_vectors(const std::vector<std::vector<T>> &vectors)
+{
+    std::vector<T> merged;
+    uint32_t size = 0;
+    for(int i = 0; i < vectors.size(); i++)
+    {
+        size += vectors[i].size();
+    }
+    merged.reserve(size);
+    for (auto &v : vectors)
+    {
+        merged.insert(merged.end(), v.begin(), v.end());
+    }
+    return merged;
+}
 
 int main()
 {
@@ -21,19 +36,20 @@ int main()
     p.p_R0 = 0.0f;
     p.p_I0 = 0.1f;
     p.p_R = 1e-1f;
-    p.Nt = 8;
+    p.Nt = 20;
     p.Nt_alloc = 4;
     sycl::queue q(sycl::cpu_selector_v, {cl::sycl::property::queue::enable_profiling{}});
     auto device_info = get_device_info(q);
     device_info.print();
 
     // p.N_sims = device_info.max_compute_units*device_info.max_work_group_size;
-    p.N_sims = 1;
+    p.N_sims = 2;
     p.output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_0/";
     uint32_t seed = 238;
 
-    float p_I_min = 1e-5f;
-    float p_I_max = 1e-3f;
+
+    float p_I_min = 1e-4f;
+    float p_I_max = 1e-2f;
 
     auto [edge_lists, vertex_lists] = generate_planted_SBM_edges(N_pop, N_communities, p.p_in, p.p_out, seed);
 
