@@ -32,10 +32,13 @@ struct Sim_Param
     float p_R0 = .0f;
     float p_I0;
     float p_R;
+    float p_I_min = 0.0f;
+    float p_I_max = 0.0f;
     uint32_t Nt_alloc = 2;
     uint32_t N_threads = 1024;
     uint32_t seed = 238;
     uint32_t max_infection_samples = 1000;
+    std::size_t N_vertices() const {return N_communities * N_pop;}
     std::string output_dir;
 };
 

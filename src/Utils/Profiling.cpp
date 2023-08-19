@@ -1,4 +1,4 @@
-#include <Sycl_Graph/Profiling.hpp>
+#include <Sycl_Graph/Utils/Profiling.hpp>
 #include <CL/sycl.hpp>
 #include <iostream>
 #include <algorithm>

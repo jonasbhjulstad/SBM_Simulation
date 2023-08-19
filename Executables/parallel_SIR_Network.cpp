@@ -2,9 +2,9 @@
 //enable tbb debug
 #define TBB_USE_DEBUG 1
 
-#include <Sycl_Graph/path_config.hpp>
-#include <Sycl_Graph/Simulation.hpp>
-#include <Sycl_Graph/Profiling.hpp>
+#include <Sycl_Graph/Utils/path_config.hpp>
+#include <Sycl_Graph/Simulation/Sim_Routines.hpp>
+#include <Sycl_Graph/Utils/Profiling.hpp>
 #include <Sycl_Graph/Graph.hpp>
 template <typename T>
 std::vector<T> merge_vectors(const std::vector<std::vector<T>> &vectors)
@@ -38,7 +38,9 @@ int main()
     p.p_R = 1e-1f;
     p.Nt = 20;
     p.Nt_alloc = 4;
-    sycl::queue q(sycl::cpu_selector_v, {cl::sycl::property::queue::enable_profiling{}});
+    p.p_I_max = 1e-2f;
+    p.p_I_min = 1e-4f;
+        sycl::queue q(sycl::cpu_selector_v, {cl::sycl::property::queue::enable_profiling{}});
     auto device_info = get_device_info(q);
     device_info.print();
 
@@ -47,17 +49,13 @@ int main()
     p.output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Graph_0/";
     uint32_t seed = 238;
 
-
-    float p_I_min = 1e-4f;
-    float p_I_max = 1e-2f;
-
     auto [edge_lists, vertex_lists] = generate_planted_SBM_edges(N_pop, N_communities, p.p_in, p.p_out, seed);
 
     auto vcm = create_vcm(vertex_lists);
 
     auto edge_list_flat = merge_vectors(edge_lists);
 
-    auto sim = make_SIR_simulation(q, p, edge_list_flat, vcm, p_I_min, p_I_max);
-    sim.run();
+
+    auto buffers = Sim_Buffers::make(q, p, edge_list_flat, vcm);
     return 0;
 }

@@ -5,8 +5,8 @@
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Graph.hpp>
 #include <Sycl_Graph/Regression.hpp>
-#include <Sycl_Graph/Simulation.hpp>
-#include <Sycl_Graph/Profiling.hpp>
+#include <Sycl_Graph/Simulation/Simulation.hpp>
+#include <Sycl_Graph/Utils/Profiling.hpp>
 namespace py = pybind11;
 
 sycl::queue create_sycl_device_queue(std::string device_type, uint32_t index = 0)

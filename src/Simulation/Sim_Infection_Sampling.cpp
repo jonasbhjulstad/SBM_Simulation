@@ -1,5 +1,6 @@
-#include <Sycl_Graph/Buffer_Utils.hpp>
-#include <Sycl_Graph/SIR_Infection_Sampling.hpp>
+
+#include <Sycl_Graph/Simulation/Sim_Infection_Sampling.hpp>
+#include <Sycl_Graph/Utils/Buffer_Utils.hpp>
 #include <algorithm>
 #include <iostream>
 #include <random>
@@ -231,4 +232,33 @@ std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vect
                    { return sample_timestep_infections(std::get<0>(z), std::get<1>(z), std::get<2>(z), ccm, ccm_weights, N_connections, std::get<3>(z), max_infection_samples); });
 
     return sampled_infections;
+}
+
+
+std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(const std::vector<std::vector<std::vector<State_t>>> &community_state,
+                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
+                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &to_events,
+                                                                                        const std::vector<uint32_t>& ccm,
+                                                                                        const std::vector<uint32_t>& ccm_weights,
+                                                                                        uint32_t seed, uint32_t max_infection_samples)
+{
+    uint32_t Nt = from_events.size();
+    uint32_t N_sims = from_events[0].size();
+    uint32_t N_connections = from_events[0][0].size();
+    std::vector<std::vector<std::vector<uint32_t>>> infections = std::vector<std::vector<std::vector<uint32_t>>>(N_sims, std::vector<std::vector<uint32_t>>(N_connections, std::vector<uint32_t>(Nt)));
+
+    std::vector<std::tuple<std::vector<std::vector<State_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>>> sim_data(N_sims);
+
+    for (int sim_idx = 0; sim_idx < N_sims; sim_idx++)
+    {
+        sim_data[sim_idx] = std::make_tuple(community_state[sim_idx], from_events[sim_idx], to_events[sim_idx]);
+    }
+    std::transform(std::execution::par_unseq, sim_data.begin(), sim_data.end(), infections.begin(), [&](const auto &sim_d)
+                   {
+        const auto& sim_community_state = std::get<0>(sim_d);
+        const auto& sim_from_events = std::get<1>(sim_d);
+        const auto& sim_to_events = std::get<2>(sim_d);
+        return sample_infections(sim_community_state, sim_from_events, sim_to_events, ccm, ccm_weights, seed, max_infection_samples); });
+
+    return infections;
 }

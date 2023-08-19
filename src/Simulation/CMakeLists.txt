@@ -1,0 +1,11 @@
+add_custom_library(Sim_Buffer_Routines)
+add_custom_library(Sim_Write)
+add_custom_library(Sim_Buffers)
+
+add_custom_library(Sim_Data)
+
+
+add_custom_library(Sim_Infection_Sampling)
+target_link_libraries(Sim_Infection_Sampling PRIVATE Buffer_Utils)
+add_custom_library(Sim_Routines)
+target_link_libraries(Sim_Routines PRIVATE Sim_Write Sim_Buffer_Routines Sim_Buffers Dynamics Sim_Infection_Sampling Buffer_Utils Sim_Data Vector_Remap)

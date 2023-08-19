@@ -1,4 +1,4 @@
-#include "Sycl_Graph/Buffer_Utils_impl.hpp"
+#include "Sycl_Graph/Utils/Buffer_Utils_impl.hpp"
 #include <random>
 #include <execution>
 void linewrite(std::ofstream &file, const std::vector<uint32_t> &state_iter)
@@ -156,7 +156,15 @@ std::vector<std::vector<std::vector<float>>> generate_floats(uint32_t N0, uint32
     });
     return p_Is;
 }
-
+std::tuple<sycl::range<1>, sycl::range<1>> sim_ranges(sycl::queue& q, uint32_t N_sims)
+{
+    auto device = q.get_device();
+    auto max_wg_size = device.get_info<sycl::info::device::max_work_group_size>();
+    double d_sims = N_sims;
+    double d_max_wg_size = max_wg_size;
+    auto N_compute_units = static_cast<uint32_t>(std::ceil(d_sims / d_max_wg_size));
+    return std::make_tuple(sycl::range<1>(N_compute_units), sycl::range<1>(max_wg_size));
+}
 
 // template std::vector<uint32_t> merge_vectors(const std::vector<std::vector<uint32_t>>&);
 // template std::vector<int> merge_vectors(const std::vector<std::vector<int>>&);

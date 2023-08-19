@@ -65,7 +65,7 @@ file(MAKE_DIRECTORY ${SYCL_GRAPH_DATA_DIR}/SIR_sim)
 
 
 
-configure_file("${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.hpp.in" "${PROJECT_SOURCE_DIR}/include/Sycl_Graph/path_config.hpp")
+configure_file("${PROJECT_SOURCE_DIR}/include/Sycl_Graph/Utils/path_config.hpp.in" "${PROJECT_SOURCE_DIR}/include/Sycl_Graph/Utils/path_config.hpp")
 
 add_compile_options("-fcolor-diagnostics")
 add_subdirectory(src)
