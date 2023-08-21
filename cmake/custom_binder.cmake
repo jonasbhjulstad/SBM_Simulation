@@ -12,7 +12,7 @@ endfunction()
 
 function(add_custom_library source_file)
     add_library(${source_file} STATIC "${source_file}.cpp")
-    target_link_libraries(${source_file} PUBLIC Static_RNG::Static_RNG TBB::tbb Eigen3::Eigen)
+    # target_link_libraries(${source_file} PUBLIC Static_RNG::Static_RNG TBB::tbb Eigen3::Eigen)
     target_compile_options(${source_file} PUBLIC -fsycl ${SYCL_CUSTOM_FLAGS})
     target_compile_options(${source_file} PUBLIC ${DEFAULT_WARNING_FLAGS})
     target_include_directories(${source_file} PUBLIC ${SYCL_GRAPH_INCLUDE_DIR})

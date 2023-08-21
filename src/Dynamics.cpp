@@ -1,9 +1,7 @@
-#ifndef DYNAMICS_HPP
-#define DYNAMICS_HPP
 
+#include <Sycl_Graph/Dynamics.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
 #include <Sycl_Graph/Utils/Buffer_Validation.hpp>
-#include <Sycl_Graph/Dynamics.hpp>
 
 std::vector<sycl::event> recover(sycl::queue &q,
                                  const Sim_Param &p,
@@ -15,18 +13,19 @@ std::vector<sycl::event> recover(sycl::queue &q,
     float p_R = p.p_R;
     uint32_t N_vertices = p.N_pop * p.N_communities;
     uint32_t N_sims = p.N_sims;
-    auto [compute_range, wg_range] = sim_ranges(q, p.N_sims);
+    auto Nt_alloc = vertex_state.get_range()[0]-1;
+    auto t_alloc = t % Nt_alloc;
     auto event = q.submit([&](sycl::handler &h)
                           {
     h.depends_on(dep_event);
     auto rng_acc_glob = rngs.template get_access<sycl::access_mode::read_write>(h);
     auto v_glob_prev = construct_validate_accessor<SIR_State, 3, sycl::access_mode::read>(vertex_state, h, sycl::range<3>(1, N_sims, N_vertices), sycl::range<3>(t_alloc, 0, 0));
     auto v_glob_next = construct_validate_accessor<SIR_State, 3, sycl::access_mode::write>(vertex_state, h, sycl::range<3>(1, N_sims, N_vertices), sycl::range<3>(t_alloc + 1, 0, 0));
-    sycl::local_accessor<Static_RNG::default_rng> rng_acc(wg_range, h);
-    sycl::local_accessor<SIR_State, 2> v_prev(sycl::range<2>(wg_range[0], N_vertices), h);
-    sycl::local_accessor<SIR_State, 2> v_next(sycl::range<2>(wg_range[0], N_vertices), h);
+    sycl::local_accessor<Static_RNG::default_rng> rng_acc(p.wg_range, h);
+    sycl::local_accessor<SIR_State, 2> v_prev(sycl::range<2>(p.wg_range[0], N_vertices), h);
+    sycl::local_accessor<SIR_State, 2> v_next(sycl::range<2>(p.wg_range[0], N_vertices), h);
 
-    h.parallel_for_work_group(compute_range, wg_range, [=](sycl::group<1> gr)
+    h.parallel_for_work_group(p.compute_range, p.wg_range, [=](sycl::group<1> gr)
     {
         gr.parallel_for_work_item([&](sycl::h_item<1> it)
         {
@@ -78,14 +77,14 @@ sycl::buffer<Static_RNG::default_rng> &rngs)
     uint32_t N_vertices = p.N_pop * p.N_communities;
     float p_I0 = p.p_I0;
     float p_R0 = p.p_R0;
-    auto [compute_range, wg_range] = sim_ranges(q, p.N_sims);
-    std::vector<sycl::event> init_events(3);
-    init_events[0] = q.submit([&](sycl::handler &h)
+
+    auto buf_size = vertex_state.get_range()[1]*vertex_state.get_range()[2]*sizeof(SIR_State) + rngs.byte_size();
+    auto init_event = q.submit([&](sycl::handler &h)
                               {
-    auto v_acc = vertex_state.template get_access<sycl::access_mode::write>(h);
+    auto v_acc = construct_validate_accessor<SIR_State, 3, sycl::access::mode::write>(vertex_state, h, sycl::range<3>(1, p.N_sims, N_vertices), sycl::range<3>(0, 0, 0));
     auto rng_acc =
         rngs.template get_access<sycl::access::mode::read_write>(h);
-    h.parallel_for_work_group(compute_range, wg_range, [=](sycl::group<1> gr) {
+    h.parallel_for_work_group(p.compute_range, p.wg_range, [=](sycl::group<1> gr) {
         gr.parallel_for_work_item([&](sycl::h_item<1> it)
         {
             auto sim_id = it.get_global_id(0);
@@ -105,7 +104,7 @@ sycl::buffer<Static_RNG::default_rng> &rngs)
             }
     }); }); });
 
-    return init_events[2];
+    return init_event;
 }
 
 std::vector<sycl::event> infect(sycl::queue &q,
@@ -115,13 +114,12 @@ std::vector<sycl::event> infect(sycl::queue &q,
                                            std::vector<sycl::event> &dep_event)
 {
 
-    auto [compute_range, wg_range] = sim_ranges();
     uint32_t N_connections = b.events_from.get_range()[2];
     uint32_t N_edges = b.ecm.size();
-    uint32_t N_vertices = N_vertices;
+    uint32_t N_vertices = p.N_communities*p.N_pop;
     uint32_t N_sims = p.N_sims;
     uint32_t t_alloc = t % p.Nt_alloc;
-    uint32_t Nt = b.vertex_state.get_range()[0]-1;
+    uint32_t Nt = p.Nt;
     assert(N_vertices == 200);
     assert(b.ecm.size() == N_edges);
     assert(b.vcm.size() == N_vertices);
@@ -132,10 +130,10 @@ std::vector<sycl::event> infect(sycl::queue &q,
     assert(b.vertex_state.get_range()[1] == N_sims);
     assert(b.vertex_state.get_range()[2] == N_vertices);
     assert(b.events_to.get_range()[1] == N_sims);
-    // assert(events_to.get_range()[1] == Nt);
+    assert(b.events_to.get_range()[0] == p.Nt_alloc);
     assert(b.events_to.get_range()[2] == N_connections);
     assert(b.events_from.get_range()[1] == N_sims);
-    // assert(events_from.get_range()[1] == Nt);
+    assert(b.events_from.get_range()[0] == p.Nt_alloc);
     assert(b.events_from.get_range()[2] == N_connections);
     auto inf_event = q.submit([&](sycl::handler &h)
                               {
@@ -148,17 +146,14 @@ std::vector<sycl::event> infect(sycl::queue &q,
         auto e_acc_1 = b.edge_from.template get_access<sycl::access::mode::read>(h);
         auto event_to_acc_glob = construct_validate_accessor<uint32_t, 3, sycl::access::mode::write>(b.events_to, h, sycl::range<3>(1, N_sims, N_connections), sycl::range<3>(t_alloc, 0, 0));
         auto event_from_acc_glob = construct_validate_accessor<uint32_t, 3, sycl::access::mode::write>(b.events_from, h, sycl::range<3>(1, N_sims, N_connections), sycl::range<3>(t_alloc, 0, 0));
-        sycl::local_accessor<Static_RNG::default_rng> rng_acc(wg_range, h);
-        sycl::local_accessor<SIR_State, 2> v_prev(sycl::range<2>(wg_range[0], N_vertices), h);
-        sycl::local_accessor<SIR_State, 2> v_next(sycl::range<2>(wg_range[0], N_vertices), h);
-        sycl::local_accessor<float, 2> p_I_acc(sycl::range<2>(wg_range[0], N_connections), h);
-        sycl::local_accessor<uint32_t, 2> event_to_acc(sycl::range<2>(wg_range[0], N_connections), h);
-        sycl::local_accessor<uint32_t, 2> event_from_acc(sycl::range<2>(wg_range[0], N_connections), h);
+        sycl::local_accessor<Static_RNG::default_rng> rng_acc(p.wg_range, h);
+        sycl::local_accessor<SIR_State, 2> v_prev(sycl::range<2>(p.wg_range[0], N_vertices), h);
+        sycl::local_accessor<SIR_State, 2> v_next(sycl::range<2>(p.wg_range[0], N_vertices), h);
+        sycl::local_accessor<float, 2> p_I_acc(sycl::range<2>(p.wg_range[0], N_connections), h);
+        sycl::local_accessor<uint32_t, 2> event_to_acc(sycl::range<2>(p.wg_range[0], N_connections), h);
+        sycl::local_accessor<uint32_t, 2> event_from_acc(sycl::range<2>(p.wg_range[0], N_connections), h);
         auto local_mem_size_used = rng_acc.byte_size() + v_prev.byte_size() + v_next.byte_size() + p_I_acc.byte_size() + event_to_acc.byte_size() + event_from_acc.byte_size();
-        // auto lms = this->local_mem_size();
-        assert(local_mem_size_used < lms);
-        sycl::stream out(1024*10, 256, h);
-        h.parallel_for_work_group(compute_range, wg_range, [=](sycl::group<1> gr)
+        h.parallel_for_work_group(p.compute_range, p.wg_range, [=](sycl::group<1> gr)
                                   {
                                     // Copy to local accessor
                                     gr.parallel_for_work_item([&](sycl::h_item<1> it)
@@ -222,7 +217,6 @@ std::vector<sycl::event> infect(sycl::queue &q,
                                               }
 
                                           }
-                                          out << "N_inf for sim " << sim_id << ":\t" << N_inf << sycl::endl;
                                            });
                                     gr.parallel_for_work_item([&](sycl::h_item<1> it)
                                                                   {
@@ -247,5 +241,3 @@ std::vector<sycl::event> infect(sycl::queue &q,
     std::cout << "Timestep " << t << " done\n";
     return {inf_event};
 }
-
-#endif

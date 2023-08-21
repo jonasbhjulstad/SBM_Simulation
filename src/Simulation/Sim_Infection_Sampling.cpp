@@ -190,18 +190,16 @@ std::vector<std::vector<int>> get_delta_Is(const std::vector<std::vector<State_t
         }
     }
 
-    #ifdef NDEBUG
 
     for(int i = 0; i < delta_I.size();i++)
     {
-        assert(delta_I[i] >= 0);
+        assert(std::all_of(delta_I[i].begin(), delta_I[i].end(), [](auto x){return x >= 0;}) && "Negative delta_I");
     }
 
     for(int i = 0; i < delta_R.size();i++)
     {
-        assert(delta_R[i] >= 0);
+        assert(std::all_of(delta_R[i].begin(), delta_R[i].end(), [](auto x){return x >= 0;}) && "Negative delta_R");
     }
-    #endif
 
     return delta_I;
 }
@@ -238,12 +236,13 @@ std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vect
 std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(const std::vector<std::vector<std::vector<State_t>>> &community_state,
                                                                                          const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
                                                                                          const std::vector<std::vector<std::vector<uint32_t>>> &to_events,
-                                                                                        const std::vector<uint32_t>& ccm,
+                                                                                        const std::vector<std::pair<uint32_t, uint32_t>>& ccm,
                                                                                         const std::vector<uint32_t>& ccm_weights,
                                                                                         uint32_t seed, uint32_t max_infection_samples)
 {
-    uint32_t Nt = from_events.size();
-    uint32_t N_sims = from_events[0].size();
+
+    uint32_t N_sims = from_events.size();
+    uint32_t Nt = from_events[0].size();
     uint32_t N_connections = from_events[0][0].size();
     std::vector<std::vector<std::vector<uint32_t>>> infections = std::vector<std::vector<std::vector<uint32_t>>>(N_sims, std::vector<std::vector<uint32_t>>(N_connections, std::vector<uint32_t>(Nt)));
 

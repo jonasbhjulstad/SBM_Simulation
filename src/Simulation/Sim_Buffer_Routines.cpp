@@ -1,6 +1,7 @@
-#include <Sycl_Graph/Simulation/Sim_Buffer_Routines.hpp>
 #include <iostream>
-
+#include <Sycl_Graph/Simulation/Sim_Buffer_Routines.hpp>
+#include <Sycl_Graph/Utils/Buffer_Validation.hpp>
+#include <Sycl_Graph/Utils/Vector_Remap.hpp>
 
 void single_community_state_accumulate(sycl::h_item<1> &it, const sycl::accessor<uint32_t, 1, sycl::access_mode::read> &vcm_acc, const sycl::accessor<SIR_State, 3, sycl::access_mode::read> &v_acc, const sycl::accessor<State_t, 3, sycl::access_mode::read_write> &state_acc)
 {
@@ -44,47 +45,23 @@ sycl::event accumulate_community_state(sycl::queue &q, std::vector<sycl::event> 
 
 
 
-
-std::vector<sycl::event> read_reset_buffers(
-    sycl::queue &q,
-    sycl::buffer<SIR_State, 3> &vertex_state,
-    sycl::buffer<uint32_t, 3> &events_from,
-    sycl::buffer<uint32_t, 3> &events_to,
-    sycl::buffer<uint32_t> &vcm,
-    uint32_t t,
-    std::vector<sycl::event> &dep_events)
+void print_timestep(sycl::queue &q, std::vector<sycl::event> &dep_events, sycl::buffer<uint32_t, 3> &e_from, sycl::buffer<uint32_t, 3> &e_to, sycl::buffer<SIR_State, 3> &v_buf, sycl::buffer<uint32_t> &vcm_buf, const Sim_Param &p)
 {
-    std::vector<sycl::event> read_events(1);
-    auto [compute_range, wg_range] = sim_ranges(q, vertex_state);
-    // print_community_state(q, dep_events, trajectory, vcm, Nt_alloc + 1, N_communities, compute_range, wg_range);
-    print_timestep(q, dep_events, events_from, events_to, trajectory, vcm, compute_range, wg_range);
-    community_state_to_timeseries(t, dep_events);
-    connection_events_to_timeseries(t, dep_events);
-
-    read_events[0] = q.submit([&](sycl::handler &h)
-                              {
-        auto start_acc = sycl::accessor<SIR_State, 3, sycl::access_mode::write>(trajectory, h, sycl::range<3>(1,N_sims, N_vertices()), sycl::range<3>(0,0,0));
-        auto end_acc = sycl::accessor<SIR_State, 3, sycl::access_mode::read>(trajectory, h, sycl::range<3>(1,N_sims, N_vertices()), sycl::range<3>(Nt_alloc,0,0));
-        h.copy(end_acc, start_acc); });
-
-    return read_events;
-}
-
-void print_timestep(sycl::queue &q, std::vector<sycl::event> &dep_events, sycl::buffer<uint32_t, 3> &e_from, sycl::buffer<uint32_t, 3> &e_to, sycl::buffer<SIR_State, 3> &v_buf, sycl::buffer<uint32_t> &vcm_buf, const Sim_Param &p, sycl::range<1> compute_range, sycl::range<1> wg_range)
-{
-    auto N_sims = compute_range[0] * wg_range[0];
+    auto N_sims = p.compute_range[0] * p.wg_range[0];
     auto N_connections = e_from.get_range()[2];
-    sycl::buffer<State_t, 3> community_buf(sycl::range<3>(Nt_alloc, N_sims, N_communities));
+    auto Nt_alloc = v_buf.get_range()[0]-1;
+    auto N_communities = p.N_communities;
+    sycl::buffer<State_t, 3> community_buf(sycl::range<3>(Nt_alloc + 1, N_sims, N_communities));
 
-    accumulate_community_state(q, dep_events, v_buf, vcm_buf, community_buf, Nt_alloc, compute_range, wg_range).wait();
-    std::vector<State_t> community_state_flat(Nt_alloc * N_sims * N_communities);
+    accumulate_community_state(q, dep_events, v_buf, vcm_buf, community_buf, Nt_alloc + 1, p.compute_range, p.wg_range).wait();
+    std::vector<State_t> community_state_flat((Nt_alloc+1) * N_sims * N_communities);
     q.submit([&](sycl::handler &h)
              {
         h.depends_on(dep_events);
         auto community_acc = community_buf.template get_access<sycl::access::mode::read>(h);
         h.copy(community_acc, community_state_flat.data()); })
         .wait();
-    auto community_state = vector_remap(community_state_flat, Nt_alloc, N_sims, N_communities);
+    auto community_state = vector_remap(community_state_flat, Nt_alloc+1, N_sims, N_communities);
 
     auto read_e_buf = [&](auto &buf)
     {

@@ -24,10 +24,11 @@ extern template std::vector<std::vector<uint32_t>> diff<uint32_t>(const std::vec
 extern template std::vector<std::vector<int>> diff<int>(const std::vector<std::vector<int>> &v);
 
 std::vector<float> generate_floats(uint32_t N, float min, float max, uint32_t seed);
-std::vector<std::vector<float>> generate_floats(uint32_t rows, uint32_t cols, float min, float max, uint32_t seed);
-std::vector<std::vector<std::vector<float>>> generate_floats(uint32_t N0, uint32_t N1, uint32_t N2, float min, float max, uint32_t seed);
+// std::vector<std::vector<float>> generate_floats(uint32_t rows, uint32_t cols, float min, float max, uint32_t seed);
+// std::vector<std::vector<std::vector<float>>> generate_floats(uint32_t N0, uint32_t N1, uint32_t N2, float min, float max, uint32_t seed);
 
 std::tuple<sycl::range<1>, sycl::range<1>> sim_ranges(sycl::queue& q, uint32_t N_sims);
+// sycl::event move_buffer_row(sycl::queue& q, sycl::buffer<SIR_State,3>& buf, uint32_t row, std::vector<sycl::event>& dep_events);
 
 
 extern template sycl::event initialize_device_buffer<uint32_t, 1>(sycl::queue& q, const std::vector<uint32_t> &host_data, sycl::buffer<uint32_t, 1>& buf);

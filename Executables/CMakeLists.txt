@@ -1,6 +1,4 @@
-# add_sycl_executable(planted_SIR_Simulation)
-# add_sycl_executable(planted_SIR_Network)
-# add_sycl_executable(single_SIR_Network)
 add_sycl_executable(parallel_SIR_Network)
+target_link_libraries(parallel_SIR_Network PRIVATE Graph Sim_Routines Profiling)
 add_regression_executable(SBM_Regression)
 # add_regression_executable(SBM_Regression)

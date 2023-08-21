@@ -11,7 +11,9 @@ std::vector<std::vector<int>> get_delta_Is(const std::vector<std::vector<State_t
 // std::vector<uint32_t> events_combine(const std::vector<uint32_t> &from_events, const std::vector<uint32_t> &to_events);
 // std::vector<std::vector<uint32_t>> events_combine(const std::vector<std::vector<uint32_t>> &from_events, const std::vector<std::vector<uint32_t>> &to_events);
 std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(const std::vector<std::vector<std::vector<State_t>>> &community_state,
-                                                                              const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
-                                                                              const std::vector<std::vector<std::vector<uint32_t>>> &to_events,
-                                                                              uint32_t max_infection_samples = 1000);
+                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
+                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &to_events,
+                                                                                        const std::vector<std::pair<uint32_t, uint32_t>>& ccm,
+                                                                                        const std::vector<uint32_t>& ccm_weights,
+                                                                                        uint32_t seed, uint32_t max_infection_samples = 1000);
 #endif

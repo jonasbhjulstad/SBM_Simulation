@@ -4,11 +4,17 @@
 #include <Sycl_Graph/SIR_Types.hpp>
 #include <CL/sycl.hpp>
 #include <Static_RNG/distributions.hpp>
+#include <stdexcept>
 
 
 template <typename T, std::size_t N>
 sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, std::vector<T>& result, std::vector<sycl::event>& dep_events)
 {
+    if (result.size() < buf.size())
+    {
+        throw std::runtime_error("Result vector is too small to hold the buffer");
+        result.resize(buf.size());
+    }
     return q.submit([&](sycl::handler& h)
     {
         h.depends_on(dep_events);
@@ -20,6 +26,11 @@ sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, std::vector<T>& 
 template <typename T, std::size_t N>
 sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, std::vector<T>& result, std::vector<sycl::event>& dep_events, sycl::range<N> range, sycl::range<N> offset)
 {
+    if (result.size() < range.size())
+    {
+        throw std::runtime_error("Result vector is too small to hold the buffer");
+        result.resize(buf.size());
+    }
     return q.submit([&](sycl::handler& h)
     {
         h.depends_on(dep_events);

@@ -134,37 +134,29 @@ std::vector<float> generate_floats(uint32_t N, float min, float max, uint32_t se
     return result;
 }
 
-std::vector<std::vector<float>> generate_floats(uint32_t rows, uint32_t cols, float min, float max, uint32_t seed)
-{
-    std::mt19937_64 rng(seed);
-    std::uniform_real_distribution<float> dist(min, max);
-    std::vector<std::vector<float>> floats(rows, std::vector<float>(cols));
-    std::for_each(floats.begin(), floats.end(), [&](auto& row){std::generate(row.begin(), row.end(), [&](){return dist(rng);});});
-    return floats;
-}
+// std::vector<std::vector<float>> generate_floats(uint32_t rows, uint32_t cols, float min, float max, uint32_t seed)
+// {
+//     std::mt19937_64 rng(seed);
+//     std::uniform_real_distribution<float> dist(min, max);
+//     std::vector<std::vector<float>> floats(rows, std::vector<float>(cols));
+//     std::for_each(floats.begin(), floats.end(), [&](auto& row){std::generate(row.begin(), row.end(), [&](){return dist(rng);});});
+//     return floats;
+// }
 
-std::vector<std::vector<std::vector<float>>> generate_floats(uint32_t N0, uint32_t N1, uint32_t N2, float min, float max, uint32_t seed)
-{
-    //generate p_Is
-    using p_I_mat = std::vector<std::vector<float>>;
-    std::vector<p_I_mat> p_Is(N0);
-    auto seeds = generate_seeds(N0, seed);
+// std::vector<std::vector<std::vector<float>>> generate_floats(uint32_t N0, uint32_t N1, uint32_t N2, float min, float max, uint32_t seed)
+// {
+//     //generate p_Is
+//     using p_I_mat = std::vector<std::vector<float>>;
+//     std::vector<p_I_mat> p_Is(N0);
+//     auto seeds = generate_seeds(N0, seed);
 
-    std::transform(std::execution::par_unseq, seeds.begin(), seeds.end(), p_Is.begin(), [=](auto seed)
-    {
-        return generate_floats(N1, N2, min, max, seed);
-    });
-    return p_Is;
-}
-std::tuple<sycl::range<1>, sycl::range<1>> sim_ranges(sycl::queue& q, uint32_t N_sims)
-{
-    auto device = q.get_device();
-    auto max_wg_size = device.get_info<sycl::info::device::max_work_group_size>();
-    double d_sims = N_sims;
-    double d_max_wg_size = max_wg_size;
-    auto N_compute_units = static_cast<uint32_t>(std::ceil(d_sims / d_max_wg_size));
-    return std::make_tuple(sycl::range<1>(N_compute_units), sycl::range<1>(max_wg_size));
-}
+//     std::transform(std::execution::par_unseq, seeds.begin(), seeds.end(), p_Is.begin(), [=](auto seed)
+//     {
+//         return generate_floats(N1, N2, min, max, seed);
+//     });
+//     return p_Is;
+// }
+
 
 // template std::vector<uint32_t> merge_vectors(const std::vector<std::vector<uint32_t>>&);
 // template std::vector<int> merge_vectors(const std::vector<std::vector<int>>&);
