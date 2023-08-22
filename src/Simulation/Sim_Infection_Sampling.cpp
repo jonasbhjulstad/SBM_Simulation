@@ -261,3 +261,39 @@ std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(co
 
     return infections;
 }
+
+uint32_t floor_div(uint32_t a, uint32_t b)
+{
+    return static_cast<uint32_t>(std::floor(static_cast<double>(a) / static_cast<double>(b)));
+}
+
+std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(const std::vector<std::vector<std::vector<State_t>>> &community_state,
+                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
+                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &to_events,
+                                                                                        const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& ccms,
+                                                                                        const std::vector<std::vector<uint32_t>>& ccm_weights,
+                                                                                        uint32_t seed, uint32_t max_infection_samples, uint32_t N_compute)
+{
+
+    uint32_t N_sims = from_events.size();
+    uint32_t Nt = from_events[0].size();
+    uint32_t N_connections = from_events[0][0].size();
+    std::vector<std::vector<std::vector<uint32_t>>> infections = std::vector<std::vector<std::vector<uint32_t>>>(N_sims, std::vector<std::vector<uint32_t>>(N_connections, std::vector<uint32_t>(Nt)));
+
+    std::vector<std::tuple<std::vector<std::vector<State_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>, uint32_t>> sim_data(N_sims);
+
+
+    for (int sim_idx = 0; sim_idx < N_sims; sim_idx++)
+    {
+        sim_data[sim_idx] = std::make_tuple(community_state[sim_idx], from_events[sim_idx], to_events[sim_idx], floor_div(sim_idx, N_compute));
+    }
+    std::transform(std::execution::par_unseq, sim_data.begin(), sim_data.end(), infections.begin(), [&](const auto &sim_d)
+                   {
+        const auto& sim_community_state = std::get<0>(sim_d);
+        const auto& sim_from_events = std::get<1>(sim_d);
+        const auto& sim_to_events = std::get<2>(sim_d);
+        const auto& ccm_idx = std::get<3>(sim_d);
+        return sample_infections(sim_community_state, sim_from_events, sim_to_events, ccms[ccm_idx], ccm_weights[ccm_idx], seed, max_infection_samples); });
+
+    return infections;
+}

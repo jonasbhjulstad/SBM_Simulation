@@ -3,10 +3,10 @@
 #include <Sycl_Graph/Utils/Buffer_Validation.hpp>
 #include <Sycl_Graph/Utils/Vector_Remap.hpp>
 
-void single_community_state_accumulate(sycl::h_item<1> &it, const sycl::accessor<uint32_t, 1, sycl::access_mode::read> &vcm_acc, const sycl::accessor<SIR_State, 3, sycl::access_mode::read> &v_acc, const sycl::accessor<State_t, 3, sycl::access_mode::read_write> &state_acc)
+void single_community_state_accumulate(sycl::h_item<1> &it, const auto &vcm_acc, const sycl::accessor<SIR_State, 3, sycl::access_mode::read> &v_acc, const sycl::accessor<State_t, 3, sycl::access_mode::read_write> &state_acc)
 {
     auto Nt = v_acc.get_range()[0];
-    auto N_vertices = vcm_acc.get_range()[0];
+    auto N_vertices = v_acc.get_range()[2];
     auto sim_id = it.get_global_id(0);
     auto lid = it.get_local_id(0);
     auto N_communities = state_acc.get_range()[2];
@@ -25,7 +25,7 @@ void single_community_state_accumulate(sycl::h_item<1> &it, const sycl::accessor
     }
 }
 
-sycl::event accumulate_community_state(sycl::queue &q, std::vector<sycl::event> &dep_events, sycl::buffer<SIR_State, 3> &v_buf, sycl::buffer<uint32_t> &vcm_buf, sycl::buffer<State_t, 3> community_buf, uint32_t Nt, sycl::range<1> compute_range, sycl::range<1> wg_range)
+sycl::event accumulate_community_state(sycl::queue &q, std::vector<sycl::event> &dep_events, sycl::buffer<SIR_State, 3> &v_buf, sycl::buffer<uint32_t, 2> &vcm_buf, sycl::buffer<State_t, 3> community_buf, uint32_t Nt, sycl::range<1> compute_range, sycl::range<1> wg_range)
 {
     auto range = sycl::range<3>(Nt, v_buf.get_range()[1], v_buf.get_range()[2]);
     return q.submit([&](sycl::handler &h)
@@ -36,16 +36,17 @@ sycl::event accumulate_community_state(sycl::queue &q, std::vector<sycl::event> 
         auto vcm_acc = vcm_buf.template get_access<sycl::access::mode::read>(h);
         h.parallel_for_work_group(compute_range, wg_range, [state_acc, vcm_acc, v_acc](sycl::group<1> gr)
         {
+            auto graph_id = gr.get_group_id();
             gr.parallel_for_work_item([&](sycl::h_item<1> it)
             {
-                single_community_state_accumulate(it, vcm_acc, v_acc, state_acc);
+                single_community_state_accumulate(it, vcm_acc[graph_id], v_acc, state_acc);
             });
         }); });
 }
 
 
 
-void print_timestep(sycl::queue &q, std::vector<sycl::event> &dep_events, sycl::buffer<uint32_t, 3> &e_from, sycl::buffer<uint32_t, 3> &e_to, sycl::buffer<SIR_State, 3> &v_buf, sycl::buffer<uint32_t> &vcm_buf, const Sim_Param &p)
+void print_timestep(sycl::queue &q, std::vector<sycl::event> &dep_events, sycl::buffer<uint32_t, 3> &e_from, sycl::buffer<uint32_t, 3> &e_to, sycl::buffer<SIR_State, 3> &v_buf, sycl::buffer<uint32_t, 2> &vcm_buf, const Sim_Param &p)
 {
     auto N_sims = p.compute_range[0] * p.wg_range[0];
     auto N_connections = e_from.get_range()[2];

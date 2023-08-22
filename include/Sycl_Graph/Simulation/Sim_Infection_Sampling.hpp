@@ -16,4 +16,10 @@ std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(co
                                                                                         const std::vector<std::pair<uint32_t, uint32_t>>& ccm,
                                                                                         const std::vector<uint32_t>& ccm_weights,
                                                                                         uint32_t seed, uint32_t max_infection_samples = 1000);
+std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(const std::vector<std::vector<std::vector<State_t>>> &community_state,
+                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
+                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &to_events,
+                                                                                        const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& ccms,
+                                                                                        const std::vector<std::vector<uint32_t>>& ccm_weights,
+                                                                                        uint32_t seed, uint32_t N_compute, uint32_t max_infection_samples = 1000);
 #endif

@@ -56,7 +56,7 @@ void run_allocated(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b)
 
     timeseries_to_file(d.state_timeseries, p.output_dir + "/community_trajectory");
     events_to_file(d.events_from_timeseries, d.events_to_timeseries, p.output_dir + "/connection_events");
-    d.connection_infections = sample_from_connection_events(d.state_timeseries, d.events_from_timeseries, d.events_to_timeseries, b.ccm, b.ccm_weights, p.seed);
+    d.connection_infections = sample_from_connection_events(d.state_timeseries, d.events_from_timeseries, d.events_to_timeseries, b.ccm, b.ccm_weights, p.seed, p.compute_range[0]);
 
     timeseries_to_file(d.connection_infections, p.output_dir + "/connection_infections");
 }
@@ -79,20 +79,20 @@ void run(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b)
     //make directory
     for (t = 0; t < p.Nt; t++)
     {
-        // bool is_initial_write = (t == 0);
-        // if (is_allocated_space_full(t, p.Nt_alloc) && false)
-        // {
-        //     // print_timestep(q, events, b.events_from, b.events_to, b.vertex_state, b.vcm, p);
-        //     community_state_append_to_file(q, b.vertex_state, b.community_state, b.vcm, p.compute_range, p.wg_range, p.output_dir, events);
-        //     connection_events_append_to_file(q, b.events_from, b.events_to, b.vcm, p.output_dir, events, is_initial_write);
-        //     d.connection_infections = sample_from_connection_events(d.state_timeseries, d.events_from_timeseries, d.events_to_timeseries, b.ccm, b.ccm_weights, p.seed);
-        //     timeseries_to_file(d.connection_infections, p.output_dir + "/connection_infections", is_initial_write);
-        //     events[0] = move_buffer_row(q, b.vertex_state, p.Nt_alloc, events);
-        //     q.wait();
-        // }
+        bool is_initial_write = (t == 0);
+        if (is_allocated_space_full(t, p.Nt_alloc) && false)
+        {
+            // print_timestep(q, events, b.events_from, b.events_to, b.vertex_state, b.vcm, p);
+            community_state_append_to_file(q, b.vertex_state, b.community_state, b.vcm, p.compute_range, p.wg_range, p.output_dir, events);
+            connection_events_append_to_file(q, b.events_from, b.events_to, b.vcm, p.output_dir, events, is_initial_write);
+            d.connection_infections = sample_from_connection_events(d.state_timeseries, d.events_from_timeseries, d.events_to_timeseries, b.ccm, b.ccm_weights, p.seed, p.compute_range[0]);
+            timeseries_to_file(d.connection_infections, p.output_dir + "/connection_infections", is_initial_write);
+            events[0] = move_buffer_row(q, b.vertex_state, p.Nt_alloc, events);
+            q.wait();
+        }
         events = recover(q, p, b.vertex_state, b.rngs, t, events);
-        // q.wait();
-        // events = infect(q, p, b, t, events);
+        q.wait();
+        events = infect(q, p, b, t, events);
         q.wait();
     }
     auto last_offset = p.Nt - (t % p.Nt_alloc);

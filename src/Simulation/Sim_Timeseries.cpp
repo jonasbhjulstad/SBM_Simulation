@@ -7,7 +7,7 @@ void community_state_to_timeseries(sycl::queue &q,
                                    sycl::buffer<SIR_State, 3> &vertex_state,
                                    sycl::buffer<State_t, 3> &community_state,
                                    std::vector<std::vector<std::vector<State_t>>> &community_timeseries,
-                                   sycl::buffer<uint32_t> &vcm,
+                                   sycl::buffer<uint32_t, 2> &vcm,
                                    uint32_t t_offset,
                                    sycl::range<1> compute_range,
                                    sycl::range<1> wg_range,
@@ -43,7 +43,7 @@ void community_state_to_timeseries(sycl::queue &q,
 void community_state_append_to_file(sycl::queue &q,
                                    sycl::buffer<SIR_State, 3> &vertex_state,
                                    sycl::buffer<State_t, 3> &community_state,
-                                   sycl::buffer<uint32_t> &vcm,
+                                   sycl::buffer<uint32_t, 2> &vcm,
                                    sycl::range<1> compute_range,
                                    sycl::range<1> wg_range,
                                    const std::string& output_dir,
@@ -74,12 +74,17 @@ void community_state_append_to_file(sycl::queue &q,
             }
         }
     }
-    timeseries_to_file(community_timeseries, output_dir + "/community_trajectory", true);
+    for(int compute_idx = 0; compute_idx < compute_range[0]; compute_idx++)
+    {
+        auto graph_community_timeseries = std::vector<std::vector<std::vector<State_t>>>(community_timeseries.begin() + compute_idx*wg_range[0], community_timeseries.begin() + (compute_idx+1)*wg_range[0]);
+        timeseries_to_file(graph_community_timeseries, output_dir + "Graph_" + std::to_string(compute_idx) + "/community_trajectory", true);
+    }
+
 }
 void community_state_init_to_file(sycl::queue &q,
                                    sycl::buffer<SIR_State, 3> &vertex_state,
                                    sycl::buffer<State_t, 3> &community_state,
-                                   sycl::buffer<uint32_t> &vcm,
+                                   sycl::buffer<uint32_t, 2> &vcm,
                                    sycl::range<1> compute_range,
                                    sycl::range<1> wg_range,
                                    const std::string& output_dir,
@@ -118,7 +123,7 @@ void connection_events_to_timeseries(sycl::queue &q,
                                      sycl::buffer<uint32_t, 3> &events_to,
                                      std::vector<std::vector<std::vector<uint32_t>>> &events_from_timeseries,
                                      std::vector<std::vector<std::vector<uint32_t>>> &events_to_timeseries,
-                                     sycl::buffer<uint32_t> &vcm,
+                                     sycl::buffer<uint32_t, 2> &vcm,
                                      uint32_t t_offset,
                                      std::vector<sycl::event> &dep_events)
 {
@@ -157,7 +162,7 @@ void connection_events_to_timeseries(sycl::queue &q,
 void connection_events_append_to_file(sycl::queue &q,
                                      sycl::buffer<uint32_t, 3> events_from,
                                      sycl::buffer<uint32_t, 3> &events_to,
-                                     sycl::buffer<uint32_t> &vcm,
+                                     sycl::buffer<uint32_t, 2> &vcm,
                                      const std::string& output_dir,
                                      std::vector<sycl::event> &dep_events,
                                      bool append)

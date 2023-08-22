@@ -9,6 +9,10 @@ std::vector<std::pair<uint32_t, uint32_t>> random_connect(const std::vector<uint
 std::vector<std::vector<std::pair<uint32_t, uint32_t>>> random_connect(const std::vector<std::vector<uint32_t>> &nodelists,
                                                                        float p_in, float p_out, uint32_t seed);
 std::tuple<std::vector<std::vector<std::pair<uint32_t, uint32_t>>>, std::vector<std::vector<uint32_t>>> generate_planted_SBM_edges(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed);
+using Edge_List_t = std::vector<std::vector<std::pair<uint32_t, uint32_t>>>;
+using Node_List_t = std::vector<std::vector<uint32_t>>;
+std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>> generate_N_SBM_graphs(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng);
+
 
 std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities);
 

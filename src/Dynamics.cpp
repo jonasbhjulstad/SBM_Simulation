@@ -47,11 +47,11 @@ std::vector<sycl::event> recover(sycl::queue &q,
         for(int v_idx = 0; v_idx < N_vertices; v_idx++)
         {
             auto state_prev = v_glob[0][sim_id][v_idx];
-            // if (state_prev == SIR_INDIVIDUAL_I) {
-            //     if (bernoulli_R(rng_acc_glob[sim_id])) {
-            //     v_glob[0][sim_id][v_idx] = SIR_INDIVIDUAL_R;
-            //     }
-            // }
+            if (state_prev == SIR_INDIVIDUAL_I) {
+                if (bernoulli_R(rng_acc_glob[sim_id])) {
+                v_glob[0][sim_id][v_idx] = SIR_INDIVIDUAL_R;
+                }
+            }
             }
         });
         // gr.parallel_for_work_item([&](sycl::h_item<1> it)
@@ -80,6 +80,10 @@ sycl::event initialize_vertices(sycl::queue &q, const Sim_Param &p,
 
     auto buf_size = vertex_state.get_range()[1] * vertex_state.get_range()[2] * sizeof(SIR_State) + rngs.byte_size();
     assert(buf_size < p.global_mem_size);
+    assert(vertex_state.get_range()[0] == (p.Nt_alloc+1));
+    assert(vertex_state.get_range()[1] = p.N_sims);
+    assert(vertex_state.get_range()[2] = N_vertices);
+    assert(rngs.size() == p.N_sims);
     auto init_event = q.submit([&](sycl::handler &h)
                                {
     auto v_acc = construct_validate_accessor<SIR_State, 3, sycl::access::mode::write>(vertex_state, h, sycl::range<3>(1, p.N_sims, N_vertices), sycl::range<3>(0, 0, 0));
@@ -121,7 +125,7 @@ std::vector<sycl::event> infect(sycl::queue &q,
     uint32_t N_sims = p.N_sims;
     uint32_t t_alloc = t % p.Nt_alloc;
     uint32_t Nt = p.Nt;
-    assert(N_vertices == 200);
+    // assert(N_vertices == p.N_vertices);
     assert(b.ecm.size() == N_edges);
     assert(b.vcm.size() == N_vertices);
     assert(b.p_Is.get_range()[0] == Nt);
@@ -150,6 +154,8 @@ std::vector<sycl::event> infect(sycl::queue &q,
         auto p_I_acc_glob = construct_validate_accessor<float, 3, sycl::access::mode::read>(b.p_Is, h, sycl::range<3>(1, N_sims, N_connections), sycl::range<3>(t, 0, 0));
         auto rng_acc_glob = b.rngs.template get_access<sycl::access::mode::read_write>(h);
         auto v_glob_next = construct_validate_accessor<SIR_State, 3, sycl::access_mode::write>(b.vertex_state, h, sycl::range<3>(1, N_sims, N_vertices), sycl::range<3>(t_alloc + 1, 0, 0));
+        auto e_count = b.edge_counts.template get_access<sycl::access::mode::read>(h);
+        auto e_offset = b.edge_offsets.template get_access<sycl::access::mode::read>(h);
         auto e_acc_0 = b.edge_to.template get_access<sycl::access::mode::read>(h);
         auto e_acc_1 = b.edge_from.template get_access<sycl::access::mode::read>(h);
         auto event_to_acc_glob = construct_validate_accessor<uint32_t, 3, sycl::access::mode::write>(b.events_to, h, sycl::range<3>(1, N_sims, N_connections), sycl::range<3>(t_alloc, 0, 0));
@@ -181,13 +187,16 @@ std::vector<sycl::event> infect(sycl::queue &q,
                                     //     }
                                     //     // rng_acc[lid] = rng_acc_glob[sim_id];
                                     // });
-
+                                    //get group id
+                                    auto graph_id = gr.get_group_id();
+                                    auto edge_start_idx = e_offset[graph_id];
+                                    auto edge_end_idx = edge_start_idx + e_count[graph_id];
                                     gr.parallel_for_work_item([&](sycl::h_item<1> it)
                                                                   {
                                         auto sim_id = it.get_global_id();
                                         auto lid = it.get_local_id(0);
                                         uint32_t N_inf = 0;
-                                          for (uint32_t edge_idx = 0; edge_idx < N_edges; edge_idx++)
+                                          for (uint32_t edge_idx = edge_start_idx; edge_idx < edge_end_idx; edge_idx++)
                                           {
                                             auto connection_id = ecm_acc[edge_idx];
                                             auto v_from_id = e_acc_0[edge_idx];
@@ -205,6 +214,7 @@ std::vector<sycl::event> infect(sycl::queue &q,
                                                   if (bernoulli_I(rng))
                                                   {
                                                     N_inf++;
+
                                                       v_glob_next[0][sim_id][v_from_id] = SIR_INDIVIDUAL_I;
                                                       event_to_acc_glob[0][sim_id][connection_id]++;
                                                   }

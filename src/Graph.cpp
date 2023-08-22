@@ -88,7 +88,10 @@ std::vector<std::vector<std::pair<uint32_t, uint32_t>>> random_connect(const std
     return edge_lists;
 }
 
-std::tuple<std::vector<std::vector<std::pair<uint32_t, uint32_t>>>,std::vector<std::vector<uint32_t>>> generate_planted_SBM_edges(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed)
+
+using Node_Edge_Tuple_t = std::tuple<Edge_List_t, Node_List_t>;
+
+Node_Edge_Tuple_t generate_planted_SBM_edges(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed)
 {
     std::vector<std::vector<uint32_t>> nodelists(N_communities);
     std::generate(nodelists.begin(), nodelists.end(), [N_pop, offset = 0]()
@@ -100,6 +103,37 @@ std::tuple<std::vector<std::vector<std::pair<uint32_t, uint32_t>>>,std::vector<s
                   });
     return std::make_tuple(random_connect(nodelists, p_in, p_out, seed), nodelists);
 }
+
+
+std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>> generate_N_SBM_graphs(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng)
+{
+    std::vector<Node_Edge_Tuple_t> result(Ng);
+    std::vector<uint32_t> seeds(Ng);
+    std::mt19937 gen(seed);
+    std::generate_n(seeds.begin(), Ng, [&gen]()
+    {
+        return gen();
+    });
+    std::transform(std::execution::par_unseq, seeds.begin(), seeds.end(), result.begin(), [&](auto seed)
+    {
+        return generate_planted_SBM_edges(N_pop, N_communities, p_in, p_out, seed);
+    });
+
+    std::vector<Edge_List_t> edge_data(Ng);
+    std::vector<Node_List_t> node_data(Ng);
+
+    std::transform(std::execution::par_unseq, result.begin(), result.end(), edge_data.begin(), [](auto& t)
+    {
+        return std::get<0>(t);
+    });
+    std::transform(std::execution::par_unseq, result.begin(), result.end(), node_data.begin(), [](auto& t)
+    {
+        return std::get<1>(t);
+    });
+
+    return std::make_tuple(edge_data, node_data);
+}
+
 
 std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities)
 {
@@ -177,6 +211,7 @@ std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_
     return ecm;
 }
 
+
 std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t>& ecm)
 {
     uint32_t N_connections = std::max_element(ecm.begin(), ecm.end())[0]+1;
@@ -186,4 +221,11 @@ std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t>& ecm)
         ccm_weights[idx]++;
     });
     return ccm_weights;
+}
+
+std::vector<std::vector<uint32_t>> ccm_weights_from_ecms(const std::vector<uint32_t>& ecms, const std::vector<uint32_t>& edge_counts)
+{
+    std::vector<std::vector<uint32_t>> result(ecms.size());
+
+    return result;
 }
