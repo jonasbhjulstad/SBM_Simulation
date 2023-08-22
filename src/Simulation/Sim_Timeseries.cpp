@@ -195,5 +195,5 @@ void connection_events_append_to_file(sycl::queue &q,
                 }
         }
     }
-    events_to_file(events_from_timeseries, events_to_timeseries, output_dir + "/community_trajectory", append);
+    events_to_file(events_from_timeseries, events_to_timeseries, output_dir + "/connection_events", append);
 }

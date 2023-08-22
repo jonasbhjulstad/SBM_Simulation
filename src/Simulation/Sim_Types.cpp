@@ -7,6 +7,11 @@ Sim_Data::Sim_Data(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_
 {
 }
 
+// static Sim_Data assert_size(sycl::queue& q, uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections)
+// {
+
+// }
+
 std::size_t get_sim_data_byte_size(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections)
 {
     return sizeof(uint32_t) * Nt * N_sims * N_connections * 2 + sizeof(State_t) * Nt * N_sims * N_communities + sizeof(uint32_t) * Nt * N_sims * N_connections;
@@ -29,4 +34,18 @@ sycl::range<1> get_compute_range(sycl::queue &q, uint32_t N_sims)
     return N_compute_units;
 }
 
-Sim_Param::Sim_Param(sycl::queue &q, uint32_t N_sims): wg_range(sycl::range<1>(std::min<uint32_t>({(uint32_t)get_wg_range(q)[0], N_sims}))), compute_range(get_compute_range(q, N_sims)), N_sims(N_sims) {}
+
+void Sim_Param::print() const
+{
+    std::cout << "SBM:\t" << N_communities << " communities, with " << N_pop << " individuals" << "\n";
+    std::cout << "N_sims:\t" << N_sims << "\n";
+    std::cout << "p_in:\t" << p_in << "\n";
+    std::cout << "p_out:\t" << p_out << "\n";
+    std::cout << "Nt:\t" << Nt << "\n";
+    std::cout << "Initial probabilities:\t " << p_I0 << ", " << p_R0 << "\n";
+    std::cout << "p_I in:\t [" << p_I_min << "," << p_I_max << "]" << "\n";
+    std::cout << "compute_range:\t" << compute_range[0] << "\n";
+    std::cout << "work_group_range:\t" << wg_range[0] << "\n";
+    std::cout << "output directory:\t" << output_dir << std::endl;
+
+}

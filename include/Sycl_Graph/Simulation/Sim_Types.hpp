@@ -15,7 +15,12 @@ struct Sim_Data
 
 struct Sim_Param
 {
-    Sim_Param(sycl::queue& q, uint32_t N_sims);
+    Sim_Param(sycl::queue& q) : compute_range(sycl::range<1>(1)), wg_range(sycl::range<1>(1))
+    {
+        auto device = q.get_device();
+        global_mem_size = device.get_info<sycl::info::device::global_mem_size>();
+        local_mem_size = device.get_info<sycl::info::device::local_mem_size>();
+    }
     std::tuple<sycl::range<1>, sycl::range<1>> sim_ranges(sycl::queue& q, uint32_t N_sims) const;
     uint32_t N_communities = 4;
     uint32_t N_pop = 100;
@@ -29,13 +34,15 @@ struct Sim_Param
     float p_I_min = 0.0f;
     float p_I_max = 0.0f;
     uint32_t Nt_alloc = 2;
-    uint32_t N_threads = 1024;
     uint32_t seed = 238;
     uint32_t max_infection_samples = 1000;
+    std::size_t local_mem_size = 0;
+    std::size_t global_mem_size = 0;
     sycl::range<1> compute_range;
     sycl::range<1> wg_range;
     std::size_t N_vertices() const {return N_communities * N_pop;}
     std::string output_dir;
+    void print() const;
 };
 std::size_t get_sim_data_byte_size(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections);
 

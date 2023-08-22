@@ -26,7 +26,7 @@ auto merge(const std::vector<std::vector<std::vector<uint32_t>>> &t0, const std:
 void events_to_file(const std::vector<std::vector<std::vector<uint32_t>>> &e_to, const std::vector<std::vector<std::vector<uint32_t>>> &e_from, const std::string &abs_fname, bool append)
 {
     auto merged = merge(e_to, e_from);
-    std::ofstream f;
+    std::fstream f;
     std::for_each(merged.begin(), merged.end(), [&, n = 0](const auto &sim_ts) mutable
                   {
                     if (append)
@@ -50,7 +50,7 @@ void events_to_file(const std::vector<std::vector<std::vector<uint32_t>>> &e_to,
 }
 void timeseries_to_file(const std::vector<std::vector<std::vector<std::array<uint32_t, 3>>>> &ts, const std::string &abs_fname, bool append)
 {
-    std::ofstream f;
+    std::fstream f;
     std::for_each(ts.begin(), ts.end(), [&, n = 0](const auto &sim_ts) mutable
                   {
                     if (append)
@@ -75,7 +75,7 @@ void timeseries_to_file(const std::vector<std::vector<std::vector<std::array<uin
 
 void timeseries_to_file(const std::vector<std::vector<std::vector<uint32_t>>> &ts, const std::string &abs_fname, bool append)
 {
-    std::ofstream f;
+    std::fstream f;
     std::for_each(ts.begin(), ts.end(), [&, n = 0](const auto &sim_ts) mutable
                   {
                     if (append)

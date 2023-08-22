@@ -11,7 +11,7 @@ sycl::accessor<T,N, Mode> construct_validate_accessor(cl::sycl::buffer<T, N>& bu
         assert(buf.get_range()[i] >= range[i] + offset[i]);
         assert(range[i] > 0);
     }
-    return sycl::accessor<T, N, Mode>(buf, h, range, offset);
+    return sycl::accessor<T, N, Mode, sycl::access::target::global_buffer>(buf, h, range, offset);
 }
 template <typename T, std::size_t N, sycl::access::mode Mode>
 sycl::accessor<T,N, Mode> construct_validate_accessor(cl::sycl::buffer<T, N>& buf, sycl::handler& h, sycl::range<N> range)

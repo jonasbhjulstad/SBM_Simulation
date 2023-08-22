@@ -45,7 +45,7 @@ sycl::event initialize_device_buffer(sycl::queue& q, const std::vector<T> &vec, 
 {
     return q.submit([&](sycl::handler& h)
     {
-        auto acc = buf.template get_access<sycl::access::mode::write, sycl::access::target::device>(h);
+        auto acc = buf.template get_access<sycl::access::mode::write, sycl::access::target::global_buffer>(h);
         h.copy(vec.data(), acc);
     });
 }

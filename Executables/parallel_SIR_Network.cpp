@@ -26,21 +26,21 @@ std::vector<T> merge_vectors(const std::vector<std::vector<T>> &vectors)
 int main(int argc, char **argv)
 {
     //parse argv which is N_sims, N_communities, N_pop
-    if (argc != 4)
+    if (argc != 5)
     {
-        std::cout << "Usage: ./parallel_SIR_Network N_sims N_communities N_pop" << std::endl;
+        std::cout << "Usage: ./parallel_SIR_Network N_compute N_work_group_size N_communities N_pop" << std::endl;
         return 1;
     }
-    uint32_t N_sims = std::stoi(argv[1]);
-    uint32_t N_communities = std::stoi(argv[2]);
-    uint32_t N_pop = std::stoi(argv[3]);
+    uint32_t N_wg = std::stoi(argv[1]);
+    uint32_t N_compute = std::stoi(argv[2]);
+    uint32_t N_communities = std::stoi(argv[3]);
+    uint32_t N_pop = std::stoi(argv[4]);
 
 
     sycl::queue q(sycl::gpu_selector_v);//, {cl::sycl::property::queue::enable_profiling{}});
 
 
-
-    Sim_Param p(q, N_sims);
+    Sim_Param p(q);
     p.N_communities = N_communities;
     p.N_pop = N_pop;
     p.p_in = 1.0f;
@@ -48,10 +48,18 @@ int main(int argc, char **argv)
     p.p_R0 = 0.0f;
     p.p_I0 = 0.1f;
     p.p_R = 1e-1f;
-    p.Nt = 9;
-    p.Nt_alloc = 4;
+    p.Nt = 56;
+    p.Nt_alloc = 3;
     p.p_I_max = 1e-2f;
     p.p_I_min = 1e-4f;
+
+
+    p.compute_range = sycl::range<1>(N_compute);
+    p.wg_range = sycl::range<1>(N_wg);
+    p.N_sims = p.compute_range[0]*p.wg_range[0];
+
+
+
     auto device_info = get_device_info(q);
     device_info.print();
 
@@ -65,13 +73,13 @@ int main(int argc, char **argv)
     auto vcm = create_vcm(vertex_lists);
 
     auto edge_list_flat = merge_vectors(edge_lists);
-
+    p.print();
 
 
     auto buffers = Sim_Buffers::make(q, p, edge_list_flat, vcm);
-
-
-    run_allocated(q, p, buffers);
+    std::cout << "Sim_Buffers size:\t" << buffers.byte_size() << "byte" << std::endl;
+    q.wait();
+    run(q, p, buffers);
 
     return 0;
 }

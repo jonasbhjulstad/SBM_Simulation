@@ -64,6 +64,20 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vec
     std::transform(seeds.begin(), seeds.end(), std::back_inserter(rng_init), [](const auto seed)
                    { return Static_RNG::default_rng(seed); });
 
+    std::vector<std::size_t> sizes = {p.Nt*p.N_sims*N_connections*sizeof(float),
+    edge_from_init.size()*sizeof(uint32_t),
+    edge_to_init.size()*sizeof(uint32_t),
+    ecm_init.size()*sizeof(uint32_t),
+    vcm_init.size()*sizeof(uint32_t),
+    (p.Nt_alloc + 1)*p.N_sims*p.N_communities*sizeof(State_t),
+    p.Nt_alloc*p.N_sims*N_connections*sizeof(uint32_t),
+    p.Nt_alloc*p.N_sims*N_connections*sizeof(uint32_t),
+    rng_init.size()*sizeof(Static_RNG::default_rng)};
+
+    assert(p.global_mem_size > std::accumulate(sizes.begin(), sizes.end(), 0) && "Not enough global memory to allocate all buffers");
+
+
+
     auto p_Is = sycl::buffer<float, 3>(sycl::range<3>(p.Nt, p.N_sims, N_connections));
     auto edge_from = sycl::buffer<uint32_t>(sycl::range<1>(edge_from_init.size()));
     auto edge_to = sycl::buffer<uint32_t>(sycl::range<1>(edge_to_init.size()));

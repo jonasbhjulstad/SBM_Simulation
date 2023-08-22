@@ -5,6 +5,7 @@
 #include <Sycl_Graph/Simulation/Sim_Write.hpp>
 #include <Sycl_Graph/Simulation/Sim_Timeseries.hpp>
 #include <Sycl_Graph/Simulation/Sim_Buffer_Routines.hpp>
+#include <filesystem>
 
 sycl::event move_buffer_row(sycl::queue& q, sycl::buffer<SIR_State,3>& buf, uint32_t row, std::vector<sycl::event>& dep_events)
 {
@@ -64,29 +65,34 @@ void run_allocated(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b)
 void run(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b)
 {
     uint32_t N_connections = b.events_from.get_range()[2];
-    Sim_Data d(p.Nt, p.N_sims, p.N_communities, N_connections);
+    Sim_Data d(p.Nt_alloc, p.N_sims, p.N_communities, N_connections);
     std::vector<sycl::event> events(1);
+    q.wait();
     events[0] = initialize_vertices(q, p, b.vertex_state, b.rngs);
-    community_state_init_to_file(q, b.vertex_state, b.community_state, b.vcm, p.compute_range, p.wg_range, p.output_dir, events);
+    std::filesystem::remove_all(p.output_dir);
+    std::filesystem::create_directories(p.output_dir);
+    //remove all files in directory
+    // community_state_init_to_file(q, b.vertex_state, b.community_state, b.vcm, p.compute_range, p.wg_range, p.output_dir, events);
+
     q.wait();
     uint32_t t = 0;
+    //make directory
     for (t = 0; t < p.Nt; t++)
     {
-        bool is_initial_write = (t == 0);
-        if (is_allocated_space_full(t, p.Nt_alloc))
-        {
-            print_timestep(q, events, b.events_from, b.events_to, b.vertex_state, b.vcm, p);
-            events[0] = move_buffer_row(q, b.vertex_state, p.Nt_alloc, events);
-            community_state_append_to_file(q, b.vertex_state, b.community_state, b.vcm, p.compute_range, p.wg_range, p.output_dir, events);
-            connection_events_append_to_file(q, b.events_from, b.events_to, b.vcm, p.output_dir, events, is_initial_write);
-            d.connection_infections = sample_from_connection_events(d.state_timeseries, d.events_from_timeseries, d.events_to_timeseries, b.ccm, b.ccm_weights, p.seed);
-            timeseries_to_file(d.connection_infections, p.output_dir + "/connection_infections", is_initial_write);
-            q.wait();
-        }
+        // bool is_initial_write = (t == 0);
+        // if (is_allocated_space_full(t, p.Nt_alloc) && false)
+        // {
+        //     // print_timestep(q, events, b.events_from, b.events_to, b.vertex_state, b.vcm, p);
+        //     community_state_append_to_file(q, b.vertex_state, b.community_state, b.vcm, p.compute_range, p.wg_range, p.output_dir, events);
+        //     connection_events_append_to_file(q, b.events_from, b.events_to, b.vcm, p.output_dir, events, is_initial_write);
+        //     d.connection_infections = sample_from_connection_events(d.state_timeseries, d.events_from_timeseries, d.events_to_timeseries, b.ccm, b.ccm_weights, p.seed);
+        //     timeseries_to_file(d.connection_infections, p.output_dir + "/connection_infections", is_initial_write);
+        //     events[0] = move_buffer_row(q, b.vertex_state, p.Nt_alloc, events);
+        //     q.wait();
+        // }
         events = recover(q, p, b.vertex_state, b.rngs, t, events);
-        q.wait();
-
-        events = infect(q, p, b, t, events);
+        // q.wait();
+        // events = infect(q, p, b, t, events);
         q.wait();
     }
     auto last_offset = p.Nt - (t % p.Nt_alloc);
