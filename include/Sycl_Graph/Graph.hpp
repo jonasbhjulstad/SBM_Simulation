@@ -1,8 +1,8 @@
 #ifndef GRAPH_GENERATION_HPP
 #define GRAPH_GENERATION_HPP
 #include <cstdint>
-#include <vector>
 #include <fstream>
+#include <vector>
 
 std::vector<std::pair<uint32_t, uint32_t>> random_connect(const std::vector<uint32_t> &to_nodes,
                                                           const std::vector<uint32_t> &from_nodes, float p, uint32_t connection_idx, uint32_t seed);
@@ -12,7 +12,9 @@ std::tuple<std::vector<std::vector<std::pair<uint32_t, uint32_t>>>, std::vector<
 using Edge_List_t = std::vector<std::vector<std::pair<uint32_t, uint32_t>>>;
 using Node_List_t = std::vector<std::vector<uint32_t>>;
 std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>> generate_N_SBM_graphs(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng);
+std::tuple<std::vector<std::pair<uint32_t, uint32_t>>, std::vector<uint32_t>> generate_planted_SBM_flat(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed);
 
+std::tuple<std::vector<std::vector<std::pair<uint32_t, uint32_t>>>, std::vector<std::vector<uint32_t>>> generate_N_SBM_graphs_flat(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng);
 
 std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities);
 
@@ -21,5 +23,5 @@ std::vector<uint32_t> create_ecm(const std::vector<std::vector<std::pair<uint32_
 std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_lists);
 
 std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm);
-std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t>& ecm);
+std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm);
 #endif

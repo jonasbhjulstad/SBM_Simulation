@@ -40,15 +40,15 @@ if __name__ == '__main__':
         queue = sycl_queue(gpu_selector())
 
     queues = get_sycl_gpus()
-    device_infos = get_device_info(queues)
+    device_infos = [get_device_info(q) for q in queues]
 
     _ = [d.print() for d in device_infos]
 
     N_sim = 2
-    N_pop = 10
-    N_communities = 1
+    N_pop = 100
+    N_communities = 2
     p_in = 1.0
-    p_out = 0.5
+    p_out = 1.0
     N_threads = 4
     seed = 999
     Nt = 70
@@ -73,7 +73,8 @@ if __name__ == '__main__':
     #gt.graph_draw(G, output=fpath + "graph.png")
 
     state = gt.minimize_blockmodel_dl(G, state_args=dict(deg_corr=False))
-    state.draw(vertex_shape=state.get_blocks(), output=fpath + "state.png")
+    a = list(state.get_state())
+    # state.draw(vertex_shape=state.get_blocks(), output=fpath + "state.png")
     # entropies = [state.level_entropy(i) for i in range(len(state.get_levels()))]
 
     # entropy_tol = 80
@@ -90,8 +91,25 @@ if __name__ == '__main__':
     # lv = state.get_levels()
     # state.get_levels()[idx].g.save(fpath + "graph.gt")
     #plot state
-    state.draw(vertex_shape=state.get_blocks(), output=fpath + "state.png")
-    ccm_indices = list(state.get_state())
+    #create SBM
+    N_communities = 10
+    p_out = 0.0
+    N_pop = 100
+    nodes = [[i]*N_pop for i in range(N_communities)]
+    nodes = [x for y in nodes for x in y]
+
+    probs = np.identity(N_communities)
+    probs[probs==0] = p_out
+
+    g_SBM = gt.generate_sbm(nodes, probs, directed = False)
+
+    state_sbm = gt.minimize_blockmodel_dl(g_SBM, state_args=dict(deg_corr=False))
+    # state_sbm = gt.minimize_blockmodel_dl(g_SBM)
+    a_sbm = list(state_sbm.get_state())
+    state_sbm.draw(vertex_shape=state_sbm.get_blocks(), output=fpath + "state.png")
+    bstate = state_sbm.get_block_state()
+    bstate.draw(output=fpath + "block_state.png")
+    ccm_indices = list(state_sbm.get_state())
     new_idx, old_idx = remap(ccm_indices)
 
 

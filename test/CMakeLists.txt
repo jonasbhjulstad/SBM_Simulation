@@ -1,3 +1,3 @@
 add_sycl_executable(rng)
-add_sycl_executable(compute_units)
-target_link_libraries(compute_units PRIVATE Profiling)
+# add_sycl_executable(compute_units)
+add_sycl_executable_nodep(compute_units)

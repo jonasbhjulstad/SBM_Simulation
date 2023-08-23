@@ -8,7 +8,7 @@ int main()
     {
         qs.emplace_back(d);
     }
-    auto q = qs[1];
+    auto q = qs[0];
     auto device = q.get_device();
     auto max_wg_size = device.get_info<sycl::info::device::max_work_group_size>();
     auto N_compute = device.get_info<sycl::info::device::max_compute_units>();

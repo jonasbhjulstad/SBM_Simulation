@@ -32,11 +32,11 @@ auto generate_graphs(const std::vector<Sim_Param>& ps, uint32_t seed)
     {
         return gen();
     });
-    std::vector<std::tuple<Edge_List_t, Node_List_t>> graphs(ps.size());
+    std::vector<std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>>> graphs(ps.size());
     std::transform(std::execution::par_unseq, ps.begin(), ps.end(), seeds.begin(),  graphs.begin(), [&](const auto& p, auto s)
     {
 
-        return generate_planted_SBM_edges(p.N_pop, p.N_communities, p.p_in, p.p_out, s);
+        return generate_N_SBM_graphs(p.N_pop, p.N_communities, p.p_in, p.p_out, p.seed, p.N_graphs);
     });
     return graphs;
 }
@@ -86,6 +86,7 @@ int main(int argc, char **argv)
     p.wg_range = sycl::range<1>(N_wg);
     p.N_sims = p.compute_range[0]*p.wg_range[0];
     p.file_idx_offset = N_compute*n;
+    p.N_graphs = 2;
     p.output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Batch_0/";
     n++;
     return p;
@@ -106,18 +107,27 @@ int main(int argc, char **argv)
         auto q = std::get<1>(t);
         auto p = std::get<2>(t);
         auto edge_lists = std::get<0>(graph);
-        auto vcm = create_vcm(std::get<1>(graph));
-        std::vector<decltype(vcm)> vcms(p.N_sims, vcm);
-        return Sim_Buffers::make(q, p, edge_lists, vcms, {});
+        //flatten edge_lists
+        std::vector<std::vector<std::pair<uint32_t, uint32_t>>> edge_lists_flat(edge_lists.size());
+        std::transform(std::execution::par_unseq, edge_lists.begin(), edge_lists.end(), edge_lists_flat.begin(), [](auto& el)
+        {
+            return merge_vectors(el);
+        });
+
+        auto vcm = create_vcm(std::get<1>(graph)[0]);
+
+        auto vcms = std::vector<decltype(vcm)>(p.N_sims, vcm);
+        return Sim_Buffers::make(q, p, edge_lists_flat, vcms, {});
     });
     std::for_each(qs.begin(), qs.end(), [](auto& q){q.wait();});
     // std::cout << "Sim_Buffers size:\t" << buffers.byte_size() << "byte" << std::endl;
 
     std::vector<uint32_t> result(qs.size());
-    std::transform(std::execution::par_unseq, buffer_params.begin(), buffer_params.end(), buffers.begin(), result.begin(), [](auto& bp, auto& b){
-        run(std::get<1>(bp), std::get<2>(bp), b);
-        return 0;
-    });
+    // std::transform(std::execution::par_unseq, buffer_params.begin(), buffer_params.end(), buffers.begin(), result.begin(), [](auto& bp, auto& b){
+    //     run(std::get<1>(bp), std::get<2>(bp), b);
+    //     return 0;
+    // });
+    run(std::get<1>(buffer_params[0]), std::get<2>(buffer_params[0]), buffers[0]);
 
 
     return 0;

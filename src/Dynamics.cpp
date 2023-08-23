@@ -126,8 +126,8 @@ std::vector<sycl::event> infect(sycl::queue &q,
     uint32_t t_alloc = t % p.Nt_alloc;
     uint32_t Nt = p.Nt;
     // assert(N_vertices == p.N_vertices);
-    assert(b.ecm.size() == N_edges);
-    assert(b.vcm.size() == N_vertices);
+    // assert(b.ecm[0].size() == N_edges);
+    // assert(b.vcm[0].size() == N_vertices);
     assert(b.p_Is.get_range()[0] == Nt);
     assert(b.p_Is.get_range()[1] == N_sims);
     assert(b.p_Is.get_range()[2] == N_connections);
@@ -166,6 +166,7 @@ std::vector<sycl::event> infect(sycl::queue &q,
         // sycl::local_accessor<float, 2> p_I_acc(sycl::range<2>(p.wg_range[0], N_connections), h);
         // sycl::local_accessor<uint32_t, 2> event_to_acc(sycl::range<2>(p.wg_range[0], N_connections), h);
         // sycl::local_accessor<uint32_t, 2> event_from_acc(sycl::range<2>(p.wg_range[0], N_connections), h);
+        sycl::stream out(1024, 256, h);
         // auto local_mem_size_used = rng_acc.byte_size() + p_I_acc.byte_size() + event_to_acc.byte_size() + event_from_acc.byte_size();
         h.parallel_for_work_group(p.compute_range, p.wg_range, [=](sycl::group<1> gr)
                                   {
