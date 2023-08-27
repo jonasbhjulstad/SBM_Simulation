@@ -41,27 +41,23 @@ void community_state_to_timeseries(sycl::queue &q,
 }
 
 void community_state_append_to_file(sycl::queue &q,
-                                   sycl::buffer<SIR_State, 3> &vertex_state,
-                                   sycl::buffer<State_t, 3> &community_state,
-                                   sycl::buffer<uint32_t, 2> &vcm,
+                                    const Sim_Param& p,
+                                   Sim_Buffers& b,
                                    sycl::range<1> compute_range,
                                    sycl::range<1> wg_range,
                                    const std::string& output_dir,
                                    std::vector<sycl::event> &dep_events)
 {
-    uint32_t N_sims = vertex_state.get_range()[1];
-    uint32_t Nt_alloc = vertex_state.get_range()[0] - 1;
-    uint32_t N_communities = community_state.get_range()[2];
     std::vector<sycl::event> acc_event(1);
     sycl::event event;
-    std::vector<State_t> community_state_flat((Nt_alloc+1) * N_sims * N_communities);
-    acc_event[0] = accumulate_community_state(q, dep_events, vertex_state, vcm, community_state, Nt_alloc + 1, compute_range, wg_range);
-    event = read_buffer<State_t, 3>(community_state, q, community_state_flat, acc_event);
+    std::vector<State_t> community_state_flat((p.Nt_alloc+1) *p. N_sims * p.N_communities);
+    acc_event[0] = accumulate_community_state(q, dep_events, b.vertex_state, b.vcm, b.community_state, p.Nt_alloc + 1, compute_range, wg_range);
+    event = read_device_usm<State_t>(b.community_state, q, community_state_flat, acc_event);
     event.wait();
-    auto cs = vector_remap(community_state_flat, Nt_alloc+1, N_sims, N_communities);
-    std::vector<std::vector<std::vector<State_t>>> community_timeseries(N_sims, std::vector<std::vector<State_t>>(Nt_alloc+1, std::vector<State_t>(N_communities)));
+    auto cs = vector_remap(community_state_flat, p.Nt_alloc+1, p.N_sims, p.N_communities);
+    std::vector<std::vector<std::vector<State_t>>> community_timeseries(p.N_sims, std::vector<std::vector<State_t>>(Nt_alloc+1, std::vector<State_t>(N_communities)));
     auto Nt_max = community_timeseries[0].size();
-    for (size_t i0 = 0; i0 < N_sims; i0++)
+    for (size_t i0 = 0; i0 < p.N_sims; i0++)
     {
         for (size_t i2 = 0; i2 < (Nt_alloc+1); i2++)
         {
