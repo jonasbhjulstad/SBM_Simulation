@@ -33,9 +33,6 @@ std::vector<sycl::event> recover(sycl::queue &q,
     h.depends_on(cpy_event);
     auto rng_acc_glob = rngs.template get_access<sycl::access_mode::read_write>(h);
     auto v_glob = construct_validate_accessor<SIR_State, 3, sycl::access_mode::read_write>(vertex_state, h, sycl::range<3>(1, N_sims, N_vertices), sycl::range<3>(t_alloc + 1, 0, 0));
-    // sycl::local_accessor<Static_RNG::default_rng> rng_acc(p.wg_range, h);
-    // sycl::local_accessor<SIR_State, 2> v_prev(sycl::range<2>(p.wg_range[0], N_vertices), h);
-    // sycl::local_accessor<SIR_State, 2> v_next(sycl::range<2>(p.wg_range[0], N_vertices), h);
     h.parallel_for_work_group(p.compute_range, p.wg_range, [=](sycl::group<1> gr)
     {
         gr.parallel_for_work_item([&](sycl::h_item<1> it)

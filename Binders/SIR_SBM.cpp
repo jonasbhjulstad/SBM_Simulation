@@ -1,3 +1,4 @@
+
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -24,6 +25,7 @@ sycl::queue create_sycl_device_queue(std::string device_type, uint32_t index = 0
             std::cout << "Warning: CPU index out of range, using CPU 0" << std::endl;
         return sycl::queue(CPU_devices[index]);
     }
+    
     else
     {
         throw std::runtime_error("Invalid device type");
