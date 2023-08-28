@@ -7,7 +7,7 @@
 #include <Sycl_Graph/SIR_Types.hpp>
 
 template <typename T>
-void write_timeseries(const std::vector<std::vector<T>>& data, std::ofstream& f)
+void write_timeseries(const Timeseries_t<T>&& data, std::fstream& f)
 {
     auto N0 = data.size();
     auto N1 = data[0].size();
@@ -26,7 +26,7 @@ void write_timeseries(const std::vector<std::vector<T>>& data, std::ofstream& f)
 }
 
 template <>
-void write_timeseries(const std::vector<std::vector<State_t>>& data, std::ofstream& f)
+void write_timeseries(const Timeseries_t<State_t>&& data, std::fstream& f)
 {
     auto N0 = data.size();
     auto N1 = data[0].size();
@@ -42,7 +42,7 @@ void write_timeseries(const std::vector<std::vector<State_t>>& data, std::ofstre
 
 
 template <typename T>
-void write_timeseries(const std::vector<std::vector<std::vector<T>>>& data, const std::string& fname, bool append = false)
+void write_timeseries(const Simseries_t<T>&& data, const std::string& fname, bool append = false)
 {
     auto N0 = data.size();
     auto N1 = data[0].size();
@@ -51,13 +51,13 @@ void write_timeseries(const std::vector<std::vector<std::vector<T>>>& data, cons
     for(auto n0 = 0; n0 < N0; n0++)
     {
         f.open(fname + "_" + std::to_string(n0) + ".csv", std::ios::out | (append ? std::ios::app : std::ios::trunc));
-
+        write_timeseries(std::forward<const Timeseries_t<T>>(data[n0]), f);
         f.close();
     }
 }
 
 template <typename T>
-void write_timeseries(const std::vector<std::vector<std::vector<std::vector<T>>>>& data, const std::string& base_dir, const std::string& fname, bool append = false)
+void write_timeseries(const Graphseries_t<T>&& data, const std::string& base_dir, const std::string& fname, bool append = false)
 {
     auto N0 = data.size();
     auto N1 = data[0].size();
@@ -66,7 +66,7 @@ void write_timeseries(const std::vector<std::vector<std::vector<std::vector<T>>>
     for(int n0 = 0; n0 < N0; n0++)
     {
         std::filesystem::create_directories(base_dir + "Graph_" + std::to_string(n0) + "/");
-        write_timeseries(data[n0], base_dir + "Graph_" + std::to_string(n0) + "/" + fname, append);
+        write_timeseries(std::forward<const Simseries_t<T>>(data[n0]), base_dir + "Graph_" + std::to_string(n0) + "/" + fname, append);
     }
 }
 

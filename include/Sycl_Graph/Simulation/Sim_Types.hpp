@@ -4,14 +4,6 @@
 #include <string>
 #include <Sycl_Graph/SIR_Types.hpp>
 #include <CL/sycl.hpp>
-struct Sim_Data
-{
-    Sim_Data(uint32_t Nt, uint32_t N_communities, uint32_t N_connections);
-    Simseries_t<uint32_t> events_to_timeseries;
-    Simseries_t<uint32_t> events_from_timeseries;
-    Simseries_t<State_t> state_timeseries;
-    Simseries_t<uint32_t> connection_infections;
-};
 
 struct Sim_Param
 {

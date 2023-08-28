@@ -11,6 +11,9 @@ struct Timeseries_t : public std::vector<std::vector<T>>
 {
   Timeseries_t(uint32_t Nt, uint32_t N_columns)
       : std::vector<std::vector<T>>(Nt, std::vector<T>(N_columns, T{})) {}
+  Timeseries_t(const std::vector<std::vector<T>> &&v)
+      : std::vector<std::vector<T>>(v) {}
+  Timeseries_t() = default;
 };
 template <typename T>
 struct Simseries_t : public std::vector<Timeseries_t<T>>
@@ -19,6 +22,8 @@ struct Simseries_t : public std::vector<Timeseries_t<T>>
       : std::vector<Timeseries_t<T>>(N_sims, Timeseries_t<T>(Nt, N_columns))
   {
   }
+  Simseries_t() = default;
+  Simseries_t(const std::vector<Timeseries_t<T>>&& v): std::vector<Timeseries_t<T>>(v) {}
 };
 template <typename T>
 struct Graphseries_t : public std::vector<Simseries_t<T>>
@@ -27,6 +32,8 @@ struct Graphseries_t : public std::vector<Simseries_t<T>>
       : std::vector<Simseries_t<T>>(N_graphs, Simseries_t<T>(N_sims, Nt, N_columns))
   {
   }
+  Graphseries_t() = default;
+  Graphseries_t(const std::vector<Simseries_t<T>>&& v): std::vector<Simseries_t<T>>(v) {}
 };
 
 struct Inf_Sample_Data_t

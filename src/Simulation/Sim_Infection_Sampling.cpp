@@ -269,8 +269,8 @@ Graphseries_t<uint32_t> sample_infections(
     const Graphseries_t<State_t> &community_state,
     const Graphseries_t<uint32_t> &from_events,
     const Graphseries_t<uint32_t> &to_events,
-    const std::vector<std::pair<uint32_t, uint32_t>> &ccm,
-    const std::vector<uint32_t> &ccm_weights,
+    const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &ccm,
+    const std::vector<std::vector<uint32_t>> &ccm_weights,
     uint32_t seed, uint32_t max_infection_samples)
 {
     auto N_graphs = community_state.size();
@@ -278,14 +278,16 @@ Graphseries_t<uint32_t> sample_infections(
     auto Nt = from_events[0][0].size();
     auto N_connections = from_events[0][0][0].size();
     Graphseries_t<uint32_t> result(N_graphs, N_sims, Nt, N_connections);
-    std::vector<Graph_Inf_Pack> packs(N_sims);
+    std::vector<Graph_Inf_Pack> packs(N_graphs);
     for (int i = 0; i < packs.size(); i++)
     {
         packs[i].community_state = community_state[i];
         packs[i].from_events = from_events[i];
         packs[i].to_events = to_events[i];
+        packs[i].ccm = ccm[i];
+        packs[i].ccm_weights = ccm_weights[i];
     }
     std::transform(std::execution::par_unseq, packs.begin(), packs.end(), result.begin(), [&](const auto &p)
-                   { return sample_infections(p.community_state, p.from_events, p.to_events, ccm, ccm_weights, seed, max_infection_samples); });
+                   { return sample_infections(p.community_state, p.from_events, p.to_events, p.ccm, p.ccm_weights, seed, max_infection_samples); });
     return result;
 }

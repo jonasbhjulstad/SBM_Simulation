@@ -77,6 +77,8 @@ sycl::event initialize_vertices(sycl::queue &q, const Sim_Param &p,
     return init_event;
 }
 
+SYCL_EXTERNAL auto floor_div(auto a, auto b) { return static_cast<uint32_t>(std::floor(static_cast<double>(a) / static_cast<double>(b))); }
+
 std::vector<sycl::event> infect(sycl::queue &q,
                                 const Sim_Param &p,
                                 Sim_Buffers &b,
@@ -85,7 +87,6 @@ std::vector<sycl::event> infect(sycl::queue &q,
 {
 
     uint32_t N_connections = b.N_connections;
-    uint32_t N_edges = b.N_edges;
     uint32_t N_vertices = p.N_communities * p.N_pop;
     uint32_t N_sims = p.N_sims;
     uint32_t t_alloc = t % p.Nt_alloc;
@@ -97,12 +98,13 @@ std::vector<sycl::event> infect(sycl::queue &q,
                                   h.parallel_for(p.N_sims, [=](sycl::item<1> it)
                                                             {
                                         uint32_t N_inf = 0;
+                                        auto graph_idx = floor_div(it[0], N_sims);
                                         auto v_prev_offset = get_linear_offset(N_sims, p.Nt_alloc, N_vertices, it[0], t_alloc, 0);
                                         auto v_next_offset = get_linear_offset(N_sims, p.Nt_alloc, N_vertices, it[0], t_alloc + 1, 0);
                                         auto e_prev_offset = get_linear_offset(N_sims, p.Nt_alloc, N_connections, it[0], t_alloc, 0);
                                         auto e_next_offset = get_linear_offset(N_sims, p.Nt_alloc, N_connections, it[0], t_alloc + 1, 0);
                                         auto p_I_offset = get_linear_offset(N_sims, p.Nt, N_connections, it[0], t, 0);
-                                          for (uint32_t edge_idx = 0; edge_idx < N_edges; edge_idx++)
+                                          for (uint32_t edge_idx = b.edge_offsets[graph_idx]; edge_idx < b.edge_offsets[graph_idx+1]; edge_idx++)
                                           {
                                             auto connection_id = b.ecm[edge_idx];
                                             auto v_from_id = b.edge_from[edge_idx];

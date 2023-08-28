@@ -1,14 +1,5 @@
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <algorithm>
-Sim_Data::Sim_Data(uint32_t Ng, uint32_t N_sims, uint32_t Nt, uint32_t N_communities, uint32_t N_connections) :
-events_to_timeseries(Ng, N_sims, Nt, N_connections),
-events_from_timeseries(Ng, N_sims,Nt, N_connections),
-state_timeseries(Ng, N_sims, Nt+1, N_communities),
-connection_infections(Ng, N_sims, Nt, N_connections)
-{
-}
-
-
 
 
 std::size_t get_sim_data_byte_size(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections)

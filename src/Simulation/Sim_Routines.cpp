@@ -8,7 +8,7 @@
 #include <filesystem>
 #include <Sycl_Graph/Utils/Vector_Remap.hpp>
 
-sycl::event reset_state_index(sycl::queue& q, Sim_Param& p, Sim_Buffers& b, std::vector<sycl::event>& dep_events)
+sycl::event reset_state_index(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, std::vector<sycl::event>& dep_events)
 {
     auto N_vertices = p.N_pop * p.N_communities;
     return q.submit([&](sycl::handler& h)
@@ -37,11 +37,11 @@ void read_allocated_space_to_file(sycl::queue& q, const Sim_Param& p, Sim_Buffer
     auto [events_from, events_to] = read_connection_events(q, p, b, events);
     auto events_from_timeseries = events_from;
     auto events_to_timeseries = events_to;
-    auto connection_infections = sample_from_connection_events(state_timeseries, events_from_timeseries, events_to_timeseries, b.ccm, b.ccm_weights, p.seed, p.compute_range[0]);
+    auto connection_infections = sample_infections(state_timeseries, events_from_timeseries, events_to_timeseries, b.ccm, b.ccm_weights, p.seed, p.max_infection_samples);
     auto merged_events = zip_merge_timeseries(get_N_timesteps(events_from_timeseries, Nt), get_N_timesteps(events_to_timeseries, Nt));
 
     write_timeseries(get_N_timesteps(state_timeseries, Nt), output_dir, "community_trajectory", append);
-    write_timeseries(merged_events, output_dir, "connection_events", append);
+    write_timeseries(std::forward<decltype(merged_events)>(merged_events), output_dir, "connection_events", append);
     write_timeseries(get_N_timesteps(connection_infections, Nt), output_dir, "connection_infections", append);
 }
 
@@ -50,7 +50,6 @@ void read_allocated_space_to_file(sycl::queue& q, const Sim_Param& p, Sim_Buffer
 void run(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b, const std::string& output_dir)
 {
     uint32_t N_connections = b.N_connections;
-    Sim_Data d(p.N_graphs, p.N_sims, p.Nt_alloc, p.N_communities, N_connections);
     std::vector<sycl::event> events(1);
     q.wait();
     events[0] = initialize_vertices(q, p, b);
