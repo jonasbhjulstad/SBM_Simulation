@@ -1,15 +1,17 @@
 #ifndef SIM_WRITE_HPP
 #define SIM_WRITE_HPP
-
-#include <vector>
-#include <cstdint>
-#include <string>
-auto merge(const std::vector<std::vector<std::vector<uint32_t>>>& t0, const std::vector<std::vector<std::vector<uint32_t>>>& t1);
-
-void events_to_file(const std::vector<std::vector<std::vector<uint32_t>>>& e_to, const std::vector<std::vector<std::vector<uint32_t>>>& e_from, const std::string& abs_fname, bool append=false);
-
-void timeseries_to_file(const std::vector<std::vector<std::vector<std::array<uint32_t, 3>>>>& ts, const std::string& abs_fname, bool append = false);
-void timeseries_to_file(const std::vector<std::vector<std::vector<uint32_t>>>& ts, const std::string& abs_fname, bool append = false);
+#include <Sycl_Graph/Simulation/Sim_Write_Impl.hpp>
 
 
+extern template void write_timeseries(const Timeseries_t<uint32_t>&& ts, std::fstream& f);
+extern template void write_timeseries(const Timeseries_t<float>&& ts, std::fstream& f);
+// extern template void write_timeseries(const Timeseries_t<State_t>&& ts, std::fstream& f);
+
+extern template void write_simseries(const Simseries_t<uint32_t>&& ss, const std::string& abs_fname, bool append);
+extern template void write_simseries(const Simseries_t<float>&& ss, const std::string& abs_fname, bool append);
+extern template void write_simseries(const Simseries_t<State_t>&& ss, const std::string& abs_fname, bool append);
+
+extern template void write_graphseries(const Graphseries_t<uint32_t>&& gs, const std::string& base_dir, const std::string& base_fname, bool append);
+extern template void write_graphseries(const Graphseries_t<float>&& gs, const std::string& base_dir, const std::string& base_fname, bool append);
+extern template void write_graphseries(const Graphseries_t<State_t>&& gs, const std::string& base_dir, const std::string& base_fname, bool append);
 #endif

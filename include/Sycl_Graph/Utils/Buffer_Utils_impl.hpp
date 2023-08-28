@@ -24,6 +24,22 @@ sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, std::vector<T>& 
 }
 
 template <typename T, std::size_t N>
+sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, std::vector<T>& result, sycl::event& dep_event)
+{
+    if (result.size() < buf.size())
+    {
+        throw std::runtime_error("Result vector is too small to hold the buffer");
+        result.resize(buf.size());
+    }
+    return q.submit([&](sycl::handler& h)
+    {
+        h.depends_on(dep_event);
+        auto acc = sycl::accessor<T, N, sycl::access_mode::read>(buf, h, sycl::range<N>(buf.get_range()));
+        h.copy(acc, result.data());
+    });
+}
+
+template <typename T, std::size_t N>
 sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, std::vector<T>& result, std::vector<sycl::event>& dep_events, sycl::range<N> range, sycl::range<N> offset)
 {
     if (result.size() < range.size())

@@ -102,11 +102,12 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vec
     {
         return ecm_from_vcm(e_list, vcm);
     });
+    auto N_sims_tot = p.N_sims*p.wg_range[0];
     auto ecm_init = join_vectors(ecms);
     uint32_t N_connections = std::max_element(ecm_init.begin(), ecm_init.end())[0] + 1;
     if (p_Is_init.size() == 0)
     {
-        p_Is_init = generate_floats(p.Nt * p.N_sims * N_connections, p.p_I_min, p.p_I_max, p.seed);
+        p_Is_init = generate_floats(p.Nt * N_sims_tot * N_connections, p.p_I_min, p.p_I_max, p.seed);
     }
     uint32_t N_vertices = vcms[0].size();
     auto vcm_init = join_vectors(vcms);
@@ -120,40 +121,40 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vec
     uint32_t N_tot_edges = std::accumulate(edge_counts_init.begin(), edge_counts_init.end(), 0);
 
 
-    std::vector<State_t> community_state_init(p.N_communities * p.N_sims * (p.Nt_alloc + 1), {0, 0, 0});
-    std::vector<SIR_State> traj_init(p.N_sims * (p.Nt_alloc + 1) * N_vertices, SIR_INDIVIDUAL_S);
-    std::vector<uint32_t> event_init(p.N_sims * N_connections * p.Nt_alloc, 0);
-    auto seeds = generate_seeds(p.N_sims, p.seed);
+    std::vector<State_t> community_state_init(p.N_communities * N_sims_tot * (p.Nt_alloc + 1), {0, 0, 0});
+    std::vector<SIR_State> traj_init(N_sims_tot * (p.Nt_alloc + 1) * N_vertices, SIR_INDIVIDUAL_S);
+    std::vector<uint32_t> event_init(N_sims_tot * N_connections * p.Nt_alloc, 0);
+    auto seeds = generate_seeds(N_sims_tot, p.seed);
     std::vector<Static_RNG::default_rng> rng_init;
-    rng_init.reserve(p.N_sims);
+    rng_init.reserve(N_sims_tot);
     std::transform(seeds.begin(), seeds.end(), std::back_inserter(rng_init), [](const auto seed)
                    { return Static_RNG::default_rng(seed); });
 
-    std::vector<std::size_t> sizes = {p.Nt*p.N_sims*N_connections*sizeof(float),
+    std::vector<std::size_t> sizes = {p.Nt*N_sims_tot*N_connections*sizeof(float),
     edge_from_init.size()*sizeof(uint32_t),
     edge_to_init.size()*sizeof(uint32_t),
     ecm_init.size()*sizeof(uint32_t),
     vcm_init.size()*sizeof(uint32_t),
-    (p.Nt_alloc + 1)*p.N_sims*p.N_communities*sizeof(State_t),
-    p.Nt_alloc*p.N_sims*N_connections*sizeof(uint32_t),
-    p.Nt_alloc*p.N_sims*N_connections*sizeof(uint32_t),
+    (p.Nt_alloc + 1)*N_sims_tot*p.N_communities*sizeof(State_t),
+    p.Nt_alloc*N_sims_tot*N_connections*sizeof(uint32_t),
+    p.Nt_alloc*N_sims_tot*N_connections*sizeof(uint32_t),
     rng_init.size()*sizeof(Static_RNG::default_rng)};
 
     assert(p.global_mem_size > std::accumulate(sizes.begin(), sizes.end(), 0) && "Not enough global memory to allocate all buffers");
 
 
 
-    auto p_Is = sycl::buffer<float, 3>(sycl::range<3>(p.Nt, p.N_sims, N_connections));
+    auto p_Is = sycl::buffer<float, 3>(sycl::range<3>(p.Nt, N_sims_tot, N_connections));
     auto edge_from = sycl::buffer<uint32_t>((sycl::range<1>(N_tot_edges)));
     auto edge_to = sycl::buffer<uint32_t>((sycl::range<1>(N_tot_edges)));
     auto ecm = sycl::buffer<uint32_t, 1>((sycl::range<1>(N_tot_edges)));
     auto vcm = sycl::buffer<uint32_t, 2>(sycl::range<2>(p.compute_range[0], vcms[0].size()));
     auto edge_counts = sycl::buffer<uint32_t>((sycl::range<1>(p.compute_range[0])));
     auto edge_offsets = sycl::buffer<uint32_t>((sycl::range<1>(p.compute_range[0])));
-    auto community_state = sycl::buffer<State_t, 3>(sycl::range<3>(p.Nt_alloc + 1, p.N_sims, p.N_communities));
-    auto trajectory = sycl::buffer<SIR_State, 3>(sycl::range<3>(p.Nt_alloc + 1, p.N_sims, N_vertices));
-    auto events_from = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.Nt_alloc, p.N_sims, N_connections));
-    auto events_to = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.Nt_alloc, p.N_sims, N_connections));
+    auto community_state = sycl::buffer<State_t, 3>(sycl::range<3>(p.Nt_alloc + 1, N_sims_tot, p.N_communities));
+    auto trajectory = sycl::buffer<SIR_State, 3>(sycl::range<3>(p.Nt_alloc + 1, N_sims_tot, N_vertices));
+    auto events_from = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.Nt_alloc, N_sims_tot, N_connections));
+    auto events_to = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.Nt_alloc, N_sims_tot, N_connections));
     auto rngs = sycl::buffer<Static_RNG::default_rng>(sycl::range<1>(rng_init.size()));
 
     std::vector<sycl::event> alloc_events(11);

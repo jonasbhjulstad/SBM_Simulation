@@ -50,16 +50,16 @@ int main(int argc, char **argv)
     //parse argv which is N_sims, N_communities, N_pop
     if (argc != 5)
     {
-        std::cout << "Usage: ./parallel_SIR_Network N_compute N_work_group_size N_communities N_pop" << std::endl;
+        std::cout << "Usage: ./parallel_SIR_Network N_work_group_size N_communities N_pop N_graphs" << std::endl;
         return 1;
     }
-    uint32_t N_wg = std::stoi(argv[1]);
-    uint32_t N_compute = std::stoi(argv[2]);
-    uint32_t N_communities = std::stoi(argv[3]);
-    uint32_t N_pop = std::stoi(argv[4]);
+    auto N_wg = std::stoi(argv[1]);
+    uint32_t N_communities = std::stoi(argv[2]);
+    uint32_t N_pop = std::stoi(argv[3]);
+    uint32_t N_graphs = std::stoi(argv[4]);
     //get all gpus
     std::vector<sycl::queue> qs;
-    auto devices = sycl::device::get_devices(sycl::info::device_type::gpu);
+    auto devices = sycl::device::get_devices(sycl::info::device_type::cpu);
     for (auto &d : devices)
     {
         qs.emplace_back(d);
@@ -71,22 +71,24 @@ int main(int argc, char **argv)
 
     std::transform(qs.begin(), qs.end(), std::back_inserter(ps), [&, n = 0](sycl::queue& q)mutable {auto p = Sim_Param(q);
     p.N_communities = N_communities;
+    auto device = q.get_device();
+    auto N_wg_used = (N_wg == 0) ? device.get_info<sycl::info::device::max_work_group_size>() : N_wg;
     p.N_pop = N_pop;
     p.p_in = 1.0f;
     p.p_out = 0.0f;
     p.p_R0 = 0.0f;
     p.p_I0 = 0.1f;
     p.p_R = 1e-1f;
-    p.Nt = 20;
-    p.Nt_alloc = 3;
+    p.Nt = 56;
+    p.Nt_alloc = 6;
     p.p_I_max = 1e-3f;
     p.p_I_min = 1e-5f;
     p.seed = gen();
-    p.compute_range = sycl::range<1>(N_compute);
-    p.wg_range = sycl::range<1>(N_wg);
-    p.N_sims = p.compute_range[0]*p.wg_range[0];
-    p.file_idx_offset = N_compute*n;
-    p.N_graphs = 2;
+    p.compute_range = sycl::range<1>(N_graphs*N_wg_used);
+    p.wg_range = sycl::range<1>(N_wg_used);
+    p.N_sims = p.wg_range[0];
+    p.file_idx_offset = N_graphs*n;
+    p.N_graphs = N_graphs;
     p.output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Batch_0/";
     n++;
     return p;
@@ -101,33 +103,24 @@ int main(int argc, char **argv)
         buffer_params.push_back(std::make_tuple(graphs[i], qs[i], ps[i]));
     }
 
-    std::transform(buffer_params.begin(), buffer_params.end(), std::back_inserter(buffers), [](auto &t)
-    {
-        auto graph = std::get<0>(t);
-        auto q = std::get<1>(t);
-        auto p = std::get<2>(t);
-        auto edge_lists = std::get<0>(graph);
-        //flatten edge_lists
-        std::vector<std::vector<std::pair<uint32_t, uint32_t>>> edge_lists_flat(edge_lists.size());
-        std::transform(std::execution::par_unseq, edge_lists.begin(), edge_lists.end(), edge_lists_flat.begin(), [](auto& el)
-        {
-            return merge_vectors(el);
-        });
-
-        auto vcm = create_vcm(std::get<1>(graph)[0]);
-
-        auto vcms = std::vector<decltype(vcm)>(p.N_sims, vcm);
-        return Sim_Buffers::make(q, p, edge_lists_flat, vcms, {});
-    });
+    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> edge_lists_flat(std::get<0>(graphs[0]).size());
+    std::vector<std::vector<uint32_t>> vcms(std::get<0>(graphs[0]).size());
+    for(int i = 0; i < std::get<0>(graphs[0]).size(); i++)
+    {    //flatten edge_lists
+        auto& e_list = std::get<0>(graphs[0])[i];
+        auto& nodelists = std::get<1>(graphs[0])[i];
+        edge_lists_flat[i] = merge_vectors(e_list);
+        vcms[i] = create_vcm(nodelists);
+    }
+    auto b = Sim_Buffers::make(qs[0], ps[0], edge_lists_flat, vcms, {});
     std::for_each(qs.begin(), qs.end(), [](auto& q){q.wait();});
     // std::cout << "Sim_Buffers size:\t" << buffers.byte_size() << "byte" << std::endl;
 
-    std::vector<uint32_t> result(qs.size());
     // std::transform(std::execution::par_unseq, buffer_params.begin(), buffer_params.end(), buffers.begin(), result.begin(), [](auto& bp, auto& b){
     //     run(std::get<1>(bp), std::get<2>(bp), b);
     //     return 0;
     // });
-    run(std::get<1>(buffer_params[0]), std::get<2>(buffer_params[0]), buffers[0]);
+    run(qs[0], ps[0], b);
 
 
     return 0;

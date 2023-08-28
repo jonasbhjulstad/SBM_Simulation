@@ -50,4 +50,31 @@ struct Sim_Param
 };
 std::size_t get_sim_data_byte_size(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections);
 
+
+
+
+template <typename T>
+struct Timeseries_t: public std::vector<std::vector<T>>
+{
+    Timeseries_t() = default;
+    Timeseries_t(const std::vector<std::vector<T>>& data): std::vector<std::vector<T>>(data){}
+    Timeseries_t(size_t Nt, size_t N_cols): std::vector<std::vector<T>>(Nt, std::vector<T>(N_cols)){}
+};
+
+template <typename T>
+struct Simseries_t: public std::vector<Timeseries_t<T>>
+{
+    Simseries_t() = default;
+    Simseries_t(const std::vector<Timeseries_t<T>>& data): std::vector<Timeseries_t<T>>(data){}
+    Simseries_t(size_t N_sims, size_t Nt, size_t N_cols): std::vector<Timeseries_t<T>>(N_sims, Timeseries_t<T>(Nt, N_cols)){}
+};
+
+template <typename T>
+struct Graphseries_t: public std::vector<Simseries_t<T>>
+{
+    Graphseries_t() = default;
+    Graphseries_t(const std::vector<Simseries_t<T>>& data): std::vector<Simseries_t<T>>(data){}
+    Graphseries_t(size_t N_graphs, size_t N_sims, size_t Nt, size_t N_cols): std::vector<Simseries_t<T>>(N_graphs, Simseries_t<T>(N_sims, Nt, N_cols)){}
+};
+
 #endif
