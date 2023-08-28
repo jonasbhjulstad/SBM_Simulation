@@ -1,49 +1,42 @@
 #include <Sycl_Graph/Utils/Vector_Remap.hpp>
-#include <stdexcept>
-std::vector<std::vector<std::vector<State_t>>> vector_remap(std::vector<State_t> &input, size_t N0, size_t N1, size_t N2)
+template Graphseries_t<uint32_t> remap_linear_data(uint32_t Ng, uint32_t N_sims, uint32_t Nt, uint32_t N_columns, const std::vector<uint32_t>& linear_data);
+template Graphseries_t<SIR_State> remap_linear_data(uint32_t Ng, uint32_t N_sims, uint32_t Nt, uint32_t N_columns, const std::vector<SIR_State>& linear_data);
+template Graphseries_t<State_t> remap_linear_data(uint32_t Ng, uint32_t N_sims, uint32_t Nt, uint32_t N_columns, const std::vector<State_t>& linear_data);
+
+std::size_t get_linear_offset(uint32_t N_sims, uint32_t Nt, uint32_t N_columns, uint32_t sim_id, uint32_t t, uint32_t c_id)
 {
-    size_t M = N0 * N1 * N2;
-    if (input.size() != M)
-    {
-        throw std::runtime_error("Input vector size does not match 3D dimensions.");
-    }
-
-    std::vector<std::vector<std::vector<State_t>>> output(N0, std::vector<std::vector<State_t>>(N1, std::vector<State_t>(N2)));
-
-    // linear position defined by i2 + i1*n2 + i0*n1*n2
-    for (size_t i0 = 0; i0 < N0; i0++)
-    {
-        for (size_t i1 = 0; i1 < N1; i1++)
-        {
-            for (size_t i2 = 0; i2 < N2; i2++)
-            {
-                output[i0][i1][i2] = input[i2 + i1 * N2 + i0 * N1 * N2];
-            }
-        }
-    }
-    return output;
+    auto sim_frac = std::floor(static_cast<double>(sim_id) / static_cast<double>(N_sims));
+    auto graph_offset = sim_frac*N_sims*Nt*N_columns;
+    auto sim_offset = sim_id*Nt*N_columns;
+    auto t_offset = t*N_columns;
+    return graph_offset + sim_offset + t_offset + c_id;
 }
 
-std::vector<std::vector<std::vector<uint32_t>>> vector_remap(std::vector<uint32_t> &input, size_t N0, size_t N1, size_t N2)
+
+
+template Graphseries_t<uint32_t> get_N_timesteps(const Graphseries_t<uint32_t>& ts, uint32_t Nt);
+template Graphseries_t<State_t> get_N_timesteps(const Graphseries_t<State_t>& ts, uint32_t Nt);
+
+Graphseries_t<uint32_t> zip_merge_timeseries(const Graphseries_t<uint32_t>& ts_0, const Graphseries_t<uint32_t>& ts_1)
 {
-    size_t M = N0 * N1 * N2;
-    if (input.size() != M)
+    auto N_graphs = ts_0.size();
+    auto N_sims = ts_0[0].size();
+    auto Nt = ts_0[0][0].size();
+    auto N_columns = ts_0[0][0][0].size();
+    Graphseries_t<uint32_t> result(N_graphs, N_sims, Nt, N_columns*2);
+    for (uint32_t g = 0; g < N_graphs; ++g)
     {
-        throw std::runtime_error("Input vector size does not match 3D dimensions.");
-    }
-
-    std::vector<std::vector<std::vector<uint32_t>>> output(N0, std::vector<std::vector<uint32_t>>(N1, std::vector<uint32_t>(N2)));
-
-    //linear position defined by i2 + i1*n2 + i0*n1*n2
-    for (size_t i0 = 0; i0 < N0; i0++)
-    {
-        for (size_t i1 = 0; i1 < N1; i1++)
+        for (uint32_t s = 0; s < N_sims; ++s)
         {
-            for (size_t i2 = 0; i2 < N2; i2++)
+            for (uint32_t t = 0; t < Nt; ++t)
             {
-                output[i0][i1][i2] = input[i2 + i1 * N2 + i0 * N1 * N2];
+                for (uint32_t c = 0; c < N_columns; ++c)
+                {
+                    result[g][s][t][c*2] = ts_0[g][s][t][c];
+                    result[g][s][t][c*2+1] = ts_1[g][s][t][c];
+                }
             }
         }
     }
-    return output;
+    return result;
 }

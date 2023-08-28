@@ -2,9 +2,9 @@
 #include <Sycl_Graph/Simulation/Sim_Infection_Sampling.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
 #include <algorithm>
+#include <execution>
 #include <iostream>
 #include <random>
-#include <execution>
 
 std::vector<uint32_t> sample_connection_infections(Inf_Sample_Data_t &z, const uint32_t max_infection_samples)
 {
@@ -190,21 +190,29 @@ std::vector<std::vector<int>> get_delta_Is(const std::vector<std::vector<State_t
         }
     }
 
-
-    for(int i = 0; i < delta_I.size();i++)
+    for (int i = 0; i < delta_I.size(); i++)
     {
-        assert(std::all_of(delta_I[i].begin(), delta_I[i].end(), [](auto x){return x >= 0;}) && "Negative delta_I");
+        assert(std::all_of(delta_I[i].begin(), delta_I[i].end(), [](auto x)
+                           { return x >= 0; }) &&
+               "Negative delta_I");
     }
 
-    for(int i = 0; i < delta_R.size();i++)
+    for (int i = 0; i < delta_R.size(); i++)
     {
-        assert(std::all_of(delta_R[i].begin(), delta_R[i].end(), [](auto x){return x >= 0;}) && "Negative delta_R");
+        assert(std::all_of(delta_R[i].begin(), delta_R[i].end(), [](auto x)
+                           { return x >= 0; }) &&
+               "Negative delta_R");
     }
 
     return delta_I;
 }
 
-std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vector<State_t>> &community_state, const std::vector<std::vector<uint32_t>> &from_events, const std::vector<std::vector<uint32_t>> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t seed, uint32_t max_infection_samples)
+std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vector<State_t>> &community_state,
+                                                     const std::vector<std::vector<uint32_t>> &from_events,
+                                                     const std::vector<std::vector<uint32_t>> &to_events,
+                                                     const std::vector<std::pair<uint32_t, uint32_t>> &ccm,
+                                                     const std::vector<uint32_t> &ccm_weights,
+                                                     uint32_t seed, uint32_t max_infection_samples)
 {
     std::vector<uint32_t> community_idx(community_state.size());
     std::iota(community_idx.begin(), community_idx.end(), 0);
@@ -233,67 +241,51 @@ std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vect
 }
 
 
-std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(const std::vector<std::vector<std::vector<State_t>>> &community_state,
-                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
-                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &to_events,
-                                                                                        const std::vector<std::pair<uint32_t, uint32_t>>& ccm,
-                                                                                        const std::vector<uint32_t>& ccm_weights,
-                                                                                        uint32_t seed, uint32_t max_infection_samples)
+Simseries_t<uint32_t> sample_infections(
+    const Simseries_t<State_t> &community_state,
+    const Simseries_t<uint32_t> &from_events,
+    const Simseries_t<uint32_t> &to_events,
+    const std::vector<std::pair<uint32_t, uint32_t>> &ccm,
+    const std::vector<uint32_t> &ccm_weights,
+    uint32_t seed, uint32_t max_infection_samples)
 {
-
-    uint32_t N_sims = from_events.size();
-    uint32_t Nt = from_events[0].size();
-    uint32_t N_connections = from_events[0][0].size();
-    std::vector<std::vector<std::vector<uint32_t>>> infections = std::vector<std::vector<std::vector<uint32_t>>>(N_sims, std::vector<std::vector<uint32_t>>(N_connections, std::vector<uint32_t>(Nt)));
-
-    std::vector<std::tuple<std::vector<std::vector<State_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>>> sim_data(N_sims);
-
-    for (int sim_idx = 0; sim_idx < N_sims; sim_idx++)
+    auto N_sims = community_state.size();
+    auto Nt = from_events[0].size();
+    auto N_connections = from_events[0][0].size();
+    Simseries_t<uint32_t> result(N_sims, Nt, N_connections);
+    std::vector<Sim_Inf_Pack> packs(N_sims);
+    for (int i = 0; i < packs.size(); i++)
     {
-        sim_data[sim_idx] = std::make_tuple(community_state[sim_idx], from_events[sim_idx], to_events[sim_idx]);
+        packs[i].community_state = community_state[i];
+        packs[i].from_events = from_events[i];
+        packs[i].to_events = to_events[i];
     }
-    std::transform(std::execution::par_unseq, sim_data.begin(), sim_data.end(), infections.begin(), [&](const auto &sim_d)
-                   {
-        const auto& sim_community_state = std::get<0>(sim_d);
-        const auto& sim_from_events = std::get<1>(sim_d);
-        const auto& sim_to_events = std::get<2>(sim_d);
-        return sample_infections(sim_community_state, sim_from_events, sim_to_events, ccm, ccm_weights, seed, max_infection_samples); });
-
-    return infections;
+    std::transform(std::execution::par_unseq, packs.begin(), packs.end(), result.begin(), [&](const auto &p)
+                   { return sample_infections(p.community_state, p.from_events, p.to_events, ccm, ccm_weights, seed, max_infection_samples); });
+    return result;
 }
 
-uint32_t floor_div(uint32_t a, uint32_t b)
+Graphseries_t<uint32_t> sample_infections(
+    const Graphseries_t<State_t> &community_state,
+    const Graphseries_t<uint32_t> &from_events,
+    const Graphseries_t<uint32_t> &to_events,
+    const std::vector<std::pair<uint32_t, uint32_t>> &ccm,
+    const std::vector<uint32_t> &ccm_weights,
+    uint32_t seed, uint32_t max_infection_samples)
 {
-    return static_cast<uint32_t>(std::floor(static_cast<double>(a) / static_cast<double>(b)));
-}
-
-std::vector<std::vector<std::vector<uint32_t>>> sample_from_connection_events(const std::vector<std::vector<std::vector<State_t>>> &community_state,
-                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &from_events,
-                                                                                         const std::vector<std::vector<std::vector<uint32_t>>> &to_events,
-                                                                                        const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& ccms,
-                                                                                        const std::vector<std::vector<uint32_t>>& ccm_weights,
-                                                                                        uint32_t seed, uint32_t max_infection_samples, uint32_t N_compute)
-{
-
-    uint32_t N_sims = from_events.size();
-    uint32_t Nt = from_events[0].size();
-    uint32_t N_connections = from_events[0][0].size();
-    std::vector<std::vector<std::vector<uint32_t>>> infections = std::vector<std::vector<std::vector<uint32_t>>>(N_sims, std::vector<std::vector<uint32_t>>(N_connections, std::vector<uint32_t>(Nt)));
-
-    std::vector<std::tuple<std::vector<std::vector<State_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>, uint32_t>> sim_data(N_sims);
-
-
-    for (int sim_idx = 0; sim_idx < N_sims; sim_idx++)
+    auto N_graphs = community_state.size();
+    auto N_sims = from_events[0].size();
+    auto Nt = from_events[0][0].size();
+    auto N_connections = from_events[0][0][0].size();
+    Graphseries_t<uint32_t> result(N_graphs, N_sims, Nt, N_connections);
+    std::vector<Graph_Inf_Pack> packs(N_sims);
+    for (int i = 0; i < packs.size(); i++)
     {
-        sim_data[sim_idx] = std::make_tuple(community_state[sim_idx], from_events[sim_idx], to_events[sim_idx], floor_div(sim_idx, N_compute));
+        packs[i].community_state = community_state[i];
+        packs[i].from_events = from_events[i];
+        packs[i].to_events = to_events[i];
     }
-    std::transform(std::execution::par_unseq, sim_data.begin(), sim_data.end(), infections.begin(), [&](const auto &sim_d)
-                   {
-        const auto& sim_community_state = std::get<0>(sim_d);
-        const auto& sim_from_events = std::get<1>(sim_d);
-        const auto& sim_to_events = std::get<2>(sim_d);
-        const auto& ccm_idx = std::get<3>(sim_d);
-        return sample_infections(sim_community_state, sim_from_events, sim_to_events, ccms[ccm_idx], ccm_weights[ccm_idx], seed, max_infection_samples); });
-
-    return infections;
+    std::transform(std::execution::par_unseq, packs.begin(), packs.end(), result.begin(), [&](const auto &p)
+                   { return sample_infections(p.community_state, p.from_events, p.to_events, ccm, ccm_weights, seed, max_infection_samples); });
+    return result;
 }

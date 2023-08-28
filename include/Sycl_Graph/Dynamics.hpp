@@ -6,13 +6,11 @@
 #include <Sycl_Graph/Simulation/Sim_Buffers.hpp>
 std::vector<sycl::event> recover(sycl::queue &q,
                                  const Sim_Param &p,
-                                 sycl::buffer<SIR_State, 3> &vertex_state,
-                                 sycl::buffer<Static_RNG::default_rng> &rngs,
+                                 Sim_Buffers& b,
                                  uint32_t t,
                                  std::vector<sycl::event> &dep_event);
 sycl::event initialize_vertices(sycl::queue &q, const Sim_Param &p,
-                                sycl::buffer<SIR_State, 3> &vertex_state,
-                                sycl::buffer<Static_RNG::default_rng> &rngs);
+                                Sim_Buffers& b);
 
 std::vector<sycl::event> infect(sycl::queue &q,
                                 const Sim_Param &p,

@@ -6,17 +6,24 @@
 #include <Sycl_Graph/Simulation/Sim_Timeseries.hpp>
 #include <Sycl_Graph/Simulation/Sim_Buffer_Routines.hpp>
 #include <filesystem>
+#include <Sycl_Graph/Utils/Vector_Remap.hpp>
 
-sycl::event move_buffer_row(sycl::queue& q, sycl::buffer<SIR_State,3>& buf, uint32_t row, std::vector<sycl::event>& dep_events)
+sycl::event reset_state_index(sycl::queue& q, Sim_Param& p, Sim_Buffers& b, std::vector<sycl::event>& dep_events)
 {
-    auto Nt = buf.get_range()[0];
-    auto N_sims = buf.get_range()[1];
-    auto N_vertices = buf.get_range()[2];
-    return q.submit([&](sycl::handler &h)
-                                {
-            auto start_acc = sycl::accessor<SIR_State, 3, sycl::access_mode::write>(buf, h, sycl::range<3>(1,N_sims, N_vertices), sycl::range<3>(0,0,0));
-            auto end_acc = sycl::accessor<SIR_State, 3, sycl::access_mode::read>(buf, h, sycl::range<3>(1,N_sims, N_vertices), sycl::range<3>(row,0,0));
-            h.copy(end_acc, start_acc); });
+    auto N_vertices = p.N_pop * p.N_communities;
+    return q.submit([&](sycl::handler& h)
+    {
+        h.depends_on(dep_events);
+        h.parallel_for(p.N_sims, [=](sycl::item<1> it)
+        {
+            auto offset_0 = get_linear_offset(p.N_sims, p.Nt_alloc, N_vertices, it[0], 0, 0);
+            auto offset_end = get_linear_offset(p.N_sims, p.Nt_alloc, N_vertices, it[0], p.Nt_alloc, 0);
+            for(auto i = offset_0; i < offset_end; i++)
+            {
+                b.vertex_state[offset_0 + i] = b.vertex_state[offset_end + i];
+            }
+        });
+    });
 }
 
 bool is_allocated_space_full(uint32_t t, uint32_t Nt_alloc)
@@ -24,55 +31,31 @@ bool is_allocated_space_full(uint32_t t, uint32_t Nt_alloc)
     return ((t != 0) && (t % (Nt_alloc) == 0));
 }
 
-void run_allocated(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b)
+void read_allocated_space_to_file(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, std::vector<sycl::event>& events, const std::string& output_dir, uint32_t Nt, bool append)
 {
-    uint32_t N_connections = b.events_from.get_range()[2];
-    Sim_Data d(p.Nt, p.N_sims, p.N_communities, N_connections);
-    std::vector<sycl::event> events(1);
-    events[0] = initialize_vertices(q, p, b.vertex_state, b.rngs);
-    community_state_to_timeseries(q, b.vertex_state, b.community_state, d.state_timeseries, b.vcm, 0, p.compute_range, p.wg_range, events);
-    q.wait();
-    uint32_t t = 0;
-    for (t = 0; t < p.Nt; t++)
-    {
-        if (is_allocated_space_full(t, p.Nt_alloc))
-        {
+    auto state_timeseries = read_community_state(q, p, b.community_state, events);
+    auto [events_from, events_to] = read_connection_events(q, p, b, events);
+    auto events_from_timeseries = events_from;
+    auto events_to_timeseries = events_to;
+    auto connection_infections = sample_from_connection_events(state_timeseries, events_from_timeseries, events_to_timeseries, b.ccm, b.ccm_weights, p.seed, p.compute_range[0]);
+    auto merged_events = zip_merge_timeseries(get_N_timesteps(events_from_timeseries, Nt), get_N_timesteps(events_to_timeseries, Nt));
 
-            print_timestep(q, events, b.events_from, b.events_to, b.vertex_state, b.vcm, p);
-            community_state_to_timeseries(q, b.vertex_state, b.community_state, d.state_timeseries, b.vcm, (t - p.Nt_alloc), p.compute_range, p.wg_range, events);
-            connection_events_to_timeseries(q, b.events_from, b.events_to, d.events_from_timeseries, d.events_to_timeseries, b.vcm, (t - p.Nt_alloc), events);
-            events[0] = move_buffer_row(q, b.vertex_state, p.Nt_alloc, events);
-            q.wait();
-        }
-        events = recover(q, p, b.vertex_state, b.rngs, t, events);
-        q.wait();
-
-        events = infect(q, p, b, t, events);
-        q.wait();
-    }
-    auto last_offset = p.Nt - (t % p.Nt_alloc);
-    community_state_to_timeseries(q, b.vertex_state, b.community_state, d.state_timeseries, b.vcm, last_offset, p.compute_range, p.wg_range, events);
-    connection_events_to_timeseries(q, b.events_from, b.events_to, d.events_from_timeseries, d.events_to_timeseries, b.vcm, last_offset, events);
-
-    timeseries_to_file(d.state_timeseries, p.output_dir + "/community_trajectory");
-    events_to_file(d.events_from_timeseries, d.events_to_timeseries, p.output_dir + "/connection_events");
-    d.connection_infections = sample_from_connection_events(d.state_timeseries, d.events_from_timeseries, d.events_to_timeseries, b.ccm, b.ccm_weights, p.seed, p.compute_range[0]);
-
-    timeseries_to_file(d.connection_infections, p.output_dir + "/connection_infections");
+    write_timeseries(get_N_timesteps(state_timeseries, Nt), output_dir, "community_trajectory", append);
+    write_timeseries(merged_events, output_dir, "connection_events", append);
+    write_timeseries(get_N_timesteps(connection_infections, Nt), output_dir, "connection_infections", append);
 }
 
 
-void run(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b)
+
+void run(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b, const std::string& output_dir)
 {
-    uint32_t N_connections = b.events_from.get_range()[2];
-    Sim_Data d(p.Nt_alloc, p.N_sims, p.N_communities, N_connections);
+    uint32_t N_connections = b.N_connections;
+    Sim_Data d(p.N_graphs, p.N_sims, p.Nt_alloc, p.N_communities, N_connections);
     std::vector<sycl::event> events(1);
     q.wait();
-    events[0] = initialize_vertices(q, p, b.vertex_state, b.rngs);
-    std::filesystem::remove_all(p.output_dir);
-    std::filesystem::create_directories(p.output_dir);
-    //remove all files in directory
-    // community_state_init_to_file(q, b.vertex_state, b.community_state, b.vcm, p.compute_range, p.wg_range, p.output_dir, events);
+    events[0] = initialize_vertices(q, p, b);
+    std::filesystem::remove_all(output_dir);
+    std::filesystem::create_directories(output_dir);
 
     q.wait();
     uint32_t t = 0;
@@ -82,18 +65,15 @@ void run(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b)
         bool is_initial_write = (t == 0);
         if (is_allocated_space_full(t, p.Nt_alloc) && false)
         {
-            // print_timestep(q, events, b.events_from, b.events_to, b.vertex_state, b.vcm, p);
-            community_state_append_to_file(q, b.vertex_state, b.community_state, b.vcm, p.compute_range, p.wg_range, p.output_dir, events);
-            connection_events_append_to_file(q, b.events_from, b.events_to, b.vcm, p.output_dir, events, is_initial_write);
-            d.connection_infections = sample_from_connection_events(d.state_timeseries, d.events_from_timeseries, d.events_to_timeseries, b.ccm, b.ccm_weights, p.seed, p.compute_range[0]);
-            timeseries_to_file(d.connection_infections, p.output_dir + "/connection_infections", is_initial_write);
-            events[0] = move_buffer_row(q, b.vertex_state, p.Nt_alloc, events);
+            read_allocated_space_to_file(q, p, b, events, output_dir, p.Nt_alloc, !is_initial_write);
+            events[0] = reset_state_index(q, p, b, events);
             q.wait();
         }
-        events = recover(q, p, b.vertex_state, b.rngs, t, events);
+        events = recover(q, p, b, t, events);
         q.wait();
         events = infect(q, p, b, t, events);
         q.wait();
     }
     auto last_offset = p.Nt - (t % p.Nt_alloc);
+    read_allocated_space_to_file(q, p, b, events, output_dir, last_offset, true);
 }

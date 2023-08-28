@@ -2,6 +2,8 @@
 #include <Sycl_Graph/Dynamics.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
 #include <Sycl_Graph/Utils/Buffer_Validation.hpp>
+#include <Sycl_Graph/Simulation/Sim_Types.hpp>
+#include <Sycl_Graph/Utils/Vector_Remap.hpp>
 
 std::vector<sycl::event> recover(sycl::queue &q,
                                  const Sim_Param &p,
@@ -18,8 +20,8 @@ std::vector<sycl::event> recover(sycl::queue &q,
     h.depends_on(dep_event);
     h.parallel_for(p.N_sims, [=](sycl::item<1> it)
     {
-        auto prev_offset = p.N_sims*N_vertices*t_alloc + it[0]*N_vertices;
-        auto next_offset = p.N_sims*N_vertices*(t_alloc + 1) + it[0]*N_vertices;
+        auto prev_offset = get_linear_offset(N_sims, p.Nt_alloc, N_vertices, it[0], t_alloc, 0);
+        auto next_offset = get_linear_offset(N_sims, p.Nt_alloc, N_vertices, it[0], t_alloc + 1, 0);
         for(int v_idx = 0; v_idx < N_vertices; v_idx++)
         {
             b.vertex_state[next_offset + v_idx] = b.vertex_state[prev_offset + v_idx];
@@ -32,9 +34,8 @@ std::vector<sycl::event> recover(sycl::queue &q,
                               h.parallel_for(p.N_sims, [=](sycl::item<1> it)
                                              {
         Static_RNG::bernoulli_distribution<float> bernoulli_R(p_R);
-        auto sim_offset = it[0]*N_vertices;
-        auto next_offset = p.N_sims*N_vertices*(t_alloc + 1) + sim_offset;
-        auto prev_offset = p.N_sims*N_vertices*(t_alloc) + sim_offset;
+        auto next_offset = get_linear_offset(N_sims, p.Nt_alloc, N_vertices, it[0], t_alloc + 1, 0);
+        auto prev_offset = get_linear_offset(N_sims, p.Nt_alloc, N_vertices, it[0], t_alloc, 0);
         auto& rng = b.rngs[it];
         for(int v_idx = 0; v_idx < N_vertices; v_idx++)
         {
@@ -93,25 +94,28 @@ std::vector<sycl::event> infect(sycl::queue &q,
     auto inf_event = q.submit([&](sycl::handler &h)
                               {
                                   h.depends_on(dep_event);
-                                  h.parallel_for(p.N_sims, [&](sycl::item<1> it)
+                                  h.parallel_for(p.N_sims, [=](sycl::item<1> it)
                                                             {
                                         uint32_t N_inf = 0;
-                                        auto sim_offset = it[0]*N_vertices;
-                                        auto t_offset = t*p.N_sims*N_vertices;
+                                        auto v_prev_offset = get_linear_offset(N_sims, p.Nt_alloc, N_vertices, it[0], t_alloc, 0);
+                                        auto v_next_offset = get_linear_offset(N_sims, p.Nt_alloc, N_vertices, it[0], t_alloc + 1, 0);
+                                        auto e_prev_offset = get_linear_offset(N_sims, p.Nt_alloc, N_connections, it[0], t_alloc, 0);
+                                        auto e_next_offset = get_linear_offset(N_sims, p.Nt_alloc, N_connections, it[0], t_alloc + 1, 0);
+                                        auto p_I_offset = get_linear_offset(N_sims, p.Nt, N_connections, it[0], t, 0);
                                           for (uint32_t edge_idx = 0; edge_idx < N_edges; edge_idx++)
                                           {
                                             auto connection_id = b.ecm[edge_idx];
                                             auto v_from_id = b.edge_from[edge_idx];
                                             auto v_to_id = b.edge_to[edge_idx];
-                                            const auto v_prev_from = b.vertex_state[t_offset + sim_offset + v_from_id];
-                                            const auto v_prev_to = b.vertex_state[t_offset + sim_offset + v_to_id];
+                                            const auto v_prev_from = b.vertex_state[v_prev_offset + v_from_id];
+                                            const auto v_prev_to = b.vertex_state[v_prev_offset + v_to_id];
 
-                                            auto& v_next_from = b.vertex_state[t_offset + p.N_sims*N_vertices + sim_offset + v_from_id];
-                                            auto& v_next_to = b.vertex_state[t_offset + p.N_sims*N_vertices + sim_offset + v_to_id];
+                                            auto& v_next_from = b.vertex_state[v_next_offset + v_from_id];
+                                            auto& v_next_to = b.vertex_state[v_next_offset + v_to_id];
 
                                               if ((v_prev_from == SIR_INDIVIDUAL_S) && (v_prev_to == SIR_INDIVIDUAL_I))
                                               {
-                                                  float p_I = b.p_Is[N_connections*p.N_sims*t + N_connections*it[0] + connection_id];
+                                                  float p_I = b.p_Is[p_I_offset + connection_id];
                                                   Static_RNG::bernoulli_distribution<float> bernoulli_I(p_I);
                                                   auto &rng = b.rngs[it];
                                                   bernoulli_I.p = p_I;
@@ -120,12 +124,12 @@ std::vector<sycl::event> infect(sycl::queue &q,
                                                     N_inf++;
 
                                                       v_next_from = SIR_INDIVIDUAL_I;
-                                                      b.events_to[N_connections*p.N_sims*t + N_connections*it[0] + connection_id]++;
+                                                      b.events_to[e_next_offset + connection_id]++;
                                                   }
                                               }
                                               else if ((v_prev_from == SIR_INDIVIDUAL_I) && (v_prev_to == SIR_INDIVIDUAL_S))
                                               {
-                                                  float p_I = b.p_Is[N_connections*p.N_sims*t + N_connections*it[0] + connection_id];
+                                                  float p_I = b.p_Is[p_I_offset + connection_id];
                                                   Static_RNG::bernoulli_distribution<float> bernoulli_I(p_I);
                                                   auto &rng = b.rngs[it]; // was lid
                                                   bernoulli_I.p = p_I;
@@ -134,7 +138,7 @@ std::vector<sycl::event> infect(sycl::queue &q,
 
                                                     N_inf++;
                                                     v_next_to = SIR_INDIVIDUAL_I;
-                                                      b.events_from[N_connections*p.N_sims*t + N_connections*it[0] + connection_id]++;
+                                                      b.events_from[e_next_offset + connection_id]++;
                                                   }
                                               }
 

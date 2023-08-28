@@ -114,7 +114,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vec
     b.edge_counts = sycl::malloc_device<uint32_t>(edge_counts_init.size(), q);
     b.edge_offsets = sycl::malloc_device<uint32_t>(edge_offsets_init.size(), q);
     b.community_state = sycl::malloc_device<State_t>(community_state_init.size(), q);
-    b.trajectory = sycl::malloc_device<SIR_State>(traj_init.size(), q);
+    b.vertex_state = sycl::malloc_device<SIR_State>(traj_init.size(), q);
     b.events_from = sycl::malloc_device<uint32_t>(event_init.size(), q);
     b.events_to = sycl::malloc_device<uint32_t>(event_init.size(), q);
     b.rngs = sycl::malloc_device<Static_RNG::default_rng>(rng_init.size(), q);
@@ -128,7 +128,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vec
     alloc_events[5] = initialize_device_buffer<uint32_t, 1>(q, edge_counts_init, b.edge_counts);
     alloc_events[5] = initialize_device_buffer<uint32_t, 1>(q, edge_offsets_init, b.edge_offsets);
     alloc_events[6] = initialize_device_buffer<State_t, 3>(q, community_state_init, b.community_state);
-    alloc_events[7] = initialize_device_buffer<SIR_State, 3>(q, traj_init, b.trajectory);
+    alloc_events[7] = initialize_device_buffer<SIR_State, 3>(q, traj_init, b.vertex_state);
     alloc_events[8] = initialize_device_buffer<uint32_t, 3>(q, event_init, b.events_from);
     alloc_events[9] = initialize_device_buffer<uint32_t, 3>(q, event_init, b.events_to);
     alloc_events[10] = initialize_device_buffer<Static_RNG::default_rng, 1>(q, rng_init, b.rngs);
@@ -150,3 +150,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vec
 
     return b;
 }
+
+
+
+//

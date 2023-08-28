@@ -22,11 +22,18 @@ struct Sim_Buffers
     std::size_t N_edges;
     std::size_t b_size;
 
+
     const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> ccm;
     const std::vector<std::vector<uint32_t>> ccm_weights;
     Sim_Buffers() = default;
     std::size_t byte_size() const;
     static Sim_Buffers make(sycl::queue &q, const Sim_Param &p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcm_init, std::vector<float> p_Is_init);
 };
+
+template <>
+struct sycl::is_device_copyable<Sim_Buffers> : std::true_type
+{
+};
+
 
 #endif

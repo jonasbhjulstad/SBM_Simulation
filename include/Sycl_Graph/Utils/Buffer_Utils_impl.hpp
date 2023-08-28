@@ -23,15 +23,6 @@ sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, std::vector<T>& 
     });
 }
 
-template <typename T>
-sycl::event read_device_usm(T* p_usm, sycl::queue& q, std::vector<T>& result, std::vector<sycl::event>& dep_events)
-{
-    return q.submit([&](sycl::handler& h)
-    {
-        h.depends_on(dep_events);
-        h.copy(p_buf, result.data());
-    });
-}
 
 template <typename T, std::size_t N>
 sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, std::vector<T>& result, std::vector<sycl::event>& dep_events, sycl::range<N> range, sycl::range<N> offset)
@@ -63,11 +54,14 @@ sycl::event initialize_device_buffer(sycl::queue& q, const std::vector<T> &vec, 
 template <typename T, std::size_t N = 1>
 sycl::event initialize_device_buffer(sycl::queue& q, const std::vector<T> &vec, T* p_usm)
 {
+    sycl::buffer<T> buf(vec.data(), vec.size());
     return q.submit([&](sycl::handler& h)
     {
-        h.copy(vec.data(), p_usm);
+        auto acc = buf.template get_access<sycl::access::mode::read, sycl::access::target::global_buffer>(h);
+        h.copy(acc, p_usm);
     });
 }
+
 
 template <typename T, std::size_t N = 1>
 cl::sycl::buffer<T> create_local_buffer(sycl::queue& q, const std::vector<T> &host_buffer, sycl::event& event)

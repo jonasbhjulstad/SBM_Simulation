@@ -87,11 +87,11 @@ int main(int argc, char **argv)
     p.N_sims = p.compute_range[0]*p.wg_range[0];
     p.file_idx_offset = N_compute*n;
     p.N_graphs = 2;
-    p.output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Batch_0/";
+    // p.output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Batch_0/";
     n++;
     return p;
     });
-
+    std::string output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "SIR_sim/Batch_0";
     auto graphs = generate_graphs(ps, seed);
 
     std::vector<Sim_Buffers> buffers;

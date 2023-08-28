@@ -6,11 +6,11 @@
 #include <CL/sycl.hpp>
 struct Sim_Data
 {
-    Sim_Data(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections);
-    std::vector<std::vector<std::vector<uint32_t>>> events_to_timeseries;
-    std::vector<std::vector<std::vector<uint32_t>>> events_from_timeseries;
-    std::vector<std::vector<std::vector<State_t>>> state_timeseries;
-    std::vector<std::vector<std::vector<uint32_t>>> connection_infections;
+    Sim_Data(uint32_t Nt, uint32_t N_communities, uint32_t N_connections);
+    Simseries_t<uint32_t> events_to_timeseries;
+    Simseries_t<uint32_t> events_from_timeseries;
+    Simseries_t<State_t> state_timeseries;
+    Simseries_t<uint32_t> connection_infections;
 };
 
 struct Sim_Param
@@ -45,9 +45,12 @@ struct Sim_Param
     sycl::range<1> compute_range;
     sycl::range<1> wg_range;
     std::size_t N_vertices() const {return N_communities * N_pop;}
-    std::string output_dir;
     void print() const;
+    // std::string output_dir;
 };
+
+
+
 std::size_t get_sim_data_byte_size(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections);
 
 #endif

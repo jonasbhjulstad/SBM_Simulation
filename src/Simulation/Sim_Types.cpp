@@ -1,16 +1,15 @@
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <algorithm>
-Sim_Data::Sim_Data(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections) : events_to_timeseries(N_sims, std::vector<std::vector<uint32_t>>(Nt, std::vector<uint32_t>(N_connections, 0))),
-                                                                                                   events_from_timeseries(N_sims, std::vector<std::vector<uint32_t>>(Nt, std::vector<uint32_t>(N_connections, 0))),
-                                                                                                   state_timeseries(N_sims, std::vector<std::vector<State_t>>(Nt+1, std::vector<State_t>(N_communities, {0, 0, 0}))),
-                                                                                                   connection_infections(N_sims, std::vector<std::vector<uint32_t>>(Nt, std::vector<uint32_t>(N_connections, 0)))
+Sim_Data::Sim_Data(uint32_t Ng, uint32_t N_sims, uint32_t Nt, uint32_t N_communities, uint32_t N_connections) :
+events_to_timeseries(Ng, N_sims, Nt, N_connections),
+events_from_timeseries(Ng, N_sims,Nt, N_connections),
+state_timeseries(Ng, N_sims, Nt+1, N_communities),
+connection_infections(Ng, N_sims, Nt, N_connections)
 {
 }
 
-// static Sim_Data assert_size(sycl::queue& q, uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections)
-// {
 
-// }
+
 
 std::size_t get_sim_data_byte_size(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections)
 {
@@ -46,6 +45,5 @@ void Sim_Param::print() const
     std::cout << "p_I in:\t [" << p_I_min << "," << p_I_max << "]" << "\n";
     std::cout << "compute_range:\t" << compute_range[0] << "\n";
     std::cout << "work_group_range:\t" << wg_range[0] << "\n";
-    std::cout << "output directory:\t" << output_dir << std::endl;
 
 }

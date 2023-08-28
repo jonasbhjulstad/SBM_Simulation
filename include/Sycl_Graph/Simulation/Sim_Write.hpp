@@ -1,15 +1,20 @@
 #ifndef SIM_WRITE_HPP
 #define SIM_WRITE_HPP
-
+#include <Sycl_Graph/Simulation/Sim_Write_impl.hpp>
 #include <vector>
 #include <cstdint>
 #include <string>
-auto merge(const std::vector<std::vector<std::vector<uint32_t>>>& t0, const std::vector<std::vector<std::vector<uint32_t>>>& t1);
 
-void events_to_file(const std::vector<std::vector<std::vector<uint32_t>>>& e_to, const std::vector<std::vector<std::vector<uint32_t>>>& e_from, const std::string& abs_fname, bool append=false);
+extern template void write_timeseries(const std::vector<std::vector<uint32_t>>& data, std::ofstream& f);
+extern template void write_timeseries(const std::vector<std::vector<float>>& data, std::ofstream& f);
+extern template void write_timeseries(const std::vector<std::vector<State_t>>& data, std::ofstream& f);
 
-void timeseries_to_file(const std::vector<std::vector<std::vector<std::array<uint32_t, 3>>>>& ts, const std::string& abs_fname, bool append = false);
-void timeseries_to_file(const std::vector<std::vector<std::vector<uint32_t>>>& ts, const std::string& abs_fname, bool append = false);
+extern template void write_timeseries(const std::vector<std::vector<std::vector<uint32_t>>>& data, const std::string& fname, bool append = false);
+extern template void write_timeseries(const std::vector<std::vector<std::vector<float>>>& data, const std::string& fname, bool append = false);
+extern template void write_timeseries(const std::vector<std::vector<std::vector<State_t>>>& data, const std::string& fname, bool append = false);
 
+extern template void write_timeseries(const std::vector<std::vector<std::vector<std::vector<uint32_t>>>>& data, const std::string& base_dir, const std::string& fname, bool append = false);
+extern template void write_timeseries(const std::vector<std::vector<std::vector<std::vector<float>>>>& data, const std::string& base_dir, const std::string& fname, bool append = false);
+extern template void write_timeseries(const std::vector<std::vector<std::vector<std::vector<State_t>>>>& data, const std::string& base_dir, const std::string& fname, bool append = false);
 
 #endif

@@ -3,8 +3,8 @@
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/Simulation/Sim_Buffers.hpp>
 
-void run(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b);
+void run(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, const std::string& output_dir);
 
-void run_allocated(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b);
+// void run_allocated(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b);
 
 #endif
