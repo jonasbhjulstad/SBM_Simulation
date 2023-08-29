@@ -20,7 +20,7 @@ std::vector<sycl::event> recover(sycl::queue &q,
     std::size_t global_mem_acc_size = rngs.byte_size() + vertex_state.byte_size();
     std::size_t local_mem_acc_size = 0; // p.wg_range[0] * sizeof(Static_RNG::default_rng);
     assert(global_mem_acc_size < p.global_mem_size);
-    assert(local_mem_acc_size < p.local_mem_size);
+    // assert(local_mem_acc_size < p.local_mem_size);
     auto cpy_event = q.submit([&](sycl::handler &h)
                               {
     h.depends_on(dep_event);
@@ -141,8 +141,8 @@ std::vector<sycl::event> infect(sycl::queue &q,
 
     std::size_t global_mem_acc_size = b.ecm.byte_size() + b.p_Is.byte_size() + b.rngs.byte_size() + b.vertex_state.byte_size() + b.events_to.byte_size() + b.events_from.byte_size();
     assert(global_mem_acc_size < p.global_mem_size);
-    std::size_t local_mem_acc_size = p.wg_range[0] * N_connections * sizeof(uint32_t) * 2 + p.wg_range[0] * N_connections * sizeof(float);
-    assert(local_mem_acc_size < p.local_mem_size);
+    // std::size_t local_mem_acc_size = p.wg_range[0] * N_connections * sizeof(uint32_t) * 2 + p.wg_range[0] * N_connections * sizeof(float);
+    // assert(local_mem_acc_size < p.local_mem_size);
     auto inf_event = q.submit([&](sycl::handler &h)
                               {
                                   h.depends_on(dep_event);

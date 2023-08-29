@@ -3,6 +3,7 @@
 #include <Sycl_Graph/Utils/Vector_Remap.hpp>
 #include <iostream>
 
+
 void single_community_state_accumulate(sycl::nd_item<1> &it, const auto &vcm_acc, const sycl::accessor<SIR_State, 3, sycl::access_mode::read> &v_acc, const sycl::accessor<State_t, 3, sycl::access_mode::read_write> &state_acc)
 {
     auto Nt = v_acc.get_range()[0];

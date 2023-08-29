@@ -1,6 +1,7 @@
 #include "Sycl_Graph/Utils/Buffer_Utils_impl.hpp"
 #include <random>
 #include <execution>
+#include <Static_RNG/distributions.hpp>
 void linewrite(std::ofstream &file, const std::vector<uint32_t> &state_iter)
 {
     for (const auto &t_i_i : state_iter)
@@ -134,33 +135,68 @@ std::vector<float> generate_floats(uint32_t N, float min, float max, uint32_t se
     return result;
 }
 
-// std::vector<std::vector<float>> generate_floats(uint32_t rows, uint32_t cols, float min, float max, uint32_t seed)
-// {
-//     std::mt19937_64 rng(seed);
-//     std::uniform_real_distribution<float> dist(min, max);
-//     std::vector<std::vector<float>> floats(rows, std::vector<float>(cols));
-//     std::for_each(floats.begin(), floats.end(), [&](auto& row){std::generate(row.begin(), row.end(), [&](){return dist(rng);});});
-//     return floats;
-// }
+std::vector<float> generate_floats(uint32_t N, float min, float max, uint32_t N_rngs, uint32_t seed)
+{
+    std::vector<uint32_t> seeds;
+    std::mt19937 rng(seed);
+    std::generate_n(std::back_inserter(seeds), N_rngs, [&](){return rng();});
+    std::vector<std::mt19937> rngs;
+    std::transform(seeds.begin(), seeds.end(), std::back_inserter(rngs), [](auto seed){return std::mt19937(seed);});
+    auto N_per_rng = N / N_rngs;
+    std::vector<std::vector<float>> result(N_rngs);
+    std::transform(rngs.begin(), rngs.end(), result.begin(), [&](auto& rng)
+                   {
+        std::uniform_real_distribution<float> dist(min, max);
+        std::vector<float> res(N_per_rng);
+        std::generate(res.begin(), res.end(), [&](){return dist(rng);});
+        return res;
+                   });
+    std::vector<float> flat_result;
+    for(auto& r : result)
+    {
+        flat_result.insert(flat_result.end(), r.begin(), r.end());
+    }
+    return flat_result;
+}
 
-// std::vector<std::vector<std::vector<float>>> generate_floats(uint32_t N0, uint32_t N1, uint32_t N2, float min, float max, uint32_t seed)
-// {
-//     //generate p_Is
-//     using p_I_mat = std::vector<std::vector<float>>;
-//     std::vector<p_I_mat> p_Is(N0);
-//     auto seeds = generate_seeds(N0, seed);
+sycl::event generate_floats(sycl::queue& q, std::vector<float>& result, float min, float max, uint32_t seed)
+{
+    auto device = q.get_device();
+    auto wg_size = device.get_info<sycl::info::device::max_work_group_size>();
+    std::mt19937 rng(seed);
+    std::vector<uint32_t> seeds(wg_size);
+    std::generate(seeds.begin(), seeds.end(), [&](){return rng();});
 
-//     std::transform(std::execution::par_unseq, seeds.begin(), seeds.end(), p_Is.begin(), [=](auto seed)
-//     {
-//         return generate_floats(N1, N2, min, max, seed);
-//     });
-//     return p_Is;
-// }
+    std::vector<Static_RNG::default_rng> rngs(wg_size);
+    std::transform(seeds.begin(), seeds.end(), rngs.begin(), [](auto seed){return Static_RNG::default_rng(seed);});
 
+    sycl::buffer<Static_RNG::default_rng> rngs_buf(rngs.data(), rngs.size());
+    sycl::buffer<float> result_buf((sycl::range<1>(result.size())));
+    auto N_per_thread = result.size() / wg_size;
 
-// template std::vector<uint32_t> merge_vectors(const std::vector<std::vector<uint32_t>>&);
-// template std::vector<int> merge_vectors(const std::vector<std::vector<int>>&);
-// template std::vector<float> merge_vectors(const std::vector<std::vector<float>>&);
+    auto rng_event = q.submit([&](sycl::handler& h)
+    {
+        auto result_acc = result_buf.template get_access<sycl::access::mode::write>(h);
+        auto rng_acc = rngs_buf.template get_access<sycl::access::mode::read_write>(h);
+        h.parallel_for(sycl::range<1>(wg_size), [=](sycl::id<1> idx)
+        {
+            Static_RNG::uniform_real_distribution<float> dist(min, max);
+            for(int i = 0; i < N_per_thread; i++)
+            {
+                result_acc[idx * N_per_thread + i] = dist(rng_acc[idx]);
+            }
+        });
+    });
+
+    auto cpy_event = q.submit([&](sycl::handler& h)
+    {
+        auto res_acc = result_buf.template get_access<sycl::access::mode::read>(h);
+        h.copy(res_acc, result.data());
+    });
+
+    return cpy_event;
+}
+
 
 template std::vector<std::vector<uint32_t>> diff(const std::vector<std::vector<uint32_t>> &v);
 template std::vector<std::vector<int>> diff(const std::vector<std::vector<int>> &v);
@@ -182,3 +218,5 @@ template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl:
 
 template sycl::event read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, std::vector<SIR_State>& p_result, std::vector<sycl::event>& dep_events, sycl::range<3> range, sycl::range<3> offset);
 template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, std::vector<State_t>& p_result, std::vector<sycl::event>& dep_events, sycl::range<3> range, sycl::range<3> offset);
+
+template sycl::event clear_buffer<uint32_t, 3>(sycl::queue& q, sycl::buffer<uint32_t, 3>& buf, std::vector<sycl::event>& dep_events);

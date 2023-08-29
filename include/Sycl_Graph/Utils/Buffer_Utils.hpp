@@ -22,8 +22,9 @@ std::vector<uint32_t> generate_seeds(uint32_t N_rng, uint32_t seed);
 
 extern template std::vector<std::vector<uint32_t>> diff<uint32_t>(const std::vector<std::vector<uint32_t>> &v);
 extern template std::vector<std::vector<int>> diff<int>(const std::vector<std::vector<int>> &v);
-
 std::vector<float> generate_floats(uint32_t N, float min, float max, uint32_t seed);
+std::vector<float> generate_floats(uint32_t N, float min, float max, uint32_t N_rngs, uint32_t seed);
+
 // std::vector<std::vector<float>> generate_floats(uint32_t rows, uint32_t cols, float min, float max, uint32_t seed);
 // std::vector<std::vector<std::vector<float>>> generate_floats(uint32_t N0, uint32_t N1, uint32_t N2, float min, float max, uint32_t seed);
 
@@ -48,6 +49,9 @@ extern template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf
 
 extern template sycl::event read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, std::vector<SIR_State>& p_result, std::vector<sycl::event>& dep_events, sycl::range<3> range, sycl::range<3> offset);
 extern template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, std::vector<State_t>& p_result, std::vector<sycl::event>& dep_events, sycl::range<3> range, sycl::range<3> offset);
+
+extern template sycl::event clear_buffer<uint32_t, 3>(sycl::queue& q, sycl::buffer<uint32_t, 3>& buf, std::vector<sycl::event>& dep_events);
+
 
 
 

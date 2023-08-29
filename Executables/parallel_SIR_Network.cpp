@@ -6,7 +6,10 @@
 #include <Sycl_Graph/Simulation/Sim_Routines.hpp>
 #include <Sycl_Graph/Utils/Profiling.hpp>
 #include <Sycl_Graph/Graph.hpp>
+#include <Sycl_Graph/Utils/json_settings.hpp>
 #include <execution>
+#include <iomanip>
+#include <chrono>
 template <typename T>
 std::vector<T> merge_vectors(const std::vector<std::vector<T>> &vectors)
 {
@@ -32,7 +35,7 @@ auto generate_graphs(const std::vector<Sim_Param>& ps, uint32_t seed)
     {
         return gen();
     });
-    std::vector<std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>>> graphs(ps.size());
+    std::vector<std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>, std::vector<std::vector<uint32_t>>>> graphs(ps.size());
     std::transform(std::execution::par_unseq, ps.begin(), ps.end(), seeds.begin(),  graphs.begin(), [&](const auto& p, auto s)
     {
 
@@ -41,58 +44,64 @@ auto generate_graphs(const std::vector<Sim_Param>& ps, uint32_t seed)
     return graphs;
 }
 
+Sim_Param get_settings()
+{
+    const std::string json_fname = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/parameters/settings.json";
+    //check if exists
+    std::ifstream i(json_fname);
+    if(!i.good())
+    {
+        generate_default_json(json_fname);
+    }
+    i.close();
+    return parse_json(json_fname);
+}
 
-std::vector<std::tuple<std::vector<std::vector<std::pair<uint32_t, uint32_t>>>,std::vector<std::vector<uint32_t>>>> sbm_data();
+std::vector<Sim_Param> create_sim_param(const std::vector<sycl::queue>& qs)
+{
+    auto p = get_settings();
+    std::vector<Sim_Param> ps(qs.size(), p);
+    std::mt19937 gen(p.seed);
+    std::vector<uint32_t> seeds(ps.size());
+    std::generate(seeds.begin(), seeds.end(), [&gen]()
+    {
+        return gen();
+    });
+    for(int i = 0; i < qs.size(); i++)
+    {
+        auto device = qs[i].get_device();
+        ps[i].wg_range = p.N_sims;
+        ps[i].compute_range = p.N_graphs*p.N_sims;
+        ps[i].seed = seeds[i];
+        ps[i].local_mem_size = device.get_info<sycl::info::device::local_mem_size>();
+        ps[i].global_mem_size = device.get_info<sycl::info::device::global_mem_size>();
+    }
+    return ps;
+}
+
 
 
 int main(int argc, char **argv)
 {
     //parse argv which is N_sims, N_communities, N_pop
-    if (argc != 5)
-    {
-        std::cout << "Usage: ./parallel_SIR_Network N_work_group_size N_communities N_pop N_graphs" << std::endl;
-        return 1;
-    }
+
+    std::chrono::high_resolution_clock::time_point t1, t2;
+
     auto N_wg = std::stoi(argv[1]);
     uint32_t N_communities = std::stoi(argv[2]);
     uint32_t N_pop = std::stoi(argv[3]);
     uint32_t N_graphs = std::stoi(argv[4]);
     //get all gpus
     std::vector<sycl::queue> qs;
-    auto devices = sycl::device::get_devices(sycl::info::device_type::cpu);
+    auto devices = sycl::device::get_devices(sycl::info::device_type::gpu);
     for (auto &d : devices)
     {
         qs.emplace_back(d);
     }
     uint32_t seed = 283;
-    std::vector<Sim_Param> ps;
-    std::mt19937 gen(seed);
+    auto ps = create_sim_param(qs);
 
-
-    std::transform(qs.begin(), qs.end(), std::back_inserter(ps), [&, n = 0](sycl::queue& q)mutable {auto p = Sim_Param(q);
-    p.N_communities = N_communities;
-    auto device = q.get_device();
-    auto N_wg_used = (N_wg == 0) ? device.get_info<sycl::info::device::max_work_group_size>() : N_wg;
-    p.N_pop = N_pop;
-    p.p_in = 1.0f;
-    p.p_out = 0.0f;
-    p.p_R0 = 0.0f;
-    p.p_I0 = 0.1f;
-    p.p_R = 1e-1f;
-    p.Nt = 56;
-    p.Nt_alloc = 6;
-    p.p_I_max = 1e-3f;
-    p.p_I_min = 1e-5f;
-    p.seed = gen();
-    p.compute_range = sycl::range<1>(N_graphs*N_wg_used);
-    p.wg_range = sycl::range<1>(N_wg_used);
-    p.N_sims = p.wg_range[0];
-    p.file_idx_offset = N_graphs*n;
-    p.N_graphs = N_graphs;
-    p.output_dir = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/Batch_0/";
-    n++;
-    return p;
-    });
+    t1 = std::chrono::high_resolution_clock::now();
 
     auto graphs = generate_graphs(ps, seed);
 
@@ -105,21 +114,27 @@ int main(int argc, char **argv)
 
     std::vector<std::vector<std::pair<uint32_t, uint32_t>>> edge_lists_flat(std::get<0>(graphs[0]).size());
     std::vector<std::vector<uint32_t>> vcms(std::get<0>(graphs[0]).size());
+    std::vector<std::vector<uint32_t>> ecms(std::get<0>(graphs[0]).size());
     for(int i = 0; i < std::get<0>(graphs[0]).size(); i++)
     {    //flatten edge_lists
         auto& e_list = std::get<0>(graphs[0])[i];
         auto& nodelists = std::get<1>(graphs[0])[i];
+
         edge_lists_flat[i] = merge_vectors(e_list);
         vcms[i] = create_vcm(nodelists);
+        ecms[i] = std::get<2>(graphs[0])[i];
     }
-    auto b = Sim_Buffers::make(qs[0], ps[0], edge_lists_flat, vcms, {});
-    std::for_each(qs.begin(), qs.end(), [](auto& q){q.wait();});
-    // std::cout << "Sim_Buffers size:\t" << buffers.byte_size() << "byte" << std::endl;
 
-    // std::transform(std::execution::par_unseq, buffer_params.begin(), buffer_params.end(), buffers.begin(), result.begin(), [](auto& bp, auto& b){
-    //     run(std::get<1>(bp), std::get<2>(bp), b);
-    //     return 0;
-    // });
+    t2 = std::chrono::high_resolution_clock::now();
+    std::cout << "Generate graphs: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
+    t1 = t2;
+
+
+
+    auto b = Sim_Buffers::make(qs[0], ps[0], edge_lists_flat, vcms, ecms, {});
+    std::for_each(qs.begin(), qs.end(), [](auto& q){q.wait();});
+    t2 = std::chrono::high_resolution_clock::now();
+    std::cout << "Make buffers: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     run(qs[0], ps[0], b);
 
 

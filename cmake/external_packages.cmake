@@ -52,6 +52,8 @@ include(FindThreads)
 #     GIT_TAG master
 # )
 
+find_package(nlohmann_json CONFIG REQUIRED)
+
 find_package(TBB REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 

@@ -41,6 +41,8 @@ def starmap_with_kwargs(pool, fn, args_iter, kwargs_iter):
 def apply_args_and_kwargs(fn, args, kwargs):
     return fn(*args, **kwargs)
 
+
+
 def N_graph_inference(pool, N_pop, N_communities, p_in, p_out, seed, Ng):
     #generate seeds
     np.random.seed(seed)
@@ -96,7 +98,7 @@ if __name__ == '__main__':
     p_in = 1.0
     seed = 999
     Nt = 70
-    Ng = 20
+    Ng = 2
     p_out = np.arange(0.0, 1.0, 0.1)
     # make directory
     np.random.seed(seed)

@@ -36,18 +36,16 @@ std::vector<std::pair<uint32_t, uint32_t>> random_connect(const std::vector<uint
                     edge_list.end());
     return edge_list;
 }
-long long n_choose_k(int n, int k)
+long long n_choose_2(long long n)
 {
-    long long product = 1;
-    for (int i = 1; i <= k; i++)
-        product = product * (n - k + i) / i; // Must do mul before div
-    return product;
+    return n * (n - 1) / 2;
 }
+
 
 std::vector<std::vector<std::pair<uint32_t, uint32_t>>> random_connect(const std::vector<std::vector<uint32_t>> &nodelists,
                                                                        float p_in, float p_out, uint32_t seed)
 {
-    uint32_t N_node_pairs = n_choose_k(nodelists.size(), 2) + nodelists.size();
+    uint32_t N_node_pairs = n_choose_2(nodelists.size()) + nodelists.size();
     std::random_device rd;
     std::vector<uint32_t> seeds(N_node_pairs);
     std::generate(seeds.begin(), seeds.end(), [&rd]()
@@ -89,9 +87,7 @@ std::vector<std::vector<std::pair<uint32_t, uint32_t>>> random_connect(const std
 }
 
 
-using Node_Edge_Tuple_t = std::tuple<Edge_List_t, Node_List_t>;
-
-Node_Edge_Tuple_t generate_planted_SBM_edges(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed)
+std::tuple<Edge_List_t, Node_List_t, std::vector<uint32_t>> generate_planted_SBM_edges(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed)
 {
     std::vector<std::vector<uint32_t>> nodelists(N_communities);
     std::generate(nodelists.begin(), nodelists.end(), [N_pop, offset = 0]()
@@ -101,10 +97,23 @@ Node_Edge_Tuple_t generate_planted_SBM_edges(uint32_t N_pop, uint32_t N_communit
                     offset += N_pop;
                     return nodes;
                   });
-    return std::make_tuple(random_connect(nodelists, p_in, p_out, seed), nodelists);
+    auto edge_lists = random_connect(nodelists, p_in, p_out, seed);
+    auto N_edges = std::accumulate(edge_lists.begin(), edge_lists.end(), 0, [](auto sum, auto& edge_list){return sum + edge_list.size();});
+    std::vector<uint32_t> ecm(N_edges);
+    uint32_t offset = 0;
+    uint32_t e_id = 0;
+    for(auto&& e_list: edge_lists)
+    {
+        auto N_connection_edges = e_list.size();
+        std::fill(ecm.begin() + offset, ecm.begin() + offset + N_connection_edges, e_id);
+        offset += N_connection_edges;
+        e_id++;
+    }
+
+    return std::make_tuple(edge_lists, nodelists, ecm);
 }
 
-std::tuple<std::vector<std::pair<uint32_t, uint32_t>>, std::vector<uint32_t>> generate_planted_SBM_flat(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed)
+std::tuple<std::vector<std::pair<uint32_t, uint32_t>>, std::vector<uint32_t>, std::vector<uint32_t>> generate_planted_SBM_flat(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed)
 {
     auto G_data = generate_planted_SBM_edges(N_pop, N_communities, p_in, p_out, seed);
     auto edge_list = std::get<0>(G_data);
@@ -126,13 +135,25 @@ std::tuple<std::vector<std::pair<uint32_t, uint32_t>>, std::vector<uint32_t>> ge
         offset += node_list.size();
     }
 
-    return std::make_tuple(flat_edge_list, flat_node_list);
+    std::vector<uint32_t> ecm(N_edges);
+    offset = 0;
+    uint32_t e_id = 0;
+    for(auto&& e_list: edge_list)
+    {
+        auto N_connection_edges = e_list.size();
+        std::fill(ecm.begin() + offset, ecm.begin() + offset + N_connection_edges, e_id);
+        offset += N_connection_edges;
+        e_id++;
+    }
+
+
+    return std::make_tuple(flat_edge_list, flat_node_list, ecm);
 }
 
 
-std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>> generate_N_SBM_graphs(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng)
+std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>, std::vector<std::vector<uint32_t>>> generate_N_SBM_graphs(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng)
 {
-    std::vector<Node_Edge_Tuple_t> result(Ng);
+    std::vector<std::tuple<Edge_List_t, Node_List_t, std::vector<uint32_t>>> result(Ng);
     std::vector<uint32_t> seeds(Ng);
     std::mt19937 gen(seed);
     std::generate_n(seeds.begin(), Ng, [&gen]()
@@ -146,6 +167,7 @@ std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>> generate_N_SBM_gr
 
     std::vector<Edge_List_t> edge_data(Ng);
     std::vector<Node_List_t> node_data(Ng);
+    std::vector<std::vector<uint32_t>> ecm(Ng);
 
     std::transform(std::execution::par_unseq, result.begin(), result.end(), edge_data.begin(), [](auto& t)
     {
@@ -155,16 +177,19 @@ std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>> generate_N_SBM_gr
     {
         return std::get<1>(t);
     });
+    std::transform(std::execution::par_unseq, result.begin(), result.end(), ecm.begin(), [](auto& t)
+    {
+        return std::get<2>(t);
+    });
 
-    return std::make_tuple(edge_data, node_data);
+
+    return std::make_tuple(edge_data, node_data, ecm);
 }
-using Edge_List_Flat_t = std::vector<std::pair<uint32_t, uint32_t>>;
-using Node_List_Flat_t = std::vector<uint32_t>;
-using Node_Edge_Tuple_Flat_t = std::tuple<Edge_List_Flat_t, Node_List_Flat_t>;
 
-std::tuple<std::vector<Edge_List_Flat_t>, std::vector<Node_List_Flat_t>> generate_N_SBM_graphs_flat(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng)
+
+std::tuple<std::vector<Edge_List_Flat_t>, std::vector<Node_List_Flat_t>, std::vector<std::vector<uint32_t>>> generate_N_SBM_graphs_flat(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng)
 {
-    std::vector<Node_Edge_Tuple_Flat_t> result(Ng);
+    std::vector<std::tuple<std::vector<std::pair<uint32_t, uint32_t>>, std::vector<uint32_t>, std::vector<uint32_t>>> result(Ng);
     std::vector<uint32_t> seeds(Ng);
     std::mt19937 gen(seed);
     //generate seeds
@@ -180,6 +205,7 @@ std::tuple<std::vector<Edge_List_Flat_t>, std::vector<Node_List_Flat_t>> generat
 
     std::vector<Edge_List_Flat_t> edge_data(Ng);
     std::vector<Node_List_Flat_t> node_data(Ng);
+    std::vector<std::vector<uint32_t>> ecms(Ng);
 
     std::transform(std::execution::par_unseq, result.begin(), result.end(), edge_data.begin(), [](auto& t)
     {
@@ -190,7 +216,12 @@ std::tuple<std::vector<Edge_List_Flat_t>, std::vector<Node_List_Flat_t>> generat
         return std::get<1>(t);
     });
 
-    return std::make_tuple(edge_data, node_data);
+    std::transform(std::execution::par_unseq, result.begin(), result.end(), ecms.begin(), [](auto& t)
+    {
+        return std::get<2>(t);
+    });
+
+    return std::make_tuple(edge_data, node_data, ecms);
 }
 
 
@@ -259,7 +290,7 @@ std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_
         N_connections++;
     }
 
-    std::transform(edges.begin(), edges.end(), ecm.begin(), [&](const auto& edge)
+    std::transform(std::execution::par_unseq, edges.begin(), edges.end(), ecm.begin(), [&](const auto& edge)
     {
         auto edge_communities = get_edge_communities(edge);
         //find index of edge_communities in connection_pairs

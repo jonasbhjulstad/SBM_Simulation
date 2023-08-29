@@ -171,7 +171,9 @@ std::vector<std::vector<uint32_t>> sample_infections(const Timeseries_t<State_t>
             {
                 merged_result[j] += result[i][j];
             }
-        }
+        }        uint32_t merged_infs = std::accumulate(merged_result.begin(), merged_result.end(), 0);
+        uint32_t true_infs = std::accumulate(delta_I_ts.begin(), delta_I_ts.end(), 0);
+        assert(merged_infs == true_infs && "Sampled infections do not match true infections");
         return merged_result;
     };
 

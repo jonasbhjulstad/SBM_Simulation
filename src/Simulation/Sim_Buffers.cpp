@@ -93,22 +93,14 @@ std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<uint32_t>> 
 }
 
 
-Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, std::vector<float> p_Is_init)
+Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>>& ecms, std::vector<float> p_Is_init)
 {
 
 
-    std::vector<std::vector<uint32_t>> ecms(edge_list.size());
-    std::transform(std::execution::par_unseq, edge_list.begin(), edge_list.end(), vcms.begin(), ecms.begin(), [&vcms](const auto& e_list, const auto& vcm)
-    {
-        return ecm_from_vcm(e_list, vcm);
-    });
-    auto N_sims_tot = p.N_sims*p.wg_range[0];
+    auto N_sims_tot = p.compute_range[0];
     auto ecm_init = join_vectors(ecms);
     uint32_t N_connections = std::max_element(ecm_init.begin(), ecm_init.end())[0] + 1;
-    if (p_Is_init.size() == 0)
-    {
-        p_Is_init = generate_floats(p.Nt * N_sims_tot * N_connections, p.p_I_min, p.p_I_max, p.seed);
-    }
+
     uint32_t N_vertices = vcms[0].size();
     auto vcm_init = join_vectors(vcms);
 
@@ -123,7 +115,8 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vec
 
     std::vector<State_t> community_state_init(p.N_communities * N_sims_tot * (p.Nt_alloc + 1), {0, 0, 0});
     std::vector<SIR_State> traj_init(N_sims_tot * (p.Nt_alloc + 1) * N_vertices, SIR_INDIVIDUAL_S);
-    std::vector<uint32_t> event_init(N_sims_tot * N_connections * p.Nt_alloc, 0);
+    std::vector<uint32_t> event_init_from(N_sims_tot * N_connections * p.Nt_alloc, 0);
+    std::vector<uint32_t> event_init_to(N_sims_tot * N_connections * p.Nt_alloc, 0);
     auto seeds = generate_seeds(N_sims_tot, p.seed);
     std::vector<Static_RNG::default_rng> rng_init;
     rng_init.reserve(N_sims_tot);
@@ -148,7 +141,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vec
     auto edge_from = sycl::buffer<uint32_t>((sycl::range<1>(N_tot_edges)));
     auto edge_to = sycl::buffer<uint32_t>((sycl::range<1>(N_tot_edges)));
     auto ecm = sycl::buffer<uint32_t, 1>((sycl::range<1>(N_tot_edges)));
-    auto vcm = sycl::buffer<uint32_t, 2>(sycl::range<2>(p.compute_range[0], vcms[0].size()));
+    auto vcm = sycl::buffer<uint32_t, 2>(sycl::range<2>(p.N_graphs, vcms[0].size()));
     auto edge_counts = sycl::buffer<uint32_t>((sycl::range<1>(p.compute_range[0])));
     auto edge_offsets = sycl::buffer<uint32_t>((sycl::range<1>(p.compute_range[0])));
     auto community_state = sycl::buffer<State_t, 3>(sycl::range<3>(p.Nt_alloc + 1, N_sims_tot, p.N_communities));
@@ -157,21 +150,27 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vec
     auto events_to = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.Nt_alloc, N_sims_tot, N_connections));
     auto rngs = sycl::buffer<Static_RNG::default_rng>(sycl::range<1>(rng_init.size()));
 
-    std::vector<sycl::event> alloc_events(11);
-    alloc_events[0] = initialize_device_buffer<float, 3>(q, p_Is_init, p_Is);
-    alloc_events[1] = initialize_device_buffer<uint32_t, 1>(q, edge_from_init, edge_from);
-    alloc_events[2] = initialize_device_buffer<uint32_t, 1>(q, edge_to_init, edge_to);
-    alloc_events[3] = initialize_device_buffer<uint32_t, 1>(q, ecm_init, ecm);
-    alloc_events[4] = initialize_device_buffer<uint32_t, 2>(q, vcm_init, vcm);
-    alloc_events[5] = initialize_device_buffer<uint32_t, 1>(q, edge_counts_init, edge_counts);
-    alloc_events[5] = initialize_device_buffer<uint32_t, 1>(q, edge_offsets_init, edge_offsets);
-    alloc_events[6] = initialize_device_buffer<State_t, 3>(q, community_state_init, community_state);
-    alloc_events[7] = initialize_device_buffer<SIR_State, 3>(q, traj_init, trajectory);
-    alloc_events[8] = initialize_device_buffer<uint32_t, 3>(q, event_init, events_from);
-    alloc_events[9] = initialize_device_buffer<uint32_t, 3>(q, event_init, events_to);
-    alloc_events[10] = initialize_device_buffer<Static_RNG::default_rng, 1>(q, rng_init, rngs);
+    std::vector<sycl::event> alloc_events(13);
 
-    auto ccm = complete_ccm(p.N_graphs);
+    if (p_Is_init.size() == 0)
+    {
+        p_Is_init = generate_floats(p.Nt * N_sims_tot * N_connections, p.p_I_min, p.p_I_max, 8, p.seed);
+    }
+
+    alloc_events[1] = initialize_device_buffer<float, 3>(q, p_Is_init, p_Is);
+    alloc_events[2] = initialize_device_buffer<uint32_t, 1>(q, edge_from_init, edge_from);
+    alloc_events[3] = initialize_device_buffer<uint32_t, 1>(q, edge_to_init, edge_to);
+    alloc_events[4] = initialize_device_buffer<uint32_t, 1>(q, ecm_init, ecm);
+    alloc_events[5] = initialize_device_buffer<uint32_t, 2>(q, vcm_init, vcm);
+    alloc_events[6] = initialize_device_buffer<uint32_t, 1>(q, edge_counts_init, edge_counts);
+    alloc_events[7] = initialize_device_buffer<uint32_t, 1>(q, edge_offsets_init, edge_offsets);
+    alloc_events[8] = initialize_device_buffer<State_t, 3>(q, community_state_init, community_state);
+    alloc_events[9] = initialize_device_buffer<SIR_State, 3>(q, traj_init, trajectory);
+    alloc_events[10] = initialize_device_buffer<uint32_t, 3>(q, event_init_from, events_from);
+    alloc_events[11] = initialize_device_buffer<uint32_t, 3>(q, event_init_to, events_to);
+    alloc_events[12] = initialize_device_buffer<Static_RNG::default_rng, 1>(q, rng_init, rngs);
+
+    auto ccm = complete_ccm(p.N_communities);
     std::vector<std::vector<std::pair<uint32_t, uint32_t>>> ccms(p.N_graphs, ccm);
     std::vector<std::vector<uint32_t>> ccm_weights(p.N_graphs);
     std::transform(std::execution::par_unseq, ecms.begin(), ecms.end(), ccm_weights.begin(), ccm_weights_from_ecm);

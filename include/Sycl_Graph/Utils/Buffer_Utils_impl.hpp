@@ -66,6 +66,18 @@ sycl::event initialize_device_buffer(sycl::queue& q, const std::vector<T> &vec, 
     });
 }
 
+template <typename T, std::size_t N = 3>
+sycl::event clear_buffer(sycl::queue& q, sycl::buffer<T, N>& buf, std::vector<sycl::event>& dep_events)
+{
+    return q.submit([&](sycl::handler& h)
+    {
+        h.depends_on(dep_events);
+        auto buf_acc = buf.template get_access<sycl::access::mode::write>(h);
+        h.fill(buf_acc, (uint32_t)0);
+    });
+}
+
+
 template <typename T, std::size_t N = 1>
 cl::sycl::buffer<T> create_local_buffer(sycl::queue& q, const std::vector<T> &host_buffer, sycl::event& event)
 {

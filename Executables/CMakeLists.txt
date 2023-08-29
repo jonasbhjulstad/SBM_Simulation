@@ -1,4 +1,4 @@
 add_sycl_executable(parallel_SIR_Network)
-target_link_libraries(parallel_SIR_Network PRIVATE Graph Sim_Routines Profiling)
+target_link_libraries(parallel_SIR_Network PRIVATE Graph Sim_Routines Profiling json_settings)
 add_regression_executable(SBM_Regression)
 # add_regression_executable(SBM_Regression)
