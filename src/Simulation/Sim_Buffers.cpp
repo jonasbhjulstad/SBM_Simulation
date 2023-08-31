@@ -93,10 +93,15 @@ std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<uint32_t>> 
 }
 
 
-Sim_Buffers Sim_Buffers::make(sycl::queue &q, const Sim_Param &p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>>& ecms, std::vector<float> p_Is_init)
+Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>>& ecms, std::vector<float> p_Is_init)
 {
 
-
+    if ((p.global_mem_size == 0) || p.local_mem_size == 0)
+    {
+        auto device = q.get_device();
+        p.local_mem_size = device.get_info<sycl::info::device::local_mem_size>();
+        p.global_mem_size = device.get_info<sycl::info::device::global_mem_size>();
+    }
     auto N_sims_tot = p.compute_range[0];
     auto ecm_init = join_vectors(ecms);
     uint32_t N_connections = std::max_element(ecm_init.begin(), ecm_init.end())[0] + 1;

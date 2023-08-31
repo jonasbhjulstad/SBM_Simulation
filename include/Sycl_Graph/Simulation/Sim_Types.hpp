@@ -15,6 +15,7 @@ struct Sim_Data
 
 struct Sim_Param
 {
+
     Sim_Param(sycl::queue& q) : compute_range(sycl::range<1>(1)), wg_range(sycl::range<1>(1))
     {
         auto device = q.get_device();
@@ -47,6 +48,7 @@ struct Sim_Param
     std::size_t N_vertices() const {return N_communities * N_pop;}
     std::string output_dir;
     void print() const;
+    void dump(const std::string& fname) const;
 };
 std::size_t get_sim_data_byte_size(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections);
 

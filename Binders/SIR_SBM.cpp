@@ -6,6 +6,7 @@
 #include <Sycl_Graph/Graph.hpp>
 #include <Sycl_Graph/Regression.hpp>
 #include <Sycl_Graph/Utils/Profiling.hpp>
+#include <Sycl_Graph/Simulation/Sim_Routines.hpp>
 namespace py = pybind11;
 
 sycl::queue create_sycl_device_queue(std::string device_type, uint32_t index = 0)
@@ -64,6 +65,9 @@ PYBIND11_MODULE(SIR_SBM, m)
     m.def("generate_planted_SBM_edges", &generate_planted_SBM_edges, "generate_planted_SBM_edges");
     m.def("generate_planted_SBM_flat", &generate_planted_SBM_flat, "generate_planted_SBM_flat");
     m.def("generate_N_SBM_graphs_flat", &generate_N_SBM_graphs_flat, "generate_N_SBM_graphs_flat");
+    m.def("run", static_cast<void(*)(sycl::queue&, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>&, const std::vector<std::vector<uint32_t>>&, const std::vector<std::vector<uint32_t>>&)>(&run), "run");
+
+    py::class_<sycl::range<1>>(m, "sycl_range_1").def(py::init<std::size_t>());
 
     py::class_<Sim_Param>(m, "Sim_Param").def(py::init<>())
     .def_readwrite("N_pop", &Sim_Param::N_pop)
@@ -74,7 +78,17 @@ PYBIND11_MODULE(SIR_SBM, m)
     .def_readwrite("p_R0", &Sim_Param::p_R0)
     .def_readwrite("p_I0", &Sim_Param::p_I0)
     .def_readwrite("p_R", &Sim_Param::p_R)
-    .def_readwrite("max_infection_samples", &Sim_Param::max_infection_samples);
+    .def_readwrite("max_infection_samples", &Sim_Param::max_infection_samples)
+    .def_readwrite("N_sims", &Sim_Param::N_sims)
+    .def_readwrite("Nt_alloc", &Sim_Param::Nt_alloc)
+    .def_readwrite("seed", &Sim_Param::seed)
+    .def_readwrite("N_graphs", &Sim_Param::N_graphs)
+    .def_readwrite("output_dir", &Sim_Param::output_dir)
+    .def_readwrite("compute_range", &Sim_Param::compute_range)
+    .def_readwrite("wg_range", &Sim_Param::wg_range)
+    .def_readwrite("p_I_min", &Sim_Param::p_I_min)
+    .def_readwrite("p_I_max", &Sim_Param::p_I_max);
+
 
     m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>> (*)(const std::string &, uint32_t, float, uint32_t)>(&regression_on_datasets), "regression_on_datasets");
     m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>> (*)(const std::vector<std::string> &, uint32_t, float, uint32_t)>(&regression_on_datasets), "regression_on_datasets");

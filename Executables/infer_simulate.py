@@ -39,17 +39,58 @@ def create_weighted_graph(edgelists, nodelists):
         if e.source() == e.target():
             G.ep['weight'][e] += N_pop
     return G
-
-def generate_compute(N_pop, N_communities, p_in, p_out, seed):
-    edgelists, nodelists, ecm = generate_planted_SBM_edges(N_pop, N_communities, p_in, p_out, seed)
+def structural_compute(N_pop, N_communities, p_in, p_out, seed, idx):
+    edgelists, nodelists, ecm, vcm = generate_planted_SBM_edges(N_pop, N_communities, p_in, p_out, seed)
     G = create_weighted_graph(edgelists, nodelists)
     weight = G.ep['weight']
     state = gt.minimize_blockmodel_dl(G, state_args=dict(recs=[weight], rec_types=["discrete-poisson"]))
     N_blocks = state.get_nonempty_B()
     entropies = state.entropy()
+    return edgelists, nodelists, ecm, vcm, N_blocks, entropies
+
+def generate_compute(q, N_pop, N_communities, p_in, p_out, seed, idx):
+    print("performing inference for idx " + str(idx))
+    p = Sim_Param()
+    p.N_communities = N_communities
+    p.N_pop = N_pop
+    p.N_sims = 2
+    p.p_in = p_in
+    p.p_out = p_out
+    p.Nt = 5
+    p.Nt_alloc = 5
+    p.p_R0 = 0.0
+    p.p_R = 0.1
+    p.p_I0 = 0.1
+    p.p_I_min = .0001
+    p.p_I_max = .1
+    p.seed = seed
+    p.N_graphs = 10
+    p.output_dir = Data_dir + "p_out_" + str(p_out)[:4] + "/"
+    p.compute_range=sycl_range_1(p.N_graphs*p.N_sims)
+    p.wg_range=sycl_range_1(p.N_graphs*p.N_sims)
+    seeds = np.random.randint(0, 100000, p.N_graphs)
+    #generate graphs
+    edgelists = []
+    ecms = []
+    vcms = []
+    entrops = []
+    N_blocks = []
+    for i in range(p.N_graphs):
+        elist, nlist, ecm, vcm, Nb, entrop = structural_compute(N_pop, N_communities, p_in, p_out, seeds[i], i)
+        edgelists.append([x for y in elist for x in y])
+        ecms.append(ecm)
+        vcms.append(vcm)
+        entrops.append(entrop)
+        N_blocks.append(Nb)
+
+    print("Running MC-simulations for idx " + str(idx))
+    run(q, p, edgelists, ecms, vcms)
     return N_blocks, entropies
 
 if __name__ == '__main__':
+
+    Np = 10
+    q = sycl_queue(gpu_selector())
 
     N_sim = 2
     N_pop = 100
@@ -58,24 +99,24 @@ if __name__ == '__main__':
     seed = 999
     Nt = 70
     Ng = 2
-    p_out = np.linspace(0.0, 0.1, 21)
+    p_out = np.linspace(0.0, 0.1, Np)
     p_in = np.max(p_out)-p_out
     Gs = []
     states = []
     N_blocks = []
     entropies = []
     fig, ax = plt.subplots(2)
-    seeds = np.random.randint(0, 100000, len(p_out))
+    seeds = np.random.randint(0, 100000, Np)
     pool = mp.Pool(int(mp.cpu_count()/2))
-    N_samples = 10
-    entropies = np.zeros((N_samples, len(p_out)))
-    N_blocks = np.zeros((N_samples, len(p_out)))
-    for i in range(N_samples):
-        print("Computing for sample " + str(i))
-        res = pool.starmap(generate_compute, zip([N_pop]*len(p_out), [N_communities]*len(p_out), p_in, p_out, seeds))
-        entropies[i,:] = [r[1] for r in res]
-        N_blocks[i,:] = [r[0] for r in res]
+    # for i in range(N_samples):
+    # res = pool.starmap(generate_compute, zip(qs, [N_pop]*Np, [N_communities]*Np, p_in, p_out, seeds, range(Np)))
 
+    blocklist = []
+    entropy_list =[]
+    for i in range(Np):
+        blocks, entrops = generate_compute(q, N_pop, N_communities, p_in[i], p_out[i], seeds[i], i)
+        blocklist.append(blocks)
+        entropy_list.append(entrops)
     # [ax[0].plot(p_out, nb) for nb in N_blocks]
     # [ax[1].plot(p_out, e) for e in entropies]
     # state.draw(output=Data_dir + "state.png")
@@ -83,7 +124,7 @@ if __name__ == '__main__':
     # plt.show()
 
     #violin plot
-    sns.violinplot(data=N_blocks, ax=ax[0])
-    sns.violinplot(data=entropies, ax=ax[1])
+    sns.violinplot(data=blocklist, ax=ax[0])
+    sns.violinplot(data=entropy_list, ax=ax[1])
     plt.show()
     a = 1

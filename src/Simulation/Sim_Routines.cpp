@@ -27,6 +27,8 @@ bool is_allocated_space_full(uint32_t t, uint32_t Nt_alloc)
 
 void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, size_t N_steps, std::vector<sycl::event>& dep_events)
 {
+    if (N_steps == 0)
+        return;
     std::chrono::high_resolution_clock::time_point t1, t2;
     N_steps = std::min<size_t>({N_steps, p.Nt_alloc});
     t1 = std::chrono::high_resolution_clock::now();
@@ -34,7 +36,7 @@ void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, s
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Accumulate community state: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
-    auto state_gs = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(read_graphseries(q, b.community_state, p, p.Nt_alloc+1, p.N_communities, acc_event)), N_steps, 0);
+    auto state_gs = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(read_graphseries(q, b.community_state, p, p.Nt_alloc+1, p.N_communities, acc_event)), N_steps+1, 0);
     auto event_to_gs = get_N_timesteps(std::forward<const Graphseries_t<uint32_t>>(read_graphseries(q, b.events_to, p, p.Nt_alloc, b.events_to.get_range()[2], dep_events)), N_steps, 0);
     auto event_from_gs = get_N_timesteps(std::forward<const Graphseries_t<uint32_t>>(read_graphseries(q, b.events_from, p, p.Nt_alloc, b.events_from.get_range()[2], dep_events)), N_steps, 0);
     t2 = std::chrono::high_resolution_clock::now();
@@ -51,10 +53,18 @@ void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, s
 
 
 
-void run(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b)
+void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
 {
     uint32_t N_connections = b.events_from.get_range()[2];
     Sim_Data d(p.Nt_alloc, p.N_sims, p.N_communities, N_connections);
+    if ((p.global_mem_size == 0) || p.local_mem_size == 0)
+    {
+        auto device = q.get_device();
+        p.local_mem_size = device.get_info<sycl::info::device::local_mem_size>();
+        p.global_mem_size = device.get_info<sycl::info::device::global_mem_size>();
+    }
+
+
     std::vector<sycl::event> events(1);
     q.wait();
     events[0] = initialize_vertices(q, p, b.vertex_state, b.rngs);
@@ -83,6 +93,19 @@ void run(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b)
         events = recover(q, p, b.vertex_state, b.rngs, t, events);
         events = infect(q, p, b, t, events);
     }
-    auto last_offset = t % p.Nt_alloc;
-    write_allocated_steps(q, p, b, last_offset, events);
+    write_allocated_steps(q, p, b, t % (p.Nt_alloc + 1), events);
+    ccms_to_file(b.ccm, p.output_dir);
+
+    auto p_Is = get_N_timesteps(std::forward<const Graphseries_t<float>>(read_graphseries(q, b.p_Is, p, p.Nt, b.p_Is.get_range()[2], events)), p.Nt, 0);
+    write_graphseries(std::forward<const Graphseries_t<float>>(p_Is), p.output_dir, "p_I", false);
+
+    p.dump(p.output_dir + "/Sim_Param.json");
+
+}
+
+
+void run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<uint32_t>>& ecm)
+{
+    auto b = Sim_Buffers::make(q, p, edge_list, ecm, vcm, {});
+    run(q, p, b);
 }

@@ -51,8 +51,13 @@ include(FindThreads)
 #     GITHUB_REPOSITORY wolfpld/tracy
 #     GIT_TAG master
 # )
-
-find_package(nlohmann_json CONFIG REQUIRED)
+find_package(casadi REQUIRED HINTS "/home/man/mambaforge/envs/gt/lib/cmake/casadi")
+find_package(nlohmann_json 3.11.2 REQUIRED)
+# CPMFindPackage(
+    # NAME json
+    # GITHUB_REPOSITORY nlohmann/json
+    # GIT_TAG develop
+# )
 
 find_package(TBB REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)

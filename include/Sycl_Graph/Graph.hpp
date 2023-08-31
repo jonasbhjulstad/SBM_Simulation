@@ -4,23 +4,23 @@
 #include <fstream>
 #include <vector>
 
-std::vector<std::pair<uint32_t, uint32_t>> random_connect(const std::vector<uint32_t> &to_nodes,
-                                                          const std::vector<uint32_t> &from_nodes, float p, uint32_t connection_idx, uint32_t seed);
-std::vector<std::vector<std::pair<uint32_t, uint32_t>>> random_connect(const std::vector<std::vector<uint32_t>> &nodelists,
-                                                                       float p_in, float p_out, uint32_t seed);
 using Edge_List_t = std::vector<std::vector<std::pair<uint32_t, uint32_t>>>;
 using Node_List_t = std::vector<std::vector<uint32_t>>;
 using Edge_List_Flat_t = std::vector<std::pair<uint32_t, uint32_t>>;
 using Node_List_Flat_t = std::vector<uint32_t>;
 using Node_Edge_Tuple_Flat_t = std::tuple<Edge_List_Flat_t, Node_List_Flat_t>;
-std::tuple<Edge_List_t, Node_List_t, std::vector<uint32_t>> generate_planted_SBM_edges(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed);
+
+std::vector<std::pair<uint32_t, uint32_t>> random_connect(const std::vector<uint32_t> &to_nodes,
+                                                          const std::vector<uint32_t> &from_nodes, float p, uint32_t connection_idx, uint32_t seed);
+std::vector<std::vector<std::pair<uint32_t, uint32_t>>> random_connect(const std::vector<std::vector<uint32_t>> &nodelists,
+                                                                       float p_in, float p_out, uint32_t seed);
+std::tuple<Edge_List_t, Node_List_t, std::vector<uint32_t>, std::vector<uint32_t>> generate_planted_SBM_edges(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed);
 
 std::tuple<std::vector<std::pair<uint32_t, uint32_t>>, std::vector<uint32_t>, std::vector<uint32_t>> generate_planted_SBM_flat(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed);
 
-std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>, std::vector<std::vector<uint32_t>>> generate_N_SBM_graphs(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng);
+std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>, std::vector<std::vector<uint32_t>>,std::vector<std::vector<uint32_t>>> generate_N_SBM_graphs(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng);
 
-std::tuple<std::vector<Edge_List_Flat_t>, std::vector<Node_List_Flat_t>, std::vector<std::vector<uint32_t>>> generate_N_SBM_graphs_flat(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng);
-
+std::tuple<std::vector<Edge_List_Flat_t>, std::vector<Node_List_Flat_t>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>> generate_N_SBM_graphs_flat(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng);
 
 std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities);
 

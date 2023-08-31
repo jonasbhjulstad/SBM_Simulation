@@ -45,9 +45,9 @@ std::pair<Eigen::MatrixXf, Eigen::MatrixXf> load_beta_regression(const std::stri
     auto community_traj_filename = [](uint32_t idx){return std::string("community_trajectory_" + std::to_string(idx) + ".csv");};
 
     auto infection_events_filename = [](uint32_t idx){return std::string("connection_events_" + std::to_string(idx) + ".csv");};
-    auto connection_community_map_filename = [](uint32_t idx){return std::string("ccm_" + std::to_string(idx) + ".csv");};
+    auto connection_community_map_filename = [](uint32_t idx){return std::string("ccm.csv");};
 
-    auto p_Is_filename = [](uint32_t idx){return std::string("p_Is_" + std::to_string(idx) + ".csv");};
+    auto p_Is_filename = [](uint32_t idx){return std::string("p_I_" + std::to_string(idx) + ".csv");};
 
 
     Mat connection_infs = openData(datapath + connection_infs_filename(idx));
@@ -143,7 +143,6 @@ float alpha_regression(const Eigen::VectorXf &x, const Eigen::VectorXf &y)
 {
     return y.dot(x) / x.dot(x);
 }
-
 std::tuple<std::vector<float>, std::vector<float>> regression_on_datasets(const std::string &datapath, uint32_t N, float tau, uint32_t offset)
 {
     auto [F_beta_rs_mat, connection_infs] = load_N_datasets(datapath, N, offset);

@@ -1,5 +1,3 @@
 add_custom_library(Profiling)
 add_custom_library(Vector_Remap)
 add_custom_library(Buffer_Utils)
-add_custom_library(json_settings)
-target_link_libraries(json_settings PUBLIC nlohmann_json::nlohmann_json)

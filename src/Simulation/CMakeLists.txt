@@ -3,9 +3,9 @@ add_custom_library(Sim_Buffer_Routines)
 add_custom_library(Sim_Write)
 
 target_link_libraries(Sim_Buffer_Routines PUBLIC Sim_Types)
-target_link_libraries(Sim_Buffer_Routines PRIVATE Vector_Remap)
+target_link_libraries(Sim_Buffer_Routines PRIVATE Vector_Remap nlohmann_json::nlohmann_json)
 add_custom_library(Sim_Buffers)
-target_link_libraries(Sim_Buffers PUBLIC Sim_Types Buffer_Utils)
+target_link_libraries(Sim_Buffers PUBLIC Sim_Types Buffer_Utils Graph)
 
 
 
