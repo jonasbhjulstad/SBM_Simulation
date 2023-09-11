@@ -24,21 +24,24 @@ def basename(path):
 if __name__ == '__main__':
     fig, ax = plt.subplots()
 
-    N_graphs = 10
     #find all dirs that starts with p_out
     dirs = os.listdir(Graphs_dir)
     p_dirs = [Graphs_dir + d for d in dirs if basename(d).startswith("p_out")]
     for i, p_dir in enumerate(p_dirs):
+        #get parameters from jsjon
+        params = []
+        with open(p_dir + "/Sim_Param.json") as f:
+            params = json.load(f)
+
         graph_dirs = os.listdir(p_dir)
         graph_dirs = [p_dir + "/" + d for d in graph_dirs if d.startswith("Graph")]
 
         N_connections = np.genfromtxt(graph_dirs[0] + "/theta_LS.csv", delimiter=",").shape[0]
-        beta_LS = np.zeros((N_graphs, N_connections))
-        beta_QR = np.zeros((N_graphs, N_connections))
+        beta_LS = np.zeros((params["N_graphs"], N_connections))
+        beta_QR = np.zeros((params["N_graphs"], N_connections))
         for g_idx, g_dir in enumerate(graph_dirs):
             beta_LS[g_idx, :] = np.genfromtxt(g_dir + "/theta_LS.csv", delimiter=",")
             beta_QR[g_idx,:] = np.genfromtxt(g_dir + "/theta_QR.csv", delimiter=",")
-
         a = 1
 
-    p_outs = np.linspace(0.0, 0.08, N_graphs)
+    p_outs = np.linspace(0.0, 0.08, params["N_graphs"])

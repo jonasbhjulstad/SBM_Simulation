@@ -30,4 +30,9 @@ std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_l
 
 std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm);
 std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm, uint32_t N_connections);
+void write_edgelist(const std::string& fname, const std::vector<std::pair<uint32_t, uint32_t>>& edges);
+void read_edgelist(const std::string& fname, std::vector<std::pair<uint32_t, uint32_t>>& edges);
+void write_vector(const std::string& fname, const std::vector<uint32_t>& vec);
+void read_vector(const std::string& fname, std::vector<uint32_t>& vec);
+
 #endif

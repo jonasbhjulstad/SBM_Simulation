@@ -1,4 +1,5 @@
 #include <Sycl_Graph/Dynamics.hpp>
+#include <Sycl_Graph/Graph.hpp>
 #include <Sycl_Graph/Simulation/Sim_Buffers.hpp>
 #include <Sycl_Graph/Simulation/Sim_Infection_Sampling.hpp>
 #include <Sycl_Graph/Simulation/Sim_Routines.hpp>
@@ -118,5 +119,28 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
 void run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<uint32_t>>& ecm, uint32_t N_connections)
 {
     auto b = Sim_Buffers::make(q, p, edge_list, ecm, vcm, {}, N_connections);
+    run(q, p, b);
+    for(int graph_idx = 0; graph_idx < edge_list.size(); graph_idx++)
+    {
+        write_edgelist(p.output_dir + "/Graph_" + std::to_string(graph_idx) + "/edgelist.csv", edge_list[graph_idx]);
+        write_vector(p.output_dir + "/Graph_" + std::to_string(graph_idx) + "/vcm.csv", vcm[graph_idx]);
+        write_vector(p.output_dir + "/Graph_" + std::to_string(graph_idx) + "/ecm.csv", ecm[graph_idx]);
+    }
+}
+
+auto matrix_linearize(const std::vector<std::vector<float>>& vecs)
+{
+    std::vector<float> out;
+    for(auto&& v: vecs)
+    {
+        out.insert(out.end(), v.begin(), v.end());
+    }
+    return out;
+}
+
+void p_I_run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<uint32_t>>& ecm, uint32_t N_connections, const std::vector<std::vector<float>>& p_Is)
+{
+    auto p_I_lin = matrix_linearize(p_Is);
+    auto b = Sim_Buffers::make(q, p, edge_list, ecm, vcm, p_I_lin, N_connections);
     run(q, p, b);
 }

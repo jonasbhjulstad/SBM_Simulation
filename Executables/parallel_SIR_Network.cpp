@@ -34,7 +34,6 @@ int main()
     t1 = std::chrono::high_resolution_clock::now();
 
     auto [edge_list, vertex_list, ecm, vcm] = generate_N_SBM_graphs_flat(p.N_pop, p.N_communities, p.p_in, p.p_out, p.seed, p.N_graphs);
-
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Generate graphs: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
@@ -48,5 +47,10 @@ int main()
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Make buffers: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     run(q, p, b);
+    std::for_each(edge_list.begin(), edge_list.end(), [p,i=0](const auto& edges) mutable
+    {
+        write_edgelist(p.output_dir + "Graph_" + std::to_string(i) + "/edgelist.csv", edges);
+    });
+
     return 0;
 }

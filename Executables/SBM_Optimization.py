@@ -10,7 +10,10 @@ Data_dir = Project_root + "/data/SIR_sim/"
 sys.path.append(Binder_path)
 sys.path.append('/usr/local/lib')
 from SIR_SBM import *
+def complete_graph_max_edges(N):
 
+    n_choose_2 = lambda n: n*(n-1)/2
+    return int(n_choose_2(N) + N)
 def get_avg_init_state(Graph_dir, N):
     avg_init_state = None
     for i in range(N):
@@ -69,8 +72,6 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
         c_delta_I.append(community_delta_I(i, c_states, c_p_Is))
     c_delta_R = community_delta_Rs(c_states)
     c_delta_I = vertcat(*c_delta_I)
-
-    # delta = vertcat(-c_delta_I, c_delta_I - c_delta_R, c_delta_R)
 
     #zip the delta_I and delta_R together
     delta = []

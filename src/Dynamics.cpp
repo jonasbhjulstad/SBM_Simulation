@@ -156,32 +156,6 @@ std::vector<sycl::event> infect(sycl::queue &q,
                                   auto e_acc_1 = b.edge_from.template get_access<sycl::access::mode::read>(h);
                                   auto event_to_acc_glob = construct_validate_accessor<uint32_t, 3, sycl::access::mode::write>(b.events_to, h, sycl::range<3>(1, N_sims*p.N_graphs, N_connections), sycl::range<3>(t_alloc, 0, 0));
                                   auto event_from_acc_glob = construct_validate_accessor<uint32_t, 3, sycl::access::mode::write>(b.events_from, h, sycl::range<3>(1, N_sims*p.N_graphs, N_connections), sycl::range<3>(t_alloc, 0, 0));
-                                  // sycl::local_accessor<Static_RNG::default_rng> rng_acc(p.wg_range, h);
-                                  // sycl::local_accessor<SIR_State, 2> v_prev(sycl::range<2>(p.wg_range[0], N_vertices), h);
-                                  // sycl::local_accessor<SIR_State, 2> v_next(sycl::range<2>(p.wg_range[0], N_vertices), h);
-                                  // sycl::local_accessor<float, 2> p_I_acc(sycl::range<2>(p.wg_range[0], N_connections), h);
-                                  // sycl::local_accessor<uint32_t, 2> event_to_acc(sycl::range<2>(p.wg_range[0], N_connections), h);
-                                  // sycl::local_accessor<uint32_t, 2> event_from_acc(sycl::range<2>(p.wg_range[0], N_connections), h);
-                                  // auto local_mem_size_used = rng_acc.byte_size() + p_I_acc.byte_size() + event_to_acc.byte_size() + event_from_acc.byte_size();
-                                  // // Copy to local accessor
-                                  // gr.parallel_for_work_item([&](sycl::h_item<1> it)
-                                  // {
-                                  //     auto sim_id = it.get_global_id();
-                                  //     auto lid = it.get_local_id(0);
-                                  //     // for (int v_idx = 0; v_idx < N_vertices; v_idx++)
-                                  //     // {
-                                  //     //     v_prev[lid][v_idx] = v_glob_next[0][sim_id][v_idx];
-                                  //     //     v_next[lid][v_idx] = v_glob_next[0][sim_id][v_idx];
-                                  //     // }
-                                  //     for(int i = 0; i < N_connections; i++)
-                                  //     {
-                                  //         p_I_acc[lid][i] = p_I_acc_glob[0][sim_id][i];
-                                  //         event_from_acc[lid][i] = 0;
-                                  //         event_to_acc[lid][i] = 0;
-                                  //     }
-                                  //     // rng_acc[lid] = rng_acc_glob[sim_id];
-                                  // });
-                                  // get group id
                                   h.parallel_for(sycl::nd_range<1>(p.compute_range, p.wg_range), [=](sycl::nd_item<1> it)
                                                  {
             auto sim_id = it.get_global_id();

@@ -4,6 +4,7 @@
 #include <execution>
 #include <itertools.hpp>
 #include <random>
+#include <sstream>
 #include <tuple>
 #include <unordered_map>
 
@@ -305,4 +306,49 @@ std::vector<std::vector<uint32_t>> ccm_weights_from_ecms(const std::vector<uint3
     std::vector<std::vector<uint32_t>> result(ecms.size());
 
     return result;
+}
+
+void write_edgelist(const std::string& fname, const std::vector<std::pair<uint32_t, uint32_t>>& edges)
+{
+    std::ofstream f(fname);
+    for(auto&& e: edges)
+    {
+        f << e.first << "," << e.second << "\n";
+    }
+}
+
+void read_edgelist(const std::string& fname, std::vector<std::pair<uint32_t, uint32_t>>& edges)
+{
+    std::ifstream f(fname);
+    std::string line;
+    while(std::getline(f, line))
+    {
+        std::stringstream ss(line);
+        std::string token;
+        std::vector<std::string> tokens;
+        while(std::getline(ss, token, ','))
+        {
+            tokens.push_back(token);
+        }
+        edges.push_back(std::make_pair(std::stoi(tokens[0]), std::stoi(tokens[1])));
+    }
+}
+
+void write_vector(const std::string& fname, const std::vector<uint32_t>& vec)
+{
+    std::ofstream f(fname);
+    for(auto&& e: vec)
+    {
+        f << e << "\n";
+    }
+}
+
+void read_vector(const std::string& fname, std::vector<uint32_t>& vec)
+{
+    std::ifstream f(fname);
+    std::string line;
+    while(std::getline(f, line))
+    {
+        vec.push_back(std::stoi(line));
+    }
 }
