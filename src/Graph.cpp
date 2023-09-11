@@ -292,9 +292,8 @@ std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_
     return ecm;
 }
 
-std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm)
+std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm, uint32_t N_connections)
 {
-    uint32_t N_connections = std::max_element(ecm.begin(), ecm.end())[0] + 1;
     std::vector<uint32_t> ccm_weights(N_connections, 0);
     std::for_each(ecm.begin(), ecm.end(), [&](const uint32_t idx)
                   { ccm_weights[idx]++; });

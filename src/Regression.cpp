@@ -34,7 +34,7 @@ Eigen::MatrixXf openData(const std::string& fileToOpen)
     return Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(matrixEntries.data(), matrixRowNumber, matrixEntries.size() / matrixRowNumber);
 }
 
-std::pair<Eigen::MatrixXf, Eigen::MatrixXf> load_beta_regression(const std::string& datapath, uint32_t idx)
+std::pair<Eigen::MatrixXf, Eigen::MatrixXf> load_beta_regression(const std::string& datapath, uint32_t idx, bool truncate)
 {
     using Mat = Eigen::MatrixXf;
     using Vec = Eigen::VectorXf;
@@ -53,23 +53,32 @@ std::pair<Eigen::MatrixXf, Eigen::MatrixXf> load_beta_regression(const std::stri
     Mat connection_infs = openData(datapath + connection_infs_filename(idx));
     Mat connection_community_map = openData(datapath + connection_community_map_filename(idx));
     Mat community_traj = openData(datapath + community_traj_filename(idx));
-
-    assert((connection_infs.array() <= 1000).all());
     assert((connection_infs.array() >= 0).all());
-    assert((community_traj.array() <= 1000).all());
-    auto N_connections = connection_infs.cols();
     auto Nt = community_traj.rows() - 1;
+    auto N_connections = connection_infs.cols();
+    if (truncate)
+    {
+        auto t_trunc = 0;
+        for(t_trunc = 0; t_trunc < Nt; t_trunc++)
+        {
+            if (community_traj.row(t_trunc)(Eigen::seqN(1, 3)).sum() == 0)
+            {
+                break;
+            }
+        }
+        connection_infs.conservativeResize(t_trunc, Eigen::NoChange);
+        community_traj.conservativeResize(t_trunc, Eigen::NoChange);
+        Nt = t_trunc;
+    }
+    assert((connection_infs.array() <= 1000).all());
+    assert((community_traj.array() <= 1000).all());
     uint32_t const N_communities = community_traj.cols() / 3;
     Mat p_Is = openData(datapath + p_Is_filename(idx));
 
-    Mat F_beta_rs_mat(Nt, N_connections);
-    for (int i = 0; i < connection_community_map.rows(); i++)
+    auto compute_beta_rs_col = [&](auto from_idx,auto to_idx, const Vec& p_I)
     {
-        auto target_idx = connection_community_map(i, 1);
-        auto source_idx = connection_community_map(i, 0);
-        // community_traj[:, 3*target_idx:3*target_idx+3]
-        Mat target_traj = community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * target_idx, 3));
-        Mat source_traj = community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * source_idx, 3));
+        Mat target_traj = community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * to_idx, 3));
+        Mat source_traj = community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * from_idx, 3));
 
         Vec const S_r = source_traj.col(0);
         Vec I_r = source_traj.col(1);
@@ -77,12 +86,17 @@ std::pair<Eigen::MatrixXf, Eigen::MatrixXf> load_beta_regression(const std::stri
         Vec S_s = target_traj.col(0);
         Vec const I_s = target_traj.col(1);
         Vec R_s = target_traj.col(2);
-        Vec p_I = p_Is.col(i);
 
         Vec denom = (S_s.array() + I_r.array() + R_s.array()).matrix();
         Vec nom = (S_s.array() * I_r.array()).matrix();
-        Vec const connection_inf = connection_infs.col(i);
-        F_beta_rs_mat.col(i) = p_I.array() * nom.array() / denom.array();
+        return Vec(p_I.array() * nom.array() / denom.array());
+    };
+
+    Mat F_beta_rs_mat(Nt, N_connections);
+    for (int i = 0; i < connection_community_map.rows(); i++)
+    {
+        F_beta_rs_mat.col(2*i) = compute_beta_rs_col(connection_community_map(i, 0), connection_community_map(i, 1), p_Is.col(i));
+        F_beta_rs_mat.col(2*i+1) = compute_beta_rs_col(connection_community_map(i, 1), connection_community_map(i, 0), p_Is.col(i));
     }
     // not all zero
     assert(F_beta_rs_mat.array().sum() != 0);
@@ -143,12 +157,54 @@ float alpha_regression(const Eigen::VectorXf &x, const Eigen::VectorXf &y)
 {
     return y.dot(x) / x.dot(x);
 }
+Eigen::MatrixXf filter_columns(const Eigen::MatrixXf& mat, const std::vector<uint32_t>& indices)
+{
+    Eigen::MatrixXf filtered_mat(mat.rows(), indices.size());
+    for(int i = 0; i < indices.size(); i++)
+    {
+        filtered_mat.col(i) = mat.col(indices[i]);
+    }
+    return filtered_mat;
+}
+
+auto filter_zero_columns(const Eigen::MatrixXf& mat)
+{
+    std::vector<uint32_t> non_zero_cols;
+    for(int i = 0; i < mat.cols(); i++)
+    {
+        if (mat.col(i).array().sum() != 0)
+        {
+            non_zero_cols.push_back(i);
+        }
+    }
+    return std::make_tuple(filter_columns(mat, non_zero_cols), non_zero_cols);
+}
+template <typename T>
+std::vector<T> project(const std::vector<T>& data, const std::vector<uint32_t>& indices, auto size)
+{
+    std::vector<T> projected_data(size, T{});
+    for(int i = 0; i < size; i++)
+    {
+        if (std::find(indices.begin(), indices.end(), i)!= indices.end())
+        {
+            projected_data[i] = data[i];
+        }
+    }
+    return projected_data;
+}
+
 std::tuple<std::vector<float>, std::vector<float>> regression_on_datasets(const std::string &datapath, uint32_t N, float tau, uint32_t offset)
 {
-    auto [F_beta_rs_mat, connection_infs] = load_N_datasets(datapath, N, offset);
-    // float alpha = alpha_regression(x_recovery, y_recovery);
+    auto [F_beta_rs_mat_raw, connection_infs_raw] = load_N_datasets(datapath, N, offset);
+    auto N_connections = connection_infs_raw.cols();
+    auto [connection_infs, non_zero_cols] = filter_zero_columns(connection_infs_raw);
+    auto F_beta_rs_mat = filter_columns(F_beta_rs_mat_raw, non_zero_cols);
+
+    //if column of connection_infs are all zero
     auto [thetas_LS, thetas_QR] = beta_regression(F_beta_rs_mat, connection_infs, tau);
-    return std::make_tuple(thetas_LS, thetas_QR);
+    auto LS_proj = project(thetas_LS, non_zero_cols, N_connections);
+    auto QR_proj = project(thetas_QR, non_zero_cols, N_connections);
+    return std::make_tuple(LS_proj, QR_proj);
 }
 
 std::tuple<std::vector<float>, std::vector<float>> regression_on_datasets(const std::vector<std::string> &datapaths, uint32_t N, float tau, uint32_t offset)

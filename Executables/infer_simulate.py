@@ -48,6 +48,9 @@ def structural_compute(N_pop, N_communities, p_in, p_out, seed, idx):
     entropies = state.entropy()
     return edgelists, nodelists, ecm, vcm, N_blocks, entropies
 
+def complete_graph_max_edges(N):
+    return int(n_choose_2(N))
+
 def generate_compute(q, N_pop, N_communities, p_in, p_out, seed, idx):
     print("performing inference for idx " + str(idx))
     p = Sim_Param()
@@ -64,7 +67,7 @@ def generate_compute(q, N_pop, N_communities, p_in, p_out, seed, idx):
     p.p_I_min = .0001
     p.p_I_max = .1
     p.seed = seed
-    p.N_graphs = 10
+    p.N_graphs = 2
     p.output_dir = Data_dir + "p_out_" + str(p_out)[:4] + "/"
     p.compute_range=sycl_range_1(p.N_graphs*p.N_sims)
     p.wg_range=sycl_range_1(p.N_graphs*p.N_sims)
@@ -75,6 +78,7 @@ def generate_compute(q, N_pop, N_communities, p_in, p_out, seed, idx):
     vcms = []
     entrops = []
     N_blocks = []
+    N_connections = complete_graph_max_edges(N_communities)
     for i in range(p.N_graphs):
         elist, nlist, ecm, vcm, Nb, entrop = structural_compute(N_pop, N_communities, p_in, p_out, seeds[i], i)
         edgelists.append([x for y in elist for x in y])
@@ -84,21 +88,17 @@ def generate_compute(q, N_pop, N_communities, p_in, p_out, seed, idx):
         N_blocks.append(Nb)
 
     print("Running MC-simulations for idx " + str(idx))
-    run(q, p, edgelists, ecms, vcms)
+    run(q, p, edgelists, ecms, vcms, N_connections)
     return N_blocks, entropies
 
 if __name__ == '__main__':
 
     Np = 10
-    q = sycl_queue(gpu_selector())
+    q = sycl_queue(cpu_selector())
 
-    N_sim = 2
     N_pop = 100
-    N_communities = 10
+    N_communities = 2
     p_in = 1.0
-    seed = 999
-    Nt = 70
-    Ng = 2
     p_out = np.linspace(0.0, 0.1, Np)
     p_in = np.max(p_out)-p_out
     Gs = []

@@ -74,9 +74,10 @@ struct Simseries_t: public std::vector<Timeseries_t<T>>
 template <typename T>
 struct Graphseries_t: public std::vector<Simseries_t<T>>
 {
+    const std::size_t Ng, N_sims, Nt, N_cols;
     Graphseries_t() = default;
-    Graphseries_t(const std::vector<Simseries_t<T>>& data): std::vector<Simseries_t<T>>(data){}
-    Graphseries_t(size_t N_graphs, size_t N_sims, size_t Nt, size_t N_cols): std::vector<Simseries_t<T>>(N_graphs, Simseries_t<T>(N_sims, Nt, N_cols)){}
+    Graphseries_t(const std::vector<Simseries_t<T>>& data): std::vector<Simseries_t<T>>(data), Ng(data.size()), N_sims(data[0].size()), Nt(data[0][0].size()), N_cols(N_cols){}
+    Graphseries_t(size_t N_graphs, size_t N_sims, size_t Nt, size_t N_cols): std::vector<Simseries_t<T>>(N_graphs, Simseries_t<T>(N_sims, Nt, N_cols)), Ng(N_graphs), N_sims(N_sims), Nt(Nt), N_cols(N_cols){}
 };
 
 #endif

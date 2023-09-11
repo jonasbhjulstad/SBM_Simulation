@@ -22,7 +22,7 @@ void generate_default_json(const std::string& fname)
     j["seed"] = 283;
     j["N_graphs"] = 2;
     j["N_sims"] = 2;
-    j["output_dir"] = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/";
+    j["output_dir"] = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/p_out_0.00/";
     std::ofstream o(fname);
     o << j.dump();
     o.close();

@@ -6,7 +6,7 @@
 Eigen::MatrixXf openData(const std::string& fileToOpen);
 
 float quantile_regression(const Eigen::VectorXf& x, const Eigen::VectorXf& y, float tau, float y_tol = 1e-6f, float x_tol=1e-6f);
-std::pair<Eigen::MatrixXf, Eigen::MatrixXf> load_beta_regression(const std::string& datapath, uint32_t idx);
+std::pair<Eigen::MatrixXf, Eigen::MatrixXf> load_beta_regression(const std::string& datapath, uint32_t idx, bool truncate=true);
 
 std::tuple<Eigen::MatrixXf, Eigen::MatrixXf> load_N_datasets(const std::string &datapath, uint32_t N, uint32_t offset = 0);
 

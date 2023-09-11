@@ -44,7 +44,6 @@ std::vector<std::string> get_subdirs(const std::string &dir, const std::string &
 int main()
 {
   float tau = .8f;
-  uint32_t N_sims = 2;
   std::string path = Sim_Datapath;
   std::vector<std::string> subdirs = get_subdirs(path, "p_out_");
   std::for_each(subdirs.begin(), subdirs.end(), [tau](const std::string &s)

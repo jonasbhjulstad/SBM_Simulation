@@ -29,5 +29,5 @@ std::vector<uint32_t> create_ecm(const std::vector<std::vector<std::pair<uint32_
 std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_lists);
 
 std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm);
-std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm);
+std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm, uint32_t N_connections);
 #endif

@@ -65,7 +65,7 @@ PYBIND11_MODULE(SIR_SBM, m)
     m.def("generate_planted_SBM_edges", &generate_planted_SBM_edges, "generate_planted_SBM_edges");
     m.def("generate_planted_SBM_flat", &generate_planted_SBM_flat, "generate_planted_SBM_flat");
     m.def("generate_N_SBM_graphs_flat", &generate_N_SBM_graphs_flat, "generate_N_SBM_graphs_flat");
-    m.def("run", static_cast<void(*)(sycl::queue&, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>&, const std::vector<std::vector<uint32_t>>&, const std::vector<std::vector<uint32_t>>&)>(&run), "run");
+    m.def("run", static_cast<void(*)(sycl::queue&, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>&, const std::vector<std::vector<uint32_t>>&, const std::vector<std::vector<uint32_t>>&, uint32_t)>(&run), "run");
 
     py::class_<sycl::range<1>>(m, "sycl_range_1").def(py::init<std::size_t>());
 

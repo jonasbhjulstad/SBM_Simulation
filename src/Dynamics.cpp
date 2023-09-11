@@ -214,7 +214,7 @@ std::vector<sycl::event> infect(sycl::queue &q,
                 }
                 else if ((v_prev_from == SIR_INDIVIDUAL_I) && (v_prev_to == SIR_INDIVIDUAL_S))
                 {
-                    float p_I = p_I_acc_glob[0][sim_id][ecm_acc[edge_idx]];
+                    float p_I = p_I_acc_glob[0][sim_id][connection_id];
                     Static_RNG::bernoulli_distribution<float> bernoulli_I(p_I);
                     auto &rng = rng_acc_glob[sim_id]; // was lid
                     bernoulli_I.p = p_I;

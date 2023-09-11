@@ -14,24 +14,25 @@ Project_root = "/home/man/Documents/ER_Bernoulli_Robust_MPC/"
 Binder_path = Project_root + "/build/Binders/"
 sys.path.append(Binder_path)
 from SIR_SBM import *
-Data_dir = Project_root + "/data/SIR_sim/"
-Graphs_dir = Data_dir + "Graphs/"
+Data_dir = Project_root + "data/"
+Graphs_dir = Data_dir + "SIR_sim/"
 
+def basename(path):
+    return os.path.basename(os.path.normpath(path))
 
 
 if __name__ == '__main__':
     fig, ax = plt.subplots()
 
     N_graphs = 10
-    p_outs = np.linspace(0.0, 0.08, N_graphs)
     #find all dirs that starts with p_out
-    dirs = os.listdir(Data_dir)
-    dirs = [d for d in dirs if d.startswith("p_out")]
-    for i, p_dir in enumerate(dirs):
-        graph_dirs = os.listdir(Data_dir + p_dir + "/")
-        graph_dirs = [Data_dir + "/" + p_dir + "/" + d for d in graph_dirs if d.startswith("Graph")]
+    dirs = os.listdir(Graphs_dir)
+    p_dirs = [Graphs_dir + d for d in dirs if basename(d).startswith("p_out")]
+    for i, p_dir in enumerate(p_dirs):
+        graph_dirs = os.listdir(p_dir)
+        graph_dirs = [p_dir + "/" + d for d in graph_dirs if d.startswith("Graph")]
+
         N_connections = np.genfromtxt(graph_dirs[0] + "/theta_LS.csv", delimiter=",").shape[0]
-        assert len(graph_dirs) == N_graphs
         beta_LS = np.zeros((N_graphs, N_connections))
         beta_QR = np.zeros((N_graphs, N_connections))
         for g_idx, g_dir in enumerate(graph_dirs):
@@ -39,3 +40,5 @@ if __name__ == '__main__':
             beta_QR[g_idx,:] = np.genfromtxt(g_dir + "/theta_QR.csv", delimiter=",")
 
         a = 1
+
+    p_outs = np.linspace(0.0, 0.08, N_graphs)

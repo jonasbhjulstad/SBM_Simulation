@@ -93,7 +93,7 @@ std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<uint32_t>> 
 }
 
 
-Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>>& ecms, std::vector<float> p_Is_init)
+Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>>& ecms, std::vector<float> p_Is_init, uint32_t N_connections)
 {
 
     if ((p.global_mem_size == 0) || p.local_mem_size == 0)
@@ -104,7 +104,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     }
     auto N_sims_tot = p.compute_range[0];
     auto ecm_init = join_vectors(ecms);
-    uint32_t N_connections = std::max_element(ecm_init.begin(), ecm_init.end())[0] + 1;
+    // uint32_t N_connections = std::max_element(ecm_init.begin(), ecm_init.end())[0] + 1;
 
     uint32_t N_vertices = vcms[0].size();
     auto vcm_init = join_vectors(vcms);
@@ -178,7 +178,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     auto ccm = complete_ccm(p.N_communities);
     std::vector<std::vector<std::pair<uint32_t, uint32_t>>> ccms(p.N_graphs, ccm);
     std::vector<std::vector<uint32_t>> ccm_weights(p.N_graphs);
-    std::transform(std::execution::par_unseq, ecms.begin(), ecms.end(), ccm_weights.begin(), ccm_weights_from_ecm);
+    std::transform(std::execution::par_unseq, ecms.begin(), ecms.end(), ccm_weights.begin(), [N_connections](const auto& ecm){return ccm_weights_from_ecm(ecm, N_connections);});
 
 
 

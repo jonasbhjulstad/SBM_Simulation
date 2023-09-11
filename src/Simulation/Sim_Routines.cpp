@@ -27,8 +27,7 @@ bool is_allocated_space_full(uint32_t t, uint32_t Nt_alloc)
 
 void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, size_t N_steps, std::vector<sycl::event>& dep_events)
 {
-    if (N_steps == 0)
-        return;
+    N_steps = (N_steps == 0)  ? p.Nt_alloc : N_steps;
     std::chrono::high_resolution_clock::time_point t1, t2;
     N_steps = std::min<size_t>({N_steps, p.Nt_alloc});
     t1 = std::chrono::high_resolution_clock::now();
@@ -36,21 +35,30 @@ void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, s
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Accumulate community state: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
-    auto state_gs = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(read_graphseries(q, b.community_state, p, p.Nt_alloc+1, p.N_communities, acc_event)), N_steps+1, 0);
+    auto state_gs = read_graphseries(q, b.community_state, p, p.Nt_alloc + 1, p.N_communities, acc_event);
     auto event_to_gs = get_N_timesteps(std::forward<const Graphseries_t<uint32_t>>(read_graphseries(q, b.events_to, p, p.Nt_alloc, b.events_to.get_range()[2], dep_events)), N_steps, 0);
     auto event_from_gs = get_N_timesteps(std::forward<const Graphseries_t<uint32_t>>(read_graphseries(q, b.events_from, p, p.Nt_alloc, b.events_from.get_range()[2], dep_events)), N_steps, 0);
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Read graphseries: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
-    write_graphseries(std::forward<const decltype(state_gs)>(state_gs), p.output_dir, "community_trajectory", true);
+    auto state_gs_write = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(state_gs), N_steps, 1);
+    auto state_gs_inf = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(state_gs), N_steps+1, 0);
+    write_graphseries(std::forward<const decltype(state_gs_write)>(state_gs_write), p.output_dir, "community_trajectory", true);
     auto connection_events = zip_merge_graphseries(std::forward<const decltype(event_from_gs)>(event_from_gs), std::forward<const decltype(event_to_gs)>(event_to_gs));
-    auto inf_gs = sample_infections(std::forward<const Graphseries_t<State_t>>(state_gs), std::forward<const Graphseries_t<uint32_t>>(event_from_gs), std::forward<const Graphseries_t<uint32_t>>(event_to_gs), b.ccm, b.ccm_weights, p.seed, p.compute_range[0]);
+    auto inf_gs = sample_infections(std::forward<const Graphseries_t<State_t>>(state_gs_inf), std::forward<const Graphseries_t<uint32_t>>(event_from_gs), std::forward<const Graphseries_t<uint32_t>>(event_to_gs), b.ccm, b.ccm_weights, p.seed, p.compute_range[0]);
     write_graphseries(std::forward<const decltype(inf_gs)>(inf_gs), p.output_dir, "connection_infections", true);
     write_graphseries(std::forward<const decltype(connection_events)>(connection_events), p.output_dir, "connection_events", true);
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Inf sample/ write graphseries: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
 }
 
+
+void write_initial_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, std::vector<sycl::event>& dep_events)
+{
+    auto acc_event = accumulate_community_state(q, dep_events, b.vertex_state, b.vcm, b.community_state, p.compute_range, p.wg_range);
+    auto state_gs = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(read_graphseries(q, b.community_state, p, p.Nt_alloc + 1, p.N_communities, acc_event)), 1, 0);
+    write_graphseries(std::forward<const decltype(state_gs)>(state_gs), p.output_dir, "community_trajectory", true);
+}
 
 
 void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
@@ -75,6 +83,9 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
     {
         std::filesystem::create_directories(p.output_dir + "/Graph_" + std::to_string(i) + "/");
     }
+
+    write_initial_steps(q, p, b, events);
+
     //remove all files in directory
     // write_initial_state(q, p, b, events);
     uint32_t t = 0;
@@ -93,7 +104,7 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
         events = recover(q, p, b.vertex_state, b.rngs, t, events);
         events = infect(q, p, b, t, events);
     }
-    write_allocated_steps(q, p, b, t % (p.Nt_alloc + 1), events);
+    write_allocated_steps(q, p, b, t % p.Nt_alloc, events);
     ccms_to_file(b.ccm, p.output_dir);
 
     auto p_Is = get_N_timesteps(std::forward<const Graphseries_t<float>>(read_graphseries(q, b.p_Is, p, p.Nt, b.p_Is.get_range()[2], events)), p.Nt, 0);
@@ -104,8 +115,8 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
 }
 
 
-void run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<uint32_t>>& ecm)
+void run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<uint32_t>>& ecm, uint32_t N_connections)
 {
-    auto b = Sim_Buffers::make(q, p, edge_list, ecm, vcm, {});
+    auto b = Sim_Buffers::make(q, p, edge_list, ecm, vcm, {}, N_connections);
     run(q, p, b);
 }

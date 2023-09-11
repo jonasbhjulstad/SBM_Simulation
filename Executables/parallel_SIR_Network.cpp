@@ -27,7 +27,7 @@ int main()
 
     std::chrono::high_resolution_clock::time_point t1, t2;
 
-    sycl::queue q(sycl::gpu_selector_v);
+    sycl::queue q(sycl::cpu_selector_v);
     uint32_t seed = 283;
     auto p = create_sim_param(q);
     // auto p = ps[0];
@@ -42,8 +42,8 @@ int main()
     auto p_in_max = 0.1;
     std::vector<float> p_in(Np);
     std::vector<float> p_out(Np);
-
-    auto b = Sim_Buffers::make(q, p, edge_list, vcm, ecm, {});
+    auto N_connections = complete_ccm(p.N_communities).size();
+    auto b = Sim_Buffers::make(q, p, edge_list, vcm, ecm, {}, N_connections);
     q.wait();
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Make buffers: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";

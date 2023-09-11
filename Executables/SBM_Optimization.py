@@ -18,25 +18,23 @@ def get_avg_init_state(Graph_dir, N):
         with open(filename, 'r') as f:
             first_line = f.readline()
             if avg_init_state is None:
-                avg_init_state = np.array(first_line.split(","))[:-1].astype(float)
+                avg_init_state = np.array(first_line.split(",")).astype(float)
             else:
-                avg_init_state += np.array(first_line.split(","))[:-1].astype(float)
+                avg_init_state += np.array(first_line.split(",")).astype(float)
     return avg_init_state / N
 
 
 def load_data(Graph_dir, N_sims):
         # c_sources = np.genfromtxt(Graph_dir + "connection_sources_0.csv", delimiter=",")
-    beta_LS = np.genfromtxt(Graph_dir + "theta_LS.csv", delimiter=",")
-    beta_QR = np.genfromtxt(Graph_dir + "theta_QR.csv", delimiter=",")
     alpha = 0.1
     community_traj = np.genfromtxt(Graph_dir + "community_trajectory_0.csv", delimiter=",")
     N_communities = int(community_traj.shape[1] / 3)
-    p_Is_data = np.genfromtxt(Graph_dir + "p_Is_0.csv", delimiter=",")
+    p_Is_data = np.genfromtxt(Graph_dir + "p_I_0.csv", delimiter=",")
     N_connections = p_Is_data.shape[1]
     init_state = get_avg_init_state(Graph_dir, N_sims)
     N_pop = np.sum(init_state)
     Nt = community_traj.shape[0]
-    return beta_LS, beta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt
+    return alpha, N_communities, N_connections, init_state, N_pop, Nt
 def delta_I(state_s, state_r, p_I, theta):
     return p_I*state_s[0]*state_r[1]/(state_s[0] + state_r[1] + state_s[2])*theta
 
@@ -46,11 +44,16 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
     def community_delta_I(community_idx, c_states, c_p_Is):
         d_I = 0
         state_s = c_states[3*community_idx:3*community_idx+3]
+
+        #Forward:
         for i, ct in enumerate(ccmap[:,1]):
             if (ct == community_idx):
-                beta_c = beta[i]
+                beta_from = beta[2*i]
+                beta_to = beta[2*i+1]
                 state_r = c_states[3*int(ccmap[i,0]):3*int(ccmap[i,0])+3]
-                d_I += delta_I(state_s, state_r, c_p_Is, beta_c)
+                d_I += delta_I(state_s, state_r, c_p_Is[i], beta_from)
+                d_I += delta_I(state_r, state_s, c_p_Is[i], beta_to)
+
         return d_I
     def community_delta_Rs(c_states):
         return c_states[1::3]*alpha
@@ -83,12 +86,12 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
     u = MX.sym("u", (int(Nt/div_u)+1, N_connections))
     u_unif = MX.sym("u_unif", (int(Nt/div_u)+1, 1))
     #repeat
-    u_uniform = horzcat(*[u_unif for _ in range(int(N_connections/2))])
+    u_uniform = horzcat(*[u_unif for _ in range(N_connections)])
 
 
     #generate random p_Is between u_min, u_max
 
-    p_I_test = np.random.rand(Nt, int(N_connections/2))*(u_max - u_min) + u_min
+    p_I_test = np.random.rand(Nt, N_connections)*(u_max - u_min) + u_min
     test_state = [init_state]
     deltas = []
     for i in range(Nt):
@@ -106,7 +109,7 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
             for j in range(N_communities):
                 inf_sum += state[i][1+3*j]
             f += inf_sum/N_pop
-            for k in range(int(N_connections/2)):
+            for k in range(N_connections):
                 f -= Wu/N_pop*(u_i[k] - u_max)
         return f, state
 
@@ -149,48 +152,30 @@ def solution_plot(traj, u_opt, obj_val, Data_dir):
         ax[i].plot(traj[:,i::3])
     ax[3].plot(u_opt)
     fig.savefig(Data_dir + "/optimal_community_traj.png")
-
+    plt.close(fig)
     fig2, ax2 = plt.subplots(3)
     total_state = np.array([np.sum(traj[:,i::3], axis=1) for i in range(3)]).T
     for i in range(3):
         ax2[i].plot(total_state[:,i])
     fig2.suptitle("Total State, f = " + str(obj_val))
     fig2.savefig(Data_dir + "/total_state.png")
+    plt.close(fig2)
 
-if __name__ == '__main__':
-    Graph_dir = Data_dir + "Graph_0/"
+def u_opt_comparison_plot(traj, u_opt, obj_val, traj_unif, u_unif, obj_unif, Data_dir):
+    fig, ax = plt.subplots(4)
+    for i in range(3):
+        ax[i].plot(traj[:,i::3], 'k', label='Trajectory')
+        ax[i].plot(traj_unif[:,i::3], 'r', label='Uniform controlled trajectory')
+    ax[3].plot(u_opt, 'k', label='control input')
+    ax[3].plot(u_unif, 'r', label='Uniform control input')
 
-    N_sims = 2
-    tau = 0.9
-    Wu = 5000
-    u_max = 1e-2
-    u_min = 1e-3
-    theta_LS, theta_QR = regression_on_datasets(Graph_dir, N_sims, tau, 0)
-
-    connection_community_map_path = Graph_dir + "ccm_0.csv"
-
-    ccmap = np.genfromtxt(connection_community_map_path, delimiter=",")
-    beta_LS, beta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt = load_data(Graph_dir, N_sims)
-
-    u_opt_LS, traj_LS, f_LS, u_opt_LS_uniform, traj_LS_uniform, f_LS_uniform = solve_single_shoot(ccmap, beta_LS, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max)
-
-    u_opt_QR, traj_QR, f_QR, u_opt_QR_uniform, traj_QR_uniform, f_QR_uniform = solve_single_shoot(ccmap, beta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max)
-
-
-    if not os.path.exists(Graph_dir + "LS/"):
-       os.makedirs(Graph_dir + "LS/")
-    if not os.path.exists(Graph_dir + "QR/"):
-         os.makedirs(Graph_dir + "QR/")
-    #write all to file
-    np.savetxt(Graph_dir + "LS/u_opt.csv", u_opt_LS)
-    np.savetxt(Graph_dir + "LS/traj.csv", traj_LS)
-    np.savetxt(Graph_dir + "LS/u_opt_uniform.csv", u_opt_LS_uniform)
-    np.savetxt(Graph_dir + "LS/traj_uniform.csv", traj_LS_uniform)
-    np.savetxt(Graph_dir + "QR/u_opt.csv", u_opt_QR)
-    np.savetxt(Graph_dir + "QR/traj.csv", traj_QR)
-    np.savetxt(Graph_dir + "QR/u_opt_uniform.csv", u_opt_QR_uniform)
-    np.savetxt(Graph_dir + "QR/traj_uniform.csv", traj_QR_uniform)
-
-
-    solution_plot(traj_LS, u_opt_LS, f_LS, Graph_dir + "LS/")
-    solution_plot(traj_QR, u_opt_QR, f_QR, Graph_dir + "QR/")
+    fig.savefig(Data_dir + "/comparison_plot.png")
+    plt.close(fig)
+    fig2, ax2 = plt.subplots(3)
+    total_state = np.array([np.sum(traj[:,i::3], axis=1) for i in range(3)]).T
+    for i in range(3):
+        ax2[i].plot(total_state[:,i])
+        ax2[i].plot(traj_unif[:,i::3], 'r', label='Uniform controlled trajectory')
+    fig2.suptitle("Total State, f = " + str(obj_val) + ", f_uniform = " + str(obj_unif))
+    fig2.savefig(Data_dir + "/total_state_comparison.png")
+    plt.close(fig2)
