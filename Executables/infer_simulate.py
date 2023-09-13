@@ -44,10 +44,10 @@ def create_weighted_graph(nodelists, edgelists):
             G.ep['weight'][e] += N_pop
     return G
 def create_directed_ccm(N):
-    ccm = []
+    ccm = np.empty(N*(N-1), dtype=object)
     for i in range(N):
         for j in range(i, N):
-            ccm[i*N + j] = (i,j)
+            ccm = (i,j)
     directed_ccm = []
     for i in range(N):
         for j in range(i, N):
@@ -55,14 +55,37 @@ def create_directed_ccm(N):
             directed_ccm.append((j,i))
     return directed_ccm
 
-def get_p_I_mapping(vcm, N_communities):
-    N_connections = complete_graph_max_edges(N_communities)
-    directed_ccm = create_directed_ccm(N_communities)
-    ecm = ecm_from_vcm(vcm)
-    assert len(directed_ccm) == N_connections*2
-    p_I_mapping = np.zeros((N_connections*2))
-    for i, edge in enumerate(directed_ccm):
-        p_I_mapping[i] = vcm[edge[0]]
+def create_directed_ccm_with_map(vcm):
+    N = len(vcm)
+    ccm = np.empty(N*(N-1), dtype=object)
+    for i in range(N):
+        for j in range(i, N):
+            ccm = (i,j)
+    directed_ccm = []
+    for i in range(N):
+        for j in range(i, N):
+            directed_ccm.append((vcm[i],vcm[j]))
+            directed_ccm.append((vcm[j],vcm[i]))
+    return directed_ccm
+
+def get_p_I_map(vcm, N_partitions):
+    N_communities = len(vcm)
+    community_ccm = create_directed_ccm_with_map(vcm)
+    N_inputs = len(community_ccm)
+
+    ccm = create_directed_ccm(N_partitions)
+    N_outputs = len(ccm)
+    find_child_edges = lambda c_ccm_edge: [i for i, c_edge in enumerate(ccm) if vcm[c_edge[0]] == c_ccm_edge[1] and vcm[c_edge[1]] == c_ccm_edge[0]]
+    p_I_mapping = [find_child_edges(c_edge) for c_edge in community_ccm]
+    def p_I_mapping(p_Is_in):
+        Nt = p_Is_in.shape[0]
+        p_Is_out = np.zeros((Nt, N_outputs))
+        for i in range(N_inputs):
+            for idx in p_I_mapping[i]:
+                p_Is_out[:, idx] = p_Is_in[:, i]
+        return p_Is_out
+    return p_I_mapping
+
 
 def index_normalize(indices):
     #get number of unique numbers
@@ -78,22 +101,23 @@ def structural_compute(N_pop, N_communities, p_in, p_out, seed, N_graphs):
     edgelists, nodelists, ecms_old, vcms_old = generate_N_SBM_graphs(N_pop, N_communities, p_in, p_out, seed, N_graphs)
     N_blocks = []
     entropies = []
+    p_I_mappings = []
     # NMIs = []
     for nlist, elist in zip(nodelists, edgelists):
+        N_partitions = len(nlist)
         G = create_weighted_graph(nlist, elist)
         weight = G.ep['weight']
         state = gt.minimize_blockmodel_dl(G, state_args=dict(recs=[weight], rec_types=["discrete-poisson"]))
+
         N_blocks.append(state.get_nonempty_B())
         entropies.append(state.entropy())
+
         vcm = np.array(list(state.get_state()))
-        vcm_normalized = index_normalize(vcm)
+        # vcm = index_normalize(np.array(list(state.get_state())))
+        community_edges = list(G.get_edges())
+        p_I_mappings.append(get_p_I_map(vcm, N_partitions))
 
-        a = 1
-
-
-
-
-    return edgelists, nodelists, N_blocks, entropies
+    return edgelists, nodelists, N_blocks, entropies, p_I_mappings
 
 
 def generate_compute(q, N_pop, N_communities, p_in, p_out, seed, idx):
@@ -124,7 +148,7 @@ def generate_compute(q, N_pop, N_communities, p_in, p_out, seed, idx):
     entrops = []
     N_blocks = []
     N_connections = complete_graph_max_edges(N_communities)
-    edgelists, nlist, N_blocks, entropies = structural_compute(N_pop, N_communities, p_in, p_out, p.seed, p.N_graphs)
+    edgelists, nlist, N_blocks, entropies, p_I_mapping = structural_compute(N_pop, N_communities, p_in, p_out, p.seed, p.N_graphs)
     edgelist_flat = [e for elist in edgelists for e in elist]
     print("Running MC-simulations for idx " + str(idx))
     # run(q, p, edgelist_flat, ecm, vcm, N_connections)
@@ -173,7 +197,7 @@ if __name__ == '__main__':
     ax[1].set_xticklabels([str(round(p, 2)) for p in p_out])
     ax[1].set_xlabel("p_out")
     ax[0].set_ylabel("Number of blocks")
-    ax[1].set_ylabel("Entropy")
+    ax[1].set_ylabel("'Entropy'/Minimum Description Length")
     _ = [x.grid() for x in ax]
     plt.show()
     a = 1
