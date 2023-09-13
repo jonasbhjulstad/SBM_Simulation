@@ -71,6 +71,7 @@ void Sim_Param::dump(const std::string& fname) const
     j["N_graphs"] = N_graphs;
     j["N_sims"] = N_sims;
     j["output_dir"] = output_dir;
+    j["tau"] = tau;
     std::ofstream o(fname);
     o << j.dump();
     o.close();

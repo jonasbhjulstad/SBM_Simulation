@@ -1,8 +1,8 @@
 #include <Sycl_Graph/Graph.hpp>
 #include <Sycl_Graph/Simulation/Sim_Buffers.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
-#include <functional>
 #include <execution>
+#include <functional>
 // #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
 // std::vector<float> generate_floats(uint32_t N, float min, float max, uint32_t seed)
 // {
@@ -15,46 +15,46 @@
 // }
 
 Sim_Buffers::Sim_Buffers(cl::sycl::buffer<Static_RNG::default_rng> &rngs,
-                cl::sycl::buffer<SIR_State, 3> &vertex_state,
-                cl::sycl::buffer<uint32_t, 3> &events_from,
-                cl::sycl::buffer<uint32_t, 3> &events_to,
-                cl::sycl::buffer<float, 3> &p_Is,
-                cl::sycl::buffer<uint32_t> &edge_from,
-                cl::sycl::buffer<uint32_t> &edge_to,
-                cl::sycl::buffer<uint32_t> &ecm,
-                cl::sycl::buffer<uint32_t, 2> &vcm,
-                cl::sycl::buffer<uint32_t> &edge_counts,
-                cl::sycl::buffer<uint32_t> & edge_offsets,
-                cl::sycl::buffer<State_t, 3> &community_state,
-                const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &ccm,
-                const std::vector<std::vector<uint32_t>> &ccm_weights) : rngs(std::move(rngs)),
-                                                                     vertex_state(std::move(vertex_state)),
-                                                                     events_from(std::move(events_from)),
-                                                                     events_to(std::move(events_to)),
-                                                                     p_Is(std::move(p_Is)),
-                                                                     edge_from(std::move(edge_from)),
-                                                                     edge_to(std::move(edge_to)),
-                                                                     ecm(std::move(ecm)),
-                                                                     vcm(std::move(vcm)),
-                                                                     edge_counts(std::move(edge_counts)),
-                                                                     edge_offsets(std::move(edge_offsets)),
-                                                                     community_state(std::move(community_state)),
-                                                                     ccm(ccm),
-                                                                     ccm_weights(ccm_weights) {}
+                         cl::sycl::buffer<SIR_State, 3> &vertex_state,
+                         cl::sycl::buffer<uint32_t, 3> &events_from,
+                         cl::sycl::buffer<uint32_t, 3> &events_to,
+                         cl::sycl::buffer<float, 3> &p_Is,
+                         cl::sycl::buffer<uint32_t> &edge_from,
+                         cl::sycl::buffer<uint32_t> &edge_to,
+                         cl::sycl::buffer<uint32_t> &ecm,
+                         cl::sycl::buffer<uint32_t, 2> &vcm,
+                         cl::sycl::buffer<uint32_t> &edge_counts,
+                         cl::sycl::buffer<uint32_t> &edge_offsets,
+                         cl::sycl::buffer<State_t, 3> &community_state,
+                         const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &ccm,
+                         const std::vector<std::vector<uint32_t>> &ccm_weights) : rngs(std::move(rngs)),
+                                                                                  vertex_state(std::move(vertex_state)),
+                                                                                  events_from(std::move(events_from)),
+                                                                                  events_to(std::move(events_to)),
+                                                                                  p_Is(std::move(p_Is)),
+                                                                                  edge_from(std::move(edge_from)),
+                                                                                  edge_to(std::move(edge_to)),
+                                                                                  ecm(std::move(ecm)),
+                                                                                  vcm(std::move(vcm)),
+                                                                                  edge_counts(std::move(edge_counts)),
+                                                                                  edge_offsets(std::move(edge_offsets)),
+                                                                                  community_state(std::move(community_state)),
+                                                                                  ccm(ccm),
+                                                                                  ccm_weights(ccm_weights) {}
 
 std::size_t Sim_Buffers::byte_size() const { return rngs.byte_size() + vertex_state.byte_size() + events_from.byte_size() + events_to.byte_size() + p_Is.byte_size() + edge_from.byte_size() + edge_to.byte_size() + ecm.byte_size() + vcm.byte_size() + community_state.byte_size(); }
 
-std::vector<uint32_t> join_vectors(const std::vector<std::vector<uint32_t>>& vs)
+std::vector<uint32_t> join_vectors(const std::vector<std::vector<uint32_t>> &vs)
 {
     std::vector<uint32_t> result;
-    for (auto& v : vs)
+    for (auto &v : vs)
     {
         result.insert(result.end(), v.begin(), v.end());
     }
     return result;
 }
 
-std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<uint32_t>> separate_flatten_edge_lists(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_lists)
+std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<uint32_t>> separate_flatten_edge_lists(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_lists)
 {
     std::vector<uint32_t> edge_counts_init(edge_lists.size());
     std::transform(edge_lists.begin(), edge_lists.end(), edge_counts_init.begin(), [](auto &e)
@@ -71,18 +71,18 @@ std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<uint32_t>> 
                                       { return e.first; });
                        return result; });
     std::transform(edge_lists.begin(), edge_lists.end(), edge_tos.begin(), [](auto &e)
-                     { std::vector<uint32_t> result(e.size());
+                   { std::vector<uint32_t> result(e.size());
                           std::transform(e.begin(), e.end(), result.begin(), [](auto &e)
                                           { return e.second; });
                           return result; });
-    //insert into edge_from_init
+    // insert into edge_from_init
     std::size_t offset = 0;
     for (auto &e : edge_froms)
     {
         std::copy(e.begin(), e.end(), edge_from_init.begin() + offset);
         offset += e.size();
     }
-    //insert into edge_to_init
+    // insert into edge_to_init
     offset = 0;
     for (auto &e : edge_tos)
     {
@@ -92,9 +92,70 @@ std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<uint32_t>> 
     return std::make_tuple(edge_from_init, edge_to_init, edge_counts_init);
 }
 
-
-Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>>& ecms, std::vector<float> p_Is_init, uint32_t N_connections)
+void validate_buffer_init_sizes(Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>> &ecms, std::vector<float> p_Is_init)
 {
+    if (ecms.size() != p.N_graphs)
+    {
+        throw std::runtime_error("ecms.size() != p.N_graphs");
+    }
+    if (vcms.size() != p.N_graphs)
+    {
+        throw std::runtime_error("vcms.size() != p.N_graphs");
+    }
+
+    if (edge_list.size() != p.N_graphs)
+    {
+        throw std::runtime_error("edge_list.size() != p.N_graphs");
+    }
+
+    auto N_connections = complete_graph_max_edges(p.N_communities);
+    if ((p_Is_init.size() != p.N_graphs * N_connections * p.Nt) && (p_Is_init.size() != 0))
+    {
+        throw std::runtime_error("p_Is_init.size() != p.N_graphs*N_connections*p.Nt");
+    }
+
+    if (std::any_of(vcms.begin(), vcms.end(), [&](const auto &vc)
+                    { return !(vc.size() == p.N_communities * p.N_pop); }))
+    {
+        throw std::runtime_error("vcm.size() != p.N_communities*p.N_pop");
+    }
+}
+
+void Sim_Buffers::validate_sizes(const Sim_Param& p) const
+{
+    auto if_false_throw = [](bool condition, std::string msg)
+    {
+        if(!condition)
+        {
+            throw std::runtime_error(msg);
+        }
+    };
+
+    auto check_buffer_dims = [](auto& buf, auto N0, auto N1, auto N2)
+    {
+        return (buf.get_range()[0] == N0) && (buf.get_range()[1] == N1) && (buf.get_range()[2] == N2);
+    };
+    auto buf_dim_string = [](auto& buf)
+    {
+        return "(" + std::to_string(buf.get_range()[0]) + ", " + std::to_string(buf.get_range()[1]) + ", " + std::to_string(buf.get_range()[2]) + ")";
+    };
+    auto dim_string = [](auto N0, auto N1, auto N2)
+    {
+        return "(" + std::to_string(N0) + ", " + std::to_string(N1) + ", " + std::to_string(N2) + ")";
+    };
+
+    auto N_connections = complete_graph_max_edges(p.N_communities);
+    if_false_throw(check_buffer_dims(p_Is, p.Nt, p.N_graphs*p.N_sims, N_connections), "p_Is has wrong dimensions: " + buf_dim_string(p_Is) + " vs " + dim_string(p.Nt, p.N_graphs, N_connections));
+    if_false_throw(rngs.size() == p.N_sims*p.N_graphs, "rngs has wrong size: " + std::to_string(rngs.size()) + " vs " + std::to_string(p.N_sims*p.N_graphs));
+    if_false_throw(check_buffer_dims(vertex_state, p.Nt_alloc + 1, p.N_sims*p.N_graphs, p.N_pop*p.N_communities), "vertex_state has wrong dimensions: " + buf_dim_string(vertex_state) + " vs " + dim_string(p.Nt_alloc + 1, p.N_sims*p.N_graphs, p.N_pop*p.N_communities));
+    if_false_throw(check_buffer_dims(events_to, p.Nt_alloc, p.N_sims*p.N_graphs, N_connections), "events_to has wrong dimensions: " + buf_dim_string(events_to) + " vs " + dim_string(p.Nt_alloc, p.N_sims*p.N_graphs, N_connections));
+    if_false_throw(check_buffer_dims(events_from, p.Nt_alloc, p.N_sims*p.N_graphs, N_connections), "events_from has wrong dimensions: " + buf_dim_string(events_from) + " vs " + dim_string(p.Nt_alloc, p.N_sims*p.N_graphs, N_connections));
+}
+
+Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>> &ecms, std::vector<float> p_Is_init)
+{
+    auto N_connections = complete_graph_max_edges(p.N_communities);
+    validate_buffer_init_sizes(p, edge_list, vcms, ecms, p_Is_init);
 
     if ((p.global_mem_size == 0) || p.local_mem_size == 0)
     {
@@ -114,9 +175,8 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     std::vector<uint32_t> edge_to_init = std::get<1>(e_data);
     std::vector<uint32_t> edge_counts_init = std::get<2>(e_data);
     std::vector<uint32_t> edge_offsets_init(edge_counts_init.size());
-    std::partial_sum(edge_counts_init.begin(), edge_counts_init.end()-1, edge_offsets_init.begin() + 1);
+    std::partial_sum(edge_counts_init.begin(), edge_counts_init.end() - 1, edge_offsets_init.begin() + 1);
     uint32_t N_tot_edges = std::accumulate(edge_counts_init.begin(), edge_counts_init.end(), 0);
-
 
     std::vector<State_t> community_state_init(p.N_communities * N_sims_tot * (p.Nt_alloc + 1), {0, 0, 0});
     std::vector<SIR_State> traj_init(N_sims_tot * (p.Nt_alloc + 1) * N_vertices, SIR_INDIVIDUAL_S);
@@ -128,19 +188,17 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     std::transform(seeds.begin(), seeds.end(), std::back_inserter(rng_init), [](const auto seed)
                    { return Static_RNG::default_rng(seed); });
 
-    std::vector<std::size_t> sizes = {p.Nt*N_sims_tot*N_connections*sizeof(float),
-    edge_from_init.size()*sizeof(uint32_t),
-    edge_to_init.size()*sizeof(uint32_t),
-    ecm_init.size()*sizeof(uint32_t),
-    vcm_init.size()*sizeof(uint32_t),
-    (p.Nt_alloc + 1)*N_sims_tot*p.N_communities*sizeof(State_t),
-    p.Nt_alloc*N_sims_tot*N_connections*sizeof(uint32_t),
-    p.Nt_alloc*N_sims_tot*N_connections*sizeof(uint32_t),
-    rng_init.size()*sizeof(Static_RNG::default_rng)};
+    std::vector<std::size_t> sizes = {p.Nt * N_sims_tot * N_connections * sizeof(float),
+                                      edge_from_init.size() * sizeof(uint32_t),
+                                      edge_to_init.size() * sizeof(uint32_t),
+                                      ecm_init.size() * sizeof(uint32_t),
+                                      vcm_init.size() * sizeof(uint32_t),
+                                      (p.Nt_alloc + 1) * N_sims_tot * p.N_communities * sizeof(State_t),
+                                      p.Nt_alloc * N_sims_tot * N_connections * sizeof(uint32_t),
+                                      p.Nt_alloc * N_sims_tot * N_connections * sizeof(uint32_t),
+                                      rng_init.size() * sizeof(Static_RNG::default_rng)};
 
     assert(p.global_mem_size > std::accumulate(sizes.begin(), sizes.end(), 0) && "Not enough global memory to allocate all buffers");
-
-
 
     auto p_Is = sycl::buffer<float, 3>(sycl::range<3>(p.Nt, N_sims_tot, N_connections));
     auto edge_from = sycl::buffer<uint32_t>((sycl::range<1>(N_tot_edges)));
@@ -178,9 +236,8 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     auto ccm = complete_ccm(p.N_communities);
     std::vector<std::vector<std::pair<uint32_t, uint32_t>>> ccms(p.N_graphs, ccm);
     std::vector<std::vector<uint32_t>> ccm_weights(p.N_graphs);
-    std::transform(std::execution::par_unseq, ecms.begin(), ecms.end(), ccm_weights.begin(), [N_connections](const auto& ecm){return ccm_weights_from_ecm(ecm, N_connections);});
-
-
+    std::transform(std::execution::par_unseq, ecms.begin(), ecms.end(), ccm_weights.begin(), [N_connections](const auto &ecm)
+                   { return ccm_weights_from_ecm(ecm, N_connections); });
 
     auto byte_size = rngs.byte_size() + trajectory.byte_size() + events_from.byte_size() + events_to.byte_size() + p_Is.byte_size() + edge_from.byte_size() + edge_to.byte_size() + ecm.byte_size() + vcm.byte_size() + community_state.byte_size();
     // get global memory size

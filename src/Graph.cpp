@@ -8,6 +8,11 @@
 #include <tuple>
 #include <unordered_map>
 
+std::size_t complete_graph_max_edges(std::size_t N, bool self_loops, bool directed)
+{
+    return (N*(N-1)/2 + (self_loops ? N : 0))*(directed ? 2 : 1);
+}
+
 std::vector<uint32_t> create_vcm(size_t N_pop, size_t N_clusters)
 {
     std::vector<uint32_t> vcm(N_pop * N_clusters);

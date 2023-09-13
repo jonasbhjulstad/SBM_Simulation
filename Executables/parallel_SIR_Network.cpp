@@ -42,7 +42,7 @@ int main()
     std::vector<float> p_in(Np);
     std::vector<float> p_out(Np);
     auto N_connections = complete_ccm(p.N_communities).size();
-    auto b = Sim_Buffers::make(q, p, edge_list, vcm, ecm, {}, N_connections);
+    auto b = Sim_Buffers::make(q, p, edge_list, vcm, ecm, {});
     q.wait();
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Make buffers: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";

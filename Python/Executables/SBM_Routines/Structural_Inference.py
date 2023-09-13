@@ -1,4 +1,4 @@
-from Path_Config import *
+from SBM_Routines.Path_Config import *
 from collections import Counter
 from itertools import repeat
 import graph_tool.all as gt
@@ -68,22 +68,23 @@ def structural_inference(edgelists, nodelists):
     ecm = ecm_from_vcm(edges, vcm)
     N_blocks = state.get_nonempty_B()
     entropy = state.entropy()
-    return N_blocks, entropy, ecm
+    return N_blocks, entropy, ecm, vcm
 
 def multiple_structural_inference(edgelists, nodelists):
-    N_blocks, entropies, ecms = [], [], []
+    N_blocks, entropies, ecms, vcms = [], [], [], []
     for elist, nodelist in zip(edgelists, nodelists):
-        Nb, entropy, ecm = structural_inference(elist, nodelist)
+        Nb, entropy, ecm, vcm = structural_inference(elist, nodelist)
         N_blocks.append(Nb)
         entropies.append(entropy)
         ecms.append(ecm)
-    return N_blocks, entropies, ecms
+        vcms.append(vcm)
+    return N_blocks, entropies, ecms, vcms
 
 def create_sim_param(N_communities, p_in, p_out, seed, N_graphs):
     p = Sim_Param()
     p.N_communities = N_communities
     p.N_pop = 100
-    p.N_sims = 1
+    p.N_sims = 100
     p.p_in = p_in
     p.p_out = p_out
     p.Nt = 5
@@ -92,30 +93,34 @@ def create_sim_param(N_communities, p_in, p_out, seed, N_graphs):
     p.p_R = 0.1
     p.p_I0 = 0.1
     p.p_I_min = .0001
-    p.p_I_max = .1
+    p.p_I_max = .01
     p.seed = seed
-    p.N_graphs = 20
+    p.N_graphs = 2
     p.output_dir = Data_dir + "p_out_" + str(p_out)[:4] + "/"
     p.compute_range=sycl_range_1(p.N_graphs*p.N_sims)
     p.wg_range=sycl_range_1(p.N_graphs*p.N_sims)
     return p
+def flatten_sublists(l):
+    result = []
+    for sublist in l:
+        sublist_flat = [item for sublist in sublist for item in sublist]
+        result.append(sublist_flat)
+    return result
+
 def create_graphs(p):
-    edgelists, vertexlists, _, _ = generate_N_SBM_graphs(p.N_pop, p.N_communities, p.p_in, p.p_out, p.seed, p.N_graphs)
-    return edgelists, vertexlists
+    edgelists, vertexlists, base_ecm, base_vcm = generate_N_SBM_graphs(p.N_pop, p.N_communities, p.p_in, p.p_out, p.seed, p.N_graphs)
+    return edgelists, vertexlists, base_ecm, base_vcm
 def inference_over_p_out(N_pop, N_communities, p_in, p_out, seed, N_graphs):
     seeds = np.random.randint(0, 100000, N_graphs)
     sim_params = [create_sim_param(N_communities, p_in, po, seed, N_graphs) for po, seed in zip(p_out, seeds)]
-    edgelists = []
-    vertex_lists = []
-    entropies = []
-    N_blocks = []
-    ecms = []
+    edgelists, vertex_lists, entropies, N_blocks, ecms, vcms = [], [], [], [], [], []
     for p in sim_params:
-        elist, vlist = create_graphs(p)
-        edgelists.append(elist)
+        elist, vlist, base_ecm, base_vcm = create_graphs(p)
+        edgelists.append(flatten_sublists(elist))
         vertex_lists.append(vlist)
-        Nb, entropy, ecm = multiple_structural_inference(elist, vlist)
+        Nb, entropy, ecm, vcm = multiple_structural_inference(elist, vlist)
         N_blocks.append(Nb)
         entropies.append(entropy)
-        ecms.append(ecm)
-    return edgelists, vertex_lists, N_blocks, entropies, ecms, sim_params
+        ecms.append(base_ecm)
+        vcms.append(base_vcm)
+    return edgelists, vertex_lists, N_blocks, entropies, ecms, vcms, sim_params

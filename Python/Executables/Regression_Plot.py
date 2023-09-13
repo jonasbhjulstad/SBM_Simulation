@@ -1,25 +1,12 @@
+from SBM_Routines.Path_Config import *
 import json
-from collections import Counter
-import multiprocessing as mp
 from matplotlib import pyplot as plt
-import matplotlib
 import numpy as np
 import sys
-import graph_tool.all as gt
 import os
-import seaborn as sns
-from itertools import repeat
-
-Project_root = "/home/man/Documents/ER_Bernoulli_Robust_MPC/"
-Binder_path = Project_root + "/build/Binders/"
-sys.path.append(Binder_path)
-from SIR_SBM import *
-Data_dir = Project_root + "data/"
-Graphs_dir = Data_dir + "SIR_sim/"
 
 def basename(path):
     return os.path.basename(os.path.normpath(path))
-
 
 if __name__ == '__main__':
     fig, ax = plt.subplots()

@@ -9,6 +9,7 @@ using Node_List_t = std::vector<std::vector<uint32_t>>;
 using Edge_List_Flat_t = std::vector<std::pair<uint32_t, uint32_t>>;
 using Node_List_Flat_t = std::vector<uint32_t>;
 using Node_Edge_Tuple_Flat_t = std::tuple<Edge_List_Flat_t, Node_List_Flat_t>;
+std::size_t complete_graph_max_edges(std::size_t N, bool self_loops=true, bool directed = false);
 
 std::vector<std::pair<uint32_t, uint32_t>> random_connect(const std::vector<uint32_t> &to_nodes,
                                                           const std::vector<uint32_t> &from_nodes, float p, uint32_t connection_idx, uint32_t seed);

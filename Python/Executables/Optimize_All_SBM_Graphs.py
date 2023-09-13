@@ -1,4 +1,4 @@
-from SBM_Optimization import *
+from SBM_Routines.SBM_Optimization import *
 import json
 
 def read_graph_data(p_dir):

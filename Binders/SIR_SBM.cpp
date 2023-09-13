@@ -64,8 +64,8 @@ PYBIND11_MODULE(SIR_SBM, m)
     m.def("generate_planted_SBM_flat", &generate_planted_SBM_flat, "generate_planted_SBM_flat");
     m.def("generate_N_SBM_graphs_flat", &generate_N_SBM_graphs_flat, "generate_N_SBM_graphs_flat");
     m.def("generate_N_SBM_graphs", &generate_N_SBM_graphs, "generate_N_SBM_graphs");
-    m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<uint32_t>> &, uint32_t)>(&run), "run");
-    m.def("p_I_run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<uint32_t>> &, uint32_t, const std::vector<std::vector<float>>&)>(&p_I_run), "p_I_run");
+    m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<uint32_t>> &)>(&run), "run");
+    m.def("p_I_run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<std::vector<float>>>&)>(&p_I_run), "p_I_run");
     m.def("read_edgelist", &read_edgelist, "read_edgelist");
     m.def("write_vector", &write_vector, "write_vector");
     m.def("ecm_from_vcm", &ecm_from_vcm, "ecm_from_vcm");
@@ -86,7 +86,8 @@ PYBIND11_MODULE(SIR_SBM, m)
         .def_readwrite("compute_range", &Sim_Param::compute_range)
         .def_readwrite("wg_range", &Sim_Param::wg_range)
         .def_readwrite("p_I_min", &Sim_Param::p_I_min)
-        .def_readwrite("p_I_max", &Sim_Param::p_I_max);
+        .def_readwrite("p_I_max", &Sim_Param::p_I_max)
+        .def_readwrite("tau", &Sim_Param::tau);
 
     m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>> (*)(const std::string &, uint32_t, float, uint32_t)>(&regression_on_datasets), "regression_on_datasets");
     m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>> (*)(const std::vector<std::string> &, uint32_t, float, uint32_t)>(&regression_on_datasets), "regression_on_datasets");

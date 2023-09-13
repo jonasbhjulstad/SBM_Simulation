@@ -116,9 +116,12 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
 }
 
 
-void run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<uint32_t>>& ecm, uint32_t N_connections)
+
+void run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<uint32_t>>& ecm)
 {
-    auto b = Sim_Buffers::make(q, p, edge_list, ecm, vcm, {}, N_connections);
+
+    auto b = Sim_Buffers::make(q, p, edge_list, vcm, ecm, {});
+    b.validate_sizes(p);
     run(q, p, b);
     for(int graph_idx = 0; graph_idx < edge_list.size(); graph_idx++)
     {
@@ -131,6 +134,7 @@ void run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<ui
 auto matrix_linearize(const std::vector<std::vector<float>>& vecs)
 {
     std::vector<float> out;
+    out.reserve(vecs.size() * vecs[0].size());
     for(auto&& v: vecs)
     {
         out.insert(out.end(), v.begin(), v.end());
@@ -138,9 +142,25 @@ auto matrix_linearize(const std::vector<std::vector<float>>& vecs)
     return out;
 }
 
-void p_I_run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<uint32_t>>& ecm, uint32_t N_connections, const std::vector<std::vector<float>>& p_Is)
+auto dataframe_linearize(const std::vector<std::vector<std::vector<float>>>& df)
 {
-    auto p_I_lin = matrix_linearize(p_Is);
-    auto b = Sim_Buffers::make(q, p, edge_list, ecm, vcm, p_I_lin, N_connections);
+    std::vector<float> result(df.size() * df[0].size() * df[0][0].size());
+    for(int i = 0; i < df.size(); i++)
+    {
+        for(int j = 0; j < df[0].size(); j++)
+        {
+            for(int k = 0; k < df[0][0].size(); k++)
+            {
+                result[i * df[0].size() * df[0][0].size() + j * df[0][0].size() + k] = df[i][j][k];
+            }
+        }
+    }
+    return result;
+}
+
+void p_I_run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<uint32_t>>& ecm, const std::vector<std::vector<std::vector<float>>>& p_Is)
+{
+    auto p_I_lin = dataframe_linearize(p_Is);
+    auto b = Sim_Buffers::make(q, p, edge_list, ecm, vcm, p_I_lin);
     run(q, p, b);
 }

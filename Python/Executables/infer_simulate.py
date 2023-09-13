@@ -1,5 +1,5 @@
-from Path_Config import *
-from Structural_Inference import inference_over_p_out
+from SBM_Routines.Path_Config import *
+from SBM_Routines.Structural_Inference import inference_over_p_out, complete_graph_max_edges, flatten_sublists
 import multiprocessing as mp
 from matplotlib import pyplot as plt
 import matplotlib
@@ -27,11 +27,12 @@ if __name__ == '__main__':
     seeds = np.random.randint(0, 100000, Np)
     pool = mp.Pool(int(mp.cpu_count()/2))
 
-    edgelists, vertex_lists, N_blocks, entropies, ecms, sim_params = inference_over_p_out(N_pop, N_communities, p_in, p_out, seeds, Np)
+    edgelists, vertex_lists, N_blocks, entropies, ecms, vcms, sim_params = inference_over_p_out(N_pop, N_communities, p_in, p_out, seeds, Np)
 
     block_df = pd.DataFrame(np.array(N_blocks).T, columns=p_out)
     ent_df = pd.DataFrame(np.array(entropies).T, columns=p_out)
-
+    for elist, vcm, ecm, p in zip(edgelists, vcms, ecms, sim_params):
+        run(q, p, elist, vcm, ecm)
     #violin plot
     sns.violinplot(block_df, ax=ax[0], cut=0)
     #limit x to 2 decimals
@@ -41,6 +42,4 @@ if __name__ == '__main__':
     ax[1].set_xlabel("p_out")
     ax[0].set_ylabel("Number of blocks")
     ax[1].set_ylabel("'Entropy'/Minimum Description Length")
-    _ = [x.grid() for x in ax]
-    plt.show()
-    a = 1
+    fig.savefig(Data_dir + "/Structural_Plot.pdf", format='pdf', dpi=1000)

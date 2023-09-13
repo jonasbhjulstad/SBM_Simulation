@@ -33,8 +33,10 @@ struct Sim_Buffers
                 cl::sycl::buffer<State_t, 3> &community_state,
                 const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &ccm,
                 const std::vector<std::vector<uint32_t>> &ccm_weights);
+    void validate_sizes(const Sim_Param& p) const;
+
     std::size_t byte_size() const;
-    static Sim_Buffers make(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>>& ecms, std::vector<float> p_Is_init, uint32_t N_connections);
+    static Sim_Buffers make(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>>& ecms, std::vector<float> p_Is_init);
 };
 
 #endif

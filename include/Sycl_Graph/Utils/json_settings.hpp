@@ -23,6 +23,7 @@ void generate_default_json(const std::string& fname)
     j["N_graphs"] = 2;
     j["N_sims"] = 2;
     j["output_dir"] = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/p_out_0.00/";
+    j["tau"] = 0.9f;
     std::ofstream o(fname);
     o << j.dump();
     o.close();
@@ -49,6 +50,7 @@ Sim_Param parse_json(const std::string& fname)
     p.N_graphs = data["N_graphs"].get<uint32_t>();
     p.N_sims = data["N_sims"].get<uint32_t>();
     p.output_dir = data["output_dir"].get<std::string>();
+    p.tau = data["tau"].get<float>();
     i.close();
     return p;
 }
