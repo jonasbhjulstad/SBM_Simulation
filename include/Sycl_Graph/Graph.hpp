@@ -33,6 +33,7 @@ std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm, uin
 void write_edgelist(const std::string& fname, const std::vector<std::pair<uint32_t, uint32_t>>& edges);
 void read_edgelist(const std::string& fname, std::vector<std::pair<uint32_t, uint32_t>>& edges);
 void write_vector(const std::string& fname, const std::vector<uint32_t>& vec);
-void read_vector(const std::string& fname, std::vector<uint32_t>& vec);
+// std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, float value, uint32_t connection_index);
+std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, const std::vector<float>& values, uint32_t connection_index);
 
 #endif

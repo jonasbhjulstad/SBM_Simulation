@@ -343,12 +343,45 @@ void write_vector(const std::string& fname, const std::vector<uint32_t>& vec)
     }
 }
 
-void read_vector(const std::string& fname, std::vector<uint32_t>& vec)
+
+//Project value onto the edges in connection_index
+std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, float value, uint32_t connection_index)
 {
-    std::ifstream f(fname);
-    std::string line;
-    while(std::getline(f, line))
+    std::vector<float> result(ecm.size(), 0);
+    //insert value at connection_index
+    std::transform(ecm.begin(), ecm.end(), result.begin(), [&](auto idx)
+                   {
+        if(idx == connection_index)
+        {
+            return value;
+        }
+        else
+        {
+            return 0.0f;
+        }
+    });
+    return result;
+}
+
+std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, const std::vector<float>& values, uint32_t connection_index)
+{
+    std::vector<float> result(ecm.size(), 0);
+    uint32_t N_connections = *std::max_element(ecm.begin(), ecm.end()) + 1;
+    assert(values.size() == N_connections && "projected values must be of size N_connections");
+    //insert value at connection_index
+    for(int connection_idx = 0; connection_idx < N_connections; connection_idx++)
     {
-        vec.push_back(std::stoi(line));
+        std::transform(ecm.begin(), ecm.end(), result.begin(), [&](auto idx)
+                       {
+            if(idx == connection_idx)
+            {
+                return values[connection_idx];
+            }
+            else
+            {
+                return 0.0f;
+            }
+        });
     }
+    return result;
 }

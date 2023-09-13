@@ -1,15 +1,8 @@
+from Path_Config import *
 from casadi import *
-import sys
 import numpy as np
-import os
 import matplotlib.pyplot as plt
-Project_root = "/home/man/Documents/ER_Bernoulli_Robust_MPC/"
-Binder_path = Project_root + "/build/Binders"
-Data_dir = Project_root + "/data/SIR_sim/"
-
-sys.path.append(Binder_path)
 sys.path.append('/usr/local/lib')
-from SIR_SBM import *
 def complete_graph_max_edges(N):
 
     n_choose_2 = lambda n: n*(n-1)/2

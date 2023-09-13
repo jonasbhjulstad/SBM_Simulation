@@ -68,12 +68,13 @@ PYBIND11_MODULE(SIR_SBM, m)
     m.def("p_I_run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<uint32_t>> &, uint32_t, const std::vector<std::vector<float>>&)>(&p_I_run), "p_I_run");
     m.def("read_edgelist", &read_edgelist, "read_edgelist");
     m.def("write_vector", &write_vector, "write_vector");
-    m.def("read_vector", &read_vector, "read_vector");
     m.def("ecm_from_vcm", &ecm_from_vcm, "ecm_from_vcm");
+    m.def("project_on_connection", &project_on_connection, "project_on_connection");
     py::class_<sycl::range<1>>(m, "sycl_range_1").def(py::init<std::size_t>());
 
     py::class_<Sim_Param>(m, "Sim_Param").def(py::init<>()).def_readwrite("N_pop", &Sim_Param::N_pop).def_readwrite("N_communities", &Sim_Param::N_communities).def_readwrite("p_in", &Sim_Param::p_in).def_readwrite("p_out", &Sim_Param::p_out).def_readwrite("Nt", &Sim_Param::Nt) // p_R0, p_I0, sim_idx, seed
         .def_readwrite("p_R0", &Sim_Param::p_R0)
+        .def_readwrite("N_pop", &Sim_Param::N_pop)
         .def_readwrite("p_I0", &Sim_Param::p_I0)
         .def_readwrite("p_R", &Sim_Param::p_R)
         .def_readwrite("max_infection_samples", &Sim_Param::max_infection_samples)
