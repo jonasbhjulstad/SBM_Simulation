@@ -10,7 +10,7 @@
 
 std::size_t complete_graph_max_edges(std::size_t N, bool self_loops, bool directed)
 {
-    return (N*(N-1)/2 + (self_loops ? N : 0))*(directed ? 2 : 1);
+    return (N * (N - 1) / 2 + (self_loops ? N : 0)) * (directed ? 2 : 1);
 }
 
 std::vector<uint32_t> create_vcm(size_t N_pop, size_t N_clusters)
@@ -125,7 +125,6 @@ std::tuple<Edge_List_t, Node_List_t, std::vector<uint32_t>, std::vector<uint32_t
     }
     auto vcm = create_vcm(N_pop, N_communities);
 
-
     return std::make_tuple(edge_lists, nodelists, ecm, vcm);
 }
 
@@ -166,7 +165,7 @@ std::tuple<std::vector<std::pair<uint32_t, uint32_t>>, std::vector<uint32_t>, st
     return std::make_tuple(flat_edge_list, flat_node_list, ecm);
 }
 
-std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>, std::vector<std::vector<uint32_t>>,std::vector<std::vector<uint32_t>>> generate_N_SBM_graphs(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng)
+std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>> generate_N_SBM_graphs(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng)
 {
     std::vector<std::tuple<Edge_List_t, Node_List_t, std::vector<uint32_t>, std::vector<uint32_t>>> result(Ng);
     std::vector<uint32_t> seeds(Ng);
@@ -210,9 +209,8 @@ std::tuple<std::vector<Edge_List_Flat_t>, std::vector<Node_List_Flat_t>, std::ve
     auto vcm = create_vcm(N_pop, N_communities);
     std::vector<std::vector<uint32_t>> vcms(Ng, vcm);
 
-
-        std::transform(std::execution::par_unseq, result.begin(), result.end(), edge_data.begin(), [](auto &t)
-                       { return std::get<0>(t); });
+    std::transform(std::execution::par_unseq, result.begin(), result.end(), edge_data.begin(), [](auto &t)
+                   { return std::get<0>(t); });
     std::transform(std::execution::par_unseq, result.begin(), result.end(), node_data.begin(), [](auto &t)
                    { return std::get<1>(t); });
 
@@ -222,18 +220,29 @@ std::tuple<std::vector<Edge_List_Flat_t>, std::vector<Node_List_Flat_t>, std::ve
     return std::make_tuple(edge_data, node_data, ecms, vcms);
 }
 
-std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities)
+std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities, bool directed)
 {
     uint32_t N_edges = N_communities * (N_communities - 1);
     std::vector<std::pair<uint32_t, uint32_t>> ccm;
-    ccm.reserve(N_edges);
+    ccm.reserve((directed ? 2*N_edges : N_edges));
     std::vector<uint32_t> community_idx(N_communities);
     std::iota(community_idx.begin(), community_idx.end(), 0);
-    for (auto &&prod : iter::combinations_with_replacement(community_idx, 2))
-    {
-        ccm.push_back(std::make_pair(prod[0], prod[1]));
-    }
 
+    if (directed)
+    {
+        for (auto &&prod : iter::combinations_with_replacement(community_idx, 2))
+        {
+            ccm.push_back(std::make_pair(prod[0], prod[1]));
+            ccm.push_back(std::make_pair(prod[1], prod[0]));
+        }
+    }
+    else
+    {
+        for (auto &&prod : iter::combinations_with_replacement(community_idx, 2))
+        {
+            ccm.push_back(std::make_pair(prod[0], prod[1]));
+        }
+    }
     return ccm;
 }
 
@@ -313,25 +322,25 @@ std::vector<std::vector<uint32_t>> ccm_weights_from_ecms(const std::vector<uint3
     return result;
 }
 
-void write_edgelist(const std::string& fname, const std::vector<std::pair<uint32_t, uint32_t>>& edges)
+void write_edgelist(const std::string &fname, const std::vector<std::pair<uint32_t, uint32_t>> &edges)
 {
     std::ofstream f(fname);
-    for(auto&& e: edges)
+    for (auto &&e : edges)
     {
         f << e.first << "," << e.second << "\n";
     }
 }
 
-void read_edgelist(const std::string& fname, std::vector<std::pair<uint32_t, uint32_t>>& edges)
+void read_edgelist(const std::string &fname, std::vector<std::pair<uint32_t, uint32_t>> &edges)
 {
     std::ifstream f(fname);
     std::string line;
-    while(std::getline(f, line))
+    while (std::getline(f, line))
     {
         std::stringstream ss(line);
         std::string token;
         std::vector<std::string> tokens;
-        while(std::getline(ss, token, ','))
+        while (std::getline(ss, token, ','))
         {
             tokens.push_back(token);
         }
@@ -339,21 +348,20 @@ void read_edgelist(const std::string& fname, std::vector<std::pair<uint32_t, uin
     }
 }
 
-void write_vector(const std::string& fname, const std::vector<uint32_t>& vec)
+void write_vector(const std::string &fname, const std::vector<uint32_t> &vec)
 {
     std::ofstream f(fname);
-    for(auto&& e: vec)
+    for (auto &&e : vec)
     {
         f << e << "\n";
     }
 }
 
-
-//Project value onto the edges in connection_index
-std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, float value, uint32_t connection_index)
+// Project value onto the edges in connection_index
+std::vector<float> project_on_connection(const std::vector<uint32_t> &ecm, float value, uint32_t connection_index)
 {
     std::vector<float> result(ecm.size(), 0);
-    //insert value at connection_index
+    // insert value at connection_index
     std::transform(ecm.begin(), ecm.end(), result.begin(), [&](auto idx)
                    {
         if(idx == connection_index)
@@ -363,18 +371,17 @@ std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, float
         else
         {
             return 0.0f;
-        }
-    });
+        } });
     return result;
 }
 
-std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, const std::vector<float>& values, uint32_t connection_index)
+std::vector<float> project_on_connection(const std::vector<uint32_t> &ecm, const std::vector<float> &values, uint32_t connection_index)
 {
     std::vector<float> result(ecm.size(), 0);
     uint32_t N_connections = *std::max_element(ecm.begin(), ecm.end()) + 1;
     assert(values.size() == N_connections && "projected values must be of size N_connections");
-    //insert value at connection_index
-    for(int connection_idx = 0; connection_idx < N_connections; connection_idx++)
+    // insert value at connection_index
+    for (int connection_idx = 0; connection_idx < N_connections; connection_idx++)
     {
         std::transform(ecm.begin(), ecm.end(), result.begin(), [&](auto idx)
                        {
@@ -385,8 +392,24 @@ std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, const
             else
             {
                 return 0.0f;
-            }
-        });
+            } });
     }
     return result;
+}
+
+auto read_ccm(const std::string& ccm_path)
+{
+    std::vector<std::pair<uint32_t, uint32_t>> ccm;
+    std::ifstream ccm_file(ccm_path);
+    std::string line;
+    while(std::getline(ccm_file, line))
+    {
+        std::stringstream line_stream(line);
+        std::string from_idx_str;
+        std::string to_idx_str;
+        std::getline(line_stream, from_idx_str, ',');
+        std::getline(line_stream, to_idx_str, '\n');
+        ccm.push_back(std::make_pair(std::stoi(from_idx_str), std::stoi(to_idx_str)));
+    }
+    return ccm;
 }

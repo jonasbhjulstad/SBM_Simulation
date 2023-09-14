@@ -28,11 +28,12 @@ if __name__ == '__main__':
     pool = mp.Pool(int(mp.cpu_count()/2))
 
     edgelists, vertex_lists, N_blocks, entropies, ecms, vcms, sim_params = inference_over_p_out(N_pop, N_communities, p_in, p_out, seeds, Np)
-
     block_df = pd.DataFrame(np.array(N_blocks).T, columns=p_out)
     ent_df = pd.DataFrame(np.array(entropies).T, columns=p_out)
     for elist, vcm, ecm, p in zip(edgelists, vcms, ecms, sim_params):
-        run(q, p, elist, vcm, ecm)
+        ecm_0 = [e[1] for e in ecm]
+        vcm_0 = [v[1] for v in vcm]
+        run(q, p, elist, vcm_0, ecm_0)
     #violin plot
     sns.violinplot(block_df, ax=ax[0], cut=0)
     #limit x to 2 decimals

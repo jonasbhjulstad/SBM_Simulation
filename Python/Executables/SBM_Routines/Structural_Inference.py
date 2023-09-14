@@ -57,8 +57,12 @@ def index_relabel_ascending(indices):
             result[indices == old_idx] = new_indices[nidx_offset]
             nidx_offset += 1
     return result
-
-
+#Project vertex community map from level 1 to level 0
+def project_mapping(map_1, map_0):
+    result = map_0.copy()
+    for j, map_0_elem in enumerate(map_0):
+        result[j] = map_1[map_0_elem]
+    return result
 def structural_inference(edgelists, nodelists):
     G = create_weighted_graph(nodelists, edgelists)
     weight = G.ep['weight']
@@ -84,10 +88,10 @@ def create_sim_param(N_communities, p_in, p_out, seed, N_graphs):
     p = Sim_Param()
     p.N_communities = N_communities
     p.N_pop = 100
-    p.N_sims = 100
+    p.N_sims = 10
     p.p_in = p_in
     p.p_out = p_out
-    p.Nt = 5
+    p.Nt = 20
     p.Nt_alloc = 5
     p.p_R0 = 0.0
     p.p_R = 0.1
@@ -115,12 +119,13 @@ def inference_over_p_out(N_pop, N_communities, p_in, p_out, seed, N_graphs):
     sim_params = [create_sim_param(N_communities, p_in, po, seed, N_graphs) for po, seed in zip(p_out, seeds)]
     edgelists, vertex_lists, entropies, N_blocks, ecms, vcms = [], [], [], [], [], []
     for p in sim_params:
-        elist, vlist, base_ecm, base_vcm = create_graphs(p)
-        edgelists.append(flatten_sublists(elist))
+        elist, vlist, ecm_0s, vcm_0s = create_graphs(p)
+        elist_flat = flatten_sublists(elist)
+        edgelists.append(elist_flat)
         vertex_lists.append(vlist)
-        Nb, entropy, ecm, vcm = multiple_structural_inference(elist, vlist)
+        Nb, entropy, ecm_1s, vcm_1s = multiple_structural_inference(elist, vlist)
         N_blocks.append(Nb)
         entropies.append(entropy)
-        ecms.append(base_ecm)
-        vcms.append(base_vcm)
+        vcms.append([(vcm_1, vcm_0) for vcm_1, vcm_0 in zip(vcm_1s, vcm_0s)])
+        ecms.append([(ecm_1, ecm_0) for ecm_1, ecm_0 in zip(ecm_1s, ecm_0s)])
     return edgelists, vertex_lists, N_blocks, entropies, ecms, vcms, sim_params

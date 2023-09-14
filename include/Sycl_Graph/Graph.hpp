@@ -23,7 +23,7 @@ std::tuple<std::vector<Edge_List_t>, std::vector<Node_List_t>, std::vector<std::
 
 std::tuple<std::vector<Edge_List_Flat_t>, std::vector<Node_List_Flat_t>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>> generate_N_SBM_graphs_flat(uint32_t N_pop, uint32_t N_communities, float p_in, float p_out, uint32_t seed, std::size_t Ng);
 
-std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities);
+std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities, bool directed = false);
 
 std::vector<uint32_t> create_ecm(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_lists);
 
@@ -36,5 +36,6 @@ void read_edgelist(const std::string& fname, std::vector<std::pair<uint32_t, uin
 void write_vector(const std::string& fname, const std::vector<uint32_t>& vec);
 // std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, float value, uint32_t connection_index);
 std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, const std::vector<float>& values, uint32_t connection_index);
+auto read_ccm(const std::string& ccm_path);
 
 #endif

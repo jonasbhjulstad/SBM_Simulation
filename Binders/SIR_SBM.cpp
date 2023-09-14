@@ -70,6 +70,7 @@ PYBIND11_MODULE(SIR_SBM, m)
     m.def("write_vector", &write_vector, "write_vector");
     m.def("ecm_from_vcm", &ecm_from_vcm, "ecm_from_vcm");
     m.def("project_on_connection", &project_on_connection, "project_on_connection");
+    m.def("complete_ccm", &complete_ccm, "complete_ccm");
     py::class_<sycl::range<1>>(m, "sycl_range_1").def(py::init<std::size_t>());
 
     py::class_<Sim_Param>(m, "Sim_Param").def(py::init<>()).def_readwrite("N_pop", &Sim_Param::N_pop).def_readwrite("N_communities", &Sim_Param::N_communities).def_readwrite("p_in", &Sim_Param::p_in).def_readwrite("p_out", &Sim_Param::p_out).def_readwrite("Nt", &Sim_Param::Nt) // p_R0, p_I0, sim_idx, seed

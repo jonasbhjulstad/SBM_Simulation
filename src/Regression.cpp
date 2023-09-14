@@ -6,7 +6,6 @@
 #include <tuple>
 #include <utility>
 #include <ortools/linear_solver/linear_solver.h>
-
 Eigen::MatrixXf openData(const std::string& fileToOpen)
 {
     using namespace Eigen;
@@ -233,6 +232,24 @@ std::tuple<std::vector<float>, std::vector<float>> regression_on_datasets(const 
     auto [thetas_LS, thetas_QR] = beta_regression(F_beta_rs_mat_tot, connection_infs_tot, tau);
     return std::make_tuple(thetas_LS, thetas_QR);
 }
+
+auto read_ccm(const std::string& ccm_path)
+{
+    std::vector<std::pair<uint32_t, uint32_t>> ccm;
+    std::ifstream ccm_file(ccm_path);
+    std::string line;
+    while(std::getline(ccm_file, line))
+    {
+        std::stringstream line_stream(line);
+        std::string from_idx_str;
+        std::string to_idx_str;
+        std::getline(line_stream, from_idx_str, ',');
+        std::getline(line_stream, to_idx_str, '\n');
+        ccm.push_back(std::make_pair(std::stoi(from_idx_str), std::stoi(to_idx_str)));
+    }
+    return ccm;
+}
+
 
 
 

@@ -2,6 +2,7 @@
 #define SYCL_GRAPH_REGRESSION_HPP
 #include <Eigen/Dense>
 #include <string>
+#include <Sycl_Graph/Simulation/Sim_Types.hpp>
 
 Eigen::MatrixXf openData(const std::string& fileToOpen);
 
