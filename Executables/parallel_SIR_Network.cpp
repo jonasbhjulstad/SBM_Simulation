@@ -41,7 +41,20 @@ int main()
     auto p_in_max = 0.1;
     std::vector<float> p_in(Np);
     std::vector<float> p_out(Np);
-    auto N_connections = complete_ccm(p.N_communities).size();
+    p.N_communities = 5;
+    p.N_connections = complete_ccm(p.N_communities).size();
+    //fill with random values from 0 to p.N_connections-1
+    std::mt19937 rng(p.seed);
+    std::uniform_int_distribution<uint32_t> dist(0, p.N_connections - 1);
+    for (auto&& e: ecm)
+    {
+        std::generate(e.begin(), e.end(), [&dist, &rng]() { return dist(rng); });
+    }
+    std::uniform_int_distribution<uint32_t> dist_v(0, p.N_connections - 1);
+    for(auto&& v: vcm)
+    {
+        std::generate(v.begin(), v.end(), [&dist_v, &rng]() { return dist_v(rng); });
+    }
     auto b = Sim_Buffers::make(q, p, edge_list, vcm, ecm, {});
     q.wait();
     t2 = std::chrono::high_resolution_clock::now();

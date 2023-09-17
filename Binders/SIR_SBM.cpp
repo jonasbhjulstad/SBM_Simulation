@@ -88,7 +88,8 @@ PYBIND11_MODULE(SIR_SBM, m)
         .def_readwrite("wg_range", &Sim_Param::wg_range)
         .def_readwrite("p_I_min", &Sim_Param::p_I_min)
         .def_readwrite("p_I_max", &Sim_Param::p_I_max)
-        .def_readwrite("tau", &Sim_Param::tau);
+        .def_readwrite("tau", &Sim_Param::tau)
+        .def_readwrite("N_connections", &Sim_Param::N_connections);
 
     m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>> (*)(const std::string &, uint32_t, float, uint32_t)>(&regression_on_datasets), "regression_on_datasets");
     m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>> (*)(const std::vector<std::string> &, uint32_t, float, uint32_t)>(&regression_on_datasets), "regression_on_datasets");

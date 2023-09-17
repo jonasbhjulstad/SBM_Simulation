@@ -45,8 +45,9 @@ void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, s
     auto state_gs_write = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(state_gs), N_steps, 1);
     auto state_gs_inf = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(state_gs), N_steps+1, 0);
     write_graphseries(std::forward<const decltype(state_gs_write)>(state_gs_write), p.output_dir, "community_trajectory", true);
+
     auto connection_events = zip_merge_graphseries(std::forward<const decltype(event_from_gs)>(event_from_gs), std::forward<const decltype(event_to_gs)>(event_to_gs));
-    auto inf_gs = sample_infections(std::forward<const Graphseries_t<State_t>>(state_gs_inf), std::forward<const Graphseries_t<uint32_t>>(event_from_gs), std::forward<const Graphseries_t<uint32_t>>(event_to_gs), b.ccm, b.ccm_weights, p.seed, p.compute_range[0]);
+    auto inf_gs = sample_infections(std::forward<const Graphseries_t<State_t>>(state_gs_inf), std::forward<const Graphseries_t<uint32_t>>(event_from_gs), std::forward<const Graphseries_t<uint32_t>>(event_to_gs), b.ccm, b.ccm_weights, p.seed, p.N_connections, p.max_infection_samples);
     write_graphseries(std::forward<const decltype(inf_gs)>(inf_gs), p.output_dir, "connection_infections", true);
     write_graphseries(std::forward<const decltype(connection_events)>(connection_events), p.output_dir, "connection_events", true);
     t2 = std::chrono::high_resolution_clock::now();
@@ -64,7 +65,7 @@ void write_initial_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, std
 
 void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
 {
-    uint32_t N_connections = b.events_from.get_range()[2];
+    uint32_t N_connections = p.N_connections;
     Sim_Data d(p.Nt_alloc, p.N_sims, p.N_communities, N_connections);
     if ((p.global_mem_size == 0) || p.local_mem_size == 0)
     {
@@ -72,7 +73,6 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
         p.local_mem_size = device.get_info<sycl::info::device::local_mem_size>();
         p.global_mem_size = device.get_info<sycl::info::device::global_mem_size>();
     }
-
 
     std::vector<sycl::event> events(1);
     q.wait();

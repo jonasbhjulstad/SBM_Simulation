@@ -108,17 +108,16 @@ void validate_buffer_init_sizes(Sim_Param p, const std::vector<std::vector<std::
         throw std::runtime_error("edge_list.size() != p.N_graphs");
     }
 
-    auto N_connections = complete_graph_max_edges(p.N_communities);
-    if ((p_Is_init.size() != p.N_graphs * N_connections * p.Nt) && (p_Is_init.size() != 0))
+    if ((p_Is_init.size() != p.N_graphs * p.N_connections * p.Nt) && (p_Is_init.size() != 0))
     {
         throw std::runtime_error("p_Is_init.size() != p.N_graphs*N_connections*p.Nt");
     }
 
-    if (std::any_of(vcms.begin(), vcms.end(), [&](const auto &vc)
-                    { return !(vc.size() == p.N_communities * p.N_pop); }))
-    {
-        throw std::runtime_error("vcm.size() != p.N_communities*p.N_pop");
-    }
+    // if (std::any_of(vcms.begin(), vcms.end(), [&](const auto &vc)
+    //                 { return !(vc.size() == p.N_communities * p.N_pop); }))
+    // {
+    //     throw std::runtime_error("vcm.size() != p.N_communities*p.N_pop");
+    // }
 }
 
 void Sim_Buffers::validate_sizes(const Sim_Param& p) const
@@ -144,17 +143,15 @@ void Sim_Buffers::validate_sizes(const Sim_Param& p) const
         return "(" + std::to_string(N0) + ", " + std::to_string(N1) + ", " + std::to_string(N2) + ")";
     };
 
-    auto N_connections = complete_graph_max_edges(p.N_communities);
-    if_false_throw(check_buffer_dims(p_Is, p.Nt, p.N_graphs*p.N_sims, N_connections), "p_Is has wrong dimensions: " + buf_dim_string(p_Is) + " vs " + dim_string(p.Nt, p.N_graphs, N_connections));
+    if_false_throw(check_buffer_dims(p_Is, p.Nt, p.N_graphs*p.N_sims, p.N_connections), "p_Is has wrong dimensions: " + buf_dim_string(p_Is) + " vs " + dim_string(p.Nt, p.N_graphs, p.N_connections));
     if_false_throw(rngs.size() == p.N_sims*p.N_graphs, "rngs has wrong size: " + std::to_string(rngs.size()) + " vs " + std::to_string(p.N_sims*p.N_graphs));
-    if_false_throw(check_buffer_dims(vertex_state, p.Nt_alloc + 1, p.N_sims*p.N_graphs, p.N_pop*p.N_communities), "vertex_state has wrong dimensions: " + buf_dim_string(vertex_state) + " vs " + dim_string(p.Nt_alloc + 1, p.N_sims*p.N_graphs, p.N_pop*p.N_communities));
-    if_false_throw(check_buffer_dims(events_to, p.Nt_alloc, p.N_sims*p.N_graphs, N_connections), "events_to has wrong dimensions: " + buf_dim_string(events_to) + " vs " + dim_string(p.Nt_alloc, p.N_sims*p.N_graphs, N_connections));
-    if_false_throw(check_buffer_dims(events_from, p.Nt_alloc, p.N_sims*p.N_graphs, N_connections), "events_from has wrong dimensions: " + buf_dim_string(events_from) + " vs " + dim_string(p.Nt_alloc, p.N_sims*p.N_graphs, N_connections));
+    // if_false_throw(check_buffer_dims(vertex_state, p.Nt_alloc + 1, p.N_sims*p.N_graphs, p.N_pop*p.N_communities), "vertex_state has wrong dimensions: " + buf_dim_string(vertex_state) + " vs " + dim_string(p.Nt_alloc + 1, p.N_sims*p.N_graphs, p.N_pop*p.N_communities));
+    if_false_throw(check_buffer_dims(events_to, p.Nt_alloc, p.N_sims*p.N_graphs, p.N_connections), "events_to has wrong dimensions: " + buf_dim_string(events_to) + " vs " + dim_string(p.Nt_alloc, p.N_sims*p.N_graphs, p.N_connections));
+    if_false_throw(check_buffer_dims(events_from, p.Nt_alloc, p.N_sims*p.N_graphs, p.N_connections), "events_from has wrong dimensions: " + buf_dim_string(events_from) + " vs " + dim_string(p.Nt_alloc, p.N_sims*p.N_graphs, p.N_connections));
 }
 
 Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>> &ecms, std::vector<float> p_Is_init)
 {
-    auto N_connections = complete_graph_max_edges(p.N_communities);
     validate_buffer_init_sizes(p, edge_list, vcms, ecms, p_Is_init);
 
     if ((p.global_mem_size == 0) || p.local_mem_size == 0)
@@ -180,27 +177,27 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
 
     std::vector<State_t> community_state_init(p.N_communities * N_sims_tot * (p.Nt_alloc + 1), {0, 0, 0});
     std::vector<SIR_State> traj_init(N_sims_tot * (p.Nt_alloc + 1) * N_vertices, SIR_INDIVIDUAL_S);
-    std::vector<uint32_t> event_init_from(N_sims_tot * N_connections * p.Nt_alloc, 0);
-    std::vector<uint32_t> event_init_to(N_sims_tot * N_connections * p.Nt_alloc, 0);
+    std::vector<uint32_t> event_init_from(N_sims_tot * p.N_connections * p.Nt_alloc, 0);
+    std::vector<uint32_t> event_init_to(N_sims_tot * p.N_connections * p.Nt_alloc, 0);
     auto seeds = generate_seeds(N_sims_tot, p.seed);
     std::vector<Static_RNG::default_rng> rng_init;
     rng_init.reserve(N_sims_tot);
     std::transform(seeds.begin(), seeds.end(), std::back_inserter(rng_init), [](const auto seed)
                    { return Static_RNG::default_rng(seed); });
 
-    std::vector<std::size_t> sizes = {p.Nt * N_sims_tot * N_connections * sizeof(float),
+    std::vector<std::size_t> sizes = {p.Nt * N_sims_tot * p.N_connections * sizeof(float),
                                       edge_from_init.size() * sizeof(uint32_t),
                                       edge_to_init.size() * sizeof(uint32_t),
                                       ecm_init.size() * sizeof(uint32_t),
                                       vcm_init.size() * sizeof(uint32_t),
                                       (p.Nt_alloc + 1) * N_sims_tot * p.N_communities * sizeof(State_t),
-                                      p.Nt_alloc * N_sims_tot * N_connections * sizeof(uint32_t),
-                                      p.Nt_alloc * N_sims_tot * N_connections * sizeof(uint32_t),
+                                      p.Nt_alloc * N_sims_tot * p.N_connections * sizeof(uint32_t),
+                                      p.Nt_alloc * N_sims_tot * p.N_connections * sizeof(uint32_t),
                                       rng_init.size() * sizeof(Static_RNG::default_rng)};
 
     assert(p.global_mem_size > std::accumulate(sizes.begin(), sizes.end(), 0) && "Not enough global memory to allocate all buffers");
 
-    auto p_Is = sycl::buffer<float, 3>(sycl::range<3>(p.Nt, N_sims_tot, N_connections));
+    auto p_Is = sycl::buffer<float, 3>(sycl::range<3>(p.Nt, N_sims_tot, p.N_connections));
     auto edge_from = sycl::buffer<uint32_t>((sycl::range<1>(N_tot_edges)));
     auto edge_to = sycl::buffer<uint32_t>((sycl::range<1>(N_tot_edges)));
     auto ecm = sycl::buffer<uint32_t, 1>((sycl::range<1>(N_tot_edges)));
@@ -209,15 +206,15 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     auto edge_offsets = sycl::buffer<uint32_t>((sycl::range<1>(p.compute_range[0])));
     auto community_state = sycl::buffer<State_t, 3>(sycl::range<3>(p.Nt_alloc + 1, N_sims_tot, p.N_communities));
     auto trajectory = sycl::buffer<SIR_State, 3>(sycl::range<3>(p.Nt_alloc + 1, N_sims_tot, N_vertices));
-    auto events_from = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.Nt_alloc, N_sims_tot, N_connections));
-    auto events_to = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.Nt_alloc, N_sims_tot, N_connections));
+    auto events_from = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.Nt_alloc, N_sims_tot, p.N_connections));
+    auto events_to = sycl::buffer<uint32_t, 3>(sycl::range<3>(p.Nt_alloc, N_sims_tot, p.N_connections));
     auto rngs = sycl::buffer<Static_RNG::default_rng>(sycl::range<1>(rng_init.size()));
 
     std::vector<sycl::event> alloc_events(13);
 
     if (p_Is_init.size() == 0)
     {
-        p_Is_init = generate_floats(p.Nt * N_sims_tot * N_connections, p.p_I_min, p.p_I_max, 8, p.seed);
+        p_Is_init = generate_floats(p.Nt * N_sims_tot * p.N_connections, p.p_I_min, p.p_I_max, 8, p.seed);
     }
 
     alloc_events[1] = initialize_device_buffer<float, 3>(q, p_Is_init, p_Is);
@@ -236,6 +233,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     auto ccm = complete_ccm(p.N_communities);
     std::vector<std::vector<std::pair<uint32_t, uint32_t>>> ccms(p.N_graphs, ccm);
     std::vector<std::vector<uint32_t>> ccm_weights(p.N_graphs);
+    auto N_connections = p.N_connections;
     std::transform(std::execution::par_unseq, ecms.begin(), ecms.end(), ccm_weights.begin(), [N_connections](const auto &ecm)
                    { return ccm_weights_from_ecm(ecm, N_connections); });
 

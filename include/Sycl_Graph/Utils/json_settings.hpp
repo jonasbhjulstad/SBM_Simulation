@@ -9,7 +9,7 @@ void generate_default_json(const std::string& fname)
     std::filesystem::create_directories(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/parameters/");
     nlohmann::json j;
     j["N_pop"] = 100;
-    j["N_communities"] = 2;
+    j["N_communities"] = 10;
     j["p_in"] = 1.0f;
     j["p_out"] = 0.0f;
     j["p_R0"] = 0.0f;

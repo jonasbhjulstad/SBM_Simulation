@@ -1,5 +1,5 @@
 from SBM_Routines.Path_Config import *
-from SBM_Routines.Structural_Inference import inference_over_p_out, complete_graph_max_edges, flatten_sublists
+from SBM_Routines.Structural_Inference import inference_over_p_out, complete_graph_max_edges, flatten_sublists, project_mapping
 import multiprocessing as mp
 from matplotlib import pyplot as plt
 import matplotlib
@@ -33,7 +33,11 @@ if __name__ == '__main__':
     for elist, vcm, ecm, p in zip(edgelists, vcms, ecms, sim_params):
         ecm_0 = [e[1] for e in ecm]
         vcm_0 = [v[1] for v in vcm]
-        run(q, p, elist, vcm_0, ecm_0)
+        ecm = [project_mapping(e[0], e[1])for e in ecm]
+        vcm = [project_mapping(v[0], v[1])for v in vcm]
+        p.N_connections = max([max(e) for e in ecm]) + 1
+        p.N_communities = max([max(v) for v in vcm]) + 1
+        run(q, p, elist, vcm, ecm)
     #violin plot
     sns.violinplot(block_df, ax=ax[0], cut=0)
     #limit x to 2 decimals

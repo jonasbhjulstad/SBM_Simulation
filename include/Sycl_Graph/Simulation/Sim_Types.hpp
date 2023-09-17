@@ -42,6 +42,7 @@ struct Sim_Param
     uint32_t seed = 238;
     uint32_t max_infection_samples = 1000;
     uint32_t N_graphs = 1;
+    uint32_t N_connections = 0;
     std::size_t local_mem_size = 0;
     std::size_t global_mem_size = 0;
     sycl::range<1> compute_range;
@@ -59,26 +60,38 @@ std::size_t get_sim_data_byte_size(uint32_t Nt, uint32_t N_sims, uint32_t N_comm
 template <typename T>
 struct Timeseries_t: public std::vector<std::vector<T>>
 {
+    std::size_t Nt, N_cols;
+
     Timeseries_t() = default;
     Timeseries_t(const std::vector<std::vector<T>>& data): std::vector<std::vector<T>>(data){}
-    Timeseries_t(size_t Nt, size_t N_cols): std::vector<std::vector<T>>(Nt, std::vector<T>(N_cols)){}
+    Timeseries_t(size_t Nt, size_t N_cols): std::vector<std::vector<T>>(Nt, std::vector<T>(N_cols)), N_cols{N_cols}, Nt{Nt}{}
+    //default copy assignment operator
+
+
+    std::size_t size() const {return Nt*N_cols;}
+
 };
 
 template <typename T>
 struct Simseries_t: public std::vector<Timeseries_t<T>>
 {
+    std::size_t N_sims, Nt, N_cols;
     Simseries_t() = default;
     Simseries_t(const std::vector<Timeseries_t<T>>& data): std::vector<Timeseries_t<T>>(data){}
-    Simseries_t(size_t N_sims, size_t Nt, size_t N_cols): std::vector<Timeseries_t<T>>(N_sims, Timeseries_t<T>(Nt, N_cols)){}
+    Simseries_t(size_t N_sims, size_t Nt, size_t N_cols): std::vector<Timeseries_t<T>>(N_sims, Timeseries_t<T>(Nt, N_cols)), N_sims{N_sims}, Nt{Nt}, N_cols{N_cols}{}
+    std::size_t size() const {return N_sims*Nt*N_cols;}
+
+
 };
 
 template <typename T>
 struct Graphseries_t: public std::vector<Simseries_t<T>>
 {
-    const std::size_t Ng, N_sims, Nt, N_cols;
+    std::size_t Ng, N_sims, Nt, N_cols;
     Graphseries_t() = default;
-    Graphseries_t(const std::vector<Simseries_t<T>>& data): std::vector<Simseries_t<T>>(data), Ng(data.size()), N_sims(data[0].size()), Nt(data[0][0].size()), N_cols(N_cols){}
+    Graphseries_t(const std::vector<Simseries_t<T>>& data): std::vector<Simseries_t<T>>(data), Ng{data.size()}{}
     Graphseries_t(size_t N_graphs, size_t N_sims, size_t Nt, size_t N_cols): std::vector<Simseries_t<T>>(N_graphs, Simseries_t<T>(N_sims, Nt, N_cols)), Ng(N_graphs), N_sims(N_sims), Nt(Nt), N_cols(N_cols){}
+    std::size_t size() const {return Ng*N_sims*Nt*N_cols;}
 };
 
 #endif

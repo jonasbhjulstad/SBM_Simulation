@@ -13,7 +13,7 @@ std::vector<sycl::event> recover(sycl::queue &q,
                                  std::vector<sycl::event> &dep_event)
 {
     float p_R = p.p_R;
-    uint32_t N_vertices = p.N_pop * p.N_communities;
+    uint32_t N_vertices = vertex_state.get_range()[2];
     uint32_t N_sims = p.N_sims;
     auto Nt_alloc = vertex_state.get_range()[0] - 1;
     auto t_alloc = t % Nt_alloc;
@@ -57,7 +57,7 @@ sycl::event initialize_vertices(sycl::queue &q, const Sim_Param &p,
                                 sycl::buffer<SIR_State, 3> &vertex_state,
                                 sycl::buffer<Static_RNG::default_rng> &rngs)
 {
-    uint32_t N_vertices = p.N_pop * p.N_communities;
+    uint32_t N_vertices = vertex_state.get_range()[2];
     float p_I0 = p.p_I0;
     float p_R0 = p.p_R0;
     auto N_sims = p.N_sims;
@@ -97,9 +97,9 @@ std::vector<sycl::event> infect(sycl::queue &q,
                                 std::vector<sycl::event> &dep_event)
 {
 
-    uint32_t N_connections = b.events_from.get_range()[2];
+    uint32_t N_connections = p.N_connections;
     uint32_t N_edges = b.ecm.size();
-    uint32_t N_vertices = p.N_communities * p.N_pop;
+    uint32_t N_vertices = b.vertex_state.get_range()[2];
     uint32_t N_sims = p.N_sims;
     uint32_t t_alloc = t % p.Nt_alloc;
     uint32_t Nt = p.Nt;
