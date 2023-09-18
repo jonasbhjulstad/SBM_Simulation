@@ -21,6 +21,15 @@ Sim_Param create_sim_param(sycl::queue &q, uint32_t seed = 24)
     return p;
 }
 
+auto nested_vec_max(const std::vector<std::vector<uint32_t>>& vec)
+{
+    auto max = std::max_element(vec.begin(), vec.end(), [](const auto& a, const auto& b)
+    {
+        return *std::max_element(a.begin(), a.end()) < *std::max_element(b.begin(), b.end());
+    });
+    return *std::max_element(max->begin(), max->end());
+}
+
 int main()
 {
     // parse argv which is N_sims, N_communities, N_pop
@@ -33,29 +42,25 @@ int main()
     // auto p = ps[0];
     t1 = std::chrono::high_resolution_clock::now();
 
+    p.N_communities = 3;
     auto [edge_list, vertex_list, ecm, vcm] = generate_N_SBM_graphs_flat(p.N_pop, p.N_communities, p.p_in, p.p_out, p.seed, p.N_graphs);
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Generate graphs: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
     auto Np = 10;
+
     auto p_in_max = 0.1;
     std::vector<float> p_in(Np);
     std::vector<float> p_out(Np);
-    p.N_communities = 5;
-    p.N_connections = complete_ccm(p.N_communities).size();
-    //fill with random values from 0 to p.N_connections-1
+    // fill with random values from 0 to p.N_connections-1
     std::mt19937 rng(p.seed);
-    std::uniform_int_distribution<uint32_t> dist(0, p.N_connections - 1);
-    for (auto&& e: ecm)
-    {
-        std::generate(e.begin(), e.end(), [&dist, &rng]() { return dist(rng); });
-    }
-    std::uniform_int_distribution<uint32_t> dist_v(0, p.N_connections - 1);
-    for(auto&& v: vcm)
-    {
-        std::generate(v.begin(), v.end(), [&dist_v, &rng]() { return dist_v(rng); });
-    }
-    auto b = Sim_Buffers::make(q, p, edge_list, vcm, ecm, {});
+    std::uniform_int_distribution<uint32_t> dist_v(0, p.N_communities - 1);
+    // for(auto&& v: vcm)
+    // {
+    //     std::generate(v.begin(), v.end(), [&dist_v, &rng]() { return dist_v(rng); });
+    // }
+    //max of ecms
+    auto b = Sim_Buffers::make(q, p, edge_list, vcm, {});
     q.wait();
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Make buffers: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";

@@ -224,7 +224,7 @@ std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities, 
 {
     uint32_t N_edges = N_communities * (N_communities - 1);
     std::vector<std::pair<uint32_t, uint32_t>> ccm;
-    ccm.reserve((directed ? 2*N_edges : N_edges));
+    ccm.reserve((directed ? 2 * N_edges : N_edges));
     std::vector<uint32_t> community_idx(N_communities);
     std::iota(community_idx.begin(), community_idx.end(), 0);
 
@@ -241,6 +241,36 @@ std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities, 
         for (auto &&prod : iter::combinations_with_replacement(community_idx, 2))
         {
             ccm.push_back(std::make_pair(prod[0], prod[1]));
+        }
+    }
+    return ccm;
+}
+
+std::vector<std::pair<uint32_t, uint32_t>> ccm_from_edgelist(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm, bool directed)
+{
+    auto N_communities = *std::max_element(vcm.begin(), vcm.end()) + 1;
+    std::vector<uint32_t> community_idx(N_communities);
+    std::iota(community_idx.begin(), community_idx.end(), 0);
+    std::vector<std::pair<uint32_t, uint32_t>> ccm;
+    auto edge_connects_communities = [&vcm](const auto &e, auto c_0, auto c_1)
+    {
+        return ((vcm[e.first] == c_0) && (vcm[e.second] == c_1)) || ((vcm[e.first] == c_1) && (vcm[e.second] == c_0));
+    };
+    for (auto &&comb : iter::combinations_with_replacement(community_idx, 2))
+    {
+        // if there is an edge between the communities, add it to the ccm
+        if (std::find_if(edges.begin(), edges.end(), [&](const auto &edge)
+                         { return edge_connects_communities(edge, comb[0], comb[1]); }) != edges.end())
+        {
+            if (directed)
+            {
+                ccm.push_back(std::make_pair(comb[0], comb[1]));
+                ccm.push_back(std::make_pair(comb[1], comb[0]));
+            }
+            else
+            {
+                ccm.push_back(std::make_pair(comb[0], comb[1]));
+            }
         }
     }
     return ccm;
@@ -281,29 +311,26 @@ std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_l
 std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm)
 {
     std::vector<uint32_t> ecm(edges.size());
-    auto get_edge_communities = [vcm](auto edge)
+    auto is_in_communities = [&vcm](const auto& edge, auto c_0, auto c_1)
     {
-        return std::make_pair(vcm[edge.first], vcm[edge.second]);
+        return ((vcm[edge.first] == c_0) && (vcm[edge.second] == c_1)) || ((vcm[edge.first] == c_1) && (vcm[edge.second] == c_0));
     };
     uint32_t N_communities = *std::max_element(vcm.begin(), vcm.end()) + 1;
     std::vector<uint32_t> community_idx(N_communities);
     std::iota(community_idx.begin(), community_idx.end(), 0);
     std::vector<std::pair<uint32_t, uint32_t>> connection_pairs;
-    uint32_t N_connections = 0;
 
-    for (auto &&comb : iter::combinations_with_replacement(community_idx, 2))
-    {
-        connection_pairs.push_back(std::make_pair(comb[0], comb[1]));
-        N_connections++;
-    }
+    auto ccm = ccm_from_edgelist(edges, vcm, false);
 
     std::transform(std::execution::par_unseq, edges.begin(), edges.end(), ecm.begin(), [&](const auto &edge)
                    {
-        auto edge_communities = get_edge_communities(edge);
-        //find index of edge_communities in connection_pairs
-        auto it = std::find(connection_pairs.begin(), connection_pairs.end(), edge_communities);
-        return std::distance(connection_pairs.begin(), it); });
-
+                    for(int cc_idx = 0; cc_idx < ccm.size(); cc_idx++)
+                    {
+                        if(is_in_communities(edge, ccm[cc_idx].first, ccm[cc_idx].second))
+                        {
+                            return cc_idx;
+                        }
+                    }});
     return ecm;
 }
 
@@ -397,12 +424,12 @@ std::vector<float> project_on_connection(const std::vector<uint32_t> &ecm, const
     return result;
 }
 
-auto read_ccm(const std::string& ccm_path)
+auto read_ccm(const std::string &ccm_path)
 {
     std::vector<std::pair<uint32_t, uint32_t>> ccm;
     std::ifstream ccm_file(ccm_path);
     std::string line;
-    while(std::getline(ccm_file, line))
+    while (std::getline(ccm_file, line))
     {
         std::stringstream line_stream(line);
         std::string from_idx_str;

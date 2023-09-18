@@ -30,14 +30,15 @@ Graphseries_t<T> read_graphseries(sycl::queue& q, sycl::buffer<T, 3>& buf, const
     return graphseries;
 }
 
+
 template <typename T>
 Graphseries_t<T> get_N_timesteps(const Graphseries_t<T>&& gs, size_t N, size_t offset)
 {
 
-    auto N_graphs = gs.size();
-    auto N_sims = gs[0].size();
-    auto Nt = gs[0][0].size();
-    auto N_columns = gs[0][0][0].size();
+    auto N_graphs = gs.Ng;
+    auto N_sims = gs.N_sims;
+    auto Nt = gs.Nt;
+    auto N_columns = gs.N_cols;
     Graphseries_t<T> new_gs(N_graphs, N_sims, N, N_columns);
     assert(offset + N <= Nt && "offset + N must be less than Nt");
     for(int g = 0; g < N_graphs; g++)

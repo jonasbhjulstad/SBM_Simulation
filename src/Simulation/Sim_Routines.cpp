@@ -25,6 +25,43 @@ bool is_allocated_space_full(uint32_t t, uint32_t Nt_alloc)
 {
     return ((t != 0) && (t % (Nt_alloc) == 0));
 }
+template <typename T>
+void truncate_graphseries(Graphseries_t<T>& gs, uint32_t N_cols)
+{
+    for(auto&& ss: gs)
+    {
+        for (auto&& ts: ss)
+        {
+            std::for_each(ts.begin(), ts.end(), [&](auto& elem)
+            {
+                elem.resize(N_cols);
+            });
+            ts.N_cols = N_cols;
+        }
+        ss.N_cols = N_cols;
+    }
+    gs.N_cols = N_cols;
+}
+
+template <typename T>
+void truncate_graphseries(Graphseries_t<T>& gs, const std::vector<uint32_t>& N_cols)
+{
+    auto g_idx = 0;
+    for(auto&& ss: gs)
+    {
+        for (auto&& ts: ss)
+        {
+            std::for_each(ts.begin(), ts.end(), [&](auto& elem)
+            {
+                elem.resize(N_cols[g_idx]);
+            });
+            ts.N_cols = N_cols[g_idx];
+        }
+        ss.N_cols = N_cols[g_idx];
+        g_idx++;
+    }
+    gs.N_cols = N_cols[0];
+}
 
 void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, size_t N_steps, std::vector<sycl::event>& dep_events)
 {
@@ -36,7 +73,7 @@ void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, s
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Accumulate community state: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
-    auto state_gs = read_graphseries(q, b.community_state, p, p.Nt_alloc + 1, p.N_communities, acc_event);
+    auto state_gs = read_graphseries(q, b.community_state, p, p.Nt_alloc + 1, b.N_communities_max, acc_event);
     auto event_to_gs = get_N_timesteps(std::forward<const Graphseries_t<uint32_t>>(read_graphseries(q, b.events_to, p, p.Nt_alloc, b.events_to.get_range()[2], dep_events)), N_steps, 0);
     auto event_from_gs = get_N_timesteps(std::forward<const Graphseries_t<uint32_t>>(read_graphseries(q, b.events_from, p, p.Nt_alloc, b.events_from.get_range()[2], dep_events)), N_steps, 0);
     t2 = std::chrono::high_resolution_clock::now();
@@ -44,12 +81,16 @@ void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, s
     t1 = t2;
     auto state_gs_write = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(state_gs), N_steps, 1);
     auto state_gs_inf = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(state_gs), N_steps+1, 0);
+    // truncate_graphseries(state_gs_write, b.N_communities_vec);
+    // truncate_graphseries(state_gs_inf, b.N_communities_vec);
     write_graphseries(std::forward<const decltype(state_gs_write)>(state_gs_write), p.output_dir, "community_trajectory", true);
-
+    // truncate_graphseries(event_from_gs, b.N_connections_vec);
+    // truncate_graphseries(event_to_gs, b.N_connections_vec);
     auto connection_events = zip_merge_graphseries(std::forward<const decltype(event_from_gs)>(event_from_gs), std::forward<const decltype(event_to_gs)>(event_to_gs));
-    auto inf_gs = sample_infections(std::forward<const Graphseries_t<State_t>>(state_gs_inf), std::forward<const Graphseries_t<uint32_t>>(event_from_gs), std::forward<const Graphseries_t<uint32_t>>(event_to_gs), b.ccm, b.ccm_weights, p.seed, p.N_connections, p.max_infection_samples);
-    write_graphseries(std::forward<const decltype(inf_gs)>(inf_gs), p.output_dir, "connection_infections", true);
     write_graphseries(std::forward<const decltype(connection_events)>(connection_events), p.output_dir, "connection_events", true);
+
+    auto inf_gs = sample_infections(std::forward<const Graphseries_t<State_t>>(state_gs_inf), std::forward<const Graphseries_t<uint32_t>>(event_from_gs), std::forward<const Graphseries_t<uint32_t>>(event_to_gs), b.ccm, b.ccm_weights, b.N_communities_vec, p.seed, p.max_infection_samples);
+    write_graphseries(std::forward<const decltype(inf_gs)>(inf_gs), p.output_dir, "connection_infections", true);
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Inf sample/ write graphseries: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
 }
@@ -58,7 +99,7 @@ void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, s
 void write_initial_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, std::vector<sycl::event>& dep_events)
 {
     auto acc_event = accumulate_community_state(q, dep_events, b.vertex_state, b.vcm, b.community_state, p.compute_range, p.wg_range);
-    auto state_gs = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(read_graphseries(q, b.community_state, p, p.Nt_alloc + 1, p.N_communities, acc_event)), 1, 0);
+    auto state_gs = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(read_graphseries(q, b.community_state, p, p.Nt_alloc + 1, b.N_communities_max, acc_event)), 1, 0);
     write_graphseries(std::forward<const decltype(state_gs)>(state_gs), p.output_dir, "community_trajectory", true);
 }
 
@@ -117,17 +158,17 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
 
 
 
-void run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<uint32_t>>& ecm)
+void run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm)
 {
 
-    auto b = Sim_Buffers::make(q, p, edge_list, vcm, ecm, {});
+    auto b = Sim_Buffers::make(q, p, edge_list, vcm, {});
     b.validate_sizes(p);
     run(q, p, b);
     for(int graph_idx = 0; graph_idx < edge_list.size(); graph_idx++)
     {
         write_edgelist(p.output_dir + "/Graph_" + std::to_string(graph_idx) + "/edgelist.csv", edge_list[graph_idx]);
         write_vector(p.output_dir + "/Graph_" + std::to_string(graph_idx) + "/vcm.csv", vcm[graph_idx]);
-        write_vector(p.output_dir + "/Graph_" + std::to_string(graph_idx) + "/ecm.csv", ecm[graph_idx]);
+        // write_vector(p.output_dir + "/Graph_" + std::to_string(graph_idx) + "/ecm.csv", ecm[graph_idx]);
     }
 }
 
@@ -158,9 +199,9 @@ auto dataframe_linearize(const std::vector<std::vector<std::vector<float>>>& df)
     return result;
 }
 
-void p_I_run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<uint32_t>>& ecm, const std::vector<std::vector<std::vector<float>>>& p_Is)
+void p_I_run(sycl::queue& q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<uint32_t>>& vcm, const std::vector<std::vector<std::vector<float>>>& p_Is)
 {
     auto p_I_lin = dataframe_linearize(p_Is);
-    auto b = Sim_Buffers::make(q, p, edge_list, ecm, vcm, p_I_lin);
+    auto b = Sim_Buffers::make(q, p, edge_list, vcm, p_I_lin);
     run(q, p, b);
 }

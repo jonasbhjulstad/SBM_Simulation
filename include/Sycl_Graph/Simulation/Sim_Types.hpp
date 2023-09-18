@@ -63,7 +63,7 @@ struct Timeseries_t: public std::vector<std::vector<T>>
     std::size_t Nt, N_cols;
 
     Timeseries_t() = default;
-    Timeseries_t(const std::vector<std::vector<T>>& data): std::vector<std::vector<T>>(data){}
+    Timeseries_t(const std::vector<std::vector<T>>& data): std::vector<std::vector<T>>(data), Nt{data.size()}, N_cols{data[0].size()}{}
     Timeseries_t(size_t Nt, size_t N_cols): std::vector<std::vector<T>>(Nt, std::vector<T>(N_cols)), N_cols{N_cols}, Nt{Nt}{}
     //default copy assignment operator
 
@@ -77,9 +77,9 @@ struct Simseries_t: public std::vector<Timeseries_t<T>>
 {
     std::size_t N_sims, Nt, N_cols;
     Simseries_t() = default;
-    Simseries_t(const std::vector<Timeseries_t<T>>& data): std::vector<Timeseries_t<T>>(data){}
+    Simseries_t(const std::vector<Timeseries_t<T>>& data): std::vector<Timeseries_t<T>>(data), N_sims{data.size()}, Nt{data[0].Nt}, N_cols{data[0].N_cols}{}
     Simseries_t(size_t N_sims, size_t Nt, size_t N_cols): std::vector<Timeseries_t<T>>(N_sims, Timeseries_t<T>(Nt, N_cols)), N_sims{N_sims}, Nt{Nt}, N_cols{N_cols}{}
-    std::size_t size() const {return N_sims*Nt*N_cols;}
+    std::size_t total_size() const {return N_sims*Nt*N_cols;}
 
 
 };
@@ -89,9 +89,9 @@ struct Graphseries_t: public std::vector<Simseries_t<T>>
 {
     std::size_t Ng, N_sims, Nt, N_cols;
     Graphseries_t() = default;
-    Graphseries_t(const std::vector<Simseries_t<T>>& data): std::vector<Simseries_t<T>>(data), Ng{data.size()}{}
+    Graphseries_t(const std::vector<Simseries_t<T>>& data): std::vector<Simseries_t<T>>(data), Ng{data.size()}, N_sims{data[0].N_sims}, Nt{data[0].Nt}, N_cols{data[0].N_cols}{}
     Graphseries_t(size_t N_graphs, size_t N_sims, size_t Nt, size_t N_cols): std::vector<Simseries_t<T>>(N_graphs, Simseries_t<T>(N_sims, Nt, N_cols)), Ng(N_graphs), N_sims(N_sims), Nt(Nt), N_cols(N_cols){}
-    std::size_t size() const {return Ng*N_sims*Nt*N_cols;}
+    std::size_t total_size() const {return Ng*N_sims*Nt*N_cols;}
 };
 
 #endif

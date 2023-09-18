@@ -10,6 +10,6 @@ std::vector<std::vector<int>> get_delta_Is(const std::vector<std::vector<State_t
 // std::vector<std::vector<uint32_t>> sample_infections(const std::vector<std::vector<State_t>> &community_state, const std::vector<std::vector<uint32_t>> &from_events, const std::vector<std::vector<uint32_t>> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t seed, uint32_t max_infection_samples);
 // std::vector<uint32_t> events_combine(const std::vector<uint32_t> &from_events, const std::vector<uint32_t> &to_events);
 // std::vector<std::vector<uint32_t>> events_combine(const std::vector<std::vector<uint32_t>> &from_events, const std::vector<std::vector<uint32_t>> &to_events);
-Graphseries_t<uint32_t> sample_infections(const Graphseries_t<State_t>&&community_state, const Graphseries_t<uint32_t>&& from_events, const Graphseries_t<uint32_t>&& to_events, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& ccm, const std::vector<std::vector<uint32_t>>& ccm_weights, uint32_t seed, uint32_t N_connections, uint32_t max_infection_samples);
+Graphseries_t<uint32_t> sample_infections(const Graphseries_t<State_t>&&community_state, const Graphseries_t<uint32_t>&& from_events, const Graphseries_t<uint32_t>&& to_events, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& ccm, const std::vector<std::vector<uint32_t>>& ccm_weights, const std::vector<uint32_t>& N_communities, uint32_t seed, uint32_t max_infection_samples);
 
 #endif

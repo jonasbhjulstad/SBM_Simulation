@@ -10,6 +10,10 @@
 
 std::vector<uint32_t> constrained_weight_sample(size_t N_samples, const std::vector<uint32_t> weights, const std::vector<uint32_t>& max_values)
 {
+    if (N_samples == 0)
+    {
+        return std::vector<uint32_t>(weights.size(), 0);
+    }
     std::vector<uint32_t> sample_counts(weights.size(), 0);
     std::discrete_distribution<uint32_t> dist(weights.begin(), weights.end());
     std::mt19937 rng(std::random_device{}());
@@ -108,8 +112,8 @@ auto zip_merge(const std::vector<uint32_t>& v0, const std::vector<uint32_t>& v1)
 
 auto zip_merge(const Timeseries_t<uint32_t>& ts0, const Timeseries_t<uint32_t>& ts1)
 {
-    auto Nt = ts0.size();
-    auto Nc = ts0[0].size();
+    auto Nt = ts0.Nt;
+    auto Nc = ts0.N_cols;
     Timeseries_t<uint32_t> result(Nt, Nc*2);
     for(int t = 0; t < Nt; t++)
     {
@@ -123,10 +127,10 @@ auto zip_merge(const Timeseries_t<uint32_t>& ts0, const Timeseries_t<uint32_t>& 
 }
 
 
-std::vector<std::vector<uint32_t>> sample_infections(const Timeseries_t<State_t> &community_state, const Timeseries_t<uint32_t> &from_events, const Timeseries_t<uint32_t> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t seed, uint32_t N_connections, uint32_t max_infection_samples)
+std::vector<std::vector<uint32_t>> sample_infections(const Timeseries_t<State_t> &community_state, const Timeseries_t<uint32_t> &from_events, const Timeseries_t<uint32_t> &to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_communities, uint32_t seed, uint32_t max_infection_samples)
 {
 
-    auto N_communities = community_state[0].size();
+    auto N_connections = ccm.size();
     auto delta_Is = get_delta_Is(community_state);
     auto events = zip_merge(from_events, to_events);
     auto Nt = delta_Is.size();
@@ -163,6 +167,9 @@ std::vector<std::vector<uint32_t>> sample_infections(const Timeseries_t<State_t>
         std::vector<std::vector<uint32_t>> result(N_communities, std::vector<uint32_t>(N_connections*2, 0));
         std::vector<uint32_t> community_idx(N_communities);
         std::iota(community_idx.begin(), community_idx.end(), 0);
+        auto event_sum = std::accumulate(t_events.begin(), t_events.end(), 0);
+        auto delta_I_sum = std::accumulate(delta_I_ts.begin(), delta_I_ts.end(), 0);
+        assert(event_sum == delta_I_sum && "Event sum does not match delta_I sum");
         std::transform(std::execution::par_unseq, community_idx.begin(), community_idx.end(), result.begin(), [t_events, delta_I_ts, sample_community](auto c_idx){return sample_community(t_events, delta_I_ts[c_idx], c_idx);});
         std::vector<uint32_t> merged_result(N_connections*2, 0);
         for(int i = 0; i < result.size(); i++)
@@ -188,28 +195,31 @@ std::vector<std::vector<uint32_t>> sample_infections(const Timeseries_t<State_t>
     return sampled_infections;
 }
 
-Simseries_t<uint32_t> sample_infections(const Simseries_t<State_t> &&community_state,const Simseries_t<uint32_t> &&from_events, const Simseries_t<uint32_t> &&to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t seed, uint32_t N_connections, uint32_t max_infection_samples)
+Simseries_t<uint32_t> sample_infections(const Simseries_t<State_t> &&community_state,const Simseries_t<uint32_t> &&from_events, const Simseries_t<uint32_t> &&to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_communities, uint32_t seed, uint32_t max_infection_samples)
 {
-
-    auto N_sims = community_state.size();
-    auto Nt = community_state[0].size();
+    auto N_connections = ccm.size();
+    auto N_sims = community_state.N_sims;
+    auto Nt = community_state.Nt;
     Simseries_t<uint32_t> sampled_infections(N_sims, Nt, N_connections);
-    for (int i = 0; i < community_state.size(); i++)
+    for (int i = 0; i < N_sims; i++)
     {
-        sampled_infections[i] = sample_infections(community_state[i], from_events[i], to_events[i], ccm, ccm_weights, seed, N_connections, max_infection_samples);
+        sampled_infections[i] = sample_infections(community_state[i], from_events[i], to_events[i], ccm, ccm_weights, N_communities, seed, max_infection_samples);
     }
     return sampled_infections;
 }
 
-Graphseries_t<uint32_t> sample_infections(const Graphseries_t<State_t>&&community_state, const Graphseries_t<uint32_t>&& from_events, const Graphseries_t<uint32_t>&& to_events, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& ccm, const std::vector<std::vector<uint32_t>>& ccm_weights, uint32_t seed, uint32_t N_connections, uint32_t max_infection_samples)
+Graphseries_t<uint32_t> sample_infections(const Graphseries_t<State_t>&&community_state, const Graphseries_t<uint32_t>&& from_events, const Graphseries_t<uint32_t>&& to_events, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& ccm, const std::vector<std::vector<uint32_t>>& ccm_weights, const std::vector<uint32_t>& N_communities, uint32_t seed, uint32_t max_infection_samples)
 {
-    auto N_graphs = community_state.size();
-    auto N_sims = community_state[0].size();
-    auto Nt = community_state[0][0].size();
-    Graphseries_t<uint32_t> sampled_infections(N_graphs, N_sims, Nt, N_connections);
+    auto N_graphs = community_state.Ng;
+    auto N_sims = community_state.N_sims;
+    auto Nt = community_state.Nt;
+    Graphseries_t<uint32_t> sampled_infections(N_graphs, N_sims, Nt, ccm.size()*2);
     for(int i = 0; i < N_graphs; i++)
     {
-        sampled_infections[i] = sample_infections(std::forward<const Simseries_t<State_t>>(community_state[i]), std::forward<const Simseries_t<uint32_t>>(from_events[i]), std::forward<const Simseries_t<uint32_t>>(to_events[i]), ccm[i], ccm_weights[i], seed, N_connections, max_infection_samples);
+        sampled_infections[i] = sample_infections(std::forward<const Simseries_t<State_t>>(community_state[i]),
+        std::forward<const Simseries_t<uint32_t>>(from_events[i]),
+        std::forward<const Simseries_t<uint32_t>>(to_events[i]),
+        ccm[i], ccm_weights[i], N_communities[i], seed, max_infection_samples);
     }
     return sampled_infections;
 }
