@@ -42,7 +42,7 @@ int main()
     // auto p = ps[0];
     t1 = std::chrono::high_resolution_clock::now();
 
-    p.N_communities = 3;
+    p.N_communities = 2;
     auto [edge_list, vertex_list, ecm, vcm] = generate_N_SBM_graphs_flat(p.N_pop, p.N_communities, p.p_in, p.p_out, p.seed, p.N_graphs);
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Generate graphs: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
@@ -55,10 +55,10 @@ int main()
     // fill with random values from 0 to p.N_connections-1
     std::mt19937 rng(p.seed);
     std::uniform_int_distribution<uint32_t> dist_v(0, p.N_communities - 1);
-    // for(auto&& v: vcm)
-    // {
-    //     std::generate(v.begin(), v.end(), [&dist_v, &rng]() { return dist_v(rng); });
-    // }
+    for(auto&& v: vcm)
+    {
+        std::generate(v.begin(), v.end(), [&dist_v, &rng]() { return dist_v(rng); });
+    }
     //max of ecms
     auto b = Sim_Buffers::make(q, p, edge_list, vcm, {});
     q.wait();

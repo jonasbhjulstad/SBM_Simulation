@@ -3,16 +3,6 @@
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
 #include <execution>
 #include <functional>
-// #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
-// std::vector<float> generate_floats(uint32_t N, float min, float max, uint32_t seed)
-// {
-//     std::mt19937_64 rng(seed);
-//     std::uniform_real_distribution<float> dist(min, max);
-//     std::vector<float> result(N);
-//     std::generate(result.begin(), result.end(), [&]()
-//                   { return dist(rng); });
-//     return result;
-// }
 
 Sim_Buffers::Sim_Buffers(cl::sycl::buffer<Static_RNG::default_rng> &rngs,
                          cl::sycl::buffer<SIR_State, 3> &vertex_state,
