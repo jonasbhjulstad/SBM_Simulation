@@ -79,20 +79,20 @@ void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, s
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Read graphseries: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
-    write_dataframe(p.output_dir + "/Graph_", "community_trajectory", state_df(p.N_graphs, p.N_sims, N_steps, ), true);
-    auto state_gs_write = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(state_gs), N_steps, 1);
-    auto state_gs_inf = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(state_gs), N_steps+1, 0);
-    Dataframe_t<std::size_t, 3>
+    state_df.resize_dim(2, N_steps+1);
+    state_df_write = state_df;
+    state_df_write.resize_dim(2, N_steps);
+    state_df.resize_dim(3, b.N_community_vec);
+    event_to_df.resize_dim(3, b.N_connection_vec);
+    event_from_df.resize_dim(3, b.N_connection_vec);
 
-    truncate_graphseries(state_gs_write, b.N_communities_vec);
-    truncate_graphseries(state_gs_inf, b.N_communities_vec);
-    write_graphseries(std::forward<const decltype(state_gs_write)>(state_gs_write), p.output_dir, "community_trajectory", true);
-    truncate_graphseries(event_from_gs, b.N_connections_vec);
-    truncate_graphseries(event_to_gs, b.N_connections_vec);
-    auto connection_events = zip_merge_graphseries(std::forward<const decltype(event_from_gs)>(event_from_gs), std::forward<const decltype(event_to_gs)>(event_to_gs));
-    write_graphseries(std::forward<const decltype(connection_events)>(connection_events), p.output_dir, "connection_events", true);
+    auto events = zip_merge(event_from_df, event_to_df, 3);
 
-    auto inf_gs = sample_infections(std::forward<const Graphseries_t<State_t>>(state_gs_inf), std::forward<const Graphseries_t<uint32_t>>(event_from_gs), std::forward<const Graphseries_t<uint32_t>>(event_to_gs), b.ccm, b.ccm_weights, b.N_communities_vec, p.seed, p.max_infection_samples);
+    write_dataframe(p.output_dir + "/Graph_", "community_trajectory_", state_df_write, true);
+    write_dataframe(p.output_dir + "/Graph_", "connection_events_", events, true);
+
+
+    auto inf_gs = sample_infections(state_df, events, b.ccm, b.ccm_weights, b.N_communities_vec, p.seed, p.max_infection_samples);
     write_graphseries(std::forward<const decltype(inf_gs)>(inf_gs), p.output_dir, "connection_infections", true);
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Inf sample/ write graphseries: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";

@@ -2,6 +2,7 @@
 #include <Sycl_Graph/Simulation/Sim_Infection_Sampling.hpp>
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
+#include <Sycl_Graph/Utils/Dataframe.hpp>
 #include <algorithm>
 #include <execution>
 #include <iostream>
@@ -100,7 +101,7 @@ auto get_related_connections(size_t c_idx, const std::vector<std::pair<uint32_t,
     }
     return std::make_tuple(connection_indices, connection_weights);
 }
-auto get_related_events(size_t c_idx, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, const std::vector<uint32_t>& events)
+auto get_related_events(size_t c_idx, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, const std::vector<uint32_t> &events)
 {
     auto [r_con, rw] = get_related_connections(c_idx, ccm, ccm_weights);
     std::vector<uint32_t> r_con_events(r_con.size(), 0);
@@ -133,22 +134,6 @@ auto zip_merge(const std::vector<uint32_t> &v0, const std::vector<uint32_t> &v1)
     {
         result[2 * i] = v0[i];
         result[2 * i + 1] = v1[i];
-    }
-    return result;
-}
-
-auto zip_merge(const Timeseries_t<uint32_t> &ts0, const Timeseries_t<uint32_t> &ts1)
-{
-    auto Nt = ts0.Nt;
-    auto Nc = ts0.N_cols;
-    Timeseries_t<uint32_t> result(Nt, Nc * 2);
-    for (int t = 0; t < Nt; t++)
-    {
-        for (int c = 0; c < Nc; c++)
-        {
-            result[t][2 * c] = ts0[t][c];
-            result[t][2 * c + 1] = ts1[t][c];
-        }
     }
     return result;
 }
@@ -227,7 +212,7 @@ std::vector<uint32_t> sample_timestep(const auto &events, const auto &delta_I, c
     return merged_result;
 }
 
-std::vector<std::vector<uint32_t>> sample_infections(const Timeseries_t<State_t> &community_state, const Timeseries_t<uint32_t> &events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_communities, uint32_t seed, uint32_t max_infection_samples)
+std::vector<std::vector<uint32_t>> sample_infections(const Dataframe_t<State_t, 2> &community_state, const Dataframe_t<uint32_t, 2> &events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_communities, uint32_t seed, uint32_t max_infection_samples)
 {
 
     auto N_connections = ccm.size();
@@ -242,12 +227,12 @@ std::vector<std::vector<uint32_t>> sample_infections(const Timeseries_t<State_t>
     return sampled_infections;
 }
 
-Simseries_t<uint32_t> sample_infections(const Simseries_t<State_t> &&community_state, const Simseries_t<uint32_t> &&from_events, const Simseries_t<uint32_t> &&to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_communities, uint32_t seed, uint32_t max_infection_samples)
+Dataframe_t<uint32_t, 3> sample_infections(const Dataframe_t<State_t, 3> &&community_state, const Dataframe_t<uint32_t, 3> &&from_events, const Dataframe_t<uint32_t, 3> &&to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_communities, uint32_t seed, uint32_t max_infection_samples)
 {
     auto N_connections = ccm.size();
     auto N_sims = community_state.N_sims;
     auto Nt = community_state.Nt;
-    Simseries_t<uint32_t> sampled_infections(N_sims, Nt, N_connections);
+    Dataframe_t<uint32_t, 3> sampled_infections(N_sims, Nt, N_connections);
     for (int i = 0; i < N_sims; i++)
     {
         auto events = zip_merge(from_events[i], to_events[i]);
@@ -256,24 +241,24 @@ Simseries_t<uint32_t> sample_infections(const Simseries_t<State_t> &&community_s
     return sampled_infections;
 }
 
-void validate_infection_graphseries(const Graphseries_t<State_t> &community_state, const Graphseries_t<uint32_t> &from_events, const Graphseries_t<uint32_t> &to_events, const auto& ccms, const auto& ccm_weights)
+void validate_infection_graphseries(const Dataframe_t<State_t, 4> &community_state, const Dataframe_t<uint32_t, 4> &from_events, const Dataframe_t<uint32_t, 4> &to_events, const auto &ccms, const auto &ccm_weights)
 {
     auto Ng = community_state.Ng;
     auto N_sims = community_state.N_sims;
     auto Nt = community_state.Nt;
-    for(int g_idx = 0; g_idx < Ng; g_idx++)
+    for (int g_idx = 0; g_idx < Ng; g_idx++)
     {
         auto N_communities = community_state[g_idx].N_cols;
         auto N_connections = ccms[g_idx].size();
-        const auto& ccm = ccms[g_idx];
-        const auto& ccm_w = ccm_weights[g_idx];
-        for(int sim_idx = 0; sim_idx < N_sims; sim_idx++)
+        const auto &ccm = ccms[g_idx];
+        const auto &ccm_w = ccm_weights[g_idx];
+        for (int sim_idx = 0; sim_idx < N_sims; sim_idx++)
         {
             auto events = zip_merge(from_events[g_idx][sim_idx], to_events[g_idx][sim_idx]);
             auto dIs = get_delta_Is(community_state[g_idx][sim_idx]);
-            for(int t = 0; t < Nt-1; t++)
+            for (int t = 0; t < Nt - 1; t++)
             {
-                for(int c_idx = 0; c_idx < N_communities; c_idx++)
+                for (int c_idx = 0; c_idx < N_communities; c_idx++)
                 {
                     auto r_events = get_related_events(c_idx, ccm, ccm_w, events[t]);
                     if (std::accumulate(r_events.begin(), r_events.end(), 0) < dIs[t][c_idx])
@@ -286,39 +271,38 @@ void validate_infection_graphseries(const Graphseries_t<State_t> &community_stat
     }
 }
 
-void event_inf_summary(const Graphseries_t<State_t> &community_state, const Graphseries_t<uint32_t> &from_events, const Graphseries_t<uint32_t> &to_events, const auto& ccms, const auto& ccm_weights)
+void event_inf_summary(const Dataframe_t<State_t, 4> &community_state, const Dataframe_t<uint32_t, 4> &events, const auto &ccms, const auto &ccm_weights)
 {
     auto Ng = community_state.Ng;
     auto N_sims = community_state.N_sims;
     auto Nt = community_state.Nt;
-    for(int g_idx = 0; g_idx < Ng; g_idx++)
+    for (int g_idx = 0; g_idx < Ng; g_idx++)
     {
         std::cout << "Graph " << g_idx << "\n";
         auto N_communities = community_state[g_idx].N_cols;
         auto N_connections = ccms[g_idx].size();
-        const auto& ccm = ccms[g_idx];
-        const auto& ccm_w = ccm_weights[g_idx];
-        for(int sim_idx = 0; sim_idx < N_sims; sim_idx++)
+        const auto &ccm = ccms[g_idx];
+        const auto &ccm_w = ccm_weights[g_idx];
+        for (int sim_idx = 0; sim_idx < N_sims; sim_idx++)
         {
             std::cout << "Simulation " << sim_idx << "\n";
-            auto events = zip_merge(from_events[g_idx][sim_idx], to_events[g_idx][sim_idx]);
             auto dIs = get_delta_Is(community_state[g_idx][sim_idx]);
-            for(int t = 0; t < Nt-1; t++)
+            for (int t = 0; t < Nt - 1; t++)
             {
                 std::cout << "Timestep " << t << "\n";
-                for(int c_idx = 0; c_idx < N_communities; c_idx++)
+                for (int c_idx = 0; c_idx < N_communities; c_idx++)
                 {
                     auto [r_idx, r_w] = get_related_connections(c_idx, ccm, ccm_w);
-                    auto r_events = get_related_events(c_idx, ccm, ccm_w, events[t]);
+                    auto r_events = get_related_events(c_idx, ccm, ccm_w, events[g_idx][sim_idx][t]);
                     std::cout << "Community " << c_idx << "\n";
                     std::cout << "Delta I: " << dIs[t][c_idx] << "\n";
                     std::cout << "Related events: ";
-                    for(auto&& e: r_events)
+                    for (auto &&e : r_events)
                     {
                         std::cout << e << ", ";
                     }
                     std::cout << "Related idx: ";
-                    for(auto&& e: r_idx)
+                    for (auto &&e : r_idx)
                     {
                         std::cout << e << ", ";
                     }
@@ -334,19 +318,19 @@ void event_inf_summary(const Graphseries_t<State_t> &community_state, const Grap
     }
 }
 
-Graphseries_t<uint32_t> sample_infections(const Graphseries_t<State_t> &&community_state, const Graphseries_t<uint32_t> &&from_events, const Graphseries_t<uint32_t> &&to_events, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &ccm, const std::vector<std::vector<uint32_t>> &ccm_weights, const std::vector<uint32_t> &N_communities, uint32_t seed, uint32_t max_infection_samples)
+Dataframe_t<uint32_t, 4> sample_infections(const Dataframe_t<State_t, 4>& community_state, const Dataframe_t<uint32_t, 4>& events, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &ccm, const std::vector<std::vector<uint32_t>> &ccm_weights, uint32_t seed, uint32_t max_infection_samples)
 {
     auto N_graphs = community_state.Ng;
     auto N_sims = community_state.N_sims;
     auto Nt = community_state.Nt;
     event_inf_summary(community_state, from_events, to_events, ccm, ccm_weights);
     // validate_infection_graphseries(community_state, from_events, to_events, ccm, ccm_weights);
-    Graphseries_t<uint32_t> sampled_infections(N_graphs, N_sims, Nt, ccm.size() * 2);
+    Dataframe_t<uint32_t, 4> sampled_infections(N_graphs, N_sims, Nt, ccm.size() * 2);
     for (int i = 0; i < N_graphs; i++)
     {
-        sampled_infections[i] = sample_infections(std::forward<const Simseries_t<State_t>>(community_state[i]),
-                                                  std::forward<const Simseries_t<uint32_t>>(from_events[i]),
-                                                  std::forward<const Simseries_t<uint32_t>>(to_events[i]),
+        sampled_infections[i] = sample_infections(std::forward<const Dataframe_t<State_t, 3>>(community_state[i]),
+                                                  std::forward<const Dataframe_t<uint32_t, 3>>(from_events[i]),
+                                                  std::forward<const Dataframe_t<uint32_t, 3>>(to_events[i]),
                                                   ccm[i], ccm_weights[i], N_communities[i], seed, max_infection_samples);
     }
     return sampled_infections;

@@ -1,6 +1,7 @@
 #include <Sycl_Graph/Graph.hpp>
 #include <Sycl_Graph/Simulation/Sim_Buffers.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
+#include <Sycl_Graph/Utils/Validation.hpp>
 #include <execution>
 #include <functional>
 
@@ -118,13 +119,7 @@ void validate_buffer_init_sizes(Sim_Param p, const std::vector<std::vector<std::
     // }
 }
 
-void if_false_throw(bool condition, std::string msg)
-{
-    if (!condition)
-    {
-        throw std::runtime_error(msg);
-    }
-};
+
 
 void Sim_Buffers::validate_sizes(const Sim_Param &p) const
 {

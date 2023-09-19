@@ -2,6 +2,7 @@
 #define SIM_TIMESERIES_HPP
 #include <CL/sycl.hpp>
 #include <Sycl_Graph/SIR_Types.hpp>
+#include <Sycl_Graph/Utils/Validation.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
 #include <Sycl_Graph/Utils/Dataframe.hpp>
 #include <cmath>
@@ -73,6 +74,7 @@ void write_dataframe(const std::string& base_dir, const std::string& basename, c
         write_dataframe(base_dir + std::to_string(i) + "/" + basename, df[i], append);
     }
 }
+
 
 
 #endif
