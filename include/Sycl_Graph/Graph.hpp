@@ -25,14 +25,17 @@ std::tuple<std::vector<Edge_List_Flat_t>, std::vector<Node_List_Flat_t>, std::ve
 
 std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities, bool directed = false);
 
-std::vector<std::pair<uint32_t, uint32_t>> ccm_from_edgelist(const std::vector<std::pair<uint32_t, uint32_t>>& edges, const std::vector<uint32_t>& vcm, bool directed = false);
+std::vector<std::pair<uint32_t, uint32_t>> ccm_from_edgelist(const std::vector<std::pair<uint32_t, uint32_t>>& edges, const std::vector<uint32_t>& vcm);
 
 
 std::vector<uint32_t> create_ecm(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_lists);
 
 std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_lists);
 
-std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm);
+std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>>& ccm);
+std::vector<std::pair<uint32_t, uint32_t>> ccm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm);
+std::vector<std::pair<uint32_t, uint32_t>> complete_graph(size_t N);
+
 std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm, uint32_t N_connections);
 void write_edgelist(const std::string& fname, const std::vector<std::pair<uint32_t, uint32_t>>& edges);
 void read_edgelist(const std::string& fname, std::vector<std::pair<uint32_t, uint32_t>>& edges);

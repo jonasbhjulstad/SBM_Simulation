@@ -102,11 +102,11 @@ auto get_related_connections(size_t c_idx, const std::vector<std::pair<uint32_t,
 }
 auto get_related_events(size_t c_idx, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, const std::vector<uint32_t>& events)
 {
-    auto [rc, rw] = get_related_connections(c_idx, ccm, ccm_weights);
-    std::vector<uint32_t> r_con_events(rc.size(), 0);
+    auto [r_con, rw] = get_related_connections(c_idx, ccm, ccm_weights);
+    std::vector<uint32_t> r_con_events(r_con.size(), 0);
     for (int i = 0; i < r_con_events.size(); i++)
     {
-        r_con_events[i] = events[rc[i]];
+        r_con_events[i] = events[r_con[i]];
     }
     return r_con_events;
 }
@@ -271,11 +271,59 @@ void validate_infection_graphseries(const Graphseries_t<State_t> &community_stat
         {
             auto events = zip_merge(from_events[g_idx][sim_idx], to_events[g_idx][sim_idx]);
             auto dIs = get_delta_Is(community_state[g_idx][sim_idx]);
-            for(int t = 0; t < Nt; t++)
+            for(int t = 0; t < Nt-1; t++)
             {
                 for(int c_idx = 0; c_idx < N_communities; c_idx++)
                 {
-                    auto r_events = get_related_events(c_idx, ccm, ccm_w, events[sim_idx][t]);
+                    auto r_events = get_related_events(c_idx, ccm, ccm_w, events[t]);
+                    if (std::accumulate(r_events.begin(), r_events.end(), 0) < dIs[t][c_idx])
+                    {
+                        throw std::runtime_error("Error: too few events related to community in timeseries, (g_idx, sim_idx, t, c_idx): (" + std::to_string(g_idx) + "," + std::to_string(sim_idx) + "," + std::to_string(t) + "," + std::to_string(c_idx) + ")");
+                    }
+                }
+            }
+        }
+    }
+}
+
+void event_inf_summary(const Graphseries_t<State_t> &community_state, const Graphseries_t<uint32_t> &from_events, const Graphseries_t<uint32_t> &to_events, const auto& ccms, const auto& ccm_weights)
+{
+    auto Ng = community_state.Ng;
+    auto N_sims = community_state.N_sims;
+    auto Nt = community_state.Nt;
+    for(int g_idx = 0; g_idx < Ng; g_idx++)
+    {
+        std::cout << "Graph " << g_idx << "\n";
+        auto N_communities = community_state[g_idx].N_cols;
+        auto N_connections = ccms[g_idx].size();
+        const auto& ccm = ccms[g_idx];
+        const auto& ccm_w = ccm_weights[g_idx];
+        for(int sim_idx = 0; sim_idx < N_sims; sim_idx++)
+        {
+            std::cout << "Simulation " << sim_idx << "\n";
+            auto events = zip_merge(from_events[g_idx][sim_idx], to_events[g_idx][sim_idx]);
+            auto dIs = get_delta_Is(community_state[g_idx][sim_idx]);
+            for(int t = 0; t < Nt-1; t++)
+            {
+                std::cout << "Timestep " << t << "\n";
+                for(int c_idx = 0; c_idx < N_communities; c_idx++)
+                {
+                    auto [r_idx, r_w] = get_related_connections(c_idx, ccm, ccm_w);
+                    auto r_events = get_related_events(c_idx, ccm, ccm_w, events[t]);
+                    std::cout << "Community " << c_idx << "\n";
+                    std::cout << "Delta I: " << dIs[t][c_idx] << "\n";
+                    std::cout << "Related events: ";
+                    for(auto&& e: r_events)
+                    {
+                        std::cout << e << ", ";
+                    }
+                    std::cout << "Related idx: ";
+                    for(auto&& e: r_idx)
+                    {
+                        std::cout << e << ", ";
+                    }
+
+                    std::cout << "\n";
                     if (std::accumulate(r_events.begin(), r_events.end(), 0) < dIs[t][c_idx])
                     {
                         throw std::runtime_error("Error: too few events related to community in timeseries, (g_idx, sim_idx, t, c_idx): (" + std::to_string(g_idx) + "," + std::to_string(sim_idx) + "," + std::to_string(t) + "," + std::to_string(c_idx) + ")");
@@ -291,9 +339,8 @@ Graphseries_t<uint32_t> sample_infections(const Graphseries_t<State_t> &&communi
     auto N_graphs = community_state.Ng;
     auto N_sims = community_state.N_sims;
     auto Nt = community_state.Nt;
-    #ifdef DEBUG
-    validate_infection_graphseries(community_state, from_events, to_events, ccm, ccm_weights);
-    #endif
+    event_inf_summary(community_state, from_events, to_events, ccm, ccm_weights);
+    // validate_infection_graphseries(community_state, from_events, to_events, ccm, ccm_weights);
     Graphseries_t<uint32_t> sampled_infections(N_graphs, N_sims, Nt, ccm.size() * 2);
     for (int i = 0; i < N_graphs; i++)
     {

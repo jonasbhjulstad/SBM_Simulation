@@ -69,23 +69,26 @@ void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, s
     std::chrono::high_resolution_clock::time_point t1, t2;
     N_steps = std::min<size_t>({N_steps, p.Nt_alloc});
     t1 = std::chrono::high_resolution_clock::now();
-    auto acc_event = accumulate_community_state(q, dep_events, b.vertex_state, b.vcm, b.community_state, p.compute_range, p.wg_range);
+    auto acc_event = accumulate_community_state(q, dep_events, b.vertex_state, b.vcm, b.community_state, p.compute_range, p.wg_range, p.N_sims);
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Accumulate community state: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
-    auto state_gs = read_graphseries(q, b.community_state, p, p.Nt_alloc + 1, b.N_communities_max, acc_event);
-    auto event_to_gs = get_N_timesteps(std::forward<const Graphseries_t<uint32_t>>(read_graphseries(q, b.events_to, p, p.Nt_alloc, b.events_to.get_range()[2], dep_events)), N_steps, 0);
-    auto event_from_gs = get_N_timesteps(std::forward<const Graphseries_t<uint32_t>>(read_graphseries(q, b.events_from, p, p.Nt_alloc, b.events_from.get_range()[2], dep_events)), N_steps, 0);
+    auto state_df = read_3D_buffer(q, b.community_state, p.N_graphs, {acc_event});
+    auto event_to_df = read_3D_buffer(q, b.events_to, p.N_graphs, {acc_event})({0,0,0}, {N_steps, p.N_sims, b.N_connections_max});
+    auto event_from_df = read_3D_buffer(q, b.events_from, p.N_graphs, {acc_event})({0,0,0}, {N_steps, p.N_sims, b.N_connections_max});
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Read graphseries: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
+    write_dataframe(p.output_dir + "/Graph_", "community_trajectory", state_df(p.N_graphs, p.N_sims, N_steps, ), true);
     auto state_gs_write = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(state_gs), N_steps, 1);
     auto state_gs_inf = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(state_gs), N_steps+1, 0);
-    // truncate_graphseries(state_gs_write, b.N_communities_vec);
-    // truncate_graphseries(state_gs_inf, b.N_communities_vec);
+    Dataframe_t<std::size_t, 3>
+
+    truncate_graphseries(state_gs_write, b.N_communities_vec);
+    truncate_graphseries(state_gs_inf, b.N_communities_vec);
     write_graphseries(std::forward<const decltype(state_gs_write)>(state_gs_write), p.output_dir, "community_trajectory", true);
-    // truncate_graphseries(event_from_gs, b.N_connections_vec);
-    // truncate_graphseries(event_to_gs, b.N_connections_vec);
+    truncate_graphseries(event_from_gs, b.N_connections_vec);
+    truncate_graphseries(event_to_gs, b.N_connections_vec);
     auto connection_events = zip_merge_graphseries(std::forward<const decltype(event_from_gs)>(event_from_gs), std::forward<const decltype(event_to_gs)>(event_to_gs));
     write_graphseries(std::forward<const decltype(connection_events)>(connection_events), p.output_dir, "connection_events", true);
 
@@ -98,7 +101,7 @@ void write_allocated_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, s
 
 void write_initial_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, std::vector<sycl::event>& dep_events)
 {
-    auto acc_event = accumulate_community_state(q, dep_events, b.vertex_state, b.vcm, b.community_state, p.compute_range, p.wg_range);
+    auto acc_event = accumulate_community_state(q, dep_events, b.vertex_state, b.vcm, b.community_state, p.compute_range, p.wg_range, p.N_sims);
     auto state_gs = get_N_timesteps(std::forward<const Graphseries_t<State_t>>(read_graphseries(q, b.community_state, p, p.Nt_alloc + 1, b.N_communities_max, acc_event)), 1, 0);
     write_graphseries(std::forward<const decltype(state_gs)>(state_gs), p.output_dir, "community_trajectory", true);
 }
@@ -106,8 +109,6 @@ void write_initial_steps(sycl::queue& q, const Sim_Param& p, Sim_Buffers& b, std
 
 void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
 {
-    uint32_t N_connections = p.N_connections;
-    Sim_Data d(p.Nt_alloc, p.N_sims, p.N_communities, N_connections);
     if ((p.global_mem_size == 0) || p.local_mem_size == 0)
     {
         auto device = q.get_device();

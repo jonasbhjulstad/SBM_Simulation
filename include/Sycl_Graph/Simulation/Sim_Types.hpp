@@ -1,9 +1,9 @@
 #ifndef SIM_TYPES_HPP
 #define SIM_TYPES_HPP
+#include <CL/sycl.hpp>
+#include <Sycl_Graph/SIR_Types.hpp>
 #include <cstdint>
 #include <string>
-#include <Sycl_Graph/SIR_Types.hpp>
-#include <CL/sycl.hpp>
 struct Sim_Data
 {
     Sim_Data(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections);
@@ -16,14 +16,14 @@ struct Sim_Data
 struct Sim_Param
 {
 
-    Sim_Param(sycl::queue& q) : compute_range(sycl::range<1>(1)), wg_range(sycl::range<1>(1))
+    Sim_Param(sycl::queue &q) : compute_range(sycl::range<1>(1)), wg_range(sycl::range<1>(1))
     {
         auto device = q.get_device();
         global_mem_size = device.get_info<sycl::info::device::global_mem_size>();
         local_mem_size = device.get_info<sycl::info::device::local_mem_size>();
     }
 
-    Sim_Param(): compute_range(sycl::range<1>(1)), wg_range(sycl::range<1>(1)){}
+    Sim_Param() : compute_range(sycl::range<1>(1)), wg_range(sycl::range<1>(1)) {}
 
     uint32_t N_communities = 4;
     uint32_t N_pop = 100;
@@ -47,51 +47,13 @@ struct Sim_Param
     std::size_t global_mem_size = 0;
     sycl::range<1> compute_range;
     sycl::range<1> wg_range;
-    std::size_t N_vertices() const {return N_communities * N_pop;}
+    std::size_t N_vertices() const { return N_communities * N_pop; }
     std::string output_dir;
     void print() const;
-    void dump(const std::string& fname) const;
+    void dump(const std::string &fname) const;
 };
 std::size_t get_sim_data_byte_size(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections);
 
 
-
-
-template <typename T>
-struct Timeseries_t: public std::vector<std::vector<T>>
-{
-    std::size_t Nt, N_cols;
-
-    Timeseries_t() = default;
-    Timeseries_t(const std::vector<std::vector<T>>& data): std::vector<std::vector<T>>(data), Nt{data.size()}, N_cols{data[0].size()}{}
-    Timeseries_t(size_t Nt, size_t N_cols): std::vector<std::vector<T>>(Nt, std::vector<T>(N_cols)), N_cols{N_cols}, Nt{Nt}{}
-    //default copy assignment operator
-
-
-    std::size_t size() const {return Nt*N_cols;}
-
-};
-
-template <typename T>
-struct Simseries_t: public std::vector<Timeseries_t<T>>
-{
-    std::size_t N_sims, Nt, N_cols;
-    Simseries_t() = default;
-    Simseries_t(const std::vector<Timeseries_t<T>>& data): std::vector<Timeseries_t<T>>(data), N_sims{data.size()}, Nt{data[0].Nt}, N_cols{data[0].N_cols}{}
-    Simseries_t(size_t N_sims, size_t Nt, size_t N_cols): std::vector<Timeseries_t<T>>(N_sims, Timeseries_t<T>(Nt, N_cols)), N_sims{N_sims}, Nt{Nt}, N_cols{N_cols}{}
-    std::size_t total_size() const {return N_sims*Nt*N_cols;}
-
-
-};
-
-template <typename T>
-struct Graphseries_t: public std::vector<Simseries_t<T>>
-{
-    std::size_t Ng, N_sims, Nt, N_cols;
-    Graphseries_t() = default;
-    Graphseries_t(const std::vector<Simseries_t<T>>& data): std::vector<Simseries_t<T>>(data), Ng{data.size()}, N_sims{data[0].N_sims}, Nt{data[0].Nt}, N_cols{data[0].N_cols}{}
-    Graphseries_t(size_t N_graphs, size_t N_sims, size_t Nt, size_t N_cols): std::vector<Simseries_t<T>>(N_graphs, Simseries_t<T>(N_sims, Nt, N_cols)), Ng(N_graphs), N_sims(N_sims), Nt(Nt), N_cols(N_cols){}
-    std::size_t total_size() const {return Ng*N_sims*Nt*N_cols;}
-};
 
 #endif

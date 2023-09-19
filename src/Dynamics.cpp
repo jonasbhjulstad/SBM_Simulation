@@ -114,11 +114,12 @@ std::vector<sycl::event> infect(sycl::queue &q,
                                   auto v_glob_next = construct_validate_accessor<SIR_State, 3, sycl::access_mode::write>(b.vertex_state, h, sycl::range<3>(1, N_sims*p.N_graphs, N_vertices), sycl::range<3>(t_alloc + 1, 0, 0));
                                   auto e_count = b.edge_counts.template get_access<sycl::access::mode::read>(h);
                                   auto e_offset = b.edge_offsets.template get_access<sycl::access::mode::read>(h);
-                                  auto e_acc_0 = b.edge_to.template get_access<sycl::access::mode::read>(h);
-                                  auto e_acc_1 = b.edge_from.template get_access<sycl::access::mode::read>(h);
+                                  auto e_acc_from = b.edge_from.template get_access<sycl::access::mode::read>(h);
+                                  auto e_acc_to = b.edge_to.template get_access<sycl::access::mode::read>(h);
                                   auto N_connections_acc = b.N_connections.template get_access<sycl::access::mode::read>(h);
                                   auto event_to_acc_glob = construct_validate_accessor<uint32_t, 3, sycl::access::mode::write>(b.events_to, h, sycl::range<3>(1, N_sims*p.N_graphs, b.N_connections_max), sycl::range<3>(t_alloc, 0, 0));
                                   auto event_from_acc_glob = construct_validate_accessor<uint32_t, 3, sycl::access::mode::write>(b.events_from, h, sycl::range<3>(1, N_sims*p.N_graphs, b.N_connections_max), sycl::range<3>(t_alloc, 0, 0));
+                                //   sycl::stream out(1024, 256, h);
                                   h.parallel_for(sycl::nd_range<1>(p.compute_range, p.wg_range), [=](sycl::nd_item<1> it)
                                                  {
             auto sim_id = it.get_global_id();
@@ -130,8 +131,8 @@ std::vector<sycl::event> infect(sycl::queue &q,
             for (uint32_t edge_idx = edge_start_idx; edge_idx < edge_end_idx; edge_idx++)
             {
                 auto connection_id = ecm_acc[edge_idx];
-                auto v_from_id = e_acc_0[edge_idx];
-                auto v_to_id = e_acc_1[edge_idx];
+                auto v_from_id = e_acc_from[edge_idx];
+                auto v_to_id = e_acc_to[edge_idx];
                 const auto v_prev_from = v_glob_next[0][sim_id][v_from_id];
                 const auto v_prev_to = v_glob_next[0][sim_id][v_to_id];
 
@@ -144,9 +145,12 @@ std::vector<sycl::event> infect(sycl::queue &q,
                     if (bernoulli_I(rng))
                     {
                         N_inf++;
-
+                        // if (sim_id == 0)
+                        // {
+                        //     out << "Infection on edge " << edge_idx << " to " << v_to_id << " from " << v_from_id << ", Connection " <<  connection_id << "\n";
+                        // }
                         v_glob_next[0][sim_id][v_from_id] = SIR_INDIVIDUAL_I;
-                        event_to_acc_glob[0][sim_id][connection_id]++;
+                        event_from_acc_glob[0][sim_id][connection_id]++;
                     }
                 }
                 else if ((v_prev_from == SIR_INDIVIDUAL_I) && (v_prev_to == SIR_INDIVIDUAL_S))
@@ -157,10 +161,13 @@ std::vector<sycl::event> infect(sycl::queue &q,
                     bernoulli_I.p = p_I;
                     if (bernoulli_I(rng))
                     {
-
+                        // if (sim_id == 0)
+                        // {
+                        //     out << "Infection on edge " << edge_idx << " from " << v_from_id << " to " << v_to_id << ", Connection " <<  connection_id << "\n";
+                        // }
                         N_inf++;
                         v_glob_next[0][sim_id][v_to_id] = SIR_INDIVIDUAL_I;
-                        event_from_acc_glob[0][sim_id][connection_id]++;
+                        event_to_acc_glob[0][sim_id][connection_id]++;
                     }
                 }
             } });

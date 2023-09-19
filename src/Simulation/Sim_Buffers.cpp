@@ -175,6 +175,60 @@ void validate_maps(const std::vector<std::vector<uint32_t>> &ecms, const std::ve
     }
 }
 
+void validate_ecm(const auto& edge_list, const auto& ecm, const auto& ccm, const auto& vcm)
+{
+    auto is_edge_in_connection = [&](auto edge, auto ecm_id)
+    {
+        for(int i = 0; i < ccm.size(); i++)
+        {
+            if (((vcm[edge.first] == ccm[i].first) && (vcm[edge.second] == ccm[i].second)) || ((vcm[edge.first] == ccm[i].second) && (vcm[edge.second] == ccm[i].first)))
+            {
+                return ecm_id == i;
+            }
+        }
+        return false;
+    };
+    for(int i = 0; i < edge_list.size(); i++)
+    {
+        if_false_throw(is_edge_in_connection(edge_list[i], ecm[i]), "edge_list[" + std::to_string(i) + "] is not in the correct connection");
+    }
+}
+
+std::tuple<std::vector<uint32_t>, std::vector<std::pair<uint32_t, uint32_t>>> create_mappings(const std::vector<std::pair<uint32_t, uint32_t>>& edge_list, const std::vector<uint32_t>& vcm)
+{
+    std::vector<std::pair<uint32_t, uint32_t>> ccm;
+    auto undirected_equal = [](const std::pair<uint32_t, uint32_t> e0, const std::pair<uint32_t, uint32_t> e1)
+    {
+        return ((e0.first == e1.first) && (e0.second == e1.second)) || ((e0.first == e1.second) && (e0.second == e1.first));
+    };
+    auto rising_directed = [](const std::pair<uint32_t, uint32_t> e0)
+    {
+        return (e0.first < e0.second) ? e0 : std::make_pair(e0.second, e0.first);
+    };
+    std::vector<uint32_t> ecm(edge_list.size());
+    auto idx = 0;
+    for(int e_idx = 0; e_idx < edge_list.size(); e_idx++)
+    {
+        auto edge = edge_list[e_idx];
+        auto v1 = vcm[edge.first];
+        auto v2 = vcm[edge.second];
+        auto ccm_edge = std::make_pair(v1, v2);
+        auto it = std::find_if(ccm.begin(), ccm.end(), [&](auto e)
+                               { return undirected_equal(e, ccm_edge); });
+        if(it == ccm.end())
+        {
+            ccm.push_back(rising_directed(ccm_edge));
+            idx = ccm.size() - 1;
+        }
+        else
+        {
+            idx = std::distance(ccm.begin(), it);
+        }
+        ecm[e_idx] = idx;
+    }
+    return std::make_tuple(ecm, ccm);
+}
+
 
 Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, std::vector<float> p_Is_init)
 {
@@ -185,12 +239,18 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
         p.local_mem_size = device.get_info<sycl::info::device::local_mem_size>();
         p.global_mem_size = device.get_info<sycl::info::device::global_mem_size>();
     }
+
     std::vector<std::vector<uint32_t>> ecms(p.N_graphs);
-    std::transform(edge_list.begin(), edge_list.end(),vcms.begin(), ecms.begin(), [](const auto &e, const auto& vc)
-                   { return ecm_from_vcm(e, vc); });
+    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> ccms(p.N_graphs);
+    for(int i = 0; i < p.N_graphs; i++)
+    {
+        std::tie(ecms[i], ccms[i]) = create_mappings(edge_list[i], vcms[i]);
+    }
+
+
     std::vector<uint32_t> N_connections_vec(p.N_graphs);
-    std::transform(ecms.begin(), ecms.end(), N_connections_vec.begin(), [](auto &v)
-                   { return *std::max_element(v.begin(), v.end()) + 1; });
+    std::transform(ccms.begin(), ccms.end(), N_connections_vec.begin(), [](const auto &c)
+                   { return c.size(); });
 
     auto N_connections_max = std::max_element(N_connections_vec.begin(), N_connections_vec.end())[0];
     std::vector<uint32_t> N_communities(p.N_graphs);
@@ -199,11 +259,14 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     auto N_communities_max = std::max_element(N_communities.begin(), N_communities.end())[0];
     validate_buffer_init_sizes(p, edge_list, vcms, ecms, p_Is_init, N_connections_max);
     auto N_sims_tot = p.compute_range[0];
+
     auto ecm_init = join_vectors(ecms);
     // uint32_t N_connections = std::max_element(ecm_init.begin(), ecm_init.end())[0] + 1;
 
     uint32_t N_vertices = vcms[0].size();
     auto vcm_init = join_vectors(vcms);
+
+
     validate_maps(ecms, vcms, N_communities, N_connections_vec, edge_list);
     auto e_data = separate_flatten_edge_lists(edge_list);
     std::vector<uint32_t> edge_from_init = std::get<0>(e_data);
@@ -270,17 +333,16 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     alloc_events[12] = initialize_device_buffer<Static_RNG::default_rng, 1>(q, rng_init, rngs);
     alloc_events[13] = initialize_device_buffer<uint32_t, 1>(q, N_connections_vec, N_connections);
 
-    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> ccms(p.N_graphs);
-
-    for (int i = 0; i < p.N_graphs; i++)
-    {
-        ccms[i] = ccm_from_edgelist(edge_list[i], vcms[i]);
-    }
 
     std::vector<std::vector<uint32_t>> ccm_weights(p.N_graphs);
     for (int i = 0; i < ecms.size(); i++)
     {
         ccm_weights[i] = ccm_weights_from_ecm(ecms[i], N_connections_vec[i]);
+    }
+
+    for(int i = 0; i < ecms.size(); i++)
+    {
+        validate_ecm(edge_list[i], ecms[i], ccms[i], vcms[i]);
     }
 
     auto byte_size = rngs.byte_size() + trajectory.byte_size() + events_from.byte_size() + events_to.byte_size() + p_Is.byte_size() + edge_from.byte_size() + edge_to.byte_size() + ecm.byte_size() + vcm.byte_size() + community_state.byte_size();

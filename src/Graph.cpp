@@ -246,31 +246,48 @@ std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities, 
     return ccm;
 }
 
-std::vector<std::pair<uint32_t, uint32_t>> ccm_from_edgelist(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm, bool directed)
+std::vector<std::pair<uint32_t, uint32_t>> complete_graph(size_t N)
+{
+    auto make_iota = [](auto N)
+    {
+        std::vector<uint32_t> result(N);
+        std::iota(result.begin(), result.end(), 0);
+        return result;
+    };
+    std::vector<std::pair<uint32_t, uint32_t>> edge_list(N * (N - 1) / 2);
+    for (auto &&comb : iter::combinations_with_replacement(make_iota(N), 2))
+    {
+        edge_list.push_back(std::make_pair(comb[0], comb[1]));
+    }
+    return edge_list;
+}
+
+std::vector<std::pair<uint32_t, uint32_t>> ccm_from_edgelist(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm)
 {
     auto N_communities = *std::max_element(vcm.begin(), vcm.end()) + 1;
     std::vector<uint32_t> community_idx(N_communities);
     std::iota(community_idx.begin(), community_idx.end(), 0);
     std::vector<std::pair<uint32_t, uint32_t>> ccm;
+
+    auto is_edge_in_list = [&](const auto &e_list, auto e_from, auto e_to)
+    {
+        for (auto &&e : e_list)
+        {
+            if ((e.first == e_from && e.second == e_to) || (e.first == e_to && e.second == e_from))
+                return true;
+        }
+        return false;
+    };
     auto edge_connects_communities = [&vcm](const auto &e, auto c_0, auto c_1)
     {
         return ((vcm[e.first] == c_0) && (vcm[e.second] == c_1)) || ((vcm[e.first] == c_1) && (vcm[e.second] == c_0));
     };
     for (auto &&comb : iter::combinations_with_replacement(community_idx, 2))
     {
-        // if there is an edge between the communities, add it to the ccm
-        if (std::find_if(edges.begin(), edges.end(), [&](const auto &edge)
-                         { return edge_connects_communities(edge, comb[0], comb[1]); }) != edges.end())
+        for (int i = 0; i < edges.size(); i++)
         {
-            if (directed)
-            {
+            if (((edge_connects_communities(edges[i], comb[0], comb[1]))) && !is_edge_in_list(ccm, comb[0], comb[1]))
                 ccm.push_back(std::make_pair(comb[0], comb[1]));
-                ccm.push_back(std::make_pair(comb[1], comb[0]));
-            }
-            else
-            {
-                ccm.push_back(std::make_pair(comb[0], comb[1]));
-            }
         }
     }
     return ccm;
@@ -308,10 +325,10 @@ std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_l
     return vcm;
 }
 
-std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm)
+std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &ccm)
 {
     std::vector<uint32_t> ecm(edges.size());
-    auto is_in_communities = [&vcm](const auto& edge, auto c_0, auto c_1)
+    auto is_in_communities = [&vcm](const auto &edge, auto c_0, auto c_1)
     {
         return ((vcm[edge.first] == c_0) && (vcm[edge.second] == c_1)) || ((vcm[edge.first] == c_1) && (vcm[edge.second] == c_0));
     };
@@ -319,8 +336,6 @@ std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_
     std::vector<uint32_t> community_idx(N_communities);
     std::iota(community_idx.begin(), community_idx.end(), 0);
     std::vector<std::pair<uint32_t, uint32_t>> connection_pairs;
-
-    auto ccm = ccm_from_edgelist(edges, vcm, false);
 
     std::transform(std::execution::par_unseq, edges.begin(), edges.end(), ecm.begin(), [&](const auto &edge)
                    {
@@ -330,8 +345,34 @@ std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_
                         {
                             return cc_idx;
                         }
-                    }});
+                    } });
     return ecm;
+}
+
+std::vector<std::pair<uint32_t, uint32_t>> ccm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm)
+{
+    // std::vector<std::pair<uint32_t, uint32_t>> ccm;
+    auto N_communities = *std::max_element(vcm.begin(), vcm.end()) + 1;
+    auto ccm = complete_ccm(N_communities, false);
+
+    auto is_in_ccm = [](auto c_0, auto c_1, auto ccm)
+    {
+        return std::find_if(ccm.begin(), ccm.end(), [&](const auto &cc)
+                            { return ((cc.first == c_0) && (cc.second == c_1)) || ((cc.first == c_1) && (cc.second == c_0)); }) != ccm.end();
+    };
+    std::for_each(edges.begin(), edges.end(), [&](const auto &edge)
+                  {
+        auto c_0 = vcm[edge.first];
+        auto c_1 = vcm[edge.second];
+        if (is_in_ccm(c_0, c_1, ccm))
+        {
+            // remove
+            auto idx = std::find_if(ccm.begin(), ccm.end(), [&](const auto &cc)
+                                    { return ((cc.first == c_0) && (cc.second == c_1)) || ((cc.first == c_1) && (cc.second == c_0)); });
+            if (idx == ccm.end())
+                ccm.erase(idx);
+        } });
+    return ccm;
 }
 
 std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm, uint32_t N_connections)
