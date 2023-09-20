@@ -14,6 +14,7 @@ Sim_Buffers::Sim_Buffers(cl::sycl::buffer<Static_RNG::default_rng> &rngs,
                          cl::sycl::buffer<uint32_t> &edge_to,
                          cl::sycl::buffer<uint32_t> &ecm,
                          cl::sycl::buffer<uint32_t, 2> &vcm,
+                         const std::vector<uint32_t>& vcm_vec,
                          cl::sycl::buffer<uint32_t> &edge_counts,
                          cl::sycl::buffer<uint32_t> &edge_offsets,
                          cl::sycl::buffer<uint32_t> &N_connections,
@@ -29,6 +30,7 @@ Sim_Buffers::Sim_Buffers(cl::sycl::buffer<Static_RNG::default_rng> &rngs,
                                                                        edge_to(std::move(edge_to)),
                                                                        ecm(std::move(ecm)),
                                                                        vcm(std::move(vcm)),
+                                                                       vcm_vec(vcm_vec),
                                                                        edge_counts(std::move(edge_counts)),
                                                                        edge_offsets(std::move(edge_offsets)),
                                                                        N_connections(N_connections),
@@ -89,6 +91,24 @@ std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<uint32_t>> 
     return std::make_tuple(edge_from_init, edge_to_init, edge_counts_init);
 }
 
+void align_edges_with_ccm(std::vector<std::pair<uint32_t, uint32_t>>& edges, const std::vector<std::pair<uint32_t, uint32_t>>& ccm, const std::vector<uint32_t>& vcm)
+{
+    auto unaligned_equal = [](const std::pair<uint32_t, uint32_t> e0, const std::pair<uint32_t, uint32_t> e1)
+    {
+        return ((e0.first == e1.first) && (e0.second == e1.second)) || ((e0.first == e1.second) && (e0.second == e1.first));
+    };
+    for(auto& e: edges)
+    {
+        for(auto& c: ccm)
+        {
+            if(unaligned_equal(std::make_pair(vcm[e.first], vcm[e.second]), c))
+            {
+                e = std::make_pair(e.second, e.first);
+            }
+        }
+    }
+}
+
 void validate_buffer_init_sizes(Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>> &ecms, std::vector<float> p_Is_init, uint32_t N_connections)
 {
     if (ecms.size() != p.N_graphs)
@@ -116,8 +136,6 @@ void validate_buffer_init_sizes(Sim_Param p, const std::vector<std::vector<std::
     //     throw std::runtime_error("vcm.size() != N_communities_max*p.N_pop");
     // }
 }
-
-
 
 void Sim_Buffers::validate_sizes(const Sim_Param &p) const
 {
@@ -153,7 +171,7 @@ uint32_t count_unique(const std::vector<T> &v)
     return n;
 }
 
-void validate_maps(const std::vector<std::vector<uint32_t>> &ecms, const std::vector<std::vector<uint32_t>> &vcms, const auto &N_communities, const auto &N_connections, const auto& edge_list)
+void validate_maps(const std::vector<std::vector<uint32_t>> &ecms, const std::vector<std::vector<uint32_t>> &vcms, const auto &N_communities, const auto &N_connections, const auto &edge_list)
 {
     for (auto g_idx = 0; g_idx < ecms.size(); g_idx++)
     {
@@ -168,11 +186,11 @@ void validate_maps(const std::vector<std::vector<uint32_t>> &ecms, const std::ve
     }
 }
 
-void validate_ecm(const auto& edge_list, const auto& ecm, const auto& ccm, const auto& vcm)
+void validate_ecm(const auto &edge_list, const auto &ecm, const auto &ccm, const auto &vcm)
 {
     auto is_edge_in_connection = [&](auto edge, auto ecm_id)
     {
-        for(int i = 0; i < ccm.size(); i++)
+        for (int i = 0; i < ccm.size(); i++)
         {
             if (((vcm[edge.first] == ccm[i].first) && (vcm[edge.second] == ccm[i].second)) || ((vcm[edge.first] == ccm[i].second) && (vcm[edge.second] == ccm[i].first)))
             {
@@ -181,15 +199,14 @@ void validate_ecm(const auto& edge_list, const auto& ecm, const auto& ccm, const
         }
         return false;
     };
-    for(int i = 0; i < edge_list.size(); i++)
+    for (int i = 0; i < edge_list.size(); i++)
     {
         if_false_throw(is_edge_in_connection(edge_list[i], ecm[i]), "edge_list[" + std::to_string(i) + "] is not in the correct connection");
     }
 }
 
-std::tuple<std::vector<uint32_t>, std::vector<std::pair<uint32_t, uint32_t>>> create_mappings(const std::vector<std::pair<uint32_t, uint32_t>>& edge_list, const std::vector<uint32_t>& vcm)
+std::tuple<std::vector<uint32_t>, std::vector<std::pair<uint32_t, uint32_t>>> create_mappings(const std::vector<std::pair<uint32_t, uint32_t>> &edge_list, const std::vector<uint32_t> &vcm)
 {
-    std::vector<std::pair<uint32_t, uint32_t>> ccm;
     auto undirected_equal = [](const std::pair<uint32_t, uint32_t> e0, const std::pair<uint32_t, uint32_t> e1)
     {
         return ((e0.first == e1.first) && (e0.second == e1.second)) || ((e0.first == e1.second) && (e0.second == e1.first));
@@ -198,31 +215,19 @@ std::tuple<std::vector<uint32_t>, std::vector<std::pair<uint32_t, uint32_t>>> cr
     {
         return (e0.first < e0.second) ? e0 : std::make_pair(e0.second, e0.first);
     };
-    std::vector<uint32_t> ecm(edge_list.size());
     auto idx = 0;
-    for(int e_idx = 0; e_idx < edge_list.size(); e_idx++)
-    {
-        auto edge = edge_list[e_idx];
-        auto v1 = vcm[edge.first];
-        auto v2 = vcm[edge.second];
-        auto ccm_edge = std::make_pair(v1, v2);
-        auto it = std::find_if(ccm.begin(), ccm.end(), [&](auto e)
-                               { return undirected_equal(e, ccm_edge); });
-        if(it == ccm.end())
-        {
-            ccm.push_back(rising_directed(ccm_edge));
-            idx = ccm.size() - 1;
-        }
-        else
-        {
-            idx = std::distance(ccm.begin(), it);
-        }
-        ecm[e_idx] = idx;
-    }
+    auto N_communities = std::max_element(vcm.begin(), vcm.end())[0] + 1;
+    auto ccm = complete_ccm(N_communities, false);
+    std::vector<uint32_t> ecm(edge_list.size());
+    std::transform(edge_list.begin(), edge_list.end(), ecm.begin(), [&](const auto &e)
+                   { return std::distance(ccm.begin(), std::find_if(ccm.begin(), ccm.end(), [&](const auto &c)
+                                                                    { auto vcm_e = std::make_pair(vcm[e.first], vcm[e.second]);
+                                                                        return undirected_equal(c, vcm_e); })); });
+
     return std::make_tuple(ecm, ccm);
 }
 
-std::vector<Edge_t> combine_ccm(const std::vector<std::pair<uint32_t, uint32_t>>& ccm_indices, const std::vector<uint32_t>& ccm_weights)
+std::vector<Edge_t> combine_ccm(const std::vector<std::pair<uint32_t, uint32_t>> &ccm_indices, const std::vector<uint32_t> &ccm_weights)
 {
     auto make_edges = [](const auto pair, const auto weight)
     {
@@ -234,7 +239,7 @@ std::vector<Edge_t> combine_ccm(const std::vector<std::pair<uint32_t, uint32_t>>
     return result;
 }
 
-auto combine_ccms(const auto& ccm_indices, const auto& ccm_weights)
+auto combine_ccms(const auto &ccm_indices, const auto &ccm_weights)
 {
     std::vector<std::vector<Edge_t>> result;
     result.reserve(ccm_indices.size());
@@ -242,25 +247,24 @@ auto combine_ccms(const auto& ccm_indices, const auto& ccm_weights)
     return result;
 }
 
-Dataframe_t<Edge_t, 2> duplicate_ccm(const std::vector<Edge_t>& ccm, auto N)
+Dataframe_t<Edge_t, 2> duplicate_ccm(const std::vector<Edge_t> &ccm, auto N)
 {
     Dataframe_t<Edge_t, 2> result;
     result.data = std::vector<Dataframe_t<Edge_t, 1>>(N, ccm);
     return result;
 }
 
-Dataframe_t<Edge_t, 4> make_ccm_df(const auto& ccms, auto N_graphs, auto N_sims)
+Dataframe_t<Edge_t, 4> make_ccm_df(const auto &ccms, auto N_graphs, auto N_sims)
 {
     Dataframe_t<Edge_t, 4> df;
     df.data.reserve(N_graphs);
-    for(int i = 0; i < N_graphs; i++)
+    for (int i = 0; i < N_graphs; i++)
     {
         auto df_graph = Dataframe_t<Edge_t, 3>(std::vector<Dataframe_t<Edge_t, 2>>(N_sims, duplicate_ccm(ccms[i], N_sims)));
         df.data.push_back(df_graph);
     }
     return df;
 }
-
 
 Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, std::vector<float> p_Is_init)
 {
@@ -274,12 +278,10 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
 
     std::vector<std::vector<uint32_t>> ecms(p.N_graphs);
     std::vector<std::vector<std::pair<uint32_t, uint32_t>>> ccm_indices(p.N_graphs);
-    for(int i = 0; i < p.N_graphs; i++)
+    for (int i = 0; i < p.N_graphs; i++)
     {
         std::tie(ecms[i], ccm_indices[i]) = create_mappings(edge_list[i], vcms[i]);
     }
-
-
     std::vector<uint32_t> N_connections_vec(p.N_graphs);
     std::transform(ccm_indices.begin(), ccm_indices.end(), N_connections_vec.begin(), [](const auto &c)
                    { return c.size(); });
@@ -297,7 +299,6 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
 
     uint32_t N_vertices = vcms[0].size();
     auto vcm_init = join_vectors(vcms);
-
 
     validate_maps(ecms, vcms, N_communities, N_connections_vec, edge_list);
     auto e_data = separate_flatten_edge_lists(edge_list);
@@ -365,7 +366,6 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     alloc_events[12] = initialize_device_buffer<Static_RNG::default_rng, 1>(q, rng_init, rngs);
     alloc_events[13] = initialize_device_buffer<uint32_t, 1>(q, N_connections_vec, N_connections);
 
-
     std::vector<std::vector<uint32_t>> ccm_weights(p.N_graphs);
     for (int i = 0; i < ecms.size(); i++)
     {
@@ -375,7 +375,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     auto ccms = combine_ccms(ccm_indices, ccm_weights);
     auto ccm_df = make_ccm_df(ccms, p.N_graphs, N_sims_tot);
 
-    for(int i = 0; i < ecms.size(); i++)
+    for (int i = 0; i < ecms.size(); i++)
     {
         validate_ecm(edge_list[i], ecms[i], ccm_indices[i], vcms[i]);
     }
@@ -396,6 +396,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
                        edge_to,
                        ecm,
                        vcm,
+                       vcm_init,
                        edge_counts,
                        edge_offsets,
                        N_connections,

@@ -24,6 +24,7 @@ struct Sim_Buffers
     const std::vector<uint32_t> N_communities_vec;
     const uint32_t N_connections_max;
     const uint32_t N_communities_max;
+    const std::vector<uint32_t> vcm_vec;
     Sim_Buffers(cl::sycl::buffer<Static_RNG::default_rng> &rngs,
                 cl::sycl::buffer<SIR_State, 3> &vertex_state,
                 cl::sycl::buffer<uint32_t, 3> &events_from,
@@ -33,6 +34,7 @@ struct Sim_Buffers
                 cl::sycl::buffer<uint32_t> &edge_to,
                 cl::sycl::buffer<uint32_t> &ecm,
                 cl::sycl::buffer<uint32_t, 2> &vcm,
+                const std::vector<uint32_t>& vcm_vec,
                 cl::sycl::buffer<uint32_t> &edge_counts,
                 cl::sycl::buffer<uint32_t> & edge_offsets,
                 cl::sycl::buffer<uint32_t> &N_connections,
