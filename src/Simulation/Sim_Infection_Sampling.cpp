@@ -3,6 +3,7 @@
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
 #include <Sycl_Graph/Utils/Dataframe.hpp>
+#include <Sycl_Graph/Utils/Validation.hpp>
 #include <algorithm>
 #include <execution>
 #include <iostream>
@@ -39,61 +40,52 @@ std::vector<uint32_t> constrained_weight_sample(size_t N_samples, const std::vec
     return sample_counts;
 }
 
-std::vector<std::vector<int>> get_delta_Is(const std::vector<std::vector<State_t>> &community_state)
+
+Dataframe_t<int, 2> get_delta_Is(const Dataframe_t<State_t, 2> &community_state)
 {
-    uint32_t N_communities = community_state[0].size();
-    std::vector<std::vector<int>> I_trajectories(community_state.size(), std::vector<int>(N_communities));
-    std::vector<std::vector<int>> R_trajectories(community_state.size(), std::vector<int>(N_communities));
+    auto [Nt, N_communities] = community_state.get_ranges();
 
-    for (int i = 0; i < community_state.size(); i++)
+    auto I_trajectories = community_state.apply([](const State_t& state)
     {
-        for (int j = 0; j < N_communities; j++)
+        return state[1];
+    });
+    auto R_trajectories = community_state.apply([](const State_t& state)
+    {
+        return state[2];
+    });
+
+    Dataframe_t<int, 2> delta_I(Nt-1, N_communities);
+    Dataframe_t<int, 2> delta_R(Nt-1, N_communities);
+    for(int t = 0; t < Nt-1; t++)
+    {
+        for(int col_idx = 0; col_idx < N_communities; col_idx++)
         {
-            I_trajectories[i][j] = community_state[i][j][1];
-            R_trajectories[i][j] = community_state[i][j][2];
+            delta_R[t][col_idx] = R_trajectories[t+1][col_idx] - R_trajectories[t][col_idx];
+            delta_I[t][col_idx] = I_trajectories[t+1][col_idx] - I_trajectories[t][col_idx] + delta_R[t][col_idx];
         }
     }
 
-    std::vector<std::vector<int>> delta_R = diff(R_trajectories);
-    std::vector<std::vector<int>> delta_I = diff(I_trajectories);
-
-    for (int i = 0; i < delta_I.size(); i++)
+    for(int t = 0; t < Nt-1; t++)
     {
-        for (int j = 0; j < delta_I[i].size(); j++)
-        {
-            delta_I[i][j] += delta_R[i][j];
-        }
+    validate_elements_throw(delta_I[t], [](auto x){return x < 0;}, "Negative delta_I");
+    validate_elements_throw(delta_R[t], [](auto x){return x < 0;}, "Negative delta_R");
     }
-
-    for (int i = 0; i < delta_I.size(); i++)
-    {
-        assert(std::all_of(delta_I[i].begin(), delta_I[i].end(), [](auto x)
-                           { return x >= 0; }) &&
-               "Negative delta_I");
-    }
-
-    for (int i = 0; i < delta_R.size(); i++)
-    {
-        assert(std::all_of(delta_R[i].begin(), delta_R[i].end(), [](auto x)
-                           { return x >= 0; }) &&
-               "Negative delta_R");
-    }
-
     return delta_I;
 }
 
-auto get_related_connections(size_t c_idx, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights)
+std::tuple<std::vector<uint32_t>,std::vector<uint32_t>> get_related_connections(size_t c_idx, const std::vector<Edge_t> &ccm)
 {
+    auto ccm_weights = get_weights(ccm);
     std::vector<uint32_t> connection_indices;
     std::vector<uint32_t> connection_weights;
     for (int i = 0; i < ccm.size(); i++)
     {
-        if (ccm[i].first == c_idx)
+        if (ccm[i].from == c_idx)
         {
             connection_indices.push_back(2 * i);
             connection_weights.push_back(ccm_weights[i]);
         }
-        if (ccm[i].second == c_idx)
+        if (ccm[i].to == c_idx)
         {
             connection_indices.push_back(2 * i + 1);
             connection_weights.push_back(ccm_weights[i]);
@@ -101,9 +93,9 @@ auto get_related_connections(size_t c_idx, const std::vector<std::pair<uint32_t,
     }
     return std::make_tuple(connection_indices, connection_weights);
 }
-auto get_related_events(size_t c_idx, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, const std::vector<uint32_t> &events)
+std::vector<uint32_t> get_related_events(size_t c_idx, const std::vector<Edge_t> &ccm, const std::vector<uint32_t> &events)
 {
-    auto [r_con, rw] = get_related_connections(c_idx, ccm, ccm_weights);
+    auto [r_con, rw] = get_related_connections(c_idx, ccm);
     std::vector<uint32_t> r_con_events(r_con.size(), 0);
     for (int i = 0; i < r_con_events.size(); i++)
     {
@@ -111,7 +103,7 @@ auto get_related_events(size_t c_idx, const std::vector<std::pair<uint32_t, uint
     }
     return r_con_events;
 }
-auto get_community_connections(size_t N_communities, const auto &ccm, const auto &ccm_weights)
+auto get_community_connections(size_t N_communities, const auto &ccm)
 {
     std::vector<uint32_t> community_indices(N_communities);
     std::iota(community_indices.begin(), community_indices.end(), 0);
@@ -120,7 +112,7 @@ auto get_community_connections(size_t N_communities, const auto &ccm, const auto
 
     for (int i = 0; i < community_indices.size(); i++)
     {
-        auto [rc, rw] = get_related_connections(community_indices[i], ccm, ccm_weights);
+        auto [rc, rw] = get_related_connections(community_indices[i], ccm);
         indices[i] = rc;
         weights[i] = rw;
     }
@@ -149,12 +141,6 @@ void verbose_community_infection_debug(auto c_idx, const auto &related_connectio
     std::cout << "\n";
 }
 
-auto make_iota(auto N)
-{
-    std::vector<uint32_t> result(N);
-    std::iota(result.begin(), result.end(), 0);
-    return result;
-}
 
 std::vector<uint32_t> get_related_connection_events(const auto &related_connections, const std::vector<uint32_t> &events)
 {
@@ -181,7 +167,7 @@ std::vector<uint32_t> sample_community(const auto &related_connections, const au
     return result;
 }
 
-std::vector<uint32_t> sample_timestep(const auto &events, const auto &delta_I, const auto &ccm, const auto &ccm_weights)
+std::vector<uint32_t> sample_timestep(const std::vector<uint32_t> &events, const std::vector<int> &delta_I, const std::vector<Edge_t> &ccm)
 {
     auto N_communities = delta_I.size();
     auto N_connections = events.size() / 2;
@@ -202,7 +188,7 @@ std::vector<uint32_t> sample_timestep(const auto &events, const auto &delta_I, c
     auto community_idx = make_iota(N_communities);
     std::transform(std::execution::par_unseq, community_idx.begin(), community_idx.end(), result.begin(), [&](auto c_idx)
                    {
-                    auto [r_con, r_weight] = get_related_connections(c_idx, ccm, ccm_weights);
+                    auto [r_con, r_weight] = get_related_connections(c_idx, ccm);
                     auto dI = delta_I[c_idx];
                     return sample_community(r_con, r_weight, events, dI); });
     auto merged_result = merge_sample_result(result);
@@ -211,127 +197,32 @@ std::vector<uint32_t> sample_timestep(const auto &events, const auto &delta_I, c
     assert(merged_infs == true_infs && "Sampled infections do not match true infections");
     return merged_result;
 }
-
-std::vector<std::vector<uint32_t>> sample_infections(const Dataframe_t<State_t, 2> &community_state, const Dataframe_t<uint32_t, 2> &events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_communities, uint32_t seed, uint32_t max_infection_samples)
-{
-
-    auto N_connections = ccm.size();
-    auto delta_Is = get_delta_Is(community_state);
-    auto Nt = delta_Is.size();
-    std::vector<std::vector<uint32_t>>
-        sampled_infections(Nt, std::vector<uint32_t>(N_connections * 2, 0));
-    auto t_vec = make_iota(Nt);
-    std::transform(std::execution::par_unseq, t_vec.begin(), t_vec.end(), sampled_infections.begin(), [events, delta_Is, ccm, ccm_weights](auto t)
-                   { return sample_timestep(events[t], delta_Is[t], ccm, ccm_weights); });
-
-    return sampled_infections;
-}
-
-Dataframe_t<uint32_t, 3> sample_infections(const Dataframe_t<State_t, 3> &&community_state, const Dataframe_t<uint32_t, 3> &&from_events, const Dataframe_t<uint32_t, 3> &&to_events, const std::vector<std::pair<uint32_t, uint32_t>> &ccm, const std::vector<uint32_t> &ccm_weights, uint32_t N_communities, uint32_t seed, uint32_t max_infection_samples)
-{
-    auto N_connections = ccm.size();
-    auto N_sims = community_state.N_sims;
-    auto Nt = community_state.Nt;
-    Dataframe_t<uint32_t, 3> sampled_infections(N_sims, Nt, N_connections);
-    for (int i = 0; i < N_sims; i++)
-    {
-        auto events = zip_merge(from_events[i], to_events[i]);
-        sampled_infections[i] = sample_infections(community_state[i], events, ccm, ccm_weights, N_communities, seed, max_infection_samples);
-    }
-    return sampled_infections;
-}
-
-void validate_infection_graphseries(const Dataframe_t<State_t, 4> &community_state, const Dataframe_t<uint32_t, 4> &from_events, const Dataframe_t<uint32_t, 4> &to_events, const auto &ccms, const auto &ccm_weights)
-{
-    auto Ng = community_state.Ng;
-    auto N_sims = community_state.N_sims;
-    auto Nt = community_state.Nt;
-    for (int g_idx = 0; g_idx < Ng; g_idx++)
-    {
-        auto N_communities = community_state[g_idx].N_cols;
-        auto N_connections = ccms[g_idx].size();
-        const auto &ccm = ccms[g_idx];
-        const auto &ccm_w = ccm_weights[g_idx];
-        for (int sim_idx = 0; sim_idx < N_sims; sim_idx++)
-        {
-            auto events = zip_merge(from_events[g_idx][sim_idx], to_events[g_idx][sim_idx]);
-            auto dIs = get_delta_Is(community_state[g_idx][sim_idx]);
-            for (int t = 0; t < Nt - 1; t++)
-            {
-                for (int c_idx = 0; c_idx < N_communities; c_idx++)
-                {
-                    auto r_events = get_related_events(c_idx, ccm, ccm_w, events[t]);
-                    if (std::accumulate(r_events.begin(), r_events.end(), 0) < dIs[t][c_idx])
-                    {
-                        throw std::runtime_error("Error: too few events related to community in timeseries, (g_idx, sim_idx, t, c_idx): (" + std::to_string(g_idx) + "," + std::to_string(sim_idx) + "," + std::to_string(t) + "," + std::to_string(c_idx) + ")");
-                    }
-                }
-            }
-        }
-    }
-}
-
-void event_inf_summary(const Dataframe_t<State_t, 4> &community_state, const Dataframe_t<uint32_t, 4> &events, const auto &ccms, const auto &ccm_weights)
-{
-    auto Ng = community_state.Ng;
-    auto N_sims = community_state.N_sims;
-    auto Nt = community_state.Nt;
-    for (int g_idx = 0; g_idx < Ng; g_idx++)
-    {
-        std::cout << "Graph " << g_idx << "\n";
-        auto N_communities = community_state[g_idx].N_cols;
-        auto N_connections = ccms[g_idx].size();
-        const auto &ccm = ccms[g_idx];
-        const auto &ccm_w = ccm_weights[g_idx];
-        for (int sim_idx = 0; sim_idx < N_sims; sim_idx++)
-        {
-            std::cout << "Simulation " << sim_idx << "\n";
-            auto dIs = get_delta_Is(community_state[g_idx][sim_idx]);
-            for (int t = 0; t < Nt - 1; t++)
-            {
-                std::cout << "Timestep " << t << "\n";
-                for (int c_idx = 0; c_idx < N_communities; c_idx++)
-                {
-                    auto [r_idx, r_w] = get_related_connections(c_idx, ccm, ccm_w);
-                    auto r_events = get_related_events(c_idx, ccm, ccm_w, events[g_idx][sim_idx][t]);
-                    std::cout << "Community " << c_idx << "\n";
-                    std::cout << "Delta I: " << dIs[t][c_idx] << "\n";
-                    std::cout << "Related events: ";
-                    for (auto &&e : r_events)
-                    {
-                        std::cout << e << ", ";
-                    }
-                    std::cout << "Related idx: ";
-                    for (auto &&e : r_idx)
-                    {
-                        std::cout << e << ", ";
-                    }
-
-                    std::cout << "\n";
-                    if (std::accumulate(r_events.begin(), r_events.end(), 0) < dIs[t][c_idx])
-                    {
-                        throw std::runtime_error("Error: too few events related to community in timeseries, (g_idx, sim_idx, t, c_idx): (" + std::to_string(g_idx) + "," + std::to_string(sim_idx) + "," + std::to_string(t) + "," + std::to_string(c_idx) + ")");
-                    }
-                }
-            }
-        }
-    }
-}
-
-Dataframe_t<uint32_t, 4> sample_infections(const Dataframe_t<State_t, 4>& community_state, const Dataframe_t<uint32_t, 4>& events, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &ccm, const std::vector<std::vector<uint32_t>> &ccm_weights, uint32_t seed, uint32_t max_infection_samples)
-{
-    auto N_graphs = community_state.Ng;
-    auto N_sims = community_state.N_sims;
-    auto Nt = community_state.Nt;
-    event_inf_summary(community_state, from_events, to_events, ccm, ccm_weights);
-    // validate_infection_graphseries(community_state, from_events, to_events, ccm, ccm_weights);
-    Dataframe_t<uint32_t, 4> sampled_infections(N_graphs, N_sims, Nt, ccm.size() * 2);
-    for (int i = 0; i < N_graphs; i++)
-    {
-        sampled_infections[i] = sample_infections(std::forward<const Dataframe_t<State_t, 3>>(community_state[i]),
-                                                  std::forward<const Dataframe_t<uint32_t, 3>>(from_events[i]),
-                                                  std::forward<const Dataframe_t<uint32_t, 3>>(to_events[i]),
-                                                  ccm[i], ccm_weights[i], N_communities[i], seed, max_infection_samples);
-    }
-    return sampled_infections;
-}
+// void validate_infection_graphseries(const Dataframe_t<State_t, 4> &community_state, const Dataframe_t<uint32_t, 4> &from_events, const Dataframe_t<uint32_t, 4> &to_events, const auto &ccms, const auto &ccm_weights)
+// {
+//     auto Ng = community_state.Ng;
+//     auto N_sims = community_state.N_sims;
+//     auto Nt = community_state.Nt;
+//     for (int g_idx = 0; g_idx < Ng; g_idx++)
+//     {
+//         auto N_communities = community_state[g_idx].N_cols;
+//         auto N_connections = ccms[g_idx].size();
+//         const auto &ccm = ccms[g_idx];
+//         const auto &ccm_w = ccm_weights[g_idx];
+//         for (int sim_idx = 0; sim_idx < N_sims; sim_idx++)
+//         {
+//             auto events = zip_merge(from_events[g_idx][sim_idx], to_events[g_idx][sim_idx]);
+//             auto dIs = get_delta_Is(community_state[g_idx][sim_idx]);
+//             for (int t = 0; t < Nt - 1; t++)
+//             {
+//                 for (int c_idx = 0; c_idx < N_communities; c_idx++)
+//                 {
+//                     auto r_events = get_related_events(c_idx, ccm, ccm_w, events[t]);
+//                     if (std::accumulate(r_events.begin(), r_events.end(), 0) < dIs[t][c_idx])
+//                     {
+//                         throw std::runtime_error("Error: too few events related to community in timeseries, (g_idx, sim_idx, t, c_idx): (" + std::to_string(g_idx) + "," + std::to_string(sim_idx) + "," + std::to_string(t) + "," + std::to_string(c_idx) + ")");
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }

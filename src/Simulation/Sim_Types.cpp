@@ -13,6 +13,34 @@ Sim_Data::Sim_Data(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_
 // {
 
 // }
+std::vector<uint32_t> get_weights(const std::vector<Edge_t>& edges)
+{
+    std::vector<uint32_t> result(edges.size());
+    std::transform(edges.begin(), edges.end(), result.begin(), [](auto edge)
+    {
+        return edge.weight;
+    });
+    return result;
+}
+std::vector<uint32_t> get_from(const std::vector<Edge_t>& edges)
+{
+    std::vector<uint32_t> result(edges.size());
+    std::transform(edges.begin(), edges.end(), result.begin(), [](auto edge)
+    {
+        return edge.from;
+    });
+    return result;
+}
+std::vector<uint32_t> get_to(const std::vector<Edge_t>& edges)
+{
+    std::vector<uint32_t> result(edges.size());
+    std::transform(edges.begin(), edges.end(), result.begin(), [](auto edge)
+    {
+        return edge.to;
+    });
+    return result;
+}
+
 
 std::size_t get_sim_data_byte_size(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections)
 {

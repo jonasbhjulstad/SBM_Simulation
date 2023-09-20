@@ -1,6 +1,5 @@
 add_custom_library(Sim_Types)
 add_custom_library(Sim_Buffer_Routines)
-add_custom_library(Sim_Write)
 
 target_link_libraries(Sim_Buffer_Routines PUBLIC Sim_Types)
 target_link_libraries(Sim_Buffer_Routines PRIVATE Vector_Remap nlohmann_json::nlohmann_json)
@@ -13,4 +12,4 @@ add_custom_library(Sim_Infection_Sampling)
 target_link_libraries(Sim_Infection_Sampling PRIVATE Buffer_Utils)
 add_custom_library(Sim_Routines)
 target_link_libraries(Sim_Routines PUBLIC Sim_Buffers)
-target_link_libraries(Sim_Routines PRIVATE Sim_Write Sim_Buffers Dynamics Sim_Infection_Sampling Sim_Buffer_Routines)
+target_link_libraries(Sim_Routines PRIVATE Sim_Buffers Dynamics Sim_Infection_Sampling Sim_Buffer_Routines)

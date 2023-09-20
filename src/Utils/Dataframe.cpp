@@ -151,7 +151,6 @@ struct Dataframe_t
                            { return d.all_of(f); });
     }
 
-
     Dataframe_t<T, N> operator+(const Dataframe_t<T, N> &df)
     {
         this->data.insert(data.begin(), df.data.begin(), df.data.end());
@@ -253,6 +252,33 @@ struct Dataframe_t
         }
     }
 
+    template <std::unsigned_integral uI_t>
+    void resize_dim(std::size_t dim, const std::vector<uI_t> sizes)
+    {
+        if_false_throw(dim < N, "Specified resize dimension is larger than dataframe dimension: " + std::to_string(dim) + " vs " + std::to_string(N));
+        if (dim == 1)
+        {
+            if_false_throw(sizes.size() != data.size(), "New sizes for dataframe does not match the dimension size of the dataframe");
+                std::for_each(sizes.begin(), sizes.end(), [&, n = 0](auto s) mutable
+                              {
+                data[n].resize(s);
+                n++; });
+        }
+        else
+        {
+            auto subsize = std::vector<uI_t>(sizes.begin() + 1, sizes.end());
+            if (subsize.size() == 1)
+            {
+                std::for_each(data.begin(), data.end(), [dim, subsize](auto &d)
+                          { d.resize_dim(dim - 1, subsize[0]); });
+            }
+            else
+            {
+                std::for_each(data.begin(), data.end(), [dim, subsize](auto &d)
+                          { d.resize_dim(dim - 1, subsize); });
+            }
+        }
+    }
 };
 
 template <typename First_t, typename ... Ts, std::size_t N>

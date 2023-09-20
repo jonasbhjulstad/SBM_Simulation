@@ -3,6 +3,7 @@
 #include <CL/sycl.hpp>
 #include <Static_RNG/distributions.hpp>
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
+#include <Sycl_Graph/Utils/Dataframe.hpp>
 struct Sim_Buffers
 {
     cl::sycl::buffer<Static_RNG::default_rng> rngs;
@@ -18,8 +19,7 @@ struct Sim_Buffers
     cl::sycl::buffer<uint32_t> edge_offsets;
     cl::sycl::buffer<State_t, 3> community_state;
     cl::sycl::buffer<uint32_t> N_connections;
-    const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> ccm;
-    const std::vector<std::vector<uint32_t>> ccm_weights;
+    const Dataframe_t<Edge_t, 4> ccm;
     const std::vector<uint32_t> N_connections_vec;
     const std::vector<uint32_t> N_communities_vec;
     const uint32_t N_connections_max;
@@ -37,8 +37,7 @@ struct Sim_Buffers
                 cl::sycl::buffer<uint32_t> & edge_offsets,
                 cl::sycl::buffer<uint32_t> &N_connections,
                 cl::sycl::buffer<State_t, 3> &community_state,
-                const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &ccm,
-                const std::vector<std::vector<uint32_t>> &ccm_weights,
+                const Dataframe_t<Edge_t, 4> &ccm,
                 const std::vector<uint32_t>& N_connections_vec,
                 const std::vector<uint32_t>& N_communities);
     void validate_sizes(const Sim_Param& p) const;

@@ -4,7 +4,23 @@
 #include <vector>
 #include <cstdint>
 #include <string>
-typedef std::array<uint32_t, 3> State_t;
+#include <fstream>
+
+struct State_t: public std::array<uint32_t, 3>
+{
+  friend std::ofstream& operator<<(std::ofstream& os, const State_t& s)
+  {
+    os << s[0] << "," << s[1] << "," << s[2];
+    return os;
+  }
+
+  //fstream
+  friend std::fstream& operator<<(std::fstream& os, const State_t& s)
+  {
+    os << s[0] << "," << s[1] << "," << s[2];
+    return os;
+  }
+};
 
 struct Inf_Sample_Data_t
 {

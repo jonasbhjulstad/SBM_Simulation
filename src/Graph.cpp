@@ -345,7 +345,10 @@ std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_
                         {
                             return cc_idx;
                         }
-                    } });
+
+                    }
+                    return std::numeric_limits<int>::max();
+                     });
     return ecm;
 }
 

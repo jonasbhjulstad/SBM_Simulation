@@ -150,7 +150,7 @@ std::vector<sycl::event> infect(sycl::queue &q,
                         //     out << "Infection on edge " << edge_idx << " to " << v_to_id << " from " << v_from_id << ", Connection " <<  connection_id << "\n";
                         // }
                         v_glob_next[0][sim_id][v_from_id] = SIR_INDIVIDUAL_I;
-                        event_from_acc_glob[0][sim_id][connection_id]++;
+                        event_to_acc_glob[0][sim_id][connection_id]++;
                     }
                 }
                 else if ((v_prev_from == SIR_INDIVIDUAL_I) && (v_prev_to == SIR_INDIVIDUAL_S))
@@ -167,7 +167,7 @@ std::vector<sycl::event> infect(sycl::queue &q,
                         // }
                         N_inf++;
                         v_glob_next[0][sim_id][v_to_id] = SIR_INDIVIDUAL_I;
-                        event_to_acc_glob[0][sim_id][connection_id]++;
+                        event_from_acc_glob[0][sim_id][connection_id]++;
                     }
                 }
             } });

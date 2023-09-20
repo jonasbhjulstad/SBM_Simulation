@@ -10,6 +10,8 @@ set(CMAKE_CXX_COMPILER_WORKS ON)
 # set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
 # set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE})
 # endif()
+#add wfatal-errors
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors")
 set(SYCL_HEADER_INCLUDE_DIR "/opt/intel/oneapi/compiler/latest/linux/include/sycl")
 if(WIN32)
     set(PYTHON_EXECUTABLE "C:\\Users\\jonas\\anaconda3\\envs\\Network_MPC\\python.exe")

@@ -4,6 +4,27 @@
 #include <Sycl_Graph/SIR_Types.hpp>
 #include <cstdint>
 #include <string>
+struct Edge_t
+{
+    uint32_t from;
+    uint32_t to;
+    uint32_t weight;
+    friend std::fstream &operator<<(std::fstream &os, const Edge_t &e)
+    {
+        os << e.from << "," << e.to << "," << e.weight;
+        return os;
+    }
+    friend std::ofstream &operator<<(std::ofstream &os, const Edge_t &e)
+    {
+        os << e.from << "," << e.to << "," << e.weight;
+        return os;
+    }
+};
+
+std::vector<uint32_t> get_weights(const std::vector<Edge_t>& edges);
+std::vector<uint32_t> get_from(const std::vector<Edge_t>& edges);
+std::vector<uint32_t> get_to(const std::vector<Edge_t>& edges);
+
 struct Sim_Data
 {
     Sim_Data(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections);
