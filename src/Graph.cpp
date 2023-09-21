@@ -293,21 +293,6 @@ std::vector<std::pair<uint32_t, uint32_t>> ccm_from_edgelist(const std::vector<s
     return ccm;
 }
 
-std::vector<uint32_t> create_ecm(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_lists)
-{
-    std::vector<uint32_t> list_sizes(edge_lists.size());
-    std::transform(edge_lists.begin(), edge_lists.end(), list_sizes.begin(), [](auto &edge_list)
-                   { return edge_list.size(); });
-    uint32_t N_edges = std::accumulate(list_sizes.begin(), list_sizes.end(), 0);
-    std::vector<uint32_t> ecm(N_edges);
-    uint32_t offset = 0;
-    for (int i = 0; i < edge_lists.size(); i++)
-    {
-        std::fill(ecm.begin() + offset, ecm.begin() + offset + list_sizes[i], i);
-        offset += list_sizes[i];
-    }
-    return ecm;
-}
 
 std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_lists)
 {
@@ -328,27 +313,16 @@ std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_l
 std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &ccm)
 {
     std::vector<uint32_t> ecm(edges.size());
-    auto is_in_communities = [&vcm](const auto &edge, auto c_0, auto c_1)
+    std::transform(edges.begin(), edges.end(), ecm.begin(), [&](const auto& edge)
     {
-        return ((vcm[edge.first] == c_0) && (vcm[edge.second] == c_1)) || ((vcm[edge.first] == c_1) && (vcm[edge.second] == c_0));
-    };
-    uint32_t N_communities = *std::max_element(vcm.begin(), vcm.end()) + 1;
-    std::vector<uint32_t> community_idx(N_communities);
-    std::iota(community_idx.begin(), community_idx.end(), 0);
-    std::vector<std::pair<uint32_t, uint32_t>> connection_pairs;
-
-    std::transform(std::execution::par_unseq, edges.begin(), edges.end(), ecm.begin(), [&](const auto &edge)
-                   {
-                    for(int cc_idx = 0; cc_idx < ccm.size(); cc_idx++)
-                    {
-                        if(is_in_communities(edge, ccm[cc_idx].first, ccm[cc_idx].second))
-                        {
-                            return cc_idx;
-                        }
-
-                    }
-                    return std::numeric_limits<int>::max();
-                     });
+        auto c_0 = vcm[edge.first];
+        auto c_1 = vcm[edge.second];
+        auto idx = std::find_if(ccm.begin(), ccm.end(), [&](const auto& cc)
+        {
+            return ((cc.first == c_0) && (cc.second == c_1)) || ((cc.first == c_1) && (cc.second == c_0));
+        });
+        return std::distance(ccm.begin(), idx);
+    });
     return ecm;
 }
 

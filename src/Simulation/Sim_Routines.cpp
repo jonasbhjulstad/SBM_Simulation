@@ -37,8 +37,7 @@ void write_allocated_steps(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b, s
     std::cout << "Accumulate community state: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
     auto state_df = read_3D_buffer(q, b.community_state, p.N_graphs, {acc_event});
-    auto event_to_df = read_3D_buffer(q, b.events_to, p.N_graphs, {acc_event})({0, 0, 0, 0}, {p.N_graphs, p.N_sims, N_steps, b.N_connections_max});
-    auto event_from_df = read_3D_buffer(q, b.events_from, p.N_graphs, {acc_event})({0, 0, 0}, {p.N_graphs, p.N_sims, N_steps, b.N_connections_max});
+    auto event_df = read_3D_buffer(q, b.events, p.N_graphs, {acc_event})({0, 0, 0, 0}, {p.N_graphs, p.N_sims, N_steps, b.N_connections_max*2});
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Read graphseries: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
@@ -48,17 +47,14 @@ void write_allocated_steps(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b, s
     for (int i = 0; i < p.N_graphs; i++)
     {
         state_df[i].resize_dim(2, b.N_communities_vec[i]);
-        event_to_df[i].resize_dim(2, b.N_connections_vec[i]);
-        event_from_df[i].resize_dim(2, b.N_connections_vec[i]);
     }
 
-    auto events = zip_merge(event_from_df, event_to_df, 3);
 
     write_dataframe(p.output_dir + "/Graph_", "community_trajectory_", state_df_write, true, {1,0});
-    write_dataframe(p.output_dir + "/Graph_", "connection_events_", events, true);
-    event_inf_summary(state_df, events, b.ccm);
+    write_dataframe(p.output_dir + "/Graph_", "connection_events_", event_df, true);
+    event_inf_summary(state_df, event_df, b.ccm);
 
-    auto inf_gs = sample_infections(state_df, events, b.ccm, p.seed);
+    auto inf_gs = sample_infections(state_df, event_df, b.ccm, p.seed);
     write_dataframe(p.output_dir + "/Graph_", "connection_infections_", inf_gs, true);
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Inf sample/ write graphseries: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
@@ -105,15 +101,14 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
         {
             q.wait();
             write_allocated_steps(q, p, b, p.Nt_alloc, events);
-            events[0] = clear_buffer<uint32_t, 3>(q, b.events_from, events);
-            events[0] = clear_buffer<uint32_t, 3>(q, b.events_to, events);
+            events[0] = clear_buffer<uint32_t, 3>(q, b.events, events);
             events[0] = move_buffer_row(q, b.vertex_state, p.Nt_alloc, events);
         }
         events = recover(q, p, b.vertex_state, b.rngs, t, events);
         events = infect(q, p, b, t, events);
     }
     write_allocated_steps(q, p, b, t % p.Nt_alloc, events);
-    write_dataframe(p.output_dir + "/Graph_", "ccm_", b.ccm, false);
+    write_dataframe(p.output_dir + "/ccm.csv",b.ccm, false);
 
     auto p_I_df = read_3D_buffer(q, b.p_Is, p.N_graphs, events);
     write_dataframe(p.output_dir + "/Graph_", "p_I_", p_I_df, true);

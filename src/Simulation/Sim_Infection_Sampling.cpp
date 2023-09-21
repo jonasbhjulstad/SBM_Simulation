@@ -142,15 +142,6 @@ void verbose_community_infection_debug(auto c_idx, const auto &related_connectio
 }
 
 
-std::vector<uint32_t> get_related_connection_events(const auto &related_connections, const std::vector<uint32_t> &events)
-{
-    std::vector<uint32_t> r_con_events(related_connections.size(), 0);
-    for (int i = 0; i < r_con_events.size(); i++)
-    {
-        r_con_events[i] = events[related_connections[i]];
-    }
-    return r_con_events;
-};
 
 std::vector<uint32_t> sample_community(const auto &related_connections, const auto &related_weights, const auto &events, auto N_samples)
 {
@@ -158,7 +149,11 @@ std::vector<uint32_t> sample_community(const auto &related_connections, const au
     std::vector<uint32_t> result(2 * N_connections, 0);
     if (!N_samples)
         return result;
-    auto r_con_events = get_related_connection_events(related_connections, events);
+    std::vector<uint32_t> r_con_events(related_connections.size(), 0);
+    for (int i = 0; i < related_connections.size(); i++)
+    {
+        r_con_events[i] = events[related_connections[i]];
+    }
     auto sample_counts = constrained_weight_sample(N_samples, related_weights, r_con_events);
     for (int sample_idx = 0; sample_idx < sample_counts.size(); sample_idx++)
     {

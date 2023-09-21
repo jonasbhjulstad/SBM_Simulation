@@ -37,7 +37,7 @@ Dataframe_t<T, 4> read_3D_buffer(sycl::queue& q, sycl::buffer<T, 3>& buf, uint32
 }
 
 template <typename T>
-void write_dataframe(const std::string& fname, const Dataframe_t<T, 2>& df, bool append = false, auto offsets = {0,0})
+void write_dataframe(const std::string& fname, const Dataframe_t<T, 2>& df, bool append = false, const std::array<std::size_t,2> offsets = {0,0})
 {
     std::fstream f;
     if(append)
