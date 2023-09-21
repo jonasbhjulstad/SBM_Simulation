@@ -73,7 +73,7 @@ sycl::event clear_buffer(sycl::queue& q, sycl::buffer<T, N>& buf, std::vector<sy
     {
         h.depends_on(dep_events);
         auto buf_acc = buf.template get_access<sycl::access::mode::write>(h);
-        h.fill(buf_acc, (uint32_t)0);
+        h.fill(buf_acc, (T)0);
     });
 }
 

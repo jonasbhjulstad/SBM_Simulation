@@ -8,7 +8,8 @@ struct Sim_Buffers
 {
     cl::sycl::buffer<Static_RNG::default_rng> rngs;
     cl::sycl::buffer<SIR_State, 3> vertex_state;
-    cl::sycl::buffer<uint32_t, 3> events;
+    cl::sycl::buffer<uint32_t, 3> accumulated_events;
+    // cl::sycl::buffer<uint8_t, 3> edge_events;
     cl::sycl::buffer<float, 3> p_Is;
     cl::sycl::buffer<uint32_t> edge_from;
     cl::sycl::buffer<uint32_t> edge_to;
@@ -24,22 +25,24 @@ struct Sim_Buffers
     const uint32_t N_communities_max;
     const std::vector<uint32_t> vcm_vec;
     const Dataframe_t<Edge_t, 2> ccm;
+    std::size_t N_edges_tot;
     Sim_Buffers(cl::sycl::buffer<Static_RNG::default_rng> &rngs,
-                cl::sycl::buffer<SIR_State, 3> &vertex_state,
-                cl::sycl::buffer<uint32_t, 3> &events,
-                cl::sycl::buffer<float, 3> &p_Is,
-                cl::sycl::buffer<uint32_t> &edge_from,
-                cl::sycl::buffer<uint32_t> &edge_to,
-                cl::sycl::buffer<uint32_t> &ecm,
-                cl::sycl::buffer<uint32_t, 2> &vcm,
-                const std::vector<uint32_t>& vcm_vec,
-                cl::sycl::buffer<uint32_t> &edge_counts,
-                cl::sycl::buffer<uint32_t> & edge_offsets,
-                cl::sycl::buffer<uint32_t> &N_connections,
-                cl::sycl::buffer<State_t, 3> &community_state,
-                const Dataframe_t<Edge_t, 2> &ccm,
-                const std::vector<uint32_t>& N_connections_vec,
-                const std::vector<uint32_t>& N_communities);
+                         cl::sycl::buffer<SIR_State, 3> &vertex_state,
+                         cl::sycl::buffer<uint32_t, 3> &accumulated_events,
+                        //  cl::sycl::buffer<uint8_t, 3> &edge_events,
+                         cl::sycl::buffer<float, 3> &p_Is,
+                         cl::sycl::buffer<uint32_t> &edge_from,
+                         cl::sycl::buffer<uint32_t> &edge_to,
+                         cl::sycl::buffer<uint32_t> &ecm,
+                         cl::sycl::buffer<uint32_t, 2> &vcm,
+                         const std::vector<uint32_t> &vcm_vec,
+                         cl::sycl::buffer<uint32_t> &edge_counts,
+                         cl::sycl::buffer<uint32_t> &edge_offsets,
+                         cl::sycl::buffer<uint32_t> &N_connections,
+                         cl::sycl::buffer<State_t, 3> &community_state,
+                         const Dataframe_t<Edge_t, 2> &ccm,
+                         const std::vector<uint32_t> &N_connections_vec,
+                         const std::vector<uint32_t> &N_communities);
     void validate_sizes(const Sim_Param& p) const;
 
     std::size_t byte_size() const;

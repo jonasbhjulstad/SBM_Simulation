@@ -69,20 +69,19 @@ def structural_inference(edgelists, nodelists):
     state = gt.minimize_blockmodel_dl(G, state_args=dict(recs=[weight], rec_types=["discrete-poisson"]))
     edges = G.get_edges()
     vcm = index_relabel_ascending(list(state.get_state()))
-    ecm = ecm_from_vcm(edges, vcm)
+    # ecm = ecm_from_vcm(edges, vcm)
     N_blocks = state.get_nonempty_B()
     entropy = state.entropy()
-    return N_blocks, entropy, ecm, vcm
+    return N_blocks, entropy, vcm
 
 def multiple_structural_inference(edgelists, nodelists):
     N_blocks, entropies, ecms, vcms = [], [], [], []
     for elist, nodelist in zip(edgelists, nodelists):
-        Nb, entropy, ecm, vcm = structural_inference(elist, nodelist)
+        Nb, entropy, vcm = structural_inference(elist, nodelist)
         N_blocks.append(Nb)
         entropies.append(entropy)
-        ecms.append(ecm)
         vcms.append(vcm)
-    return N_blocks, entropies, ecms, vcms
+    return N_blocks, entropies, vcms
 
 def create_sim_param(N_communities, p_in, p_out, seed, N_graphs):
     p = Sim_Param()
@@ -123,9 +122,9 @@ def inference_over_p_out(N_pop, N_communities, p_in, p_out, seed, N_graphs):
         elist_flat = flatten_sublists(elist)
         edgelists.append(elist_flat)
         vertex_lists.append(vlist)
-        Nb, entropy, ecm_1s, vcm_1s = multiple_structural_inference(elist, vlist)
+        Nb, entropy, vcm_1s = multiple_structural_inference(elist, vlist)
         N_blocks.append(Nb)
         entropies.append(entropy)
         vcms.append([(vcm_1, vcm_0) for vcm_1, vcm_0 in zip(vcm_1s, vcm_0s)])
-        ecms.append([(ecm_1, ecm_0) for ecm_1, ecm_0 in zip(ecm_1s, ecm_0s)])
-    return edgelists, vertex_lists, N_blocks, entropies, ecms, vcms, sim_params
+        # ecms.append([(ecm_1, ecm_0) for ecm_1, ecm_0 in zip(ecm_1s, ecm_0s)])
+    return edgelists, vertex_lists, N_blocks, entropies, vcms, sim_params

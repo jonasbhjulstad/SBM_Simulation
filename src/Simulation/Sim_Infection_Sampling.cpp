@@ -82,12 +82,7 @@ std::tuple<std::vector<uint32_t>,std::vector<uint32_t>> get_related_connections(
     {
         if (ccm[i].from == c_idx)
         {
-            connection_indices.push_back(2 * i);
-            connection_weights.push_back(ccm_weights[i]);
-        }
-        if (ccm[i].to == c_idx)
-        {
-            connection_indices.push_back(2 * i + 1);
+            connection_indices.push_back(i);
             connection_weights.push_back(ccm_weights[i]);
         }
     }
@@ -145,8 +140,8 @@ void verbose_community_infection_debug(auto c_idx, const auto &related_connectio
 
 std::vector<uint32_t> sample_community(const auto &related_connections, const auto &related_weights, const auto &events, auto N_samples)
 {
-    auto N_connections = events.size() / 2;
-    std::vector<uint32_t> result(2 * N_connections, 0);
+    auto N_connections = events.size();
+    std::vector<uint32_t> result(N_connections, 0);
     if (!N_samples)
         return result;
     std::vector<uint32_t> r_con_events(related_connections.size(), 0);
@@ -179,7 +174,7 @@ std::vector<uint32_t> sample_timestep(const std::vector<uint32_t> &events, const
         return merged_result;
     };
 
-    std::vector<std::vector<uint32_t>> result(N_communities, std::vector<uint32_t>(N_connections * 2, 0));
+    std::vector<std::vector<uint32_t>> result(N_communities, std::vector<uint32_t>(N_connections, 0));
     auto community_idx = make_iota(N_communities);
     std::transform(std::execution::par_unseq, community_idx.begin(), community_idx.end(), result.begin(), [&](auto c_idx)
                    {

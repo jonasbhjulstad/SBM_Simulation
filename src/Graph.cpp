@@ -233,7 +233,8 @@ std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities, 
         for (auto &&prod : iter::combinations_with_replacement(community_idx, 2))
         {
             ccm.push_back(std::make_pair(prod[0], prod[1]));
-            ccm.push_back(std::make_pair(prod[1], prod[0]));
+            if (prod[0] != prod[1])
+                ccm.push_back(std::make_pair(prod[1], prod[0]));
         }
     }
     else
@@ -243,6 +244,7 @@ std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities, 
             ccm.push_back(std::make_pair(prod[0], prod[1]));
         }
     }
+
     return ccm;
 }
 
@@ -312,6 +314,10 @@ std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_l
 
 std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &ccm)
 {
+    auto directed_equal = [](const auto& e0, const auto& e1)
+    {
+        return ((e0.first == e1.first) && (e0.second == e1.second));
+    };
     std::vector<uint32_t> ecm(edges.size());
     std::transform(edges.begin(), edges.end(), ecm.begin(), [&](const auto& edge)
     {
@@ -319,9 +325,10 @@ std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_
         auto c_1 = vcm[edge.second];
         auto idx = std::find_if(ccm.begin(), ccm.end(), [&](const auto& cc)
         {
-            return ((cc.first == c_0) && (cc.second == c_1)) || ((cc.first == c_1) && (cc.second == c_0));
+            return directed_equal(cc, std::make_pair(c_0, c_1));
         });
-        return std::distance(ccm.begin(), idx);
+        auto res = std::distance(ccm.begin(), idx);
+        return res;
     });
     return ecm;
 }

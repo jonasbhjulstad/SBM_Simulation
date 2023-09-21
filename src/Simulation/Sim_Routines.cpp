@@ -37,7 +37,7 @@ void write_allocated_steps(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b, s
     std::cout << "Accumulate community state: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
     auto state_df = read_3D_buffer(q, b.community_state, p.N_graphs, {acc_event});
-    auto event_df = read_3D_buffer(q, b.events, p.N_graphs, {acc_event})({0, 0, 0, 0}, {p.N_graphs, p.N_sims, N_steps, b.N_connections_max*2});
+    auto event_df = read_3D_buffer(q, b.accumulated_events, p.N_graphs, {acc_event})({0, 0, 0, 0}, {p.N_graphs, p.N_sims, N_steps, b.N_connections_max});
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Read graphseries: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
@@ -52,7 +52,7 @@ void write_allocated_steps(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b, s
 
     write_dataframe(p.output_dir + "/Graph_", "community_trajectory_", state_df_write, true, {1,0});
     write_dataframe(p.output_dir + "/Graph_", "connection_events_", event_df, true);
-    event_inf_summary(state_df, event_df, b.ccm);
+    // event_inf_summary(state_df, event_df, b.ccm);
 
     auto inf_gs = sample_infections(state_df, event_df, b.ccm, p.seed);
     write_dataframe(p.output_dir + "/Graph_", "connection_infections_", inf_gs, true);
@@ -101,11 +101,13 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
         {
             q.wait();
             write_allocated_steps(q, p, b, p.Nt_alloc, events);
-            events[0] = clear_buffer<uint32_t, 3>(q, b.events, events);
+            events[0] = clear_buffer<uint32_t, 3>(q, b.accumulated_events, events);
+            // events[0] = clear_buffer<uint8_t, 3>(q, b.edge_events, events);
             events[0] = move_buffer_row(q, b.vertex_state, p.Nt_alloc, events);
         }
         events = recover(q, p, b.vertex_state, b.rngs, t, events);
         events = infect(q, p, b, t, events);
+        std::cout << "t: " << t << "\n";
     }
     write_allocated_steps(q, p, b, t % p.Nt_alloc, events);
     write_dataframe(p.output_dir + "/ccm.csv",b.ccm, false);

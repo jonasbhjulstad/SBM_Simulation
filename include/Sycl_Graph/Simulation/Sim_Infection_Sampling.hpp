@@ -76,7 +76,36 @@ void event_inf_summary(const Dataframe_t<State_t, 4> &community_state, const Dat
         }
     }
 }
+void event_inf_validation(const Dataframe_t<State_t, 4> &community_state, const Dataframe_t<uint32_t, 4> &events, const auto &ccms)
+{
+    auto [Ng, N_sims, Nt, dummy] = community_state.get_ranges();
+    for (int g_idx = 0; g_idx < Ng; g_idx++)
+    {
+        for (int sim_idx = 0; sim_idx < N_sims; sim_idx++)
+        {
+            const auto& ccm = ccms[g_idx];
+            auto dIs = get_delta_Is(community_state[g_idx][sim_idx]);
+            for (int t = 0; t < Nt - 1; t++)
+            {
+                auto N_communities = dIs[t].size();
+                for (int c_idx = 0; c_idx < N_communities; c_idx++)
+                {
+                    auto [r_idx, r_w] = get_related_connections(c_idx, ccm);
+                    std::vector<uint32_t> r_events(r_idx.size(), 0);
+                    for(int i = 0; i < r_idx.size(); i++)
+                    {
+                        r_events[i] = events[g_idx][sim_idx][t][r_idx[i]];
+                    }
 
+                    if (std::accumulate(r_events.begin(), r_events.end(), 0) < dIs[t][c_idx])
+                    {
+                        throw std::runtime_error("Error: too few events related to community in timeseries, (g_idx, sim_idx, t, c_idx): (" + std::to_string(g_idx) + "," + std::to_string(sim_idx) + "," + std::to_string(t) + "," + std::to_string(c_idx) + ")");
+                    }
+                }
+            }
+        }
+    }
+}
 
 Dataframe_t<uint32_t, 3> sample_infections(const Dataframe_t<State_t, 3> &community_state, const Dataframe_t<uint32_t, 3> &events, const std::vector<Edge_t> &ccm, uint32_t seed)
 {

@@ -64,8 +64,11 @@ PYBIND11_MODULE(SIR_SBM, m)
     m.def("generate_planted_SBM_flat", &generate_planted_SBM_flat, "generate_planted_SBM_flat");
     m.def("generate_N_SBM_graphs_flat", &generate_N_SBM_graphs_flat, "generate_N_SBM_graphs_flat");
     m.def("generate_N_SBM_graphs", &generate_N_SBM_graphs, "generate_N_SBM_graphs");
-    m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<uint32_t>> &)>(&run), "run");
-    m.def("p_I_run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<std::vector<float>>>&)>(&p_I_run), "p_I_run");
+
+    m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, Sim_Buffers &)>(&run), "run");
+
+    m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &)>(&run), "run");
+    m.def("p_I_run",p_I_run, "p_I_run");
     m.def("read_edgelist", &read_edgelist, "read_edgelist");
     m.def("write_vector", &write_vector, "write_vector");
     m.def("ecm_from_vcm", &ecm_from_vcm, "ecm_from_vcm");

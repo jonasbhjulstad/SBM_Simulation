@@ -27,17 +27,14 @@ if __name__ == '__main__':
     seeds = np.random.randint(0, 100000, Np)
     pool = mp.Pool(int(mp.cpu_count()/2))
 
-    edgelists, vertex_lists, N_blocks, entropies, ecms, vcms, sim_params = inference_over_p_out(N_pop, N_communities, p_in, p_out, seeds, Np)
+    edgelists, vertex_lists, N_blocks, entropies, vcms, sim_params = inference_over_p_out(N_pop, N_communities, p_in, p_out, seeds, Np)
     block_df = pd.DataFrame(np.array(N_blocks).T, columns=p_out)
     ent_df = pd.DataFrame(np.array(entropies).T, columns=p_out)
-    for elist, vcm, ecm, p in zip(edgelists, vcms, ecms, sim_params):
-        ecm_0 = [e[1] for e in ecm]
+    for elist, vcm, p in zip(edgelists, vcms, sim_params):
         vcm_0 = [v[1] for v in vcm]
-        ecm = [project_mapping(e[0], e[1])for e in ecm]
         vcm = [project_mapping(v[0], v[1])for v in vcm]
-        p.N_connections = max([max(e) for e in ecm]) + 1
         p.N_communities = max([max(v) for v in vcm]) + 1
-        run(q, p, elist, vcm, ecm)
+        run(q, p, elist, vcm)
     #violin plot
     sns.violinplot(block_df, ax=ax[0], cut=0)
     #limit x to 2 decimals
