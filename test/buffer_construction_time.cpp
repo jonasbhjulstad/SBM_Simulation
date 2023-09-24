@@ -30,7 +30,7 @@ int main()
         start = std::chrono::system_clock::now();
         data.push_back(buffer_create_1D(q, vec, events[i]));
         end = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::chrono::duration<float> elapsed_seconds = end-start;
         std::cout << "elapsed time: " << elapsed_seconds.count() << "s\n";
     }
 

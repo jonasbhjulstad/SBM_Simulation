@@ -14,7 +14,7 @@ Dataframe_t<T, 4> read_3D_buffer(sycl::queue& q, sycl::buffer<T, 3>& buf, uint32
     auto N_sims_tot = buf.get_range()[1];
     auto N3 = buf.get_range()[2];
     auto N_sims = N_sims_tot/N_graphs;
-    auto floor_div = [](auto a, auto b){return static_cast<uint32_t>(std::floor(static_cast<double>(a) / static_cast<double>(b)));};
+    auto floor_div = [](auto a, auto b){return static_cast<uint32_t>(std::floor(static_cast<float>(a) / static_cast<float>(b)));};
     std::vector<T> data(buf.size());
     auto event = read_buffer<T, 3>(buf, q, data, dep_events);
     event.wait();
@@ -37,6 +37,36 @@ Dataframe_t<T, 4> read_3D_buffer(sycl::queue& q, sycl::buffer<T, 3>& buf, uint32
 }
 
 template <typename T>
+void write_dataframe(const std::string& fname, const Dataframe_t<T, 1>& df, bool append = false, const size_t offset = 0)
+{
+    if_false_throw(df.size(), "Empty df");
+    std::fstream f;
+
+    if(append)
+    {
+        f.open(fname, std::ios::app);
+    }
+    else
+    {
+        f.open(fname, std::ios::out);
+    }
+    for(int row = offset; row < df.size(); row++)
+    {
+        f << df[row] << "\n";
+    }
+    f.close();
+}
+
+template <typename T>
+void write_dataframe(const std::string& dir, const std::string& fname, const Dataframe_t<T, 2>& df, bool append = false, const std::array<std::size_t,2> offsets = {0,0})
+{
+    for(int i = 0; i < df.size(); i++)
+    {
+        write_dataframe(dir + std::to_string(i) + "/" + fname, df[i], append, offsets[0]);
+    }
+}
+
+template <typename T>
 void write_dataframe(const std::string& fname, const Dataframe_t<T, 2>& df, bool append = false, const std::array<std::size_t,2> offsets = {0,0})
 {
     std::fstream f;
@@ -52,7 +82,11 @@ void write_dataframe(const std::string& fname, const Dataframe_t<T, 2>& df, bool
     {
         for(int col = offsets[1]; col < df[row].size(); col++)
         {
-            f << df(row, col) << ",";
+            f << df(row, col);
+            if(col != df[row].size() - 1)
+            {
+                f << ",";
+            }
         }
         f << "\n";
     }

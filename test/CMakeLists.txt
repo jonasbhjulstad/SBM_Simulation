@@ -6,3 +6,5 @@ target_link_libraries(casadi_ex casadi)
 
 add_sycl_executable(test_ecm_from_vcm)
 add_sycl_executable(infection_sampling_test)
+add_executable(eigen_0d eigen_0d.cpp)
+target_link_libraries(eigen_0d Eigen3::Eigen)

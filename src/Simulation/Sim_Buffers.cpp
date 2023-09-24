@@ -159,7 +159,7 @@ uint32_t count_unique(const std::vector<T> &v)
     auto n = 1 + std::inner_product(std::next(v.begin()), v.end(),
                                     v.begin(), size_t(0),
                                     std::plus<size_t>(),
-                                    std::not_equal_to<double>());
+                                    std::not_equal_to<float>());
     return n;
 }
 
@@ -384,17 +384,12 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
         validate_ecm(edge_list[i], ecms[i], ccm_indices, vcms[i]);
     }
 
-    auto elem = std::find_if(ecms[0].begin(), ecms[0].end(), [&](auto ec)
-    {
-        return ec == (N_connections_max-1);
-    });
-    assert(elem != ecms[0].end() && "ecm contains invalid connection index");
-
     auto byte_size = rngs.byte_size() + trajectory.byte_size() + accumulated_events.byte_size() + p_Is.byte_size() + edge_from.byte_size() + edge_to.byte_size() + ecm.byte_size() + vcm.byte_size() + community_state.byte_size();
     // get global memory size
     auto global_mem_size = q.get_device().get_info<sycl::info::device::global_mem_size>();
     // get max alloc size
     //  auto max_alloc_size = q.get_device().get_info<sycl::info::device::max_mem_alloc_size>();
+    if_false_throw(ccm.size() == p.N_graphs, "ccm.size() != p.N_graphs");
     assert(byte_size < global_mem_size && "Not enough global memory to allocate all buffers");
     return Sim_Buffers(rngs,
                        trajectory,

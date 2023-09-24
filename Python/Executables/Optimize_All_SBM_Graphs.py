@@ -25,6 +25,15 @@ def simulate_with_solution(q, p_dir, u_opt, N_sims):
    sim_param.N_graphs = len(vcms)
    #write json to file
    p_I_run(q, sim_param, edge_lists, ecms, vcms, N_connections, u_opt)
+
+def read_ccm(fname):
+   mat = np.genfromtxt(fname, delimiter=",")
+   edge_from = mat[:,0::3]
+   edge_to = mat[:,1::3]
+   edge_weight = mat[:,2::3]
+   return np.concatenate([(ef, et) for ef, et in zip(edge_from.T, edge_to.T)], axis=0), edge_weight
+
+
 def optimize(Graph_dir, N_sims, tau, Wu, u_min, u_max):
    print(Graph_dir)
    theta_LS, theta_QR = regression_on_datasets(Graph_dir, N_sims, tau, 0)
@@ -32,12 +41,15 @@ def optimize(Graph_dir, N_sims, tau, Wu, u_min, u_max):
    connection_community_map_path = Graph_dir + "ccm.csv"
 
    ccmap = np.genfromtxt(connection_community_map_path, delimiter=",")
+   if(len(ccmap.shape) == 1):
+      ccmap = np.array([ccmap])
    alpha, N_communities, N_connections, init_state, N_pop, Nt = load_data(Graph_dir, N_sims)
 
    u_opt_LS, traj_LS, f_LS, u_opt_LS_uniform, traj_LS_uniform, f_LS_uniform = solve_single_shoot(ccmap, theta_LS, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max)
 
    u_opt_QR, traj_QR, f_QR, u_opt_QR_uniform, traj_QR_uniform, f_QR_uniform = solve_single_shoot(ccmap, theta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max)
 
+   assert np.all(get_total_traj(traj_LS)[0,:] == get_total_traj(traj_LS_uniform)[0,:])
 
    if not os.path.exists(Graph_dir + "LS/"):
       os.makedirs(Graph_dir + "LS/")
@@ -81,10 +93,11 @@ def get_parameters(base_dir):
 
 if __name__ == '__main__':
 
-   Wu = 5000
+   Wu = 50
    tau = .8
    p_dirs = get_p_dirs(Data_dir)
-   for pd in p_dirs:
+   for pd in p_dirs[:1]:
+      print(pd)
       graph_dirs = get_graph_dirs(pd)
       params = get_parameters(pd)
       for gd in graph_dirs:

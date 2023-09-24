@@ -1,4 +1,4 @@
-from Path_Config import *
+from SBM_Routines.Path_Config import *
 from casadi import *
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,7 +18,9 @@ def get_avg_init_state(Graph_dir, N):
             else:
                 avg_init_state += np.array(first_line.split(",")).astype(float)
     return avg_init_state / N
-
+def get_total_traj(community_traj):
+    N_communities = int(community_traj.shape[1] / 3)
+    return np.array([np.sum(community_traj[:, i::3], axis=1) for i in range(3)]).T
 
 def load_data(Graph_dir, N_sims):
         # c_sources = np.genfromtxt(Graph_dir + "connection_sources_0.csv", delimiter=",")
@@ -26,6 +28,8 @@ def load_data(Graph_dir, N_sims):
     community_traj = np.genfromtxt(Graph_dir + "community_trajectory_0.csv", delimiter=",")
     N_communities = int(community_traj.shape[1] / 3)
     p_Is_data = np.genfromtxt(Graph_dir + "p_I_0.csv", delimiter=",")
+    if (len(p_Is_data.shape) == 1):
+        p_Is_data.resize((p_Is_data.shape[0], 1))
     N_connections = p_Is_data.shape[1]
     init_state = get_avg_init_state(Graph_dir, N_sims)
     N_pop = np.sum(init_state)
@@ -44,11 +48,9 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
         #Forward:
         for i, ct in enumerate(ccmap[:,1]):
             if (ct == community_idx):
-                beta_from = beta[2*i]
-                beta_to = beta[2*i+1]
+                beta_from = beta[i]
                 state_r = c_states[3*int(ccmap[i,0]):3*int(ccmap[i,0])+3]
                 d_I += delta_I(state_s, state_r, c_p_Is[i], beta_from)
-                d_I += delta_I(state_r, state_s, c_p_Is[i], beta_to)
 
         return d_I
     def community_delta_Rs(c_states):
@@ -113,7 +115,10 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
     f_w_u = Function("f_w_u", [w], [u])
     f_traj = Function("f_traj", [w], [horzcat(*state)])
 
-    ipopt_options = {"ipopt": {"print_level":0,"file_print_level": 5, "tol":1e-8, "max_iter":1000, "output_file":Data_dir + "ipopt_output.txt"}}
+
+
+    ipopt_options = {"ipopt": {"print_level":0,"file_print_level": 5, "tol":1e-8, "max_iter":1000, "output_file":Data_dir + "ipopt_output.txt"}, "print_time":0}
+
 
     solver = nlpsol("solver", "ipopt", {"x":w, "f":f}, ipopt_options)
 
@@ -148,7 +153,7 @@ def solution_plot(traj, u_opt, obj_val, Data_dir):
     fig.savefig(Data_dir + "/optimal_community_traj.png")
     plt.close(fig)
     fig2, ax2 = plt.subplots(3)
-    total_state = np.array([np.sum(traj[:,i::3], axis=1) for i in range(3)]).T
+    total_state = get_total_traj(traj)
     for i in range(3):
         ax2[i].plot(total_state[:,i])
     fig2.suptitle("Total State, f = " + str(obj_val))
@@ -166,10 +171,11 @@ def u_opt_comparison_plot(traj, u_opt, obj_val, traj_unif, u_unif, obj_unif, Dat
     fig.savefig(Data_dir + "/comparison_plot.png")
     plt.close(fig)
     fig2, ax2 = plt.subplots(3)
-    total_state = np.array([np.sum(traj[:,i::3], axis=1) for i in range(3)]).T
+    total_state = get_total_traj(traj)
+    total_state_unif = get_total_traj(traj_unif)
     for i in range(3):
         ax2[i].plot(total_state[:,i])
-        ax2[i].plot(traj_unif[:,i::3], 'r', label='Uniform controlled trajectory')
+        ax2[i].plot(total_state_unif[:,i], 'r', label='Uniform controlled trajectory')
     fig2.suptitle("Total State, f = " + str(obj_val) + ", f_uniform = " + str(obj_unif))
     fig2.savefig(Data_dir + "/total_state_comparison.png")
     plt.close(fig2)

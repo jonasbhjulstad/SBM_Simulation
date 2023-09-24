@@ -160,10 +160,10 @@ std::vector<uint32_t> sample_community(const auto &related_connections, const au
 std::vector<uint32_t> sample_timestep(const std::vector<uint32_t> &events, const std::vector<int> &delta_I, const std::vector<Edge_t> &ccm)
 {
     auto N_communities = delta_I.size();
-    auto N_connections = events.size() / 2;
+    auto N_connections = ccm.size();
     auto merge_sample_result = [&](const std::vector<std::vector<uint32_t>> &sample_result)
     {
-        std::vector<uint32_t> merged_result(N_connections * 2, 0);
+        std::vector<uint32_t> merged_result(N_connections, 0);
         for (int i = 0; i < sample_result.size(); i++)
         {
             for (int j = 0; j < sample_result[i].size(); j++)

@@ -48,7 +48,7 @@ int main()
     std::cout << "Generate graphs: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
     std::mt19937 rng(p.seed);
-    std::uniform_int_distribution<uint32_t> dist_v(0, 1);
+    std::uniform_int_distribution<uint32_t> dist_v(0, 0);
     for(auto& v: vcm)
     {
        std::generate(v.begin(), v.end(), [&dist_v, &rng]() { return dist_v(rng); });

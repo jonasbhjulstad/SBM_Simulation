@@ -9,7 +9,7 @@ void single_community_state_accumulate(sycl::nd_item<1> &it, const auto &vcm_acc
     auto Nt = v_acc.get_range()[0];
     auto N_vertices = v_acc.get_range()[2];
     auto sim_id = it.get_global_id()[0];
-    auto graph_id = static_cast<uint32_t>(std::floor(static_cast<double>(sim_id) / static_cast<double>(N_sims)));
+    auto graph_id = static_cast<uint32_t>(std::floor(static_cast<float>(sim_id) / static_cast<float>(N_sims)));
     auto N_communities = state_acc.get_range()[2];
     for (int t = 0; t < Nt; t++)
     {

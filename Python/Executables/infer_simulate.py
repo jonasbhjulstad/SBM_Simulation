@@ -15,10 +15,11 @@ if __name__ == '__main__':
     q = sycl_queue(cpu_selector())
 
     N_pop = 100
-    N_communities = 10
-    p_in = 1.0
-    p_out = np.linspace(0.07, 0.16, Np)
-    p_in = 0.1
+    N_communities = 2
+    N_graphs = 20
+    # p_out = np.linspace(0.07, 0.16, Np)
+    p_out = np.linspace(0.3, 0.7, Np)
+    p_in = 0.5
     Gs = []
     states = []
     N_blocks = []
@@ -27,14 +28,13 @@ if __name__ == '__main__':
     seeds = np.random.randint(0, 100000, Np)
     pool = mp.Pool(int(mp.cpu_count()/2))
 
-    edgelists, vertex_lists, N_blocks, entropies, vcms, sim_params = inference_over_p_out(N_pop, N_communities, p_in, p_out, seeds, Np)
+    #if Data_dir does not exist, create it
+    if not os.path.exists(Data_dir):
+        os.makedirs(Data_dir)
+
+    edgelists, vertex_lists, N_blocks, entropies, vcms, sim_params = inference_over_p_out(N_pop, N_communities, p_in, p_out, seeds, N_graphs)
     block_df = pd.DataFrame(np.array(N_blocks).T, columns=p_out)
     ent_df = pd.DataFrame(np.array(entropies).T, columns=p_out)
-    for elist, vcm, p in zip(edgelists, vcms, sim_params):
-        vcm_0 = [v[1] for v in vcm]
-        vcm = [project_mapping(v[0], v[1])for v in vcm]
-        p.N_communities = max([max(v) for v in vcm]) + 1
-        run(q, p, elist, vcm)
     #violin plot
     sns.violinplot(block_df, ax=ax[0], cut=0)
     #limit x to 2 decimals
@@ -45,3 +45,11 @@ if __name__ == '__main__':
     ax[0].set_ylabel("Number of blocks")
     ax[1].set_ylabel("'Entropy'/Minimum Description Length")
     fig.savefig(Data_dir + "/Structural_Plot.pdf", format='pdf', dpi=1000)
+    # plt.show()
+
+    for elist, vcm, p in zip(edgelists, vcms, sim_params):
+        print("p_out: ", p.p_out)
+        vcm_0 = [v[1] for v in vcm]
+        vcm = [project_mapping(v[0], v[1])for v in vcm]
+        p.N_communities = max([max(v) for v in vcm]) + 1
+        run(q, p, elist, vcm)

@@ -86,7 +86,7 @@ def multiple_structural_inference(edgelists, nodelists):
 def create_sim_param(N_communities, p_in, p_out, seed, N_graphs):
     p = Sim_Param()
     p.N_communities = N_communities
-    p.N_pop = 100
+    p.N_pop = 10
     p.N_sims = 10
     p.p_in = p_in
     p.p_out = p_out
@@ -95,11 +95,15 @@ def create_sim_param(N_communities, p_in, p_out, seed, N_graphs):
     p.p_R0 = 0.0
     p.p_R = 0.1
     p.p_I0 = 0.1
-    p.p_I_min = .0001
-    p.p_I_max = .01
+    p.p_I_min = .001
+    p.p_I_max = .05
     p.seed = seed
-    p.N_graphs = 2
-    p.output_dir = Data_dir + "p_out_" + str(p_out)[:4] + "/"
+    p.N_graphs = N_graphs
+    p_out_str = str(p_out)[:4]
+    if len(p_out_str) < 4:
+        p_out_str += "0"*(4-len(p_out_str))
+
+    p.output_dir = Data_dir + "p_out_" + p_out_str + "/"
     p.compute_range=sycl_range_1(p.N_graphs*p.N_sims)
     p.wg_range=sycl_range_1(p.N_graphs*p.N_sims)
     return p

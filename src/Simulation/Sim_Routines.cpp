@@ -43,14 +43,14 @@ void write_allocated_steps(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b, s
     t1 = t2;
     state_df.resize_dim(2, N_steps + 1);
     auto state_df_write = state_df;
-    state_df_write.resize_dim(2, N_steps);
+    state_df_write.resize_dim(2, N_steps + 1);
     for (int i = 0; i < p.N_graphs; i++)
     {
         state_df[i].resize_dim(2, b.N_communities_vec[i]);
     }
+    auto df_range = state_df.get_ranges();
 
-
-    write_dataframe(p.output_dir + "/Graph_", "community_trajectory_", state_df_write, true, {1,0});
+    write_dataframe(p.output_dir + "/Graph_", "community_trajectory_", state_df_write, true, {1, 0});
     write_dataframe(p.output_dir + "/Graph_", "connection_events_", event_df, true);
     // event_inf_summary(state_df, event_df, b.ccm);
 
@@ -110,7 +110,9 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
         std::cout << "t: " << t << "\n";
     }
     write_allocated_steps(q, p, b, t % p.Nt_alloc, events);
-    write_dataframe(p.output_dir + "/ccm.csv",b.ccm, false);
+
+    if_false_throw(b.ccm.size() == p.N_graphs, "ccm size does not match N_graphs");
+    write_dataframe(p.output_dir + "/Graph_", "/ccm.csv", b.ccm, false);
 
     auto p_I_df = read_3D_buffer(q, b.p_Is, p.N_graphs, events);
     write_dataframe(p.output_dir + "/Graph_", "p_I_", p_I_df, true);

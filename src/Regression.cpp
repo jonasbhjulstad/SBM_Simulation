@@ -50,17 +50,29 @@ std::pair<Eigen::MatrixXf, Eigen::MatrixXf> load_beta_regression(const std::stri
 
 
     Mat connection_infs = openData(datapath + connection_infs_filename(idx));
+    auto N_connections = connection_infs.cols();
+
+    if ((connection_infs.array() == 0).all())
+    {
+        return std::make_pair(Mat(0, N_connections), Mat(0, N_connections));
+    }
+
     Mat connection_community_map = openData(datapath + connection_community_map_filename(idx));
     Mat community_traj = openData(datapath + community_traj_filename(idx));
     assert((connection_infs.array() >= 0).all());
     auto Nt = community_traj.rows() - 1;
-    auto N_connections = connection_infs.cols();
+    auto N_communities = community_traj.cols() / 3;
     if (truncate)
     {
         auto t_trunc = 0;
         for(t_trunc = 0; t_trunc < Nt; t_trunc++)
         {
-            if (community_traj.row(t_trunc)(Eigen::seqN(1, 3)).sum() == 0)
+            if (N_communities == 1)
+            {
+                if (community_traj(t_trunc, 1) == 0)
+                    break;
+            }
+            else if (community_traj.row(t_trunc)(Eigen::seqN(1, 3)).sum() == 0)
             {
                 break;
             }
@@ -71,14 +83,13 @@ std::pair<Eigen::MatrixXf, Eigen::MatrixXf> load_beta_regression(const std::stri
     }
     assert((connection_infs.array() <= 1000).all());
     assert((community_traj.array() <= 1000).all());
-    uint32_t const N_communities = community_traj.cols() / 3;
     Mat p_Is = openData(datapath + p_Is_filename(idx));
 
     auto compute_beta_rs_col = [&](auto from_idx,auto to_idx, const Vec& p_I)
     {
         Mat target_traj = community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * to_idx, 3));
         Mat source_traj = community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * from_idx, 3));
-
+        Vec p_I_trunc = p_I(Eigen::seqN(0, Nt));
         Vec const S_r = source_traj.col(0);
         Vec I_r = source_traj.col(1);
         Vec const R_r = source_traj.col(2);
@@ -88,14 +99,13 @@ std::pair<Eigen::MatrixXf, Eigen::MatrixXf> load_beta_regression(const std::stri
 
         Vec denom = (S_s.array() + I_r.array() + R_s.array()).matrix();
         Vec nom = (S_s.array() * I_r.array()).matrix();
-        return Vec(p_I.array() * nom.array() / denom.array());
+        return Vec(p_I_trunc.array() * nom.array() / denom.array());
     };
 
     Mat F_beta_rs_mat(Nt, N_connections);
     for (int i = 0; i < connection_community_map.rows(); i++)
     {
-        F_beta_rs_mat.col(2*i) = compute_beta_rs_col(connection_community_map(i, 0), connection_community_map(i, 1), p_Is.col(i));
-        F_beta_rs_mat.col(2*i+1) = compute_beta_rs_col(connection_community_map(i, 1), connection_community_map(i, 0), p_Is.col(i));
+        F_beta_rs_mat.col(i) = compute_beta_rs_col(connection_community_map(i, 0), connection_community_map(i, 1), p_Is.col(i));
     }
     // not all zero
     assert(F_beta_rs_mat.array().sum() != 0);
@@ -243,8 +253,10 @@ auto read_ccm(const std::string& ccm_path)
         std::stringstream line_stream(line);
         std::string from_idx_str;
         std::string to_idx_str;
+        std::string weight_str;
         std::getline(line_stream, from_idx_str, ',');
-        std::getline(line_stream, to_idx_str, '\n');
+        std::getline(line_stream, to_idx_str, ',');
+        std::getline(line_stream, weight_str, '\n');
         ccm.push_back(std::make_pair(std::stoi(from_idx_str), std::stoi(to_idx_str)));
     }
     return ccm;
