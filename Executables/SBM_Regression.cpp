@@ -1,7 +1,7 @@
 #include <Eigen/Dense>
 #include <Sycl_Graph/Regression.hpp>
-#include <Sycl_Graph/Utils/path_config.hpp>
 #include <Sycl_Graph/Utils/json_settings.hpp>
+#include <Sycl_Graph/Utils/path_config.hpp>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -43,20 +43,44 @@ std::vector<std::string> get_subdirs(const std::string &dir, const std::string &
 
 int main()
 {
+  auto regression_routine = [](const auto &dir, auto N_sims, auto tau)
+  {
+    auto [theta_LS, theta_QR, MSE, MAE] = regression_on_datasets(dir, N_sims, tau, 0);
+    std::ofstream LS_f(dir + "theta_LS.csv");
+    std::ofstream QR_f(dir + "theta_QR.csv");
+    linewrite(LS_f, theta_LS);
+    linewrite(QR_f, theta_QR);
+
+    std::ofstream MSE_f(dir + "MSE.csv");
+    std::ofstream MAE_f(dir + "MAE.csv");
+    linewrite(MSE_f, MSE);
+    linewrite(MAE_f, MAE);
+  };
+
+  auto str_append = [](const auto &dirs, const auto &str)
+  {
+    std::vector<std::string> new_dirs(dirs.size());
+    std::transform(dirs.begin(), dirs.end(), new_dirs.begin(), [&str](const auto &s)
+                   { return s + str; });
+    return new_dirs;
+  };
+
   float tau = .8f;
   std::string path = Sim_Datapath;
   std::vector<std::string> subdirs = get_subdirs(path, "p_out_");
-  std::for_each(subdirs.begin(), subdirs.end(), [tau](const std::string &s)
+  std::for_each(subdirs.begin(), subdirs.end(), [&](const std::string &s)
                 {
       auto graphdirs = get_subdirs(s, "Graph_");
+      auto true_dirs = str_append(graphdirs, "True_Communities/");
+      auto detected_dirs = str_append(graphdirs, "Detected_Communities/");
       Sim_Param p = parse_json(s + "/Sim_Param.json");
-      for(auto&& gdir: graphdirs)
+      for(auto&& td: true_dirs)
       {
-      auto [theta_LS, theta_QR] = regression_on_datasets(gdir, p.N_sims, tau, 0);
-      std::ofstream LS_f(gdir + "theta_LS.csv");
-      std::ofstream QR_f(gdir + "theta_QR.csv");
-      linewrite(LS_f, theta_LS);
-      linewrite(QR_f, theta_QR);
+        regression_routine(td, p.N_sims, tau);
+      }
+      for(auto&& dd: detected_dirs)
+      {
+        regression_routine(dd, p.N_sims, tau);
       } });
 
   return 0;

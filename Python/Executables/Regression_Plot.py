@@ -9,8 +9,7 @@ import pandas as pd
 def basename(path):
     return os.path.basename(os.path.normpath(path))
 
-def get_SBM_connection_elements(N_communities, connection_data, is_in_connections):
-    ccm = complete_ccm(N_communities, True)
+def get_SBM_connection_elements(ccm, connection_data, is_in_connections):
     result = []
     for i, c in enumerate(ccm):
         if ((c[0] == c[1]) and is_in_connections):
@@ -19,18 +18,14 @@ def get_SBM_connection_elements(N_communities, connection_data, is_in_connection
             result.append(connection_data[:,i])
     return np.array(result)
 
-def get_beta_std(graph_beta, N_communities, is_in_connection):
-    connection_betas = get_SBM_connection_elements(N_communities, graph_beta, is_in_connection)
+def get_beta_std(graph_beta, ccm, is_in_connection):
+    connection_betas = get_SBM_connection_elements(ccm, graph_beta, is_in_connection)
     return np.std(connection_betas,axis=0)
-def get_beta_mean(graph_beta, N_communities, is_in_connection):
-    connection_betas = get_SBM_connection_elements(N_communities, graph_beta, is_in_connection)
+def get_beta_mean(graph_beta, ccm, is_in_connection):
+    connection_betas = get_SBM_connection_elements(ccm, graph_beta, is_in_connection)
     return np.mean(connection_betas, axis=0)
 
-
-if __name__ == '__main__':
-    fig, ax = plt.subplots()
-
-    p_dirs = get_p_dirs(Data_dir)
+def get_theta_mean_std(p_dirs, Sim_basedirname):
     beta_LS_mean, beta_QR_mean, beta_LS_std, beta_QR_std = [], [], [], []
     for i, p_dir in enumerate(p_dirs):
         #get parameters from jsjon
@@ -38,11 +33,11 @@ if __name__ == '__main__':
         with open(p_dir + "/Sim_Param.json") as f:
             params = json.load(f)
         graph_dirs = get_graph_dirs(p_dir)
-
-        N_connections = np.genfromtxt(graph_dirs[0] + "/theta_LS.csv", delimiter=",").shape[0]
+        sim_dirs = [gd + "/" + Sim_basedirname for gd in graph_dirs]
+        N_connections = np.genfromtxt(sim_dirs[0] + "/theta_LS.csv", delimiter=",").shape[0]
         graph_beta_LS = np.zeros((params["N_graphs"], N_connections))
         graph_beta_QR = np.zeros((params["N_graphs"], N_connections))
-        for g_idx, g_dir in enumerate(graph_dirs):
+        for g_idx, g_dir in enumerate(sim_dirs):
             graph_beta_LS[g_idx, :] = np.genfromtxt(g_dir + "/theta_LS.csv", delimiter=",")
             graph_beta_QR[g_idx,:] = np.genfromtxt(g_dir + "/theta_QR.csv", delimiter=",")
         beta_LS_mean.append(np.mean(graph_beta_LS, axis=0))
@@ -55,10 +50,23 @@ if __name__ == '__main__':
     beta_QR_mean = np.array(beta_QR_mean).T
     beta_LS_std = np.array(beta_LS_std).T
     beta_QR_std = np.array(beta_QR_std).T
+    return beta_LS_mean, beta_QR_mean, beta_LS_std, beta_QR_std
+
+
+if __name__ == '__main__':
+    fig, ax = plt.subplots()
+    p_dirs = get_p_dirs(Data_dir)
+
+
+
     #extract numbers from p_dirs
     p_out = [float(basename(p_dir).split("_")[2]) for p_dir in p_dirs]
     #sort ascending
     p_out = np.sort(p_out)
+    #sort p_dirs wrt p_out
+    p_dirs = [p_dir for _, p_dir in sorted(zip(p_out, p_dirs))]
+    beta_LS_mean, beta_QR_mean, beta_LS_std, beta_QR_std = get_theta_mean_std(p_dirs, "True_Communities")
+
     LS_mean_df = pd.DataFrame(beta_LS_mean, columns=p_out)
     QR_mean_df = pd.DataFrame(beta_QR_mean, columns=p_out)
     LS_std_df = pd.DataFrame(beta_LS_std, columns=p_out)
@@ -77,7 +85,7 @@ if __name__ == '__main__':
     fig.savefig(Data_dir + "/Regression_Betas.pdf", format='pdf', dpi=1000)
 
 
-    LS_mean_out_df = pd.DataFrame(get_SBM_connection_elements(N_communities, beta_LS_mean, columns=p_out)
-    QR_mean_out_df = pd.DataFrame(beta_QR_mean, columns=p_out)
-    LS_std_out_df = pd.DataFrame(beta_LS_std, columns=p_out)
-    QR_std_out_df = pd.DataFrame(beta_QR_std, columns=p_out)
+    # LS_mean_out_df = pd.DataFrame(get_SBM_connection_elements(, beta_LS_mean, columns=p_out)
+    # QR_mean_out_df = pd.DataFrame(beta_QR_mean, columns=p_out)
+    # LS_std_out_df = pd.DataFrame(beta_LS_std, columns=p_out)
+    # QR_std_out_df = pd.DataFrame(beta_QR_std, columns=p_out)

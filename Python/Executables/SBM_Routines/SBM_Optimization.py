@@ -10,7 +10,7 @@ def complete_graph_max_edges(N):
 def get_avg_init_state(Graph_dir, N):
     avg_init_state = None
     for i in range(N):
-        filename = Graph_dir + "community_trajectory_" + str(i) + ".csv"
+        filename = Graph_dir + "/Trajectories/community_trajectory_" + str(i) + ".csv"
         with open(filename, 'r') as f:
             first_line = f.readline()
             if avg_init_state is None:
@@ -25,9 +25,9 @@ def get_total_traj(community_traj):
 def load_data(Graph_dir, N_sims):
         # c_sources = np.genfromtxt(Graph_dir + "connection_sources_0.csv", delimiter=",")
     alpha = 0.1
-    community_traj = np.genfromtxt(Graph_dir + "community_trajectory_0.csv", delimiter=",")
+    community_traj = np.genfromtxt(Graph_dir + "/Trajectories/community_trajectory_0.csv", delimiter=",")
     N_communities = int(community_traj.shape[1] / 3)
-    p_Is_data = np.genfromtxt(Graph_dir + "p_I_0.csv", delimiter=",")
+    p_Is_data = np.genfromtxt(Graph_dir + "/p_Is/p_I_0.csv", delimiter=",")
     if (len(p_Is_data.shape) == 1):
         p_Is_data.resize((p_Is_data.shape[0], 1))
     N_connections = p_Is_data.shape[1]
@@ -38,9 +38,7 @@ def load_data(Graph_dir, N_sims):
 def delta_I(state_s, state_r, p_I, theta):
     return p_I*state_s[0]*state_r[1]/(state_s[0] + state_r[1] + state_s[2])*theta
 
-
-def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max):
-
+def construct_community_ODE(ccmap, beta, alpha, N_communities, N_connections):
     def community_delta_I(community_idx, c_states, c_p_Is):
         d_I = 0
         state_s = c_states[3*community_idx:3*community_idx+3]
@@ -48,8 +46,9 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
         #Forward:
         for i, ct in enumerate(ccmap[:,1]):
             if (ct == community_idx):
+                r_idx = int(ccmap[i,0])
                 beta_from = beta[i]
-                state_r = c_states[3*int(ccmap[i,0]):3*int(ccmap[i,0])+3]
+                state_r = c_states[3*r_idx:3*r_idx+3]
                 d_I += delta_I(state_s, state_r, c_p_Is[i], beta_from)
 
         return d_I
@@ -77,72 +76,58 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, N_connections, init_st
     delta = vertcat(*delta)
 
     F = Function("f", [c_states, c_p_Is], [delta])
-
-    div_u = 1
-    u = MX.sym("u", (int(Nt/div_u)+1, N_connections))
-    u_unif = MX.sym("u_unif", (int(Nt/div_u)+1, 1))
-    #repeat
-    u_uniform = horzcat(*[u_unif for _ in range(N_connections)])
+    return F
 
 
-    #generate random p_Is between u_min, u_max
 
-    p_I_test = np.random.rand(Nt, N_connections)*(u_max - u_min) + u_min
-    test_state = [init_state]
-    deltas = []
+def construct_objective_from_ODE(F, init_state, Nt, Wu, u_max, sym_u):
+    f = 0
+    N_connections = sym_u.shape[1]
+    Nt_per_u = int(ceil(Nt/sym_u.shape[0]))
+    state = [DM(init_state)]
+    N_pop = int(np.sum(init_state))
+    N_communities = int(init_state.shape[0]/3)
     for i in range(Nt):
-        test_state.append(test_state[-1] + F(test_state[-1], p_I_test[i,:]))
-        deltas.append(F(test_state[-1], p_I_test[i,:]))
+        u_i = sym_u[int(floor(i/Nt_per_u)),:]
+        if (u_i.shape[1] == 1):
+            u_i = horzcat(*[u_i for _ in range(N_connections)])
+        state.append(state[-1] + F(state[-1], u_i))
+        inf_sum = 0
+        for j in range(N_communities):
+            inf_sum += state[i][1+3*j]
+        f += inf_sum/N_pop
+        for k in range(N_connections):
+            f += Wu/N_pop*((u_max - u_i[k])**2)
+            # f -= Wu/N_pop*(u_i[k] - u_max)
+    return f, state
 
-    def construct_objective(sym_u):
-        f = 0
-        state = [DM(init_state)]
+def solve_single_shoot(ccmap, beta, alpha, N_communities, init_state, Nt, Wu, u, u_min, u_max, log_fname):
 
-        for i in range(Nt):
-            u_i = sym_u[int(floor(i/div_u)),:]
-            state.append(state[-1] + F(state[-1], u_i))
-            inf_sum = 0
-            for j in range(N_communities):
-                inf_sum += state[i][1+3*j]
-            f += inf_sum/N_pop
-            for k in range(N_connections):
-                f -= Wu/N_pop*(u_i[k] - u_max)
-        return f, state
+    #get directory of log_fname
+    log_dir = "/".join(log_fname.split("/")[:-1]) + "/"
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
 
-    f, state = construct_objective(u)
+
+    N_connections = u.shape[1]
+    F = construct_community_ODE(ccmap, beta, alpha, N_communities, N_connections)
+    f, state = construct_objective_from_ODE(F, init_state, Nt, Wu, u_max, u)
 
     w = reshape(u, (u.shape[0]*N_connections, 1))
-    f_w_u = Function("f_w_u", [w], [u])
     f_traj = Function("f_traj", [w], [horzcat(*state)])
 
-
-
-    ipopt_options = {"ipopt": {"print_level":0,"file_print_level": 5, "tol":1e-8, "max_iter":1000, "output_file":Data_dir + "ipopt_output.txt"}, "print_time":0}
+    ipopt_options = {"ipopt": {"print_level":0,"file_print_level": 5, "tol":1e-8, "max_iter":1000, "output_file": log_fname}, "print_time":0}
 
 
     solver = nlpsol("solver", "ipopt", {"x":w, "f":f}, ipopt_options)
-
     #solve
-    res = solver(x0=np.ones(w.shape)*u_min, lbx=u_min*np.ones(w.shape), ubx=u_max*np.ones(w.shape))
+    res = solver(x0=np.ones(w.shape)*u_max, lbx=u_min*np.ones(w.shape), ubx=u_max*np.ones(w.shape))
     obj_val = res['f'][0][0]
     w_opt = res["x"].full()
-    u_opt = f_w_u(w_opt).full()
+    # u_opt = f_w_u(w_opt).full()
     traj = f_traj(w_opt).T.full()
 
-
-    f_uniform, state_unif = construct_objective(u_uniform)
-
-    f_traj_uniform = Function("f_traj_uniform", [u_unif], [horzcat(*state_unif)])
-
-    solver_uniform = nlpsol("solver_uniform", "ipopt", {"x":u_unif, "f":f_uniform}, ipopt_options)
-
-    res_uniform = solver_uniform(x0=np.ones(u_unif.shape)*u_min, lbx=u_min*np.ones(u_unif.shape), ubx=u_max*np.ones(u_unif.shape))
-
-    u_opt_uniform = res_uniform["x"].full()
-    traj_uniform = f_traj_uniform(u_opt_uniform).T.full()
-
-    obj_val_uniform = res_uniform['f'][0][0]
-    return u_opt, traj, obj_val, u_opt_uniform, traj_uniform, obj_val_uniform
+    return w_opt, traj, obj_val
 
 
 def solution_plot(traj, u_opt, obj_val, Data_dir):

@@ -100,6 +100,7 @@ void Sim_Param::dump(const std::string& fname) const
     j["N_sims"] = N_sims;
     j["output_dir"] = output_dir;
     j["tau"] = tau;
+    j["simulation_subdir"] = simulation_subdir;
     std::ofstream o(fname);
     o << j.dump();
     o.close();

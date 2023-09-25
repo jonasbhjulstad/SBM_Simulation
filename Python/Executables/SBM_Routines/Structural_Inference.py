@@ -69,7 +69,6 @@ def structural_inference(edgelists, nodelists):
     state = gt.minimize_blockmodel_dl(G, state_args=dict(recs=[weight], rec_types=["discrete-poisson"]))
     edges = G.get_edges()
     vcm = index_relabel_ascending(list(state.get_state()))
-    # ecm = ecm_from_vcm(edges, vcm)
     N_blocks = state.get_nonempty_B()
     entropy = state.entropy()
     return N_blocks, entropy, vcm
@@ -86,19 +85,20 @@ def multiple_structural_inference(edgelists, nodelists):
 def create_sim_param(N_communities, p_in, p_out, seed, N_graphs):
     p = Sim_Param()
     p.N_communities = N_communities
-    p.N_pop = 10
-    p.N_sims = 10
+    p.N_pop = 100
+    p.N_sims = 100
     p.p_in = p_in
     p.p_out = p_out
-    p.Nt = 20
+    p.Nt = 56
     p.Nt_alloc = 5
     p.p_R0 = 0.0
     p.p_R = 0.1
     p.p_I0 = 0.1
-    p.p_I_min = .001
-    p.p_I_max = .05
+    p.p_I_min = .00001
+    p.p_I_max = .005
     p.seed = seed
     p.N_graphs = N_graphs
+    p.simulation_subdir = "/Detected_Communities/"
     p_out_str = str(p_out)[:4]
     if len(p_out_str) < 4:
         p_out_str += "0"*(4-len(p_out_str))
@@ -122,13 +122,12 @@ def inference_over_p_out(N_pop, N_communities, p_in, p_out, seed, N_graphs):
     sim_params = [create_sim_param(N_communities, p_in, po, seed, N_graphs) for po, seed in zip(p_out, seeds)]
     edgelists, vertex_lists, entropies, N_blocks, ecms, vcms = [], [], [], [], [], []
     for p in sim_params:
-        elist, vlist, ecm_0s, vcm_0s = create_graphs(p)
+        elist, vlist, base_ecms, base_vcms = create_graphs(p)
         elist_flat = flatten_sublists(elist)
         edgelists.append(elist_flat)
         vertex_lists.append(vlist)
-        Nb, entropy, vcm_1s = multiple_structural_inference(elist, vlist)
+        Nb, entropy, inferred_vcms = multiple_structural_inference(elist, vlist)
         N_blocks.append(Nb)
         entropies.append(entropy)
-        vcms.append([(vcm_1, vcm_0) for vcm_1, vcm_0 in zip(vcm_1s, vcm_0s)])
-        # ecms.append([(ecm_1, ecm_0) for ecm_1, ecm_0 in zip(ecm_1s, ecm_0s)])
+        vcms.append([(vcm_0, vcm_1) for vcm_1, vcm_0 in zip(inferred_vcms, base_vcms)])
     return edgelists, vertex_lists, N_blocks, entropies, vcms, sim_params

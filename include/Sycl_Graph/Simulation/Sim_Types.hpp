@@ -70,6 +70,7 @@ struct Sim_Param
     sycl::range<1> wg_range;
     std::size_t N_vertices() const { return N_communities * N_pop; }
     std::string output_dir;
+    std::string simulation_subdir;
     void print() const;
     void dump(const std::string &fname) const;
 };

@@ -34,42 +34,42 @@ def read_ccm(fname):
    return np.concatenate([(ef, et) for ef, et in zip(edge_from.T, edge_to.T)], axis=0), edge_weight
 
 
-def optimize(Graph_dir, N_sims, tau, Wu, u_min, u_max):
-   print(Graph_dir)
-   theta_LS, theta_QR = regression_on_datasets(Graph_dir, N_sims, tau, 0)
+def optimize(Sim_dir, output_dir, N_sims, theta, Wu, u_min, u_max, Nt_per_u = 7):
+   print(Sim_dir)
 
-   connection_community_map_path = Graph_dir + "ccm.csv"
+   connection_community_map_path = Sim_dir + "ccm.csv"
 
-   ccmap = np.genfromtxt(connection_community_map_path, delimiter=",")
+   ccmap = np.genfromtxt(connection_community_map_path, delimiter=",", dtype=int)
    if(len(ccmap.shape) == 1):
       ccmap = np.array([ccmap])
-   alpha, N_communities, N_connections, init_state, N_pop, Nt = load_data(Graph_dir, N_sims)
+   alpha, N_communities, N_connections, init_state, N_pop, Nt = load_data(Sim_dir, N_sims)
 
-   u_opt_LS, traj_LS, f_LS, u_opt_LS_uniform, traj_LS_uniform, f_LS_uniform = solve_single_shoot(ccmap, theta_LS, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max)
+   Nu = int(ceil(Nt / Nt_per_u))
+   u = MX.sym("u", Nu, N_connections)
 
-   u_opt_QR, traj_QR, f_QR, u_opt_QR_uniform, traj_QR_uniform, f_QR_uniform = solve_single_shoot(ccmap, theta_QR, alpha, N_communities, N_connections, init_state, N_pop, Nt, Wu, u_min, u_max)
+   w_opt, traj, f  = solve_single_shoot(ccmap, theta, alpha, N_communities, init_state, Nt, Wu, u, u_min, u_max, output_dir + "/IPOPT.log")
+   u_opt = np.reshape(w_opt, (Nu, N_connections))
 
-   assert np.all(get_total_traj(traj_LS)[0,:] == get_total_traj(traj_LS_uniform)[0,:])
+   u_uniform = MX.sym("u_single", Nu, 1)
+   u_opt_uniform, traj_uniform, f_uniform = solve_single_shoot(ccmap, theta, alpha, N_communities, init_state, Nt, Wu, u_uniform, u_min, u_max, output_dir + "/Uniform_IPOPT.log")
 
-   if not os.path.exists(Graph_dir + "LS/"):
-      os.makedirs(Graph_dir + "LS/")
-   if not os.path.exists(Graph_dir + "QR/"):
-      os.makedirs(Graph_dir + "QR/")
+
+   assert np.all(get_total_traj(traj)[0,:] == get_total_traj(traj)[0,:])
+
+   if not os.path.exists(output_dir):
+      os.makedirs(output_dir)
    #write all to file
-   np.savetxt(Graph_dir + "LS/u_opt.csv", u_opt_LS)
-   np.savetxt(Graph_dir + "LS/traj.csv", traj_LS)
-   np.savetxt(Graph_dir + "LS/u_opt_uniform.csv", u_opt_LS_uniform)
-   np.savetxt(Graph_dir + "LS/traj_uniform.csv", traj_LS_uniform)
-   np.savetxt(Graph_dir + "QR/u_opt.csv", u_opt_QR)
-   np.savetxt(Graph_dir + "QR/traj.csv", traj_QR)
-   np.savetxt(Graph_dir + "QR/u_opt_uniform.csv", u_opt_QR_uniform)
-   np.savetxt(Graph_dir + "QR/traj_uniform.csv", traj_QR_uniform)
+   np.savetxt(output_dir + "f.csv", np.array(f))
+   np.savetxt(output_dir + "u_opt.csv", u_opt)
+   np.savetxt(output_dir + "traj.csv", traj)
 
+   np.savetxt(output_dir + "f_uniform.csv", np.array(f_uniform))
+   np.savetxt(output_dir + "u_opt_uniform.csv", u_opt_uniform)
+   np.savetxt(output_dir + "traj_uniform.csv", traj_uniform)
 
-   solution_plot(traj_LS, u_opt_LS, f_LS, Graph_dir + "LS/")
-   solution_plot(traj_QR, u_opt_QR, f_QR, Graph_dir + "QR/")
-   u_opt_comparison_plot(traj_LS, u_opt_LS, f_LS, traj_LS_uniform, u_opt_LS_uniform, f_LS_uniform, Graph_dir + "LS/")
-   u_opt_comparison_plot(traj_QR, u_opt_QR, f_QR, traj_QR_uniform, u_opt_QR_uniform, f_QR_uniform, Graph_dir + "QR/")
+   solution_plot(traj, u_opt, f, output_dir)
+   u_opt_comparison_plot(traj, u_opt, f, traj_uniform, u_opt_uniform, f_uniform, output_dir)
+
 
 def get_p_dirs(base_dir):
       p_dirs = []
@@ -90,15 +90,26 @@ def get_parameters(base_dir):
          params = json.load(f)
       return params
 
+def optimize_sim_dir(sim_dir, N_sims, tau):
+      theta_LS, theta_QR, MSE, MAE= regression_on_datasets(sim_dir, params["N_sims"], tau, 0)
+      np.savetxt(sim_dir + "/theta_LS.csv", theta_LS)
+      np.savetxt(sim_dir + "/theta_QR.csv", theta_QR)
+      np.savetxt(sim_dir + "/MSE.csv", MSE)
+      np.savetxt(sim_dir + "/MAE.csv", MAE)
+      optimize(sim_dir, sim_dir + "/LS/", params["N_sims"], theta_LS, Wu, params["p_I_min"], params["p_I_max"])
+      optimize(sim_dir, sim_dir + "/QR/", params["N_sims"], theta_QR, Wu, params["p_I_min"], params["p_I_max"])
+
 
 if __name__ == '__main__':
 
-   Wu = 50
-   tau = .8
+   Wu = 500
+   tau = .9
    p_dirs = get_p_dirs(Data_dir)
-   for pd in p_dirs[:1]:
-      print(pd)
-      graph_dirs = get_graph_dirs(pd)
-      params = get_parameters(pd)
-      for gd in graph_dirs:
-         optimize(gd, params["N_sims"], tau, Wu, params["p_I_min"], params["p_I_max"])
+   # for pd in p_dirs[:1]:
+   pd = p_dirs[1]
+   print(pd)
+   graph_dirs = get_graph_dirs(pd)
+   params = get_parameters(pd)
+   for gd in graph_dirs:
+      optimize_sim_dir(gd + "/True_Communities/", params["N_sims"], tau)
+      optimize_sim_dir(gd + "/Detected_Communities/", params["N_sims"], tau)
