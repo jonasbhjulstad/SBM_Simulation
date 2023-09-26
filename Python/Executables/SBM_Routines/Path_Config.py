@@ -1,5 +1,6 @@
 import sys
 import os
+import numpy as np
 Project_root = "/home/man/Documents/ER_Bernoulli_Robust_MPC/"
 Binder_path = Project_root + "/build/Binders/"
 Data_dir = Project_root + "data/SIR_sim/"

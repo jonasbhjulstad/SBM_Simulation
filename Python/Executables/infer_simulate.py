@@ -9,6 +9,35 @@ import pandas as pd
 import json
 matplotlib.use('TkAgg')
 
+def get_p_I(R0, N_pop, dt = 1):
+    alpha = 0.1
+    return 1 - np.exp(-R0*alpha*dt/N_pop*5)
+def create_sim_param(N_communities, p_in, p_out, N_pop, seed, N_graphs, R0_min, R0_max):
+    p = Sim_Param()
+    p.N_communities = N_communities
+    p.N_pop = N_pop
+    p.N_sims = 100
+    p.p_in = p_in
+    p.p_out = p_out
+    p.Nt = 56
+    p.Nt_alloc = 5
+    p.p_R0 = 0.0
+    p.p_R = 0.1
+    p.p_I0 = 0.1
+    p.p_I_min = get_p_I(R0_min, p.N_pop)
+    p.p_I_max = get_p_I(R0_max, p.N_pop)
+    p.seed = seed
+    p.N_graphs = N_graphs
+    p.simulation_subdir = "/Detected_Communities/"
+    p_out_str = str(p_out)[:4]
+    if len(p_out_str) < 4:
+        p_out_str += "0"*(4-len(p_out_str))
+
+    p.output_dir = Data_dir + "p_out_" + p_out_str + "/"
+    p.compute_range=sycl_range_1(p.N_graphs*p.N_sims)
+    p.wg_range=sycl_range_1(p.N_graphs*p.N_sims)
+    return p
+
 
 if __name__ == '__main__':
 
@@ -25,6 +54,7 @@ if __name__ == '__main__':
     states = []
     N_blocks = []
     entropies = []
+    N_pop = 100
     fig, ax = plt.subplots(2)
     seeds = np.random.randint(0, 100000, Np)
     pool = mp.Pool(int(mp.cpu_count()/2))
@@ -32,8 +62,10 @@ if __name__ == '__main__':
     #if Data_dir does not exist, create it
     if not os.path.exists(Data_dir):
         os.makedirs(Data_dir)
+    seeds = np.random.randint(0, 100000, len(p_out))
+    sim_params = [create_sim_param(N_communities, p_in, po, N_pop, s, N_graphs, 0.5, 2.5) for po, s in zip(p_out, seeds)]
 
-    edgelists, vertex_lists, N_blocks, entropies, vcms, sim_params = inference_over_p_out(N_communities, N_communities, p_in, p_out, seeds, N_graphs)
+    edgelists, vertex_lists, N_blocks, entropies, vcms, sim_params = inference_over_p_out(sim_params)
     block_df = pd.DataFrame(np.array(N_blocks).T, columns=p_out)
     ent_df = pd.DataFrame(np.array(entropies).T, columns=p_out)
     #violin plot

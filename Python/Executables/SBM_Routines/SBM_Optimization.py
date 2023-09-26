@@ -33,7 +33,7 @@ def load_data(Graph_dir, N_sims):
     N_connections = p_Is_data.shape[1]
     init_state = get_avg_init_state(Graph_dir, N_sims)
     N_pop = np.sum(init_state)
-    Nt = community_traj.shape[0]
+    Nt = community_traj.shape[0] - 1
     return alpha, N_communities, N_connections, init_state, N_pop, Nt
 def delta_I(state_s, state_r, p_I, theta):
     return p_I*state_s[0]*state_r[1]/(state_s[0] + state_r[1] + state_s[2])*theta
@@ -78,27 +78,34 @@ def construct_community_ODE(ccmap, beta, alpha, N_communities, N_connections):
     F = Function("f", [c_states, c_p_Is], [delta])
     return F
 
-
-
-def construct_objective_from_ODE(F, init_state, Nt, Wu, u_max, sym_u):
-    f = 0
-    N_connections = sym_u.shape[1]
-    Nt_per_u = int(ceil(Nt/sym_u.shape[0]))
+def construct_ODE_trajectory(Nt, sym_u, Nt_per_u, F, init_state, N_connections):
     state = [DM(init_state)]
-    N_pop = int(np.sum(init_state))
-    N_communities = int(init_state.shape[0]/3)
     for i in range(Nt):
         u_i = sym_u[int(floor(i/Nt_per_u)),:]
         if (u_i.shape[1] == 1):
             u_i = horzcat(*[u_i for _ in range(N_connections)])
         state.append(state[-1] + F(state[-1], u_i))
+    return state
+
+
+def construct_objective_from_ODE(F, init_state, Nt, Wu, u_max, sym_u):
+    f = 0
+    Nt_per_u = int(ceil(Nt/sym_u.shape[0]))
+    N_pop = int(np.sum(init_state))
+    N_connections = sym_u.shape[1]
+    N_communities = int(init_state.shape[0]/3)
+    state = construct_ODE_trajectory(Nt, sym_u, Nt_per_u, F, init_state, N_connections)
+    for t in range(Nt):
         inf_sum = 0
         for j in range(N_communities):
-            inf_sum += state[i][1+3*j]
+            inf_sum += state[t+1][1+3*j]
         f += inf_sum/N_pop
+        u_i = sym_u[int(floor(t/Nt_per_u)),:]
+        if (u_i.shape[1] == 1):
+            u_i = horzcat(*[u_i for _ in range(N_connections)])
         for k in range(N_connections):
-            f += Wu/N_pop*((u_max - u_i[k])**2)
-            # f -= Wu/N_pop*(u_i[k] - u_max)
+            # f += Wu/N_pop*((u_max - u_i[k])**2)
+            f -= Wu/N_pop*(u_i[k] - u_max)
     return f, state
 
 def solve_single_shoot(ccmap, beta, alpha, N_communities, init_state, Nt, Wu, u, u_min, u_max, log_fname):
@@ -108,12 +115,17 @@ def solve_single_shoot(ccmap, beta, alpha, N_communities, init_state, Nt, Wu, u,
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
+    w = []
 
-    N_connections = u.shape[1]
+    N_connections = ccmap.shape[0]
+    if u.shape[1] != N_connections:
+        w = u
+        u = horzcat(*[u for _ in range(N_connections)])
+    else:
+        w = reshape(u, (u.shape[0]*N_connections, 1))
     F = construct_community_ODE(ccmap, beta, alpha, N_communities, N_connections)
     f, state = construct_objective_from_ODE(F, init_state, Nt, Wu, u_max, u)
 
-    w = reshape(u, (u.shape[0]*N_connections, 1))
     f_traj = Function("f_traj", [w], [horzcat(*state)])
 
     ipopt_options = {"ipopt": {"print_level":0,"file_print_level": 5, "tol":1e-8, "max_iter":1000, "output_file": log_fname}, "print_time":0}

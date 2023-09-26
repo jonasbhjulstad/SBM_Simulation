@@ -16,7 +16,7 @@ def read_trajectories(graph_dir):
     return trajectories
 
 def read_total_trajectories(graph_dir):
-    community_traj = read_trajectories(graph_dir + "/Trajectories/")
+    community_traj = read_trajectories(graph_dir + "/Validation/Trajectories/")
     N_communities = int(community_traj[0].shape[1]/3)
     #sum every third column
     total_traj = np.zeros((len(community_traj), community_traj[0].shape[0], 3))
@@ -35,12 +35,14 @@ def plot_SIR_percentile_trajectory(graph_dir, ax):
     #get percentiles
     percentiles = [np.percentile(trajectories, p, axis=0) for p in np.linspace(5, 95, 11)]
 
+
     Nt = mean.shape[0]
     #ax is 3 subplots
     #fill_between
-    for perc in percentiles:
+    mid_idx= int(floor(len(percentiles)/2))
+    for j in range(mid_idx):
         for i in range(3):
-            ax[i].fill_between(np.arange(Nt), mean[:,i] - perc[:,i], mean[:,i] + perc[:,i], color='gray', alpha=0.05)
+            ax[i].fill_between(np.arange(Nt), percentiles[mid_idx - j][:,i], percentiles[mid_idx + j][:,i], color='gray', alpha=0.05)
     for i in range(3):
         ax[i].plot(np.arange(Nt), mean[:,i], color='k', linewidth=2, linestyle='--')
 
@@ -52,19 +54,13 @@ def get_MX_total_traj(x):
             x_tot[i] += x[3*j + i]
     return horzcat(*x_tot)
 
-def construct_trajectory_F(F, Nt, N_communities, N_connections, Nt_per_u):
-
-    x0 = MX.sym("x0", 3*N_communities)
+def f_ODE(ccm, theta, Nt, N_communities, N_connections, init_state):
+    sym_u = MX.sym("u", Nt, N_connections)
+    Nt_per_u = 7
     Nu = int(ceil(Nt / Nt_per_u))
-    u = MX.sym("u", Nu, N_connections)
-    x = [x0]
-    x_tot = [get_MX_total_traj(x0)]
-    for i in range(Nt):
-        u_idx = int(floor(i/Nt_per_u))
-        x.append(F(x[i], u[u_idx]))
-        x_tot.append(get_MX_total_traj(x[-1]))
-    x_result = vertcat(*x_tot)
-    return Function('f_traj', [x0, u], [x_result])
+    F = construct_community_ODE(ccm, theta, 0.1, N_communities, N_connections)
+    state = construct_ODE_trajectory(Nt, sym_u, Nt_per_u, F, init_state, N_connections)
+    return Function("f_ODE", [sym_u], [horzcat(*state).T])
 
 
 def plot_LS_predictions(graph_dir, ax, Nt, N_sims):
@@ -73,24 +69,43 @@ def plot_LS_predictions(graph_dir, ax, Nt, N_sims):
     ccm = np.genfromtxt(graph_dir + "ccm.csv", delimiter=",", dtype=int)[:,:2]
     N_communities = np.max((np.max(ccm, axis=1))) + 1
     N_connections = thetas.shape[0]
-    F = construct_community_ODE(ccm, thetas, alpha, N_communities, N_connections)
-    f_ODE = construct_trajectory_F(F, Nt, N_communities, N_connections, 7)
-    u_opt = np.genfromtxt(graph_dir + "/LS/u_opt.csv", delimiter=" ")
 
-    u_opt_uniform = np.genfromtxt(graph_dir + "/LS/u_opt_uniform.csv", delimiter=",")
     x_init = get_avg_init_state(graph_dir, N_sims)
-    traj = f_ODE(x_init, u_opt).full()
-    traj_uniform = f_ODE(x_init, u_opt_uniform).full()
-
+    f = f_ODE(ccm, thetas, Nt, N_communities, N_connections, x_init)
+    u_opt_uniform = np.genfromtxt(graph_dir + "/LS/u_opt_uniform.csv", delimiter=",")
+    u_opt_uniform = np.repeat([u_opt_uniform], N_connections, axis=0).T
+    Nt_per_u = 7
+    u_opt_uniform = np.repeat(u_opt_uniform, Nt_per_u, axis=0)
+    u_opt = np.genfromtxt(graph_dir + "/LS/u_opt.csv", delimiter=" ")
+    traj = get_total_traj(f(np.repeat(u_opt, Nt_per_u, axis=0)).full())
+    traj_uniform = get_total_traj(f(u_opt_uniform).full())
     t = np.array(range(Nt+1))
 
     for i in range(3):
         ax[i].plot(t, traj[:,i], color='b', linewidth=2)
         ax[i].plot(t, traj_uniform[:,i], color='r', linewidth=2)
-        # ax[i].set_xlabel("t")
-        # ax[i].set_ylabel("I(t)")
-        # ax[i].set_title("I(t) for community " + str(i))
 
+def plot_QR_predictions(graph_dir, ax, Nt, N_sims):
+    alpha = 0.1
+    thetas = np.genfromtxt(graph_dir + "theta_QR.csv", delimiter=",")
+    ccm = np.genfromtxt(graph_dir + "ccm.csv", delimiter=",", dtype=int)[:,:2]
+    N_communities = np.max((np.max(ccm, axis=1))) + 1
+    N_connections = thetas.shape[0]
+
+    x_init = get_avg_init_state(graph_dir, N_sims)
+    f = f_ODE(ccm, thetas, Nt, N_communities, N_connections, x_init)
+    u_opt_uniform = np.genfromtxt(graph_dir + "/LS/u_opt_uniform.csv", delimiter=",")
+    u_opt_uniform = np.repeat([u_opt_uniform], N_connections, axis=0).T
+    Nt_per_u = 7
+    u_opt_uniform = np.repeat(u_opt_uniform, Nt_per_u, axis=0)
+    u_opt = np.genfromtxt(graph_dir + "/LS/u_opt.csv", delimiter=" ")
+    traj = get_total_traj(f(np.repeat(u_opt, Nt_per_u, axis=0)).full())
+    traj_uniform = get_total_traj(f(u_opt_uniform).full())
+    t = np.array(range(Nt+1))
+
+    for i in range(3):
+        ax[i].plot(t, traj[:,i], color='b', linewidth=2)
+        ax[i].plot(t, traj_uniform[:,i], color='r', linewidth=2)
 
 
 

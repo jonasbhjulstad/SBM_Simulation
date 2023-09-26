@@ -8,7 +8,7 @@
 Sim_Buffers::Sim_Buffers(cl::sycl::buffer<Static_RNG::default_rng> &rngs,
                          cl::sycl::buffer<SIR_State, 3> &vertex_state,
                          cl::sycl::buffer<uint32_t, 3> &accumulated_events,
-                        //  cl::sycl::buffer<uint8_t, 3> &edge_events,
+                         //  cl::sycl::buffer<uint8_t, 3> &edge_events,
                          cl::sycl::buffer<float, 3> &p_Is,
                          cl::sycl::buffer<uint32_t> &edge_from,
                          cl::sycl::buffer<uint32_t> &edge_to,
@@ -24,7 +24,7 @@ Sim_Buffers::Sim_Buffers(cl::sycl::buffer<Static_RNG::default_rng> &rngs,
                          const std::vector<uint32_t> &N_communities) : rngs(std::move(rngs)),
                                                                        vertex_state(std::move(vertex_state)),
                                                                        accumulated_events(std::move(accumulated_events)),
-                                                                    //    edge_events(std::move(edge_events)),
+                                                                       //    edge_events(std::move(edge_events)),
                                                                        p_Is(std::move(p_Is)),
                                                                        edge_from(std::move(edge_from)),
                                                                        edge_to(std::move(edge_to)),
@@ -40,7 +40,9 @@ Sim_Buffers::Sim_Buffers(cl::sycl::buffer<Static_RNG::default_rng> &rngs,
                                                                        ccm(ccm),
                                                                        N_communities_vec(N_communities),
                                                                        N_communities_max(std::max_element(N_communities_vec.begin(), N_communities_vec.end())[0]),
-                                                                       N_edges_tot(edge_from.get_range()[0]) {}
+                                                                       N_edges_tot(edge_from.get_range()[0])
+{
+}
 
 std::vector<uint32_t> join_vectors(const std::vector<std::vector<uint32_t>> &vs)
 {
@@ -180,7 +182,7 @@ void validate_maps(const std::vector<std::vector<uint32_t>> &ecms, const std::ve
 
 void validate_ecm(const auto &edge_list, const auto &ecm, const auto &ccm, const auto &vcm)
 {
-    auto directed_equal = [](const auto& e_0, const auto& e_1)
+    auto directed_equal = [](const auto &e_0, const auto &e_1)
     {
         return (e_0.first == e_1.first) && (e_0.second == e_1.second);
     };
@@ -247,10 +249,9 @@ auto get_max_elements(const std::vector<std::vector<uint32_t>> &vec)
 {
     std::vector<uint32_t> vec_max(vec.size());
     std::transform(vec.begin(), vec.end(), vec_max.begin(), [](const auto &v)
-                   { return std::max_element(v.begin(), v.end())[0];});
+                   { return std::max_element(v.begin(), v.end())[0]; });
     return vec_max;
 }
-
 
 auto get_max_size(const std::vector<std::vector<uint32_t>> &vec)
 {
@@ -269,7 +270,7 @@ auto get_sizes(const std::vector<std::vector<T>> &vec)
     return vec_max;
 }
 
-std::vector<std::vector<std::pair<uint32_t, uint32_t>>> mirror_duplicate_edge_list(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list)
+std::vector<std::vector<std::pair<uint32_t, uint32_t>>> mirror_duplicate_edge_list(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list)
 {
     std::vector<std::vector<std::pair<uint32_t, uint32_t>>> result(edge_list.size());
     std::transform(edge_list.begin(), edge_list.end(), result.begin(), [](const auto &edge_list_elem)
@@ -365,6 +366,11 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
         p_Is_init = generate_floats(p.Nt * N_sims_tot * N_connections_max, p.p_I_min, p.p_I_max, 8, p.seed);
     }
 
+    else
+    {
+        if_false_throw(p_Is_init.size() == p.Nt * N_sims_tot * std::accumulate(N_connections_vec.begin(), N_connections_vec.end(), 0), "p_Is_init.size() != p.Nt*N_sims_tot*N_connections");
+    }
+
     alloc_events[1] = initialize_device_buffer<float, 3>(q, p_Is_init, p_Is);
     alloc_events[2] = initialize_device_buffer<uint32_t, 1>(q, edge_from_init, edge_from);
     alloc_events[3] = initialize_device_buffer<uint32_t, 1>(q, edge_to_init, edge_to);
@@ -394,7 +400,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     return Sim_Buffers(rngs,
                        trajectory,
                        accumulated_events,
-                    //    edge_events,
+                       //    edge_events,
                        p_Is,
                        edge_from,
                        edge_to,

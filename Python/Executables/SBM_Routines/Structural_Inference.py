@@ -82,31 +82,6 @@ def multiple_structural_inference(edgelists, nodelists):
         vcms.append(vcm)
     return N_blocks, entropies, vcms
 
-def create_sim_param(N_communities, p_in, p_out, seed, N_graphs):
-    p = Sim_Param()
-    p.N_communities = N_communities
-    p.N_pop = 100
-    p.N_sims = 100
-    p.p_in = p_in
-    p.p_out = p_out
-    p.Nt = 56
-    p.Nt_alloc = 5
-    p.p_R0 = 0.0
-    p.p_R = 0.1
-    p.p_I0 = 0.1
-    p.p_I_min = .00001
-    p.p_I_max = .005
-    p.seed = seed
-    p.N_graphs = N_graphs
-    p.simulation_subdir = "/Detected_Communities/"
-    p_out_str = str(p_out)[:4]
-    if len(p_out_str) < 4:
-        p_out_str += "0"*(4-len(p_out_str))
-
-    p.output_dir = Data_dir + "p_out_" + p_out_str + "/"
-    p.compute_range=sycl_range_1(p.N_graphs*p.N_sims)
-    p.wg_range=sycl_range_1(p.N_graphs*p.N_sims)
-    return p
 def flatten_sublists(l):
     result = []
     for sublist in l:
@@ -117,9 +92,9 @@ def flatten_sublists(l):
 def create_graphs(p):
     edgelists, vertexlists, base_ecm, base_vcm = generate_N_SBM_graphs(p.N_pop, p.N_communities, p.p_in, p.p_out, p.seed, p.N_graphs)
     return edgelists, vertexlists, base_ecm, base_vcm
-def inference_over_p_out(N_pop, N_communities, p_in, p_out, seed, N_graphs):
-    seeds = np.random.randint(0, 100000, N_graphs)
-    sim_params = [create_sim_param(N_communities, p_in, po, seed, N_graphs) for po, seed in zip(p_out, seeds)]
+def inference_over_p_out(sim_params):
+    seeds = np.random.randint(0, 100000, sim_params[0].N_graphs)
+
     edgelists, vertex_lists, entropies, N_blocks, ecms, vcms = [], [], [], [], [], []
     for p in sim_params:
         elist, vlist, base_ecms, base_vcms = create_graphs(p)

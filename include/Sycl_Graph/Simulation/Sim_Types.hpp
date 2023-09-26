@@ -45,7 +45,7 @@ struct Sim_Param
     }
 
     Sim_Param() : compute_range(sycl::range<1>(1)), wg_range(sycl::range<1>(1)) {}
-
+    Sim_Param(const std::string& fname);
     uint32_t N_communities = 4;
     uint32_t N_pop = 100;
     uint32_t N_sims = 2;
@@ -68,9 +68,9 @@ struct Sim_Param
     std::size_t global_mem_size = 0;
     sycl::range<1> compute_range;
     sycl::range<1> wg_range;
-    std::size_t N_vertices() const { return N_communities * N_pop; }
     std::string output_dir;
     std::string simulation_subdir;
+    std::size_t N_vertices() const { return N_communities * N_pop; }
     void print() const;
     void dump(const std::string &fname) const;
 };

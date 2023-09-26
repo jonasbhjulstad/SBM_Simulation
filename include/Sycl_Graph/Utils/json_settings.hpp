@@ -53,6 +53,11 @@ Sim_Param parse_json(const std::string& fname)
     p.output_dir = data["output_dir"].get<std::string>();
     p.tau = data["tau"].get<float>();
     p.simulation_subdir = data["simulation_subdir"].get<std::string>();
+    p.compute_range = sycl::range<1>(p.N_graphs * p.N_sims);
+    p.wg_range = sycl::range<1>(p.N_sims);
+    p.local_mem_size = 0;
+    p.global_mem_size = 0;
+
     i.close();
     return p;
 }

@@ -1,6 +1,7 @@
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <algorithm>
 #include <fstream>
+#include <Sycl_Graph/Utils/json_settings.hpp>
 #include <nlohmann/json.hpp>
 Sim_Data::Sim_Data(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections) : events_to_timeseries(N_sims, std::vector<std::vector<uint32_t>>(Nt, std::vector<uint32_t>(N_connections, 0))),
                                                                                                    events_from_timeseries(N_sims, std::vector<std::vector<uint32_t>>(Nt, std::vector<uint32_t>(N_connections, 0))),
@@ -62,6 +63,12 @@ sycl::range<1> get_compute_range(sycl::queue &q, uint32_t N_sims)
     float d_max_wg_size = max_wg_size;
     auto N_compute_units = static_cast<uint32_t>(std::ceil(d_sims / d_max_wg_size));
     return N_compute_units;
+}
+
+
+Sim_Param::Sim_Param(const std::string& fname): compute_range(sycl::range<1>(1)), wg_range(sycl::range<1>(1))
+{
+    *this = parse_json(fname);
 }
 
 

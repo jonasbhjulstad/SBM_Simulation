@@ -174,5 +174,6 @@ void p_I_run(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pai
 {
     auto p_I_lin = dataframe_linearize(p_Is);
     auto b = Sim_Buffers::make(q, p, edge_list, vcm, p_I_lin);
+    b.validate_sizes(p);
     run(q, p, b);
 }
