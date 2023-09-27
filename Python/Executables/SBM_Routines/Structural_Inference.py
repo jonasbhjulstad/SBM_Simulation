@@ -92,6 +92,17 @@ def flatten_sublists(l):
 def create_graphs(p):
     edgelists, vertexlists, base_ecm, base_vcm = generate_N_SBM_graphs(p.N_pop, p.N_communities, p.p_in, p.p_out, p.seed, p.N_graphs)
     return edgelists, vertexlists, base_ecm, base_vcm
+
+def multiple_structural_inference_over_p_out(sim_params):
+    seeds = np.random.randint(0, 100000, sim_params[0].N_graphs)
+    entropies, N_blocks = [], []
+    for p in sim_params:
+        print(p.p_out)
+        elist, vlist, _, _ = create_graphs(p)
+        Nb, entropy, _ = multiple_structural_inference(elist, vlist)
+        N_blocks.append(Nb)
+        entropies.append(entropy)
+    return N_blocks, entropies
 def inference_over_p_out(sim_params):
     seeds = np.random.randint(0, 100000, sim_params[0].N_graphs)
 

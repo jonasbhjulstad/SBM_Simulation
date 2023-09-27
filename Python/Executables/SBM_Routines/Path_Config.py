@@ -12,6 +12,8 @@ def get_p_dirs(base_dir):
       for d in os.listdir(base_dir):
          if (os.path.isdir(base_dir + d) and d.startswith("p_out")):
                p_dirs.append(base_dir + d + "/")
+      #get float number
+      p_dirs = sorted(p_dirs, key=lambda x: float(x.split("/")[-2].split("_")[-1]))
       return p_dirs
 
 def get_graph_dirs(base_dir):
@@ -19,6 +21,8 @@ def get_graph_dirs(base_dir):
       for d in os.listdir(base_dir):
          if (os.path.isdir(base_dir + d) and d.startswith("Graph")):
                graph_dirs.append(base_dir + d + "/")
+      #get float number
+      graph_dirs = sorted(graph_dirs, key=lambda x: float(x.split("/")[-2].split("_")[-1]))
       return graph_dirs
 def get_detected_dirs(base_dir):
      graph_dirs = get_graph_dirs(base_dir)

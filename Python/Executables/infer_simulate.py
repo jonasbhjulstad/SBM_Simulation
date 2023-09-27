@@ -1,5 +1,5 @@
 from SBM_Routines.Path_Config import *
-from SBM_Routines.Structural_Inference import inference_over_p_out, complete_graph_max_edges, flatten_sublists, project_mapping
+from SBM_Routines.Structural_Inference import inference_over_p_out, complete_graph_max_edges, flatten_sublists, project_mapping, multiple_structural_inference_over_p_out
 import multiprocessing as mp
 from matplotlib import pyplot as plt
 import matplotlib
@@ -11,7 +11,7 @@ matplotlib.use('TkAgg')
 
 def get_p_I(R0, N_pop, dt = 1):
     alpha = 0.1
-    return 1 - np.exp(-R0*alpha*dt/N_pop*5)
+    return 1 - np.exp(-R0*alpha*dt/N_pop*10)
 def create_sim_param(N_communities, p_in, p_out, N_pop, seed, N_graphs, R0_min, R0_max):
     p = Sim_Param()
     p.N_communities = N_communities
@@ -19,8 +19,8 @@ def create_sim_param(N_communities, p_in, p_out, N_pop, seed, N_graphs, R0_min, 
     p.N_sims = 100
     p.p_in = p_in
     p.p_out = p_out
-    p.Nt = 56
-    p.Nt_alloc = 5
+    p.Nt = 30
+    p.Nt_alloc = 30
     p.p_R0 = 0.0
     p.p_R = 0.1
     p.p_I0 = 0.1
@@ -44,12 +44,12 @@ if __name__ == '__main__':
     Np = 10
     q = sycl_queue(cpu_selector())
 
-    N_communities = 2
+    N_communities = 10
     N_graphs = 1
     # p_out = np.linspace(0.07, 0.16, Np)
-    # p_out = np.linspace(0.3, 0.7, Np)
-    p_out = [0.005]
-    p_in = 0.3
+    p_out = np.linspace(0.05,0.15, Np)[:1]
+    # p_out = [0.005]
+    p_in = 0.1
     Gs = []
     states = []
     N_blocks = []
@@ -62,8 +62,11 @@ if __name__ == '__main__':
     #if Data_dir does not exist, create it
     if not os.path.exists(Data_dir):
         os.makedirs(Data_dir)
-    seeds = np.random.randint(0, 100000, len(p_out))
+
+    #random number up to uint32 max
+    seeds = np.random.randint(0, 100000, Np)
     sim_params = [create_sim_param(N_communities, p_in, po, N_pop, s, N_graphs, 0.5, 2.5) for po, s in zip(p_out, seeds)]
+    # N_blocks, entropies = multiple_structural_inference_over_p_out(sim_params)
 
     edgelists, vertex_lists, N_blocks, entropies, vcms, sim_params = inference_over_p_out(sim_params)
     block_df = pd.DataFrame(np.array(N_blocks).T, columns=p_out)
