@@ -1,9 +1,9 @@
 add_sycl_executable(parallel_SIR_Network)
-target_link_libraries(parallel_SIR_Network PRIVATE Graph Sim_Routines Profiling nlohmann_json::nlohmann_json)
+target_link_libraries(parallel_SIR_Network PUBLIC Graph Sim_Routines Profiling nlohmann_json::nlohmann_json)
 add_sycl_executable(SBM_Regression)
-target_link_libraries(SBM_Regression PRIVATE Static_RNG::Static_RNG TBB::tbb Eigen3::Eigen ortools::ortools Regression)
+target_link_libraries(SBM_Regression PUBLIC Static_RNG::Static_RNG TBB::tbb Eigen3::Eigen ortools::ortools Regression)
 
 add_sycl_executable(gpu_simulate_from_data)
-target_link_libraries(gpu_simulate_from_data PRIVATE Graph Sim_Routines Profiling nlohmann_json::nlohmann_json)
+target_link_libraries(gpu_simulate_from_data PUBLIC Graph Sim_Routines Profiling nlohmann_json::nlohmann_json)
 # add_sycl_executable_nodep(Optimization)
-# target_link_libraries(Optimization PRIVATE nlohmann_json::nlohmann_json casadi)
+# target_link_libraries(Optimization PUBLIC nlohmann_json::nlohmann_json casadi)

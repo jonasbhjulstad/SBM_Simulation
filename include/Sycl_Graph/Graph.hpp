@@ -1,8 +1,7 @@
 #ifndef GRAPH_GENERATION_HPP
 #define GRAPH_GENERATION_HPP
-#include <cstdint>
-#include <fstream>
-#include <vector>
+#include <Sycl_Graph/Utils/Common.hpp>
+
 
 using Edge_List_t = std::vector<std::vector<std::pair<uint32_t, uint32_t>>>;
 using Node_List_t = std::vector<std::vector<uint32_t>>;

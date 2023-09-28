@@ -19,7 +19,7 @@ def create_sim_param(N_communities, p_in, p_out, N_pop, seed, N_graphs, R0_min, 
     p = Sim_Param()
     p.N_communities = N_communities
     p.N_pop = N_pop
-    p.N_sims = 40
+    p.N_sims = 10
     p.p_in = p_in
     p.p_out = p_out
     p.Nt = 30
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     Np = 5
     q = sycl_queue(cpu_selector())
 
-    N_communities = 10
+    N_communities = 2
     N_graphs = 10
     # p_out = np.linspace(0.07, 0.16, Np)
     p_out = np.linspace(0.05,0.15, Np)

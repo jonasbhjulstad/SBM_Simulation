@@ -1,9 +1,13 @@
 #ifndef DYNAMICS_HPP
 #define DYNAMICS_HPP
-#include <CL/sycl.hpp>
+#include <Sycl_Graph/Utils/Common.hpp>
 #include <Static_RNG/distributions.hpp>
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <Sycl_Graph/Simulation/Sim_Buffers.hpp>
+#include <Sycl_Graph/Utils/Buffer_Validation.hpp>
+#include <Sycl_Graph/Utils/Buffer_Utils.hpp>
+
+
 std::vector<sycl::event> recover(sycl::queue &q,
                                  const Sim_Param &p,
                                  sycl::buffer<SIR_State, 3> &vertex_state,

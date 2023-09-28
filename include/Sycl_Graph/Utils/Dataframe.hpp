@@ -1,14 +1,7 @@
 #ifndef SYCL_GRAPH_UTILS_DATAFRAME_HPP
 #define SYCL_GRAPH_UTILS_DATAFRAME_HPP
-#include <Sycl_Graph/Utils/Validation.hpp>
-#include <array>
-#include <cstdint>
-#include <map>
-#include <utility>
-#include <variant>
-#include <algorithm>
-#include <type_traits>
-#include <vector>
+#include <Sycl_Graph/Utils/Common.hpp>
+
 template <typename T, std::size_t N>
 struct Dataframe_t;
 
@@ -178,25 +171,6 @@ struct Dataframe_t
         }
     }
 
-    // template <typename T, std::size_t N, std::size_t N_frames>
-    // Dataframe_t<T,N> dataframe_apply(const std::array<Dataframe_t<T,N>, N_frames>& dfs, T (*f)(const Dataframe_t<T,N>&));
-
-    // template <typename T, std::size_t N, std::size_t N_frames>
-    // Dataframe_t<T,N> dataframe_apply(const std::array<Dataframe_t<T,N>, N_frames>& dfs, auto f)
-    // {
-    //     //iterate over all elements in the dataframe
-    //     Dataframe_t<T,N> result(dfs[0].get_ranges());
-    //     //iterate over ranges
-    //     for(int i = 0; i < result.data.size(); i++)
-    //     {
-    //         std::array<const Dataframe_t<T,N-1>&, N_frames> sub_dfs;
-    //         for(int j = 0; j < N_frames; j++)
-    //         {
-    //             sub_dfs[j] = dfs[j][i];
-    //         }
-    //         result.data[i] = dataframe_apply(sub_dfs, f);
-    //     }
-    // }
 
     Dataframe_t<T, N> operator()(const std::array<std::size_t, N> &&start, const std::array<std::size_t, N> &&end)
     {

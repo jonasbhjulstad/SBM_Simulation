@@ -1,4 +1,3 @@
-#include <Sycl_Graph/Utils/path_config.hpp>
 #include <casadi/casadi.hpp>
 #include <Sycl_Graph/Utils/json_settings.hpp>
 #include <fstream>

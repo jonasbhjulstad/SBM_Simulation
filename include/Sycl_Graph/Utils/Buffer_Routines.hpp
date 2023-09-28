@@ -1,8 +1,7 @@
 #ifndef SYCL_GRAPH_BUFFER_ROUTINES_HPP
 #define SYCL_GRAPH_BUFFER_ROUTINES_HPP
+#include <Sycl_Graph/Utils/Common.hpp>
 
-#include <CL/sycl.hpp>
-#include <vector>
 
 template <typename T>
 void print_buffer(sycl::buffer<T, 1> &buf)
@@ -123,7 +122,7 @@ sycl::event copy_to_buffer(sycl::buffer<T> &buf, const std::vector<std::vector<T
   #endif
   sycl::event event;
   std::for_each(vecs.begin(), vecs.end(), [&, n = 0](const auto &vec) mutable
-                 { event = copy_to_buffer(buf, vec, q, n, event); 
+                 { event = copy_to_buffer(buf, vec, q, n, event);
                     n += vec.size();});
   return event;
 }

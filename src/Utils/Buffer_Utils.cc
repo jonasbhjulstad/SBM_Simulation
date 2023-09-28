@@ -1,5 +1,7 @@
-#include <Sycl_Graph/Utils/Buffer_Utils.hpp>
-
+#include "Sycl_Graph/Utils/Buffer_Utils_impl.hpp"
+#include <random>
+#include <execution>
+#include <Static_RNG/distributions.hpp>
 void linewrite(std::ofstream &file, const std::vector<uint32_t> &state_iter)
 {
     for (const auto &t_i_i : state_iter)
@@ -194,3 +196,27 @@ sycl::event generate_floats(sycl::queue& q, std::vector<float>& result, float mi
 
     return cpy_event;
 }
+
+
+template std::vector<std::vector<uint32_t>> diff(const std::vector<std::vector<uint32_t>> &v);
+template std::vector<std::vector<int>> diff(const std::vector<std::vector<int>> &v);
+
+template sycl::event initialize_device_buffer<uint32_t, 1>(sycl::queue& q, const std::vector<uint32_t> &host_data, sycl::buffer<uint32_t, 1>& buf);
+template sycl::event initialize_device_buffer<uint32_t, 2>(sycl::queue& q, const std::vector<uint32_t> &host_data, sycl::buffer<uint32_t, 2>& buf);
+template sycl::event initialize_device_buffer<uint32_t, 3>(sycl::queue& q, const std::vector<uint32_t> &host_data, sycl::buffer<uint32_t, 3>& buf);
+
+template sycl::event initialize_device_buffer<float, 1>(sycl::queue& q, const std::vector<float> &host_data, sycl::buffer<float, 1>& buf);
+template sycl::event initialize_device_buffer<float, 2>(sycl::queue& q, const std::vector<float> &host_data, sycl::buffer<float, 2>& buf);
+template sycl::event initialize_device_buffer<float, 3>(sycl::queue& q, const std::vector<float> &host_data, sycl::buffer<float, 3>& buf);
+
+
+template sycl::event read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, std::vector<SIR_State>& result, std::vector<sycl::event>& dep_events);
+template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, std::vector<State_t>& result, std::vector<sycl::event>& dep_events);
+
+template sycl::event read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, std::vector<SIR_State>& result, sycl::event& dep_event);
+template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, std::vector<State_t>& result, sycl::event& dep_event);
+
+template sycl::event read_buffer<SIR_State, 3>(sycl::buffer<SIR_State,3>& buf, sycl::queue& q, std::vector<SIR_State>& p_result, std::vector<sycl::event>& dep_events, sycl::range<3> range, sycl::range<3> offset);
+template sycl::event read_buffer<State_t, 3>(sycl::buffer<State_t,3>& buf, sycl::queue& q, std::vector<State_t>& p_result, std::vector<sycl::event>& dep_events, sycl::range<3> range, sycl::range<3> offset);
+
+template sycl::event clear_buffer<uint32_t, 3>(sycl::queue& q, sycl::buffer<uint32_t, 3>& buf, std::vector<sycl::event>& dep_events);

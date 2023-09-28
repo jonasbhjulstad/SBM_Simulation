@@ -1,8 +1,6 @@
 #ifndef SIM_TIMESERIES_HPP
 #define SIM_TIMESERIES_HPP
-#include <CL/sycl.hpp>
-#include <Sycl_Graph/SIR_Types.hpp>
-#include <Sycl_Graph/Utils/Validation.hpp>
+#include <Sycl_Graph/Utils/Common.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
 #include <Sycl_Graph/Utils/Dataframe.hpp>
 #include <cmath>

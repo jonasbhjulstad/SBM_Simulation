@@ -1,6 +1,5 @@
 #include <Eigen/Dense>
 #include <Sycl_Graph/Regression.hpp>
-#include <Sycl_Graph/Utils/json_settings.hpp>
 #include <Sycl_Graph/Utils/path_config.hpp>
 #include <filesystem>
 #include <fstream>

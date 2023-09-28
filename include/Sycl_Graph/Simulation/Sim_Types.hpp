@@ -1,9 +1,8 @@
 #ifndef SIM_TYPES_HPP
 #define SIM_TYPES_HPP
-#include <CL/sycl.hpp>
-#include <Sycl_Graph/SIR_Types.hpp>
-#include <cstdint>
-#include <string>
+#include <Sycl_Graph/Utils/Common.hpp>
+#include <nlohmann/json.hpp>
+
 struct Edge_t
 {
     uint32_t from;
@@ -73,8 +72,12 @@ struct Sim_Param
     std::size_t N_vertices() const { return N_communities * N_pop; }
     void print() const;
     void dump(const std::string &fname) const;
+    static Sim_Param get_settings();
+    static Sim_Param parse_json(const std::string& fname);
+    static void generate_default_json(const std::string& fname);
 };
 std::size_t get_sim_data_byte_size(uint32_t Nt, uint32_t N_sims, uint32_t N_communities, uint32_t N_connections);
+
 
 
 

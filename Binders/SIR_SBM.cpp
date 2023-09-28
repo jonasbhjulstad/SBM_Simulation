@@ -1,8 +1,4 @@
-#include <CL/sycl.hpp>
-#include <Sycl_Graph/Graph.hpp>
-#include <Sycl_Graph/Regression.hpp>
-#include <Sycl_Graph/Simulation/Sim_Routines.hpp>
-#include <Sycl_Graph/Utils/Profiling.hpp>
+#include <Sycl_Graph/Sycl_Graph.hpp>
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>

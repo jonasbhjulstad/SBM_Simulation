@@ -1,8 +1,8 @@
 
 #include <Sycl_Graph/Graph.hpp>
-#include <Sycl_Graph/Simulation/Sim_Routines.hpp>
+#include <Sycl_Graph/Simulation/Simulation.hpp>
 #include <Sycl_Graph/Utils/Profiling.hpp>
-#include <Sycl_Graph/Utils/json_settings.hpp>
+#include <nlohmann/json.hpp>
 #include <Sycl_Graph/Utils/path_config.hpp>
 // #include <execution>
 // #include <iomanip>

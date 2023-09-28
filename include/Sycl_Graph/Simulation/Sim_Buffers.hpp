@@ -1,24 +1,27 @@
 #ifndef SIM_BUFFERS_HPP
 #define SIM_BUFFERS_HPP
-#include <CL/sycl.hpp>
 #include <Static_RNG/distributions.hpp>
+#include <Sycl_Graph/Utils/Common.hpp>
+#include <Sycl_Graph/Utils/Buffer_Utils.hpp>
+#include <Sycl_Graph/Graph.hpp>
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <Sycl_Graph/Utils/Dataframe.hpp>
+
 struct Sim_Buffers
 {
-    cl::sycl::buffer<Static_RNG::default_rng> rngs;
-    cl::sycl::buffer<SIR_State, 3> vertex_state;
-    cl::sycl::buffer<uint32_t, 3> accumulated_events;
-    // cl::sycl::buffer<uint8_t, 3> edge_events;
-    cl::sycl::buffer<float, 3> p_Is;
-    cl::sycl::buffer<uint32_t> edge_from;
-    cl::sycl::buffer<uint32_t> edge_to;
-    cl::sycl::buffer<uint32_t> ecm;
-    cl::sycl::buffer<uint32_t, 2> vcm;
-    cl::sycl::buffer<uint32_t> edge_counts;
-    cl::sycl::buffer<uint32_t> edge_offsets;
-    cl::sycl::buffer<State_t, 3> community_state;
-    cl::sycl::buffer<uint32_t> N_connections;
+    sycl::buffer<Static_RNG::default_rng> rngs;
+    sycl::buffer<SIR_State, 3> vertex_state;
+    sycl::buffer<uint32_t, 3> accumulated_events;
+    // sycl::buffer<uint8_t, 3> edge_events;
+    sycl::buffer<float, 3> p_Is;
+    sycl::buffer<uint32_t> edge_from;
+    sycl::buffer<uint32_t> edge_to;
+    sycl::buffer<uint32_t> ecm;
+    sycl::buffer<uint32_t, 2> vcm;
+    sycl::buffer<uint32_t> edge_counts;
+    sycl::buffer<uint32_t> edge_offsets;
+    sycl::buffer<State_t, 3> community_state;
+    sycl::buffer<uint32_t> N_connections;
     const std::vector<uint32_t> N_connections_vec;
     const std::vector<uint32_t> N_communities_vec;
     const uint32_t N_connections_max;
@@ -26,20 +29,20 @@ struct Sim_Buffers
     const std::vector<uint32_t> vcm_vec;
     const Dataframe_t<Edge_t, 2> ccm;
     std::size_t N_edges_tot;
-    Sim_Buffers(cl::sycl::buffer<Static_RNG::default_rng> &rngs,
-                         cl::sycl::buffer<SIR_State, 3> &vertex_state,
-                         cl::sycl::buffer<uint32_t, 3> &accumulated_events,
-                        //  cl::sycl::buffer<uint8_t, 3> &edge_events,
-                         cl::sycl::buffer<float, 3> &p_Is,
-                         cl::sycl::buffer<uint32_t> &edge_from,
-                         cl::sycl::buffer<uint32_t> &edge_to,
-                         cl::sycl::buffer<uint32_t> &ecm,
-                         cl::sycl::buffer<uint32_t, 2> &vcm,
+    Sim_Buffers(sycl::buffer<Static_RNG::default_rng> &rngs,
+                         sycl::buffer<SIR_State, 3> &vertex_state,
+                         sycl::buffer<uint32_t, 3> &accumulated_events,
+                        //  sycl::buffer<uint8_t, 3> &edge_events,
+                         sycl::buffer<float, 3> &p_Is,
+                         sycl::buffer<uint32_t> &edge_from,
+                         sycl::buffer<uint32_t> &edge_to,
+                         sycl::buffer<uint32_t> &ecm,
+                         sycl::buffer<uint32_t, 2> &vcm,
                          const std::vector<uint32_t> &vcm_vec,
-                         cl::sycl::buffer<uint32_t> &edge_counts,
-                         cl::sycl::buffer<uint32_t> &edge_offsets,
-                         cl::sycl::buffer<uint32_t> &N_connections,
-                         cl::sycl::buffer<State_t, 3> &community_state,
+                         sycl::buffer<uint32_t> &edge_counts,
+                         sycl::buffer<uint32_t> &edge_offsets,
+                         sycl::buffer<uint32_t> &N_connections,
+                         sycl::buffer<State_t, 3> &community_state,
                          const Dataframe_t<Edge_t, 2> &ccm,
                          const std::vector<uint32_t> &N_connections_vec,
                          const std::vector<uint32_t> &N_communities);

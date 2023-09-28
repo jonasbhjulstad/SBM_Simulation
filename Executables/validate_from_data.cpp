@@ -2,6 +2,7 @@
 #include <Sycl_Graph/Graph.hpp>
 #include <Sycl_Graph/Simulation/Simulation.hpp>
 #include <Sycl_Graph/Utils/Profiling.hpp>
+#include <Sycl_Graph/Utils/json_settings.hpp>
 #include <CL/sycl.hpp>
 #include <chrono>
 #include <filesystem>

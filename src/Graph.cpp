@@ -1,5 +1,5 @@
-#include <Static_RNG/distributions.hpp>
 #include <Sycl_Graph/Graph.hpp>
+#include <Static_RNG/distributions.hpp>
 #include <algorithm>
 #include <execution>
 #include <itertools.hpp>
