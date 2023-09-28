@@ -399,6 +399,27 @@ void read_edgelist(const std::string &fname, std::vector<std::pair<uint32_t, uin
         edges.push_back(std::make_pair(std::stoi(tokens[0]), std::stoi(tokens[1])));
     }
 }
+std::vector<uint32_t> read_vec(const std::string& fpath, size_t N)
+{
+    //read
+    std::vector<uint32_t> result(N);
+    std::fstream f(fpath);
+    std::string line;
+    for(int i = 0; i < N; i++)
+    {
+        std::getline(f, line);
+        result[i] = std::stoi(line);
+    }
+    return result;
+}
+
+std::vector<std::pair<uint32_t, uint32_t>> read_edgelist(const std::string& fname)
+{
+    std::vector<std::pair<uint32_t, uint32_t>> edges;
+    read_edgelist(fname, edges);
+    return edges;
+}
+
 
 void write_vector(const std::string &fname, const std::vector<uint32_t> &vec)
 {

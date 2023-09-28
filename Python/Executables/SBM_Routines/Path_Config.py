@@ -7,6 +7,10 @@ Data_dir = Project_root + "data/SIR_sim/"
 sys.path.append(Binder_path)
 from SIR_SBM import *
 
+def create_dir(dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+
 def get_p_dirs(base_dir):
       p_dirs = []
       for d in os.listdir(base_dir):

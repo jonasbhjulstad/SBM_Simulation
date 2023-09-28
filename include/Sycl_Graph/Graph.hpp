@@ -39,6 +39,9 @@ std::vector<std::pair<uint32_t, uint32_t>> complete_graph(size_t N);
 std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm, uint32_t N_connections);
 void write_edgelist(const std::string& fname, const std::vector<std::pair<uint32_t, uint32_t>>& edges);
 void read_edgelist(const std::string& fname, std::vector<std::pair<uint32_t, uint32_t>>& edges);
+std::vector<std::pair<uint32_t, uint32_t>> read_edgelist(const std::string& fname);
+std::vector<uint32_t> read_vec(const std::string& fpath, size_t N);
+
 void write_vector(const std::string& fname, const std::vector<uint32_t>& vec);
 // std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, float value, uint32_t connection_index);
 std::vector<float> project_on_connection(const std::vector<uint32_t>& ecm, const std::vector<float>& values, uint32_t connection_index);

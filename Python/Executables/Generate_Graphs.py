@@ -9,23 +9,26 @@ import pandas as pd
 import json
 matplotlib.use('TkAgg')
 
-def get_p_I(R0, N_pop, dt = 1):
-    alpha = 0.1
-    return 1 - np.exp(-R0*alpha*dt/N_pop*10)
+
+def ER_p_I(edgelist, N_pop_tot, R0):
+    N_edges = len(edgelist)/2
+    p_I = R0/(N_pop_tot*N_edges)
+    return p_I
+
 def create_sim_param(N_communities, p_in, p_out, N_pop, seed, N_graphs, R0_min, R0_max):
     p = Sim_Param()
     p.N_communities = N_communities
     p.N_pop = N_pop
-    p.N_sims = 100
+    p.N_sims = 40
     p.p_in = p_in
     p.p_out = p_out
     p.Nt = 30
-    p.Nt_alloc = 30
+    p.Nt_alloc = 10
     p.p_R0 = 0.0
     p.p_R = 0.1
     p.p_I0 = 0.1
-    p.p_I_min = get_p_I(R0_min, p.N_pop)
-    p.p_I_max = get_p_I(R0_max, p.N_pop)
+    p.p_I_min = 0.01
+    p.p_I_max = 0.01
     p.seed = seed
     p.N_graphs = N_graphs
     p.simulation_subdir = "/Detected_Communities/"
@@ -41,13 +44,13 @@ def create_sim_param(N_communities, p_in, p_out, N_pop, seed, N_graphs, R0_min, 
 
 if __name__ == '__main__':
 
-    Np = 10
+    Np = 5
     q = sycl_queue(cpu_selector())
 
     N_communities = 10
-    N_graphs = 1
+    N_graphs = 10
     # p_out = np.linspace(0.07, 0.16, Np)
-    p_out = np.linspace(0.05,0.15, Np)[:1]
+    p_out = np.linspace(0.05,0.15, Np)
     # p_out = [0.005]
     p_in = 0.1
     Gs = []
@@ -55,6 +58,9 @@ if __name__ == '__main__':
     N_blocks = []
     entropies = []
     N_pop = 100
+    N_pop_tot = N_communities*N_pop
+    R0_min = 0.1
+    R0_max = 4.0
     fig, ax = plt.subplots(2)
     seeds = np.random.randint(0, 100000, Np)
     pool = mp.Pool(int(mp.cpu_count()/2))
@@ -65,7 +71,7 @@ if __name__ == '__main__':
 
     #random number up to uint32 max
     seeds = np.random.randint(0, 100000, Np)
-    sim_params = [create_sim_param(N_communities, p_in, po, N_pop, s, N_graphs, 0.5, 2.5) for po, s in zip(p_out, seeds)]
+    sim_params = [create_sim_param(N_communities, p_in, po, N_pop, s, N_graphs, 0.1, 2.0) for po, s in zip(p_out, seeds)]
     # N_blocks, entropies = multiple_structural_inference_over_p_out(sim_params)
 
     edgelists, vertex_lists, N_blocks, entropies, vcms, sim_params = inference_over_p_out(sim_params)
@@ -81,22 +87,35 @@ if __name__ == '__main__':
     ax[0].set_ylabel("Number of blocks")
     ax[1].set_ylabel("'Entropy'/Minimum Description Length")
     fig.savefig(Data_dir + "/Structural_Plot.pdf", format='pdf', dpi=1000)
-    # plt.show()
-    # True_Param.json dump N_communities
+    # # plt.show()
+    # # True_Param.json dump N_communities
     with open(Data_dir + "True_Param.json", 'w') as f:
         json.dump({"N_communities": N_communities}, f)
+
+    Graphs_Output_dir = Project_root + "build/data/SIR_sim/"
+    create_dir(Graphs_Output_dir)
+
     for elist, vcm, p in zip(edgelists, vcms, sim_params):
         print("p_out: ", p.p_out)
         base_vcm = [v[0] for v in vcm]
         inferred_vcm = [v[1] for v in vcm]
         detected_vcm = [project_mapping(v[1], v[0])for v in vcm]
-
+        p.p_I_min = ER_p_I(elist,N_pop_tot,R0_min)
+        p.p_I_max = ER_p_I(elist,N_pop_tot,R0_max)
+        p_dir = Graphs_Output_dir + "/p_out_" + str(p.p_out)[:4] + "/"
+        p.dump(p_dir + "Sim_Param.json")
         p.N_communities = max([max(v) for v in base_vcm]) + 1
-        print("Simulation for true communities")
-        p.simulation_subdir = "/True_Communities/"
-        run(q, p, elist, base_vcm)
-
-        print("Simulation for inferred communities")
         p.simulation_subdir = "/Detected_Communities/"
-        p.N_communities = max([max(v) for v in detected_vcm]) + 1
-        run(q, p, elist, detected_vcm)
+        for g_idx in range(p.N_graphs):
+            create_dir(p_dir + "Graph_" + str(g_idx) + "/")
+            np.savetxt(p_dir + "Graph_" + str(g_idx) + "/edgelist.csv", elist[g_idx], delimiter=",", fmt="%i")
+            np.savetxt(p_dir + "Graph_" + str(g_idx) + "/base_vcm.csv", base_vcm[g_idx], delimiter=",", fmt="%i")
+            np.savetxt(p_dir + "Graph_" + str(g_idx) + "/vcm.csv", detected_vcm[g_idx], delimiter=",", fmt="%i")
+
+
+        # print("Simulation for true communities")
+        # p.simulation_subdir = "/True_Communities/"
+        # run(q, p, elist, base_vcm)
+
+        # print("Simulation for inferred communities")
+        # run(q, p, elist, detected_vcm)
