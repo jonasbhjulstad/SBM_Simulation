@@ -47,8 +47,8 @@ if __name__ == '__main__':
     Np = 5
     q = sycl_queue(cpu_selector())
 
-    N_communities = 2
-    N_graphs = 10
+    N_communities = 1
+    N_graphs = 5
     # p_out = np.linspace(0.07, 0.16, Np)
     p_out = np.linspace(0.05,0.15, Np)
     # p_out = [0.005]
@@ -57,9 +57,9 @@ if __name__ == '__main__':
     states = []
     N_blocks = []
     entropies = []
-    N_pop = 100
+    N_pop = 1000
     N_pop_tot = N_communities*N_pop
-    R0_min = 0.1
+    R0_min = 1.0
     R0_max = 4.0
     fig, ax = plt.subplots(2)
     seeds = np.random.randint(0, 100000, Np)
@@ -103,7 +103,7 @@ if __name__ == '__main__':
         p.p_I_min = ER_p_I(elist,N_pop_tot,R0_min)
         p.p_I_max = ER_p_I(elist,N_pop_tot,R0_max)
         p_dir = Graphs_Output_dir + "/p_out_" + str(p.p_out)[:4] + "/"
-        p.dump(p_dir + "Sim_Param.json")
+        p.dump(p_dir + "/Sim_Param.json")
         p.N_communities = max([max(v) for v in base_vcm]) + 1
         p.simulation_subdir = "/Detected_Communities/"
         for g_idx in range(p.N_graphs):

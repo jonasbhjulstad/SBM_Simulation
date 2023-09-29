@@ -3,7 +3,7 @@
 #include <Sycl_Graph/Simulation/Simulation.hpp>
 #include <Sycl_Graph/Utils/Profiling.hpp>
 #include <nlohmann/json.hpp>
-#include <Sycl_Graph/Utils/path_config.hpp>
+// #include <Sycl_Graph/Utils/path_config.hpp>
 // #include <execution>
 // #include <iomanip>
 #include <CL/sycl.hpp>

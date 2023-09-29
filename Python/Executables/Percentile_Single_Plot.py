@@ -26,8 +26,8 @@ def read_total_trajectories(graph_dir):
     return total_traj
 
 
-def plot_SIR_percentile_trajectory(graph_dir, ax):
-    with open(graph_dir + "../../Sim_Param.json") as f:
+def plot_SIR_percentile_trajectory(graph_dir,  ax):
+    with open(graph_dir+ "../../Sim_Param.json") as f:
         params = json.load(f)
     trajectories = read_total_trajectories(graph_dir)
     mean = np.mean(trajectories, axis=0)
@@ -47,7 +47,10 @@ def plot_SIR_percentile_trajectory(graph_dir, ax):
 
 if __name__ == '__main__':
     fig, ax = plt.subplots(1,1)
-    p_dirs = get_p_dirs(Data_dir)
+
+    sim_type = "/Validation/"
+    p_dirs = get_p_dirs("/home/man/Documents/ER_Bernoulli_Robust_MPC/build/data/SIR_sim/")
+    p_dirs = [pd + sim_type for pd in p_dirs]
     p_dir = p_dirs[0]
     #json load sim_params
     with open(p_dir + "/Sim_Param.json") as f:

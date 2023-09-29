@@ -1,10 +1,10 @@
 add_custom_library(Sim_Types)
 
 add_custom_library(Sim_Buffers)
-target_link_libraries(Sim_Buffers PUBLIC Sim_Types Buffer_Utils Graph)
-
+target_link_libraries(Sim_Buffers PUBLIC Sim_Types Buffer_Utils Graph Validation)
+add_custom_library(Sim_Write)
 add_custom_library(Sim_Infection_Sampling)
 target_link_libraries(Sim_Infection_Sampling PUBLIC Buffer_Utils)
-add_custom_library(Sim_Routines)
-target_link_libraries(Sim_Routines PUBLIC Sim_Buffers)
-target_link_libraries(Sim_Routines PUBLIC Sim_Buffers Dynamics Sim_Infection_Sampling)
+add_custom_library(Simulation)
+target_link_libraries(Simulation PUBLIC Sim_Buffers)
+target_link_libraries(Simulation PUBLIC Sim_Buffers Dynamics Sim_Infection_Sampling Sim_Write)

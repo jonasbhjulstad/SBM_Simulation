@@ -111,8 +111,8 @@ auto construct_objective(const Sim_Param& p, auto& F, auto& u, auto x0, auto Nt_
 int main()
 {
 
-    auto ccm = read_pairs(Sycl_Graph::SYCL_GRAPH_DATA_DIR + "/Graph_0/ccm.csv");
-    auto p = parse_json(Sycl_Graph::SYCL_GRAPH_DATA_DIR + "/Sim_Param.json");
+    // auto ccm = read_pairs(Sycl_Graph::SYCL_GRAPH_DATA_DIR + "/Graph_0/ccm.csv");
+    // auto p = parse_json(Sycl_Graph::SYCL_GRAPH_DATA_DIR + "/Sim_Param.json");
     p.N_connections = ccm.size();
 
     MX c_state = MX::sym("Community_State", 3*p.N_communities);

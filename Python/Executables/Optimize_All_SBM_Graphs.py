@@ -105,7 +105,6 @@ if __name__ == '__main__':
    Wu = 500
    tau = .9
    p_dirs = get_p_dirs(Data_dir)
-   # for pd in p_dirs[:1]:
    pd = p_dirs[0]
    print(pd)
    graph_dirs = get_graph_dirs(pd)

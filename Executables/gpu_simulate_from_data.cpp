@@ -7,10 +7,8 @@
 #include <filesystem>
 
 
-auto get_p_dirs()
+auto get_p_dirs(const std::string& data_dir)
 {
-    auto cwd = std::filesystem::current_path();
-    auto data_dir = std::string(cwd) + "/SIR_sim/";
     //create data dir if it doesn't exist
     if (!std::filesystem::exists(data_dir))
     {
@@ -41,11 +39,11 @@ auto get_graph_dirs(const std::string& dir)
     return dir_list;
 }
 
-void compute_for_p(const std::string& p_dir)
+void compute_for_p(const std::string& p_dir, const std::string& simulation_subdir)
 {
     auto p = Sim_Param(p_dir + "/Sim_Param.json");
-    p.output_dir = p_dir + "/Results/";
-    p.simulation_subdir = "Detected";
+    p.output_dir = p_dir + "/Excitation/";
+    p.simulation_subdir = simulation_subdir;
     sycl::queue q(sycl::cpu_selector_v);
 
     auto graph_dirs = get_graph_dirs(p_dir);
@@ -64,14 +62,31 @@ void compute_for_p(const std::string& p_dir)
     run(q, p, b);
 
 }
-
-
-int main()
+std::string get_data_dir(int argc, char** argv)
 {
-    auto p_dirs = get_p_dirs();
+    std::string data_dir;
+    if (argc != 2)
+    {
+        std::cout << "Using data_dir = cwd" << std::endl;
+        data_dir = std::filesystem::current_path().string();
+    }
+    else
+    {
+        data_dir = argv[1];
+    }
+    return data_dir;
+}
+
+
+int main(int argc, char** argv)
+{
+    auto p_dirs = get_p_dirs(get_data_dir(argc, argv));
+
+
     std::for_each(p_dirs.begin(), p_dirs.end(), [](auto p_dir)
     {
-        compute_for_p(p_dir);
+        compute_for_p(p_dir, "/Detected_Communities/");
+        compute_for_p(p_dir, "/True_Communities/");
     });
 
     return 0;

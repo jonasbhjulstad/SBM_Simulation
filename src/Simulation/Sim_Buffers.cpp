@@ -367,7 +367,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
 
     else
     {
-        if_false_throw(p_Is_init.size() == p.Nt * N_sims_tot * std::accumulate(N_connections_vec.begin(), N_connections_vec.end(), 0), "p_Is_init.size() != p.Nt*N_sims_tot*N_connections");
+        if_false_throw(p_Is_init.size() == p.Nt * N_sims_tot * N_connections_vec[0], "p_Is_init.size() != p.Nt*N_sims_tot*N_connections");
     }
 
     alloc_events[1] = initialize_device_buffer<float, 3>(q, p_Is_init, p_Is);

@@ -7,9 +7,9 @@
 #include <CL/sycl.hpp>
 #include <chrono>
 
-Sim_Param create_sim_param(sycl::queue &q, uint32_t seed = 24)
+Sim_Param create_sim_param(sycl::queue &q, const std::string& fname, uint32_t seed = 24)
 {
-    auto p = get_settings();
+    auto p = Sim_Param(fname);
     auto device = q.get_device();
     p.wg_range = p.N_sims;
     p.compute_range = p.N_graphs * p.N_sims;
@@ -30,13 +30,14 @@ auto nested_vec_max(const std::vector<std::vector<uint32_t>>& vec)
 
 int main()
 {
-    // parse argv which is N_sims, N_communities, N_pop
-
+    //project root
+    std::string root_dir = "/home/man/Documents/ER_Bernoulli_Robust_MPC/";
+    std::string output_dir = root_dir + "data/";
     std::chrono::high_resolution_clock::time_point t1, t2;
 
     sycl::queue q(sycl::cpu_selector_v);
     uint32_t seed = 283;
-    auto p = create_sim_param(q);
+    auto p = create_sim_param(q, output_dir + "Sim_Param.json");
     // auto p = ps[0];
 
     t1 = std::chrono::high_resolution_clock::now();

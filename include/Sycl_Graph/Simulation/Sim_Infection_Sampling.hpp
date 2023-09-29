@@ -1,10 +1,10 @@
 #ifndef SIR_INFECTION_SAMPLING_HPP
 #define SIR_INFECTION_SAMPLING_HPP
+#include <execution>
 #include <Sycl_Graph/Utils/Common.hpp>
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <Sycl_Graph/Utils/Dataframe.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
-#include <execution>
 
 
 auto make_iota(auto N)

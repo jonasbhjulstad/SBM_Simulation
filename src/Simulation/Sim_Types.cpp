@@ -142,7 +142,10 @@ Sim_Param Sim_Param::parse_json(const std::string& fname)
 
 void Sim_Param::generate_default_json(const std::string& fname)
 {
-    std::filesystem::create_directories(std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/parameters/");
+    //get directory of fname
+    std::filesystem::path p(fname);
+    std::string dir = p.parent_path().string();
+    std::filesystem::create_directories(dir);
     nlohmann::json j;
     j["N_pop"] = 100;
     j["N_communities"] = 10;
@@ -158,22 +161,11 @@ void Sim_Param::generate_default_json(const std::string& fname)
     j["seed"] = 283;
     j["N_graphs"] = 2;
     j["N_sims"] = 2;
-    j["output_dir"] = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/SIR_sim/p_out_0.00/";
+
+    j["output_dir"] = dir + "/p_out_0.00/";
     j["simulation_subdir"] = std::string("/True_Communities/");
     j["tau"] = 0.9f;
     std::ofstream o(fname);
     o << j.dump();
     o.close();
-}
-
-Sim_Param Sim_Param::get_settings()
-{
-    const std::string json_fname = std::string(Sycl_Graph::SYCL_GRAPH_DATA_DIR) + "/parameters/settings.json";
-    std::ifstream i(json_fname);
-    if(!i.good())
-    {
-        generate_default_json(json_fname);
-    }
-    i.close();
-    return parse_json(json_fname);
 }

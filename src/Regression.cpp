@@ -1,4 +1,5 @@
 #include <Sycl_Graph/Regression.hpp>
+#include <Sycl_Graph/Graph.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -262,24 +263,6 @@ std::tuple<std::vector<float>, std::vector<float>, std::vector<float>, std::vect
     return std::make_tuple(thetas_LS, thetas_QR, MSE, MAE);
 }
 
-auto read_ccm(const std::string& ccm_path)
-{
-    std::vector<std::pair<uint32_t, uint32_t>> ccm;
-    std::ifstream ccm_file(ccm_path);
-    std::string line;
-    while(std::getline(ccm_file, line))
-    {
-        std::stringstream line_stream(line);
-        std::string from_idx_str;
-        std::string to_idx_str;
-        std::string weight_str;
-        std::getline(line_stream, from_idx_str, ',');
-        std::getline(line_stream, to_idx_str, ',');
-        std::getline(line_stream, weight_str, '\n');
-        ccm.push_back(std::make_pair(std::stoi(from_idx_str), std::stoi(to_idx_str)));
-    }
-    return ccm;
-}
 
 
 

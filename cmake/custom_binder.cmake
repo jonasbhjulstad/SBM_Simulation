@@ -1,6 +1,6 @@
 function(add_custom_binder source_file)
     pybind11_add_module(${source_file} "${source_file}.cpp")
-    target_link_libraries(${source_file} PUBLIC Sycl_Graph)
+    # target_link_libraries(${source_file} PUBLIC Sycl_Graph)
     target_compile_options(${source_file} PRIVATE ${DEFAULT_WARNING_FLAGS})
     target_compile_options(${source_file} PUBLIC ${SYCL_CUSTOM_FLAGS} -fPIC)
     target_include_directories(${source_file} PUBLIC ${SYCL_GRAPH_INCLUDE_DIR})

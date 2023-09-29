@@ -113,7 +113,16 @@ std::vector<uint32_t> constrained_weight_sample(size_t N_samples, const std::vec
     std::cout << "Warning: Maximum number of samples exceeded\n";
     return sample_counts;
 }
-
+template <typename T>
+void validate_elements_throw(const std::vector<T>& data, auto f, const std::string& msg)
+{
+    auto it = std::find_if(data.begin(), data.end(), f);
+    if (it != data.end())
+    {
+        auto idx = std::distance(data.begin(), it);
+        throw std::runtime_error(msg + "\nInvalid element found at index " + std::to_string(idx));
+    }
+}
 
 Dataframe_t<int, 2> get_delta_Is(const Dataframe_t<State_t, 2> &community_state)
 {
