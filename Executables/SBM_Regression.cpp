@@ -12,7 +12,6 @@ using namespace std;
 static constexpr size_t MAXBUFSIZE = 100000;
 
 using namespace Eigen;
-using namespace Sycl_Graph;
 void linewrite(std::ofstream &file, const std::vector<float> &theta)
 {
   for (const auto &t_i_i : theta)
@@ -65,14 +64,14 @@ int main()
   };
 
   float tau = .8f;
-  std::string path = Sim_Datapath;
+  std::string path = "/home/man/Documents/ER_Bernoulli_Robust_MPC/build/data/SIR_sim/";
   std::vector<std::string> subdirs = get_subdirs(path, "p_out_");
   std::for_each(subdirs.begin(), subdirs.end(), [&](const std::string &s)
                 {
-      auto graphdirs = get_subdirs(s, "Graph_");
+      auto graphdirs = get_subdirs(s, "/Excitation/Graph_");
       auto true_dirs = str_append(graphdirs, "True_Communities/");
       auto detected_dirs = str_append(graphdirs, "Detected_Communities/");
-      Sim_Param p = parse_json(s + "/Sim_Param.json");
+      Sim_Param p = Sim_Param::parse_json(s + "/Sim_Param.json");
       for(auto&& td: true_dirs)
       {
         regression_routine(td, p.N_sims, tau);

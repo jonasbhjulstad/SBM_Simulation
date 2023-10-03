@@ -53,7 +53,7 @@ std::vector<uint32_t> join_vectors(const std::vector<std::vector<uint32_t>> &vs)
     return result;
 }
 
-std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<uint32_t>> separate_flatten_edge_lists(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_lists)
+std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<uint32_t>> separate_flatten_edge_lists(const Dataframe_t<std::pair<uint32_t, uint32_t>, 2> &edge_lists)
 {
     std::vector<uint32_t> edge_counts_init(edge_lists.size());
     std::transform(edge_lists.begin(), edge_lists.end(), edge_counts_init.begin(), [](auto &e)
@@ -252,13 +252,6 @@ auto get_max_elements(const std::vector<std::vector<uint32_t>> &vec)
     return vec_max;
 }
 
-auto get_max_size(const std::vector<std::vector<uint32_t>> &vec)
-{
-    std::vector<uint32_t> vec_max(vec.size());
-    std::transform(vec.begin(), vec.end(), vec_max.begin(), [](const auto &v)
-                   { return v.size(); });
-    return std::max_element(vec_max.begin(), vec_max.end())[0];
-}
 
 template <typename T>
 auto get_sizes(const std::vector<std::vector<T>> &vec)
@@ -269,11 +262,11 @@ auto get_sizes(const std::vector<std::vector<T>> &vec)
     return vec_max;
 }
 
-std::vector<std::vector<std::pair<uint32_t, uint32_t>>> mirror_duplicate_edge_list(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list)
+Dataframe_t<std::pair<uint32_t, uint32_t>, 2> mirror_duplicate_edge_list(const Dataframe_t<std::pair<uint32_t, uint32_t>, 2> &edge_list)
 {
-    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> result(edge_list.size());
+    Dataframe_t<std::pair<uint32_t, uint32_t>, 2> result(edge_list.size());
     std::transform(edge_list.begin(), edge_list.end(), result.begin(), [](const auto &edge_list_elem)
-                   { std::vector<std::pair<uint32_t, uint32_t>> result_elem(edge_list_elem.size() * 2);
+                   { Dataframe_t<std::pair<uint32_t, uint32_t>, 1> result_elem(edge_list_elem.size() * 2);
                        std::transform(edge_list_elem.begin(), edge_list_elem.end(), result_elem.begin(), [](const auto &edge)
                                       { return edge; });
                        std::transform(edge_list_elem.begin(), edge_list_elem.end(), result_elem.begin() + edge_list_elem.size(), [](const auto &edge)
@@ -282,7 +275,44 @@ std::vector<std::vector<std::pair<uint32_t, uint32_t>>> mirror_duplicate_edge_li
     return result;
 }
 
-Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edge_list_undirected, const std::vector<std::vector<uint32_t>> &vcms, std::vector<float> p_Is_init)
+Dataframe_t<float,1> generate_duplicated_p_Is(auto Nt, auto N_sims_tot, auto N_connections, float p_I_min, float p_I_max, uint32_t seed)
+{
+    std::mt19937 gen(seed);
+    std::uniform_real_distribution<float> dist(p_I_min, p_I_max);
+    Dataframe_t<float,3> p_Is(Nt, Dataframe_t<float,2>(N_sims_tot, std::vector<float>(N_connections)));
+    auto t = 0;
+    while (t < Nt)
+    {
+        Dataframe_t<float,2> p_Is_t(N_sims_tot, std::vector<float>(N_connections));
+        for (auto &p_I : p_Is_t)
+        {
+            std::generate(p_I.begin(), p_I.end(), [&]()
+                          { return dist(gen); });
+        }
+        for(int i = 0; i < 7; i++)
+        {
+            if ((t + i) >= Nt)
+                break;
+            p_Is[t + i] = p_Is_t;
+        }
+        t += 7;
+    }
+    //reshape p_Is to flat
+    std::vector<float> p_Is_flat(Nt*N_sims_tot*N_connections);
+    for (int t = 0; t < Nt; t++)
+    {
+        for (int s = 0; s < N_sims_tot; s++)
+        {
+            for (int c = 0; c < N_connections; c++)
+            {
+                p_Is_flat[t * N_sims_tot * N_connections + s * N_connections + c] = p_Is[t][s][c];
+            }
+        }
+    }
+    return p_Is_flat;
+}
+
+Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const Dataframe_t<std::pair<uint32_t, uint32_t>, 2>& edge_list_undirected, const Dataframe_t<uint32_t, 2>& vcms, std::vector<float> p_Is_init)
 {
 
     if ((p.global_mem_size == 0) || p.local_mem_size == 0)
@@ -293,20 +323,22 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     }
     auto edge_list = mirror_duplicate_edge_list(edge_list_undirected);
     auto N_sims_tot = p.N_graphs * p.N_sims;
-    auto N_vertices = get_max_size(vcms);
-    auto N_communities_max = get_max_element(vcms) + 1;
+    auto N_vertices = vcms[0].size();
+
+
+    auto N_communities = vcms.template apply<1, uint32_t>([](const Dataframe_t<uint32_t, 1>& data){return (uint32_t)std::max_element(data.begin(), data.end())[0] + 1;});
+    auto N_communities_max = std::max_element(N_communities.begin(), N_communities.end())[0] + 1;
     auto ccm_indices = complete_ccm(N_communities_max, true);
     auto N_connections_max = ccm_indices.size();
-    auto N_communities = get_max_elements(vcms);
     std::for_each(N_communities.begin(), N_communities.end(), [](auto &N)
                   { N++; });
     std::vector<uint32_t> N_connections_vec(p.N_graphs, N_connections_max);
-    auto N_edges = get_sizes(edge_list);
+    auto N_edges = edge_list.template apply<1, uint32_t>([](const Dataframe_t<std::pair<uint32_t, uint32_t>, 1>& data){return data.size();});
     auto N_tot_edges = std::accumulate(N_edges.begin(), N_edges.end(), 0);
     std::vector<uint32_t> edge_offsets_init(p.N_graphs + 1);
     std::partial_sum(N_edges.begin(), N_edges.end(), edge_offsets_init.begin() + 1);
 
-    std::vector<std::vector<uint32_t>> ecms(p.N_graphs);
+    Dataframe_t<uint32_t,2> ecms(p.N_graphs);
     for (int i = 0; i < edge_list.size(); i++)
     {
         ecms[i] = ecm_from_vcm(edge_list[i], vcms[i], ccm_indices);
@@ -319,8 +351,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     auto ccm = make_ccm_df(ccm_indices, ccm_weights);
 
     auto [edge_from_init, edge_to_init, edge_counts_init] = separate_flatten_edge_lists(edge_list);
-    auto vcm_init = join_vectors(vcms);
-    auto ecm_init = join_vectors(ecms);
+
     std::vector<State_t> community_state_init(N_communities_max * N_sims_tot * (p.Nt_alloc + 1), {0, 0, 0});
     std::vector<SIR_State> traj_init(N_sims_tot * (p.Nt_alloc + 1) * N_vertices, SIR_INDIVIDUAL_S);
     std::vector<uint32_t> accumulate_event_init(N_sims_tot * N_connections_max * p.Nt_alloc * 2, 0);
@@ -335,8 +366,8 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     std::vector<std::size_t> sizes = {p.Nt * N_sims_tot * N_connections_max * sizeof(float),
                                       edge_from_init.size() * sizeof(uint32_t),
                                       edge_to_init.size() * sizeof(uint32_t),
-                                      ecm_init.size() * sizeof(uint32_t),
-                                      vcm_init.size() * sizeof(uint32_t),
+                                      ecms.byte_size(),
+                                      vcms.byte_size(),
                                       (p.Nt_alloc + 1) * N_sims_tot * N_communities_max * sizeof(State_t),
                                       p.Nt_alloc * N_sims_tot * N_connections_max * sizeof(uint32_t),
                                       p.Nt_alloc * N_sims_tot * N_connections_max * sizeof(uint32_t),
@@ -359,11 +390,15 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     auto rngs = sycl::buffer<Static_RNG::default_rng>(sycl::range<1>(rng_init.size()));
 
     std::vector<sycl::event> alloc_events(14);
-
     if (p_Is_init.size() == 0)
     {
-        p_Is_init = generate_floats(p.Nt * N_sims_tot * N_connections_max, p.p_I_min, p.p_I_max, 8, p.seed);
+        p_Is_init = generate_duplicated_p_Is(p.Nt, p.N_sims*p.N_graphs, N_connections_max, p.p_I_min, p.p_I_max, p.seed);
     }
+
+    // if (p_Is_init.size() == 0)
+    // {
+    //     p_Is_init = generate_floats(p.Nt * N_sims_tot * N_connections_max, p.p_I_min, p.p_I_max, 8, p.seed);
+    // }
 
     else
     {
@@ -373,8 +408,8 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
     alloc_events[1] = initialize_device_buffer<float, 3>(q, p_Is_init, p_Is);
     alloc_events[2] = initialize_device_buffer<uint32_t, 1>(q, edge_from_init, edge_from);
     alloc_events[3] = initialize_device_buffer<uint32_t, 1>(q, edge_to_init, edge_to);
-    alloc_events[4] = initialize_device_buffer<uint32_t, 1>(q, ecm_init, ecm);
-    alloc_events[5] = initialize_device_buffer<uint32_t, 2>(q, vcm_init, vcm);
+    alloc_events[4] = initialize_device_buffer<uint32_t, 1>(q, ecms.flatten(), ecm);
+    alloc_events[5] = initialize_device_buffer<uint32_t, 2>(q, vcms.flatten(), vcm);
     alloc_events[6] = initialize_device_buffer<uint32_t, 1>(q, edge_counts_init, edge_counts);
     alloc_events[7] = initialize_device_buffer<uint32_t, 1>(q, edge_offsets_init, edge_offsets);
     alloc_events[8] = initialize_device_buffer<State_t, 3>(q, community_state_init, community_state);
@@ -405,7 +440,7 @@ Sim_Buffers Sim_Buffers::make(sycl::queue &q, Sim_Param p, const std::vector<std
                        edge_to,
                        ecm,
                        vcm,
-                       vcm_init,
+                       vcms.flatten(),
                        edge_counts,
                        edge_offsets,
                        N_connections,

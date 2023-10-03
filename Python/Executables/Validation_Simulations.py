@@ -20,7 +20,6 @@ def validate_for_solution(q, base_dir, subdirname, regression_type):
     gdirs = get_graph_dirs(base_dir)
     edgelists, vcms, p_Is = [], [], []
     sim_param = Sim_Param(base_dir + "/Sim_Param.json")
-    sim_param.simulation_subdir = subdirname + "/Validation/"
     for gdir in gdirs:
         edgelists.append(get_edges(gdir + "/" + subdirname + "/edgelist.csv"))
         vcms.append(np.genfromtxt(gdir + "/" + subdirname + "/vcm.csv", dtype=int))

@@ -108,6 +108,24 @@ def construct_objective_from_ODE(F, init_state, Nt, Wu, u_max, sym_u):
             f -= Wu/N_pop*(u_i[k] - u_max)
     return f, state
 
+def get_objective_value(state, u, Wu, u_max):
+    Nt = state.shape[0] - 1
+    Nt_per_u = int(ceil(Nt/u.shape[0]))
+    N_pop = np.sum(state[0])
+    N_connections = u.shape[1]
+    N_communities = int(state[0].shape[0]/3)
+    f = 0
+    for t in range(Nt):
+        inf_sum = 0
+        for j in range(N_communities):
+            inf_sum += state[t+1][1+3*j]
+        f += inf_sum/N_pop
+        u_i = u[t,:]
+        for k in range(N_connections):
+            # f += Wu/N_pop*((u_max - u_i[k])**2)
+            f -= Wu/N_pop*(u_i[k] - u_max)
+    return f
+
 def solve_single_shoot(ccmap, beta, alpha, N_communities, init_state, Nt, Wu, u, u_min, u_max, log_fname):
 
     #get directory of log_fname

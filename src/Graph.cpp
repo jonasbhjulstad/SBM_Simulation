@@ -312,6 +312,12 @@ std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_l
     return vcm;
 }
 
+std::size_t complete_graph_size(size_t N, bool directed, bool self_loops)
+{
+    return (N * (N - 1) / 2 + (self_loops ? N : 0)) * (directed ? 2 : 1);
+}
+
+
 std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>> &ccm)
 {
     auto directed_equal = [](const auto& e0, const auto& e1)
@@ -374,7 +380,7 @@ std::vector<std::vector<uint32_t>> ccm_weights_from_ecms(const std::vector<uint3
     return result;
 }
 
-void write_edgelist(const std::string &fname, const std::vector<std::pair<uint32_t, uint32_t>> &edges)
+void write_edgelist(const std::string &fname, const Dataframe_t<std::pair<uint32_t, uint32_t>, 1> &edges)
 {
     std::ofstream f(fname);
     for (auto &&e : edges)

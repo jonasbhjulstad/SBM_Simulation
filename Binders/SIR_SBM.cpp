@@ -64,7 +64,9 @@ PYBIND11_MODULE(SIR_SBM, m)
     m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, Sim_Buffers &)>(&run), "run");
 
     m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &)>(&run), "run");
-    m.def("p_I_run",p_I_run, "p_I_run");
+    // m.def("p_I_run",p_I_run, "p_I_run");
+
+    m.def("p_I_run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<std::vector<float>>> &)>(&p_I_run), "p_I_run");
 
     m.def("read_edgelist", static_cast<void (*)(const std::string &, std::vector<std::pair<uint32_t, uint32_t>> &)>(&read_edgelist), "read_edgelist");
     m.def("write_vector", &write_vector, "write_vector");
@@ -96,8 +98,80 @@ PYBIND11_MODULE(SIR_SBM, m)
         .def_readwrite("p_I_min", &Sim_Param::p_I_min)
         .def_readwrite("p_I_max", &Sim_Param::p_I_max)
         .def_readwrite("tau", &Sim_Param::tau)
-        .def_readwrite("N_connections", &Sim_Param::N_connections)
-        .def_readwrite("simulation_subdir", &Sim_Param::simulation_subdir);
+        .def_readwrite("N_connections", &Sim_Param::N_connections);
+
+
+    py::class_<Multiple_Sim_Param_t>(m, "Multiple_Sim_Param").def(py::init<sycl::queue &>())
+        .def(py::init<const std::string &>())
+        .def("dump", &Multiple_Sim_Param_t::dump)
+        .def_readwrite("N_pop", &Multiple_Sim_Param_t::N_pop)
+        .def_readwrite("N_communities", &Multiple_Sim_Param_t::N_communities)
+        .def_readwrite("p_in", &Multiple_Sim_Param_t::p_in)
+        .def_readwrite("p_out", &Multiple_Sim_Param_t::p_out)
+        .def_readwrite("Nt", &Multiple_Sim_Param_t::Nt) // p_R0, p_I0, sim_idx, seed
+        .def_readwrite("p_R0", &Multiple_Sim_Param_t::p_R0)
+        .def_readwrite("N_pop", &Multiple_Sim_Param_t::N_pop)
+        .def_readwrite("p_I0", &Multiple_Sim_Param_t::p_I0)
+        .def_readwrite("p_R", &Multiple_Sim_Param_t::p_R)
+        .def_readwrite("max_infection_samples", &Multiple_Sim_Param_t::max_infection_samples)
+        .def_readwrite("N_sims", &Multiple_Sim_Param_t::N_sims)
+        .def_readwrite("Nt_alloc", &Multiple_Sim_Param_t::Nt_alloc)
+        .def_readwrite("seed", &Multiple_Sim_Param_t::seed)
+        .def_readwrite("N_graphs", &Multiple_Sim_Param_t::N_graphs)
+        .def_readwrite("output_dir", &Multiple_Sim_Param_t::output_dir)
+        .def_readwrite("compute_range", &Multiple_Sim_Param_t::compute_range)
+        .def_readwrite("wg_range", &Multiple_Sim_Param_t::wg_range)
+        .def_readwrite("p_I_min", &Multiple_Sim_Param_t::p_I_min)
+        .def_readwrite("p_I_max", &Multiple_Sim_Param_t::p_I_max)
+        .def_readwrite("tau", &Multiple_Sim_Param_t::tau)
+        .def("to_sim_param", &Multiple_Sim_Param_t::to_sim_param);
+
+
+// struct Multiple_Sim_Param_t
+// {
+//     Multiple_Sim_Param_t(sycl::queue &q) : compute_range(sycl::range<1>(1)), wg_range(sycl::range<1>(1))
+//     {
+//         auto device = q.get_device();
+//         global_mem_size = device.get_info<sycl::info::device::global_mem_size>();
+//         local_mem_size = device.get_info<sycl::info::device::local_mem_size>();
+//     }
+
+//     Multiple_Sim_Param_t() : compute_range(sycl::range<1>(1)), wg_range(sycl::range<1>(1)) {}
+//     Multiple_Sim_Param_t(const std::string& fname);
+
+//     uint32_t N_pop = 100;
+//     float p_in = 1.0f;
+//     uint32_t Nt = 30;
+//     float p_R0 = .0f;
+//     float p_I0;
+//     float p_R;
+//     uint32_t N_sims = 2;
+//     std::vector<float> p_out;
+//     std::vector<float> p_I_min;
+//     std::vector<float> p_I_max;
+//     std::vector<float> p_I_min_vec;
+//     std::vector<float> p_I_max_vec;
+//     float tau = .9f;
+//     uint32_t Nt_alloc = 2;
+//     uint32_t seed = 238;
+//     uint32_t N_communities = 4;
+//     uint32_t max_infection_samples = 1000;
+//     uint32_t N_graphs = 1;
+//     std::size_t local_mem_size = 0;
+//     std::size_t global_mem_size = 0;
+//     sycl::range<1> compute_range;
+//     sycl::range<1> wg_range;
+//     std::string output_dir;
+//     std::size_t N_vertices() const { return N_communities * N_pop; }
+//     void print() const;
+//     void dump(const std::string &fname) const;
+//     static Multiple_Sim_Param_t parse_json(const std::string& fname);
+//     static void generate_default_json(const std::string& fname);
+//     Sim_Param to_sim_param(size_t idx = 0) const;
+
+
+// };
+
 
     m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>,std::vector<float>, std::vector<float>> (*)(const std::string &, uint32_t, float, uint32_t)>(&regression_on_datasets), "regression_on_datasets");
     m.def("regression_on_datasets", static_cast<std::tuple<std::vector<float>, std::vector<float>,std::vector<float>, std::vector<float>> (*)(const std::vector<std::string> &, uint32_t, float, uint32_t)>(&regression_on_datasets), "regression_on_datasets");

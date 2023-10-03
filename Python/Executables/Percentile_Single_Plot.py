@@ -48,7 +48,7 @@ def plot_SIR_percentile_trajectory(graph_dir,  ax):
 if __name__ == '__main__':
     fig, ax = plt.subplots(1,1)
 
-    sim_type = "/Validation/"
+    sim_type = "/Excitation/"
     p_dirs = get_p_dirs("/home/man/Documents/ER_Bernoulli_Robust_MPC/build/data/SIR_sim/")
     p_dirs = [pd + sim_type for pd in p_dirs]
     p_dir = p_dirs[0]

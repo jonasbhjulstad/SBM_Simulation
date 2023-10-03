@@ -1,6 +1,7 @@
 #ifndef SYCL_GRAPH_UTILS_COMMON_HPP
 #define SYCL_GRAPH_UTILS_COMMON_HPP
 #include <Sycl_Graph/Utils/Validation.hpp>
+#include <Sycl_Graph/Utils/String_Manipulation.hpp>
 // #include <Sycl_Graph/Utils/path_config.hpp>
 #include <Sycl_Graph/SIR_Types.hpp>
 #include <vector>

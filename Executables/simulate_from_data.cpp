@@ -25,6 +25,17 @@ auto get_p_dirs(const std::string& data_dir)
     return dir_list;
 }
 
+auto get_basename_p_dirs(const std::string& data_dir)
+{
+    auto p_dirs = get_p_dirs(data_dir);
+    //return /basename/
+    std::transform(p_dirs.begin(), p_dirs.end(), p_dirs.begin(), [](const auto& dir)
+    {
+        return dir.substr(dir.find_last_of("/\\") + 1);
+    });
+    return p_dirs;
+}
+
 auto get_graph_dirs(const std::string& dir)
 {
     std::vector<std::string> dir_list;
@@ -39,14 +50,21 @@ auto get_graph_dirs(const std::string& dir)
     return dir_list;
 }
 
-void compute_for_p(const std::string& p_dir, const std::string& simulation_subdir)
+void compute_for_p(const std::string& root_data_dir, const std::string& relative_p_dir)
 {
-    auto p = Sim_Param(p_dir + "/Sim_Param.json");
-    p.output_dir = p_dir + "/Excitation/";
-    p.simulation_subdir = simulation_subdir;
-    sycl::queue q(sycl::cpu_selector_v);
+    auto absolute_p_dir = root_data_dir + relative_p_dir;
+    //check that file exists
+    if (!std::filesystem::exists(absolute_p_dir + "/Sim_Param.json"))
+    {
+        throw std::runtime_error("Sim_Param.json not found in " + absolute_p_dir);
+    }
 
-    auto graph_dirs = get_graph_dirs(p_dir);
+    auto p = Sim_Param(absolute_p_dir + "/Sim_Param.json");
+    p.output_dir = root_data_dir + "/Excitation/" + relative_p_dir;
+    sycl::queue q(sycl::cpu_selector_v);
+    std::string device_name = q.get_device().get_info<sycl::info::device::name>();
+
+    auto graph_dirs = get_graph_dirs(absolute_p_dir);
     assert(graph_dirs.size() == p.N_graphs);
     std::vector<std::vector<std::pair<uint32_t, uint32_t>>> edge_lists(p.N_graphs);
     std::transform(graph_dirs.begin(), graph_dirs.end(), edge_lists.begin(), [](const auto& dir)
@@ -80,14 +98,17 @@ std::string get_data_dir(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
-    auto p_dirs = get_p_dirs(get_data_dir(argc, argv));
-
-
-    std::for_each(p_dirs.begin(), p_dirs.end(), [](auto p_dir)
+    auto root_data_dir = get_data_dir(argc, argv);
+    for(auto&& community_type: {"/Detected_Communities/", "/True_Communities/"})
     {
-        compute_for_p(p_dir, "/Detected_Communities/");
-        compute_for_p(p_dir, "/True_Communities/");
-    });
+        auto relative_data_dir = community_type;
+        auto p_dirs = get_basename_p_dirs(root_data_dir + relative_data_dir);
+        std::for_each(p_dirs.begin(), p_dirs.end(), [&](auto p_dir)
+        {
+            std::cout << "p_dir: " << root_data_dir + relative_data_dir + p_dir << "\n";
+            compute_for_p(root_data_dir, relative_data_dir + p_dir);
+        });
+    }
 
     return 0;
 }

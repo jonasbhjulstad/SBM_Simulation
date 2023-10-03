@@ -1,7 +1,7 @@
 #ifndef GRAPH_GENERATION_HPP
 #define GRAPH_GENERATION_HPP
 #include <Sycl_Graph/Utils/Common.hpp>
-
+#include <Sycl_Graph/Utils/Dataframe.hpp>
 
 using Edge_List_t = std::vector<std::vector<std::pair<uint32_t, uint32_t>>>;
 using Node_List_t = std::vector<std::vector<uint32_t>>;
@@ -34,9 +34,11 @@ std::vector<uint32_t> create_vcm(const std::vector<std::vector<uint32_t>> node_l
 std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm, const std::vector<std::pair<uint32_t, uint32_t>>& ccm);
 std::vector<std::pair<uint32_t, uint32_t>> ccm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm);
 std::vector<std::pair<uint32_t, uint32_t>> complete_graph(size_t N);
+std::size_t complete_graph_size(size_t N, bool directed = true, bool self_loops = false);
+
 
 std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm, uint32_t N_connections);
-void write_edgelist(const std::string& fname, const std::vector<std::pair<uint32_t, uint32_t>>& edges);
+void write_edgelist(const std::string &fname, const Dataframe_t<std::pair<uint32_t, uint32_t>, 1> &edges);
 void read_edgelist(const std::string& fname, std::vector<std::pair<uint32_t, uint32_t>>& edges);
 std::vector<std::pair<uint32_t, uint32_t>> read_edgelist(const std::string& fname);
 std::vector<uint32_t> read_vec(const std::string& fpath, size_t N);

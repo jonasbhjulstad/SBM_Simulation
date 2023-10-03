@@ -1,7 +1,7 @@
 #ifndef SYCL_GRAPH_UTILS_DATAFRAME_HPP
 #define SYCL_GRAPH_UTILS_DATAFRAME_HPP
 #include <Sycl_Graph/Utils/Common.hpp>
-
+#include <numeric>
 template <typename T, std::size_t N>
 struct Dataframe_t;
 
@@ -9,20 +9,35 @@ template <typename T>
 struct Dataframe_t<T, 1> : public std::vector<T>
 {
     using std::vector<T>::vector;
-    Dataframe_t(const std::vector<T>& v) : std::vector<T>(v) {}
+    Dataframe_t(const std::vector<T> &v) : std::vector<T>(v) {}
     template <typename uI_t>
-    Dataframe_t(const std::array<uI_t, 1>& sizes) : std::vector<T>(sizes[0]) {}
-    Dataframe_t(std::size_t N): std::vector<T>(N) {}
+    Dataframe_t(const std::array<uI_t, 1> &sizes) : std::vector<T>(sizes[0]) {}
+    Dataframe_t(std::size_t N) : std::vector<T>(N) {}
+    Dataframe_t(const std::array<std::size_t, 1> &sizes) : std::vector<T>(sizes[0]) {}
+    Dataframe_t(const std::array<std::size_t, 1>&& sizes) : std::vector<T>(sizes[0]) {}
     Dataframe_t() = default;
 
-    //assignment operator
+    //copy assignment operator
+    Dataframe_t(const Dataframe_t<T, 1> &df) : std::vector<T>(df) {}
 
+
+    // assignment operator
 
     template <typename uI_t>
     T operator()(const std::array<uI_t, 1> &&idx) const
     {
         validate_range(idx);
         return this->operator[](idx[0]);
+    }
+
+    T operator()(std::size_t idx) const
+    {
+        return this->operator[](idx);
+    }
+
+    Dataframe_t<T, 1> slice(std::size_t start, std::size_t end) const
+    {
+        return Dataframe_t<T, 1>(this->begin() + start, this->begin() + end);
     }
 
     Dataframe_t<T, 1> operator()(std::array<std::size_t, 1> start, std::array<std::size_t, 1> end) const
@@ -62,18 +77,36 @@ struct Dataframe_t<T, 1> : public std::vector<T>
         this->resize(size);
     }
 
+    template <std::size_t dim>
+    auto apply(auto f) const
+    {
+        static_assert(dim == 1, "Invalid dimension");
+        Dataframe_t<decltype(f(std::declval<T>())), dim> result(this->get_ranges());
+        std::transform(this->data.begin(), this->data.end(), result.data.begin(), f);
+    }
+
+    std::vector<T> flatten() const
+    {
+        return *this;
+    }
+
     template <std::unsigned_integral uI_t>
     void resize_dim(std::size_t dim, const std::vector<uI_t> size)
     {
         if_false_throw(dim == 0, "Specified resize dimension is larger than dataframe dimension");
         this->resize(size[0]);
     }
+
+    std::size_t byte_size() const
+    {
+        return this->size() * sizeof(T);
+    }
 };
 
 template <typename T, std::size_t N>
-auto sub_array(const std::array<T, N>& arr)
+auto sub_array(const std::array<T, N> &arr)
 {
-    std::array<T, N-1> result;
+    std::array<T, N - 1> result;
     std::copy(arr.begin() + 1, arr.end(), result.begin());
     return result;
 }
@@ -88,6 +121,19 @@ struct Dataframe_t
     Dataframe_t(std::size_t size_0, auto... sizes) : data(size_0, Dataframe_t<T, N - 1>(sizes...)) {}
     Dataframe_t(const std::vector<Dataframe_t<T, N - 1>> &data) : data(data) {}
     Dataframe_t(std::vector<Dataframe_t<T, N - 1>> &&data) : data(std::move(data)) {}
+
+    template <typename D>
+    Dataframe_t(const std::vector<D>& data): data(data.size())
+    {
+        std::transform(data.begin(), data.end(), this->data.begin(), [](auto& d)
+        {
+            return Dataframe_t<T, N-1>(d);
+        });
+    }
+
+    Dataframe_t(const std::vector<Dataframe_t<T, N-1>>::iterator& begin, const std::vector<Dataframe_t<T, N-1>>::iterator& end): data(begin, end) {}
+    //default copy assignment operator
+    Dataframe_t(const Dataframe_t<T, N> &df) = default;
 
     static constexpr std::size_t N_dims = N;
     std::vector<Dataframe_t<T, N - 1>> data;
@@ -132,10 +178,11 @@ struct Dataframe_t
         return data[idx[0]](sub_array(idx));
     }
 
-    template <typename uI_t>
-    T operator()(uI_t first, auto ... args) const
+    Dataframe_t<T,N> slice(std::size_t start, std::size_t end) const
     {
-        return this->operator()(std::array<uI_t, N>{first, args...});
+        Dataframe_t<T, N> result(end - start);
+        std::copy(this->begin() + start, this->begin() + end, result.begin());
+        return result;
     }
 
     bool all_of(auto f) const
@@ -143,7 +190,6 @@ struct Dataframe_t
         return std::all_of(data.begin(), data.end(), [f](auto &d)
                            { return d.all_of(f); });
     }
-
 
     Dataframe_t<T, N> operator+(const Dataframe_t<T, N> &df)
     {
@@ -171,6 +217,15 @@ struct Dataframe_t
         }
     }
 
+    T operator()(std::size_t first, auto&& ... rest) const
+    {
+        return this->operator()(std::array<std::size_t, N>{first, (std::size_t)rest...});
+    }
+
+    Dataframe_t<T, N> slice(std::size_t start, std::size_t end)
+    {
+        return Dataframe_t<T, N>(this->begin() + start, this->begin() + end);
+    }
 
     Dataframe_t<T, N> operator()(const std::array<std::size_t, N> &&start, const std::array<std::size_t, N> &&end)
     {
@@ -197,6 +252,23 @@ struct Dataframe_t
         Dataframe_t<decltype(f(std::declval<T>())), N> result(this->get_ranges());
         std::transform(this->data.begin(), this->data.end(), result.data.begin(), [f](auto &d)
                        { return d.apply(f); });
+        return result;
+    }
+
+    template <std::size_t dim, typename Ret_t>
+    auto apply(auto f) const
+    {
+        //decltype(f(std::declval<T>()))
+        Dataframe_t<Ret_t, dim> result(this->size());
+        if constexpr (dim == 1)
+        {
+            std::transform(this->cbegin(), this->cend(), result.begin(), f);
+        }
+        else
+        {
+            std::transform(this->cbegin(), this->cend(), result.begin(), [f](auto &d)
+                        { return d.template apply<dim-1>(f); });
+        }
         return result;
     }
 
@@ -227,14 +299,80 @@ struct Dataframe_t
         }
     }
 
+    Dataframe_t<T, N - 1> flatten_dim_0() const
+    {
+        std::vector<uint32_t> size_vec(data.size()+1, 0);
+        std::transform(data.begin(), data.end(), size_vec.begin()+1, [](auto &d)
+                       { return d.size(); });
+        auto tot_size = std::accumulate(size_vec.begin(), size_vec.end(), 1, std::multiplies<std::size_t>());
+
+        Dataframe_t<T, N - 1> result(tot_size);
+        for (int i = 0; i < data.size(); i++)
+        {
+            result.data.insert(result.begin() + size_vec[i], data[i].begin(), data[i].end());
+        }
+        return result;
+    }
+
+    std::vector<T> flatten() const
+    {
+        std::vector<T> result;
+        for (auto &d : data)
+        {
+            auto flattened = d.flatten();
+            result.insert(result.end(), flattened.begin(), flattened.end());
+        }
+        return result;
+    }
+
+    std::size_t byte_size() const
+    {
+        std::size_t result = 0;
+        for (auto &d : data)
+        {
+            result += d.byte_size();
+        }
+        return result;
+    }
+
+    auto cbegin() const
+    {
+        return data.begin();
+    }
+    auto cend() const
+    {
+        return data.cend();
+    }
+
+    auto begin()
+    {
+        return data.begin();
+    }
+    auto end()
+    {
+        return data.end();
+    }
+
+
+    auto begin() const
+    {
+        return data.begin();
+    }
+    auto end() const
+    {
+        return data.end();
+    }
+
+
+
 };
 
-template <typename First_t, typename ... Ts, std::size_t N>
-std::vector<std::tuple<const Dataframe_t<First_t, N-1>&, const Dataframe_t<Ts, N-1>& ...>> dataframe_tie(const Dataframe_t<First_t, N>& df_0, const Dataframe_t<Ts, N>& ... dfs)
+template <typename First_t, typename... Ts, std::size_t N>
+std::vector<std::tuple<const Dataframe_t<First_t, N - 1> &, const Dataframe_t<Ts, N - 1> &...>> dataframe_tie(const Dataframe_t<First_t, N> &df_0, const Dataframe_t<Ts, N> &...dfs)
 {
-    std::vector<std::tuple<const Dataframe_t<First_t, N-1>&, const Dataframe_t<Ts, N-1>& ...>> result;
+    std::vector<std::tuple<const Dataframe_t<First_t, N - 1> &, const Dataframe_t<Ts, N - 1> &...>> result;
     result.reserve(df_0.size());
-    for(int i = 0; i < df_0.size(); i++)
+    for (int i = 0; i < df_0.size(); i++)
     {
         result.push_back(std::tie(df_0[i], dfs[i]...));
     }
@@ -262,15 +400,8 @@ std::enable_if_t<(N > 1), Dataframe_t<T, N>> zip_merge(const Dataframe_t<T, N> &
     std::transform(dfs.begin(), dfs.end(), result.data.begin(), [axis](const auto &df_pack)
                    {
         auto [d0, d1] = df_pack;
-        return zip_merge(d0, d1, axis - 1);
-    });
+        return zip_merge(d0, d1, axis - 1); });
     return result;
 }
-
-
-
-
-
-
 
 #endif
