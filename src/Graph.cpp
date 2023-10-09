@@ -250,12 +250,6 @@ std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities, 
 
 std::vector<std::pair<uint32_t, uint32_t>> complete_graph(size_t N)
 {
-    auto make_iota = [](auto N)
-    {
-        std::vector<uint32_t> result(N);
-        std::iota(result.begin(), result.end(), 0);
-        return result;
-    };
     std::vector<std::pair<uint32_t, uint32_t>> edge_list(N * (N - 1) / 2);
     for (auto &&comb : iter::combinations_with_replacement(make_iota(N), 2))
     {

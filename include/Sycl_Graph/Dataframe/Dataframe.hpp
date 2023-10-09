@@ -1,7 +1,17 @@
 #ifndef SYCL_GRAPH_UTILS_DATAFRAME_HPP
 #define SYCL_GRAPH_UTILS_DATAFRAME_HPP
-#include <Sycl_Graph/Utils/Common.hpp>
+#include <vector>
+#include <array>
+#include <cstdint>
+#include <tuple>
+#include <fstream>
+#include <stdexcept>
+#include <filesystem>
+#include <type_traits>
+#include <algorithm>
 #include <numeric>
+#include <Sycl_Graph/Utils/Validation.hpp>
+// #include <Sycl_Graph/SIR_Types.hpp>
 template <typename T, std::size_t N>
 struct Dataframe_t;
 
@@ -24,13 +34,13 @@ struct Dataframe_t<T, 1> : public std::vector<T>
     // assignment operator
 
     template <typename uI_t>
-    T operator()(const std::array<uI_t, 1> &&idx) const
+    T& operator()(const std::array<uI_t, 1> &&idx)
     {
         validate_range(idx);
         return this->operator[](idx[0]);
     }
 
-    T operator()(std::size_t idx) const
+    T& operator()(std::size_t idx) const
     {
         return this->operator[](idx);
     }
@@ -40,7 +50,7 @@ struct Dataframe_t<T, 1> : public std::vector<T>
         return Dataframe_t<T, 1>(this->begin() + start, this->begin() + end);
     }
 
-    Dataframe_t<T, 1> operator()(std::array<std::size_t, 1> start, std::array<std::size_t, 1> end) const
+    Dataframe_t<T, 1>& operator()(std::array<std::size_t, 1> start, std::array<std::size_t, 1> end) const
     {
         return Dataframe_t<T, 1>(this->begin() + start[0], this->begin() + end[0]);
     }
@@ -172,7 +182,7 @@ struct Dataframe_t
     }
 
     template <typename uI_t>
-    T operator()(const std::array<uI_t, N> &&idx) const
+    T& operator()(const std::array<uI_t, N> &&idx)
     {
         validate_range(idx);
         return data[idx[0]](sub_array(idx));
@@ -217,7 +227,7 @@ struct Dataframe_t
         }
     }
 
-    T operator()(std::size_t first, auto&& ... rest) const
+    T& operator()(std::size_t first, auto&& ... rest)
     {
         return this->operator()(std::array<std::size_t, N>{first, (std::size_t)rest...});
     }
@@ -227,7 +237,7 @@ struct Dataframe_t
         return Dataframe_t<T, N>(this->begin() + start, this->begin() + end);
     }
 
-    Dataframe_t<T, N> operator()(const std::array<std::size_t, N> &&start, const std::array<std::size_t, N> &&end)
+    Dataframe_t<T, N>& operator()(const std::array<std::size_t, N> &&start, const std::array<std::size_t, N> &&end)
     {
         auto array_diff = [](const std::array<std::size_t, N> &a0, const std::array<std::size_t, N> &a1)
         {

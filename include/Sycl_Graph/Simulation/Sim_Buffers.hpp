@@ -5,7 +5,7 @@
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
 #include <Sycl_Graph/Utils/Common.hpp>
-#include <Sycl_Graph/Utils/Dataframe.hpp>
+#include <Sycl_Graph/Dataframe/Dataframe.hpp>
 
 struct Sim_Buffers
 {

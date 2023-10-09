@@ -1,9 +1,10 @@
+#include <Sycl_Graph/Database/Dataframe.hpp>
 #include <Sycl_Graph/Simulation/Simulation.hpp>
-#include <chrono>
 #include <Sycl_Graph/Simulation/State_Accumulation.hpp>
+#include <Sycl_Graph/Database/Simulation_Tables.hpp>
+#include <chrono>
 
-
-void write_allocated_steps(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b, size_t N_steps, std::vector<sycl::event> &dep_events)
+void write_allocated_steps(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b, size_t N_steps, uint32_t t_offset, std::vector<sycl::event> &dep_events)
 {
     N_steps = (N_steps == 0) ? p.Nt_alloc : N_steps;
     std::chrono::high_resolution_clock::time_point t1, t2;
@@ -18,27 +19,19 @@ void write_allocated_steps(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b, s
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Read graphseries: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
     t1 = t2;
-    state_df.resize_dim(2, N_steps + 1);
-    auto state_df_write = state_df;
-    state_df_write.resize_dim(2, N_steps + 1);
-    for (int i = 0; i < p.N_graphs; i++)
-    {
-        state_df[i].resize_dim(2, b.N_communities_vec[i]);
-    }
     auto df_range = state_df.get_ranges();
     auto sim_idx = 0;
-    for (int i = 0; i < p.p_out_vec.size(); i++)
+    for (int p_out_idx = 0; p_out_idx < p.p_out_vec.size(); p_out_idx++)
     {
 
         auto p_out = p.p_out_vec[i];
         auto Graph_dir = p.output_dir + "/" + float_to_decimal_string(p_out) + "/Graph_";
 
-
-        write_dataframe(Graph_dir, "/Trajectories/community_trajectory_", state_df_write.slice(sim_idx, sim_idx + p.N_sims), true, {1, 0});
-        write_dataframe(Graph_dir, "/Connection_Events/connection_events_", event_df.slice(sim_idx, sim_idx + p.N_sims), true);
+        write_graphseries(p_out_idx, state_df_write.slice(sim_idx, sim_idx + p.N_sims), t_offset);
+        write_graphseries(p_out_idx, event_df.slice(sim_idx, sim_idx + p.N_sims), t_offset);
 
         auto inf_gs = sample_infections(state_df, event_df, b.ccm, p.seed);
-        write_dataframe(Graph_dir, "/Connection_Infections/connection_infections_", inf_gs.slice(sim_idx, sim_idx + p.N_sims), true);
+        write_graphseries(p_out_idx, inf_gs.slice(sim_idx, sim_idx + p.N_sims), t_offset);
         sim_idx += p.N_sims;
     }
     t2 = std::chrono::high_resolution_clock::now();
@@ -53,24 +46,10 @@ void write_initial_steps(sycl::queue &q, const Sim_Param &p, Sim_Buffers &b, std
     write_dataframe(p.output_dir + "/Graph_", "/Trajectories/community_trajectory_", state_df, false);
 }
 
-void reset_directories(const Sim_Param &p)
-{
-    for (int i = 0; i < p.N_graphs; i++)
-    {
-        std::filesystem::remove_all(p.output_dir + "/Graph_" + std::to_string(i) + "/");
-    }
-    std::filesystem::create_directories(p.output_dir);
-    // create directories for all p.N_graphs
-    for (int i = 0; i < p.N_graphs; i++)
-    {
-        std::filesystem::create_directories(p.output_dir + "/Graph_" + std::to_string(i) + "/Trajectories/");
-        std::filesystem::create_directories(p.output_dir + "/Graph_" + std::to_string(i) + "/p_Is/");
-        std::filesystem::create_directories(p.output_dir + "/Graph_" + std::to_string(i) + "/Connection_Infections/");
-        std::filesystem::create_directories(p.output_dir + "/Graph_" + std::to_string(i) + "/Connection_Events/");
-    }
-}
 
-void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
+
+
+void run(sycl::queue &q, pqxx::connection& con, Sim_Param p, Sim_Buffers &b)
 {
     if ((p.global_mem_size == 0) || p.local_mem_size == 0)
     {
@@ -82,7 +61,7 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
     std::vector<sycl::event> events(1);
     q.wait();
     events[0] = initialize_vertices(q, p, b.vertex_state, b.rngs);
-    reset_directories(p);
+    construct_sim_tables()
     write_initial_steps(q, p, b, events);
 
     // remove all files in directory
@@ -97,7 +76,6 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
             q.wait();
             write_allocated_steps(q, p, b, p.Nt_alloc, events);
             events[0] = clear_buffer<uint32_t, 3>(q, b.accumulated_events, events);
-            // events[0] = clear_buffer<uint8_t, 3>(q, b.edge_events, events);
             events[0] = move_buffer_row(q, b.vertex_state, p.Nt_alloc, events);
         }
         events = recover(q, p, b.vertex_state, b.rngs, t, events);
@@ -107,10 +85,10 @@ void run(sycl::queue &q, Sim_Param p, Sim_Buffers &b)
     write_allocated_steps(q, p, b, t % p.Nt_alloc, events);
 
     if_false_throw(b.ccm.size() == p.N_graphs, "ccm size does not match N_graphs");
-    write_dataframe(p.output_dir + "/Graph_", "/ccm.csv", b.ccm, false);
+    write_dataframe(, "/ccm.csv", b.ccm, false);
 
     auto p_I_df = read_3D_buffer(q, b.p_Is, p.N_graphs, events);
-    write_dataframe(p.output_dir + "/Graph_", "/p_Is/p_I_", p_I_df, true);
+    write_dataframe(, p_I_df, true);
     p.dump(p.output_dir + "/Sim_Param.json");
 }
 
@@ -135,7 +113,6 @@ void run(sycl::queue &q, Sim_Param p, const std::vector<std::vector<std::pair<ui
     run(q, p, edge_list_df, vcm_df);
 }
 
-
 auto matrix_linearize(const std::vector<std::vector<float>> &vecs)
 {
     std::vector<float> out;
@@ -146,7 +123,6 @@ auto matrix_linearize(const std::vector<std::vector<float>> &vecs)
     }
     return out;
 }
-
 
 void p_I_run(sycl::queue &q, Sim_Param p, const Dataframe_t<std::pair<uint32_t, uint32_t>, 2> &edge_list, const Dataframe_t<uint32_t, 2> &vcm, const Dataframe_t<float, 3> &p_Is)
 {

@@ -44,6 +44,19 @@ CPMFindPackage(
     OPTIONS
     "cppitertools_INSTALL_CMAKE_DIR share"
 )
+#add pqxx
+CPMFindPackage(
+    NAME pqxx
+    GITHUB_REPOSITORY jtv/libpqxx
+    GIT_TAG master
+    OPTIONS
+    "BUILD_TESTING OFF"
+    "BUILD_DOCUMENTATION OFF"
+    "BUILD_EXAMPLES OFF"
+    "BUILD_SHARED_LIBS OFF"
+    "CMAKE_POSITION_INDEPENDENT_CODE ON")
+
+
 find_package(TBB REQUIRED)
 include(FindThreads)
 # CPMFindPackage(

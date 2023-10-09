@@ -3,16 +3,10 @@
 #include <execution>
 #include <Sycl_Graph/Utils/Common.hpp>
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
-#include <Sycl_Graph/Utils/Dataframe.hpp>
+#include <Sycl_Graph/Dataframe/Dataframe.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
+#include <Sycl_Graph/Utils/math.hpp>
 
-
-auto make_iota(auto N)
-{
-    std::vector<uint32_t> result(N);
-    std::iota(result.begin(), result.end(), 0);
-    return result;
-}
 void event_inf_summary(const Dataframe_t<State_t, 4> &community_state, const Dataframe_t<uint32_t, 4> &events, const std::vector<std::vector<uint32_t>> &ccms);
 
 void event_inf_validation(const Dataframe_t<State_t, 4> &community_state, const Dataframe_t<uint32_t, 4> &events, const std::vector<std::vector<uint32_t>> &ccms);

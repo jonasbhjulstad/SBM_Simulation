@@ -2,7 +2,7 @@
 #define SIM_TIMESERIES_HPP
 #include <Sycl_Graph/Utils/Common.hpp>
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
-#include <Sycl_Graph/Utils/Dataframe.hpp>
+#include <Sycl_Graph/Dataframe/Dataframe.hpp>
 #include <cmath>
 
 template <typename T>

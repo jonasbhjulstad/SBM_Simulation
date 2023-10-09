@@ -1,5 +1,6 @@
 
 #include <Sycl_Graph/Simulation/Sim_Infection_Sampling.hpp>
+#include <Sycl_Graph/Utils/math.hpp>
 
 #include <execution>
 #include <iostream>

@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 #include <fstream>
+#include <sstream>
 
 struct State_t: public std::array<uint32_t, 3>
 {
@@ -16,6 +17,11 @@ struct State_t: public std::array<uint32_t, 3>
 
   //fstream
   friend std::fstream& operator<<(std::fstream& os, const State_t& s)
+  {
+    os << s[0] << "," << s[1] << "," << s[2];
+    return os;
+  }
+  friend std::stringstream& operator<<(std::stringstream& os, const State_t& s)
   {
     os << s[0] << "," << s[1] << "," << s[2];
     return os;

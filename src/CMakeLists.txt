@@ -1,5 +1,5 @@
 
-
+add_subdirectory(Database)
 add_custom_library(Graph)
 target_link_libraries(Graph PUBLIC cppitertools)
 target_include_directories(Graph PUBLIC ${SYCL_GRAPH_INCLUDE_DIR})
