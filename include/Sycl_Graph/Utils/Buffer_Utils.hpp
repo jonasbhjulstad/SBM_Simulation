@@ -1,9 +1,9 @@
-#ifndef BUFFER_UTILS_IMPL_HPP
-#define BUFFER_UTILS_IMPL_HPP
-#include <Sycl_Graph/Utils/Common.hpp>
+#ifndef SYCL_GRAPH_UTILES_BUFFER_UTILS_HPP
+#define SYCL_GRAPH_UTILES_BUFFER_UTILS_HPP
+#include <CL/sycl.hpp>
+#include <vector>
 #include <Static_RNG/distributions.hpp>
-#include <random>
-#include <execution>
+#include <fstream>
 template <typename T, std::size_t N>
 sycl::event read_buffer(sycl::buffer<T,N>& buf, sycl::queue& q, std::vector<T>& result, std::vector<sycl::event>& dep_events)
 {

@@ -1,4 +1,4 @@
-#include <Sycl_Graph/Graph.hpp>
+#include <Sycl_Graph/Graph/Graph.hpp>
 #include <numeric>
 #include <cassert>
 auto make_iota(auto start, auto end)

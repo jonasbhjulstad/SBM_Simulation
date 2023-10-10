@@ -1,7 +1,7 @@
 #ifndef SYCL_GRAPH_BUFFER_ROUTINES_HPP
 #define SYCL_GRAPH_BUFFER_ROUTINES_HPP
-#include <Sycl_Graph/Utils/Common.hpp>
-
+#include <CL/sycl.hpp>
+#include <Sycl_Graph/Common.hpp>
 
 template <typename T>
 void print_buffer(sycl::buffer<T, 1> &buf)

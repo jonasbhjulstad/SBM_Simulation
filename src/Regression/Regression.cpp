@@ -1,5 +1,5 @@
 #include <Sycl_Graph/Regression.hpp>
-#include <Sycl_Graph/Graph.hpp>
+#include <Sycl_Graph/Graph/Graph.hpp>
 
 #include <fstream>
 #include <iostream>

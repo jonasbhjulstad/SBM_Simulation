@@ -1,5 +1,5 @@
 #include <Sycl_Graph/Database/Dataframe.hpp>
-#include <Sycl_Graph/SIR_Types.hpp>
+#include <Sycl_Graph/Epidemiological/SIR_Types.hpp>
 
 template <typename T>
 auto generate_timeseries(uint32_t Nt, uint32_t N_cols);

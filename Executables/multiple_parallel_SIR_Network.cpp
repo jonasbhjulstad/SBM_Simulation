@@ -1,5 +1,5 @@
 
-#include <Sycl_Graph/Graph.hpp>
+#include <Sycl_Graph/Graph/Graph.hpp>
 #include <Sycl_Graph/Simulation/Multiple_Simulation.hpp>
 #include <Sycl_Graph/Utils/Profiling.hpp>
 #include <Sycl_Graph/Utils/math.hpp>

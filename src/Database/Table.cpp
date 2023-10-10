@@ -1,8 +1,8 @@
 #include <Sycl_Graph/Database/Table.hpp>
 void create_table(pqxx::connection &con, const std::string &table_name,
-                             const std::vector<std::string> &indices,
-                             const std::vector<std::string> &data_names,
-                             std::vector<std::string> data_types)
+                  const std::vector<std::string> &indices,
+                  const std::vector<std::string> &data_names,
+                  std::vector<std::string> data_types)
 {
     auto max_constraint = [](std::string idx_name, auto N_max)
     { return "CONSTRAINT max_index_" + idx_name + " CHECK (" + idx_name + " < " + std::to_string(N_max) + ")"; };
@@ -51,10 +51,29 @@ void create_table(pqxx::connection &con, const std::string &table_name,
     work.commit();
 }
 
-std::string string_array(const std::vector<std::string>& strs)
+void read_vector(pqxx::row &work_data, const std::string &column_name, uint32_t N_cols, std::vector<float>& result)
+{
+    auto stof = [](const std::string& str)
+    {
+        return std::stof(str);
+    };
+    result = _detail::read_vector_impl<float>(work_data, column_name, stof, N_cols);
+}
+
+void read_vector(pqxx::row &work_data, const std::string &column_name, uint32_t N_cols, std::vector<int>& result)
+{
+    auto stoi = [](const std::string& str){return std::stoi(str);};
+    result = _detail::read_vector_impl<int>(work_data, column_name, stoi, N_cols);
+}
+bool data_type_is_array(const std::string &dtype_str)
+{
+    // if [] in dtype_str
+    return dtype_str.find("[]") != std::string::npos;
+}
+std::string string_array(const std::vector<std::string> &strs)
 {
     std::stringstream ss;
-    for(int i = 0; i < strs.size(); i++)
+    for (int i = 0; i < strs.size(); i++)
     {
         ss << strs[i];
         if (i < strs.size() - 1)
@@ -63,4 +82,18 @@ std::string string_array(const std::vector<std::string>& strs)
         }
     }
     return ss.str();
+}
+
+void delete_table(pqxx::connection &con, const std::string &table_name)
+{
+  auto work = pqxx::work(con);
+  work.exec("DROP TABLE IF EXISTS " + table_name);
+  work.commit();
+}
+
+void drop_table(pqxx::connection &con, const std::string& table_name)
+{
+  auto work = pqxx::work(con);
+  work.exec(("DROP TABLE IF EXISTS " + table_name).c_str());
+  work.commit();
 }

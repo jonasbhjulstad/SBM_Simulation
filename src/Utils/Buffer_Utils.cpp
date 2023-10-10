@@ -1,4 +1,5 @@
 #include <Sycl_Graph/Utils/Buffer_Utils.hpp>
+#include <random>
 
 void linewrite(std::ofstream &file, const std::vector<uint32_t> &state_iter)
 {

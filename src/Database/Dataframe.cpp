@@ -56,3 +56,58 @@ Dataframe_t<State_t, 4> read_graphseries(pqxx::connection &con, int p_out, const
   }
   return graphseries;
 }
+
+void write_ccm(pqxx::connection &con, uint32_t p_out, Dataframe_t<Edge_t, 2> &ccm)
+{
+    auto work = pqxx::work(con);
+    auto Ng = ccm.size();
+    auto N_edges = ccm[0].size();
+    auto stream = pqxx::stream_to::table(work, {"connection_community_map"}, {"p_out", "graph", "edge", "from", "to", "weight"});
+    for (int i = 0; i < Ng; i++)
+    {
+        for (int edge_id = 0; edge_id < N_edges; edge_id++)
+        {
+            auto edge = ccm(i, edge_id);
+            stream << std::make_tuple(p_out, i, 0, edge.from, edge.to, edge.weight);
+        }
+    }
+    stream.complete();
+
+    work.commit();
+}
+
+void write_vcm(pqxx::connection &con, uint32_t p_out, const Dataframe_t<uint32_t, 2> &vcm)
+{
+    auto work = pqxx::work(con);
+    auto Ng = vcm.size();
+    auto N_vertices = vcm[0].size();
+    auto stream = pqxx::stream_to::table(work, {"vertex_community_map"}, {"p_out", "graph", "vertex", "community"});
+    for (int i = 0; i < Ng; i++)
+    {
+        for (int vertex_id = 0; vertex_id < N_vertices; vertex_id++)
+        {
+
+            stream << std::make_tuple(p_out, i, vertex_id, vcm(i, vertex_id));
+        }
+    }
+    stream.complete();
+    work.commit();
+}
+
+
+void write_edgelist(pqxx::connection& con, uint32_t p_out, const Dataframe_t<std::pair<uint32_t, uint32_t>, 2>& edgelists)
+{
+    auto work = pqxx::work(con);
+    auto Ng = edgelists.size();
+    auto N_edges = edgelists[0].size();
+    auto stream = pqxx::stream_to::table(work, {"edgelists"}, {"p_out", "graph", "edge", "from", "to"});
+    for (int i = 0; i < Ng; i++)
+    {
+        for (int edge_id = 0; edge_id < N_edges; edge_id++)
+        {
+            stream << std::make_tuple(p_out, i, edge_id, edgelists(i, edge_id).first, edgelists(i, edge_id).second);
+        }
+    }
+    stream.complete();
+    work.commit();
+}

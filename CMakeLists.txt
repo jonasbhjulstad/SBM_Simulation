@@ -54,6 +54,14 @@ include(cmake/custom_binder.cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+option(ENABLE_CLANG_TIDY "Enable Clang Tidy" OFF)
+# search for clang-tidy
+if(${ENABLE_CLANG_TIDY})
+find_program(CLANG_TIDY_EXE NAMES "clang-tidy" REQUIRED)
+endif()
+# setup clang-tidy command from executable + options
+set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE}" "-checks=misc-header-include-cycle")
+
 #Sycl warning suppression flags
 set(CMAKE_UNITY_BUILD OFF)
 add_compile_options("-O0")

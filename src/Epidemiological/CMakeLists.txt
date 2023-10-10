@@ -1,0 +1,2 @@
+add_custom_library(Dynamics)
+target_link_libraries(Dynamics PUBLIC Sim_Buffers)

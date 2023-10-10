@@ -7,6 +7,10 @@ function(add_sycl_executable source_file)
     target_compile_options(${source_file} PRIVATE ${SYCL_CUSTOM_FLAGS})
     target_compile_options(${source_file} PRIVATE ${DEFAULT_WARNING_FLAGS})
     target_include_directories(${source_file} PUBLIC ${SYCL_GRAPH_INCLUDE_DIR})
+    if (${ENABLE_CLANG_TIDY})
+
+    set_target_properties(${source_file} PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
+    endif()
     # target_link_options(${source_file} PRIVATE -static-libgcc -static-libstdc++)
 endfunction()
 
@@ -24,4 +28,9 @@ function(add_regression_executable source_file)
         target_link_libraries(${source_file} PUBLIC tbb)
     endif()
     target_include_directories(${source_file} PUBLIC ${SYCL_GRAPH_INCLUDE_DIR})
+    if (${ENABLE_CLANG_TIDY})
+
+    set_target_properties(${source_file} PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
+    endif()
+
 endfunction()

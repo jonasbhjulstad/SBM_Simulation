@@ -1,11 +1,8 @@
 #ifndef SIR_INFECTION_SAMPLING_HPP
 #define SIR_INFECTION_SAMPLING_HPP
-#include <execution>
-#include <Sycl_Graph/Utils/Common.hpp>
-#include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <Sycl_Graph/Dataframe/Dataframe.hpp>
-#include <Sycl_Graph/Utils/Buffer_Utils.hpp>
-#include <Sycl_Graph/Utils/math.hpp>
+#include <Sycl_Graph/Epidemiological/SIR_Types.hpp>
+#include <Sycl_Graph/Graph/Graph_Types.hpp>
 
 void event_inf_summary(const Dataframe_t<State_t, 4> &community_state, const Dataframe_t<uint32_t, 4> &events, const std::vector<std::vector<uint32_t>> &ccms);
 

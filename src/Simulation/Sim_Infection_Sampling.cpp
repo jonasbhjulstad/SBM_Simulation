@@ -1,7 +1,7 @@
 
 #include <Sycl_Graph/Simulation/Sim_Infection_Sampling.hpp>
+#include <Sycl_Graph/Utils/Buffer_Utils.hpp>
 #include <Sycl_Graph/Utils/math.hpp>
-
 #include <execution>
 #include <iostream>
 #include <random>
@@ -159,7 +159,7 @@ Dataframe_t<int, 2> get_delta_Is(const Dataframe_t<State_t, 2> &community_state)
 
 std::tuple<std::vector<uint32_t>,std::vector<uint32_t>> get_related_connections(size_t c_idx, const std::vector<Edge_t> &ccm)
 {
-    auto ccm_weights = get_weights(ccm);
+    auto ccm_weights = Edge_t::get_weights(ccm);
     std::vector<uint32_t> connection_indices;
     std::vector<uint32_t> connection_weights;
     for (int i = 0; i < ccm.size(); i++)

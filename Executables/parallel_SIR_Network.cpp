@@ -1,12 +1,10 @@
 
-#include <Sycl_Graph/Graph.hpp>
+#include <Sycl_Graph/Graph/Graph.hpp>
 #include <Sycl_Graph/Simulation/Simulation.hpp>
 #include <Sycl_Graph/Utils/Profiling.hpp>
-// #include <execution>
-// #include <iomanip>
 #include <CL/sycl.hpp>
 #include <chrono>
-
+#include <Sycl_Graph/Database/Simulation_Tables.hpp>
 Sim_Param create_sim_param(sycl::queue &q, const std::string& fname, uint32_t seed = 24)
 {
     auto p = Sim_Param(fname);
@@ -38,7 +36,10 @@ int main()
     sycl::queue q(sycl::cpu_selector_v);
     uint32_t seed = 283;
     auto p = create_sim_param(q, output_dir + "Sim_Param.json");
-    // auto p = ps[0];
+
+    auto con = pqxx::connection("dbname=postgres user=postgres");
+
+    construct_simulation_tables(con, 1, p.N_graphs, p.N_sims, p.Nt+1);
 
     t1 = std::chrono::high_resolution_clock::now();
 
@@ -61,8 +62,9 @@ int main()
     run(q, p, b);
     std::for_each(edge_list.begin(), edge_list.end(), [p,i=0](const auto& edges) mutable
     {
-        write_edgelist(p.output_dir + "Graph_" + std::to_string(i) + "/edgelist.csv", edges);
     });
+
+    drop_simulation_tables(con);
 
     return 0;
 }

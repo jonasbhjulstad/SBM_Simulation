@@ -1,6 +1,5 @@
 #ifndef BUFFER_VALIDATION_HPP
 #define BUFFER_VALIDATION_HPP
-#include <Sycl_Graph/Utils/Common.hpp>
 template <typename T, std::size_t N, sycl::access::mode Mode>
 sycl::accessor<T,N, Mode> construct_validate_accessor(sycl::buffer<T, N>& buf, sycl::handler& h, sycl::range<N> range, sycl::range<N> offset)
 {

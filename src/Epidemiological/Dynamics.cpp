@@ -1,5 +1,5 @@
 
-#include <Sycl_Graph/Dynamics.hpp>
+#include <Sycl_Graph/Epidemiological/SIR_Dynamics.hpp>
 
 SYCL_EXTERNAL auto floor_div(auto a, auto b) { return static_cast<uint32_t>(std::floor(static_cast<float>(a) / static_cast<float>(b))); }
 

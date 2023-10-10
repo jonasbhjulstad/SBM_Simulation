@@ -1,6 +1,5 @@
 #ifndef DYNAMICS_HPP
 #define DYNAMICS_HPP
-#include <Sycl_Graph/Utils/Common.hpp>
 #include <Static_RNG/distributions.hpp>
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <Sycl_Graph/Simulation/Sim_Buffers.hpp>

@@ -2,12 +2,8 @@
 #define SYCL_GRAPH_DATABASE_DATAFRAME_HPP
 #include <Sycl_Graph/Database/Timeseries.hpp>
 #include <Sycl_Graph/Dataframe/Dataframe.hpp>
-#include <Sycl_Graph/SIR_Types.hpp>
-
-void create_table(pqxx::connection &con, const std::string &table_name,
-                             const std::vector<std::string> &indices,
-                             const std::vector<std::string> &data_names,
-                             std::vector<std::string> data_types = {});
+#include <Sycl_Graph/Epidemiological/SIR_Types.hpp>
+#include <Sycl_Graph/Graph/Graph_Types.hpp>
 
 template <typename T>
 void write_timeseries(pqxx::work &work, uint32_t p_out, uint32_t graph, uint32_t sim, Dataframe_t<T, 2> &timeseries, const std::string &table_name, uint32_t offset = 0)
@@ -78,6 +74,9 @@ void write_graphseries(pqxx::connection &con, uint32_t p_out, Dataframe_t<T, 4> 
     write_graphseries(work, p_out, graphseries, table_name, offset);
     work.commit();
 }
+void write_ccm(pqxx::connection &con, uint32_t p_out, Dataframe_t<Edge_t, 2> &ccm);
+void write_vcm(pqxx::connection &con, uint32_t p_out, const Dataframe_t<uint32_t, 2> &ccm);
+void write_edgelist(pqxx::connection &con, uint32_t p_out, const Dataframe_t<std::pair<uint32_t, uint32_t>, 2> &edgelists);
 
 Dataframe_t<State_t, 2> read_timeseries(pqxx::connection &con, int p_out, int sim_id, int graph_id, uint32_t N_cols);
 

@@ -1,7 +1,9 @@
 #ifndef SYCL_GRAPH_DEVICE_PROFILING_HPP
 #define SYCL_GRAPH_DEVICE_PROFILING_HPP
 
-#include <Sycl_Graph/Utils/Common.hpp>
+#include <CL/sycl.hpp>
+#include <string>
+#include <tuple>
 #include <Sycl_Graph/Simulation/Sim_Types.hpp>
 struct Device_Info
 {
