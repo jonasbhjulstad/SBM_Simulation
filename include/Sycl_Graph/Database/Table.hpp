@@ -3,44 +3,23 @@
 #include <array>
 #include <cstdint>
 #include <fstream>
-#include <pqxx/pqxx>
 #include <sstream>
 #include <string>
 #include <vector>
-
+#include <Sycl_Graph/Utils/String_Manipulation.hpp>
 template <typename T>
 bool is_string_entry(const T &entry)
 {
     return std::get<0>(entry) == pqxx::array_parser::juncture::string_value;
 };
+
 void create_table(pqxx::connection &con, const std::string &table_name,
                   const std::vector<std::string> &indices,
                   const std::vector<std::string> &data_names,
-                  std::vector<std::string> data_types);
+                  std::vector<std::string> data_types,
+                  const std::vector<uint32_t>& max_indices = {});
 
-template <typename... Ts>
-std::string tuple_to_string(const std::tuple<Ts...> &data)
-{
-    std::stringstream ss;
-    std::apply([&ss](auto &&...args)
-               { ((ss << args << ", "), ...); },
-               data);
-    // remove last comma
-    auto str = ss.str();
-    str.pop_back();
-    str.pop_back();
-    return str;
-}
 
-template <typename... Ts>
-std::vector<std::string> tuple_to_str_vec(const std::tuple<Ts...> &data)
-{
-    std::vector<std::string> vec;
-    std::apply([&vec](auto &&...args)
-               { ((vec.push_back(std::to_string(args))), ...); },
-               data);
-    return vec;
-}
 
 std::string string_array(const std::vector<std::string> &strs);
 
@@ -204,7 +183,6 @@ std::vector<std::tuple<Ts...>> read_table_slice(pqxx::connection &con, const std
                                    const std::vector<std::string> &data_types)
 {
     auto N_rows = slice_index_value.second - slice_index_value.first;
-    auto N_columns = data_names.size();
 
     auto work = pqxx::work(con);
     auto data_fields = string_array(data_names);

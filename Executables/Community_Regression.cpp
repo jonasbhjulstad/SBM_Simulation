@@ -1,5 +1,5 @@
 #include <Eigen/Dense>
-#include <Sycl_Graph/Regression.hpp>
+#include <Sycl_Graph/Regression/Regression.hpp>
 #include <filesystem>
 #include <fstream>
 #include <iostream>

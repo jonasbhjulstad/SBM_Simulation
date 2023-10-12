@@ -1,5 +1,7 @@
 #include <Sycl_Graph/Graph/Complete_Graph.hpp>
-std::size_t complete_graph_size(size_t N, bool directed, bool self_loops)
+#include <itertools.hpp>
+#include <Sycl_Graph/Utils/math.hpp>
+std::size_t complete_graph_size(std::size_t N, bool directed, bool self_loops)
 {
     return (N * (N - 1) / 2 + (self_loops ? N : 0)) * (directed ? 2 : 1);
 }

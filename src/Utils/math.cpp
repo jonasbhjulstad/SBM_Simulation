@@ -16,3 +16,10 @@ std::vector<uint32_t> make_iota(uint32_t N)
     std::iota(result.begin(), result.end(), 0);
     return result;
 };
+
+std::vector<uint32_t> make_iota(uint32_t start, uint32_t end)
+{
+    std::vector<uint32_t> result(end - start);
+    std::iota(result.begin(), result.end(), start);
+    return result;
+}

@@ -66,11 +66,28 @@ sycl::event initialize_device_buffer(sycl::queue& q, const std::vector<T> &vec, 
 template <typename T, std::size_t N = 1>
 sycl::event initialize_device_buffer(sycl::queue& q, const std::vector<T> &&vec, sycl::buffer<T, N>& buf)
 {
+    if_false_throw(vec.size() == buf.size(), "Buffer and vector size mismatch: " + std::to_string(vec.size()) + " != " + std::to_string(buf.size()));
     return q.submit([&](sycl::handler& h)
     {
         auto acc = buf.template get_access<sycl::access::mode::write, sycl::access::target::global_buffer>(h);
         h.copy(vec.data(), acc);
     });
+}
+
+template <typename T, std::size_t N = 1>
+sycl::buffer<T, N> construct_device_buffer(sycl::queue& q, const std::vector<T>& vec, sycl::range<N> range, sycl::event& res_event)
+{
+    sycl::buffer<T, N> buf(range);
+    res_event = initialize_device_buffer<T, N>(q, vec, buf);
+    return buf;
+}
+
+template <typename T, std::size_t N = 1>
+std::shared_ptr<sycl::buffer<T, N>> make_shared_device_buffer(sycl::queue& q, const std::vector<T>& vec, sycl::range<N> range, sycl::event& res_event)
+{
+    std::shared_ptr<sycl::buffer<T, N>> p_buf = std::make_shared<sycl::buffer<T, N>>(sycl::buffer<T, N>(range));
+    res_event = initialize_device_buffer<T, N>(q, vec, *p_buf);
+    return p_buf;
 }
 
 template <typename T, std::size_t N = 3>

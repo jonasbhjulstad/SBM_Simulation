@@ -25,7 +25,7 @@ auto generate_timeseries<float>(uint32_t Nt, uint32_t N_cols)
     {
         for (int i = 0; i < N_cols; i++)
         {
-            timeseries(t, i) = 0.0f;
+            timeseries[t][i] = 0.0f;
         }
     }
     return timeseries;

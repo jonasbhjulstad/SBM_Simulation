@@ -19,4 +19,12 @@ sycl::accessor<T,N, Mode> construct_validate_accessor(sycl::buffer<T, N>& buf, s
 }
 
 
+template <typename T, std::size_t N, sycl::access::mode Mode>
+sycl::accessor<T,N, Mode> construct_validate_accessor(std::shared_ptr<sycl::buffer<T, N>>& buf, sycl::handler& h, sycl::range<N> range)
+{
+    constexpr std::array<std::size_t, N> zeros = {};
+
+    return std::apply([&](auto ... zs){return sycl::accessor<T, N, Mode>(*buf, h, range, sycl::range<N>(zs ...));}, zeros);
+}
+
 #endif

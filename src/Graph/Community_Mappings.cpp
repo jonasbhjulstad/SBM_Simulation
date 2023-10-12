@@ -43,6 +43,27 @@ std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_
     return ecm;
 }
 
+std::vector<uint32_t> ecm_from_vcm(const std::vector<std::pair<uint32_t, uint32_t>> &edges, const std::vector<uint32_t> &vcm, const std::vector<Edge_t> &ccm)
+{
+    auto directed_equal = [](const auto& e0, const auto& e1)
+    {
+        return ((e0.from == e1.first) && (e0.to == e1.second));
+    };
+    std::vector<uint32_t> ecm(edges.size());
+    std::transform(edges.begin(), edges.end(), ecm.begin(), [&](const auto& edge)
+    {
+        auto c_0 = vcm[edge.first];
+        auto c_1 = vcm[edge.second];
+        auto idx = std::find_if(ccm.begin(), ccm.end(), [&](const auto& cc)
+        {
+            return directed_equal(cc, std::make_pair(c_0, c_1));
+        });
+        auto res = std::distance(ccm.begin(), idx);
+        return res;
+    });
+    return ecm;
+}
+
 std::vector<std::pair<uint32_t, uint32_t>> complete_ccm(uint32_t N_communities, bool directed)
 {
     uint32_t N_edges = N_communities * (N_communities - 1);
@@ -75,27 +96,32 @@ std::vector<std::pair<uint32_t, uint32_t>> ccm_from_vcm(const std::vector<std::p
 {
     // std::vector<std::pair<uint32_t, uint32_t>> ccm;
     auto N_communities = *std::max_element(vcm.begin(), vcm.end()) + 1;
-    auto ccm = complete_ccm(N_communities, false);
-
-    auto is_in_ccm = [](auto c_0, auto c_1, auto ccm)
-    {
-        return std::find_if(ccm.begin(), ccm.end(), [&](const auto &cc)
-                            { return ((cc.first == c_0) && (cc.second == c_1)) || ((cc.first == c_1) && (cc.second == c_0)); }) != ccm.end();
-    };
-    std::for_each(edges.begin(), edges.end(), [&](const auto &edge)
-                  {
-        auto c_0 = vcm[edge.first];
-        auto c_1 = vcm[edge.second];
-        if (is_in_ccm(c_0, c_1, ccm))
-        {
-            // remove
-            auto idx = std::find_if(ccm.begin(), ccm.end(), [&](const auto &cc)
-                                    { return ((cc.first == c_0) && (cc.second == c_1)) || ((cc.first == c_1) && (cc.second == c_0)); });
-            if (idx == ccm.end())
-                ccm.erase(idx);
-        } });
+    auto ccm = complete_ccm(N_communities, true);
     return ccm;
 }
+
+std::vector<std::vector<std::pair<uint32_t, uint32_t>>> ccms_from_vcms(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edges, const std::vector<std::vector<uint32_t>> &vcms)
+{
+    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> result(edges.size());
+    std::transform(edges.begin(), edges.end(), vcms.begin(), result.begin(), [](const auto &edge, const auto &vcm)
+                   { return ccm_from_vcm(edge, vcm); });
+    return result;
+}
+
+template <typename T>
+std::vector<std::vector<uint32_t>> ecms_from_vcms(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edges, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<T>> &ccms)
+{
+    std::vector<std::vector<uint32_t>> result(edges.size());
+    for(int i = 0; i < edges.size(); i++)
+    {
+        result[i] = ecm_from_vcm(edges[i], vcms[i], ccms[i]);
+    }
+    return result;
+}
+
+template std::vector<std::vector<uint32_t>> ecms_from_vcms(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edges, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &ccms);
+template std::vector<std::vector<uint32_t>> ecms_from_vcms(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &edges, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<Edge_t>> &ccms);
+
 
 std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm, uint32_t N_connections)
 {
@@ -105,10 +131,14 @@ std::vector<uint32_t> ccm_weights_from_ecm(const std::vector<uint32_t> &ecm, uin
     return ccm_weights;
 }
 
-std::vector<std::vector<uint32_t>> ccm_weights_from_ecms(const std::vector<uint32_t> &ecms, const std::vector<uint32_t> &edge_counts)
+std::vector<std::vector<uint32_t>> ccm_weights_from_ecms(const std::vector<std::vector<uint32_t>> &ecms, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& ccms)
 {
     std::vector<std::vector<uint32_t>> result(ecms.size());
 
+    for (int i = 0; i < ecms.size(); i++)
+    {
+        result[i] = ccm_weights_from_ecm(ecms[i], ccms[i].size());
+    }
     return result;
 }
 
@@ -142,6 +172,54 @@ std::vector<std::pair<uint32_t, uint32_t>> ccm_from_edgelist(const std::vector<s
         }
     }
     return ccm;
+}
+
+
+std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<std::pair<uint32_t, uint32_t>>> create_community_mappings(const std::vector<std::pair<uint32_t, uint32_t>>& edge_list, const std::vector<std::vector<uint32_t>>& vertex_list)
+{
+    auto vcm = create_vcm(vertex_list);
+    auto ccm = ccm_from_vcm(edge_list, vcm);
+    auto ecm = ecm_from_vcm(edge_list, vcm, ccm);
+    return std::make_tuple(ecm, vcm, ccm);
+}
+
+
+std::tuple<std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<std::pair<uint32_t, uint32_t>>>> create_community_mappings(const std::vector<std::vector<std::pair<uint32_t, uint32_t>>>& edge_list, const std::vector<std::vector<std::vector<uint32_t>>>& vertex_list)
+{
+    std::tuple<std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<std::pair<uint32_t, uint32_t>>>> result;
+    auto N_mappings = edge_list.size();
+    std::get<0>(result).resize(N_mappings);
+    std::get<1>(result).resize(N_mappings);
+    std::get<2>(result).resize(N_mappings);
+
+    for(int i = 0; i < N_mappings; i++)
+    {
+        std::tie(std::get<0>(result)[i], std::get<1>(result)[i], std::get<2>(result)[i]) = create_community_mappings(edge_list[i], vertex_list[i]);
+    }
+    return result;
+}
+
+std::tuple<Dataframe_t<uint32_t, 1>, Dataframe_t<uint32_t, 1>, Dataframe_t<std::pair<uint32_t, uint32_t>, 1>> create_community_mappings(const Dataframe_t<std::pair<uint32_t, uint32_t>, 1>& edge_list, const Dataframe_t<uint32_t, 2>& vertex_list)
+{
+    auto vcm = create_vcm(vertex_list);
+    auto ccm = ccm_from_vcm(edge_list, vcm);
+    auto ecm = ecm_from_vcm(edge_list, vcm, ccm);
+    return std::make_tuple(ecm, vcm, ccm);
+}
+
+std::tuple<Dataframe_t<uint32_t, 2>, Dataframe_t<uint32_t, 2>, Dataframe_t<std::pair<uint32_t, uint32_t>, 2>> create_community_mappings(const Dataframe_t<std::pair<uint32_t, uint32_t>, 2>& edge_list, const Dataframe_t<uint32_t, 3>& vertex_list)
+{
+    std::tuple<std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<std::pair<uint32_t, uint32_t>>>> result;
+    auto N_mappings = edge_list.size();
+    std::get<0>(result).resize(N_mappings);
+    std::get<1>(result).resize(N_mappings);
+    std::get<2>(result).resize(N_mappings);
+
+    for(int i = 0; i < N_mappings; i++)
+    {
+        std::tie(std::get<0>(result)[i], std::get<1>(result)[i], std::get<2>(result)[i]) = create_community_mappings(edge_list[i], vertex_list[i]);
+    }
+    return result;
 }
 
 

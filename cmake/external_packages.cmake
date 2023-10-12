@@ -31,9 +31,8 @@ find_package(pybind11 CONFIG HINTS ${PYTHON_ENV_CMAKE_MODULE_DIR})
 #     GITHUB_REPOSITORY pybind/pybind11
 #     GIT_TAG master
 # )
-# include(FindPkgConfig)
-# pkg_check_modules(graph_tool REQUIRED graph-tool-py3.9)
-
+find_package(libpqxx REQUIRED)
+message(WARNING ${libpqxx_LIBRARIES})
 # set(graph_tool_LIBRARY_DIR "/home/man/.conda/envs/py39/lib/python3.9/site-packages/graph_tool")
 
 # set(graph_tool_libraries graph_tool_core)
@@ -50,17 +49,18 @@ CPMFindPackage(
     OPTIONS
     "cppitertools_INSTALL_CMAKE_DIR share"
 )
-#add pqxx
-CPMFindPackage(
-    NAME pqxx
-    GITHUB_REPOSITORY jtv/libpqxx
-    GIT_TAG master
-    OPTIONS
-    "BUILD_TESTING OFF"
-    "BUILD_DOCUMENTATION OFF"
-    "BUILD_EXAMPLES OFF"
-    "BUILD_SHARED_LIBS OFF"
-    "CMAKE_POSITION_INDEPENDENT_CODE ON")
+# #add pqxx
+# CPMFindPackage(
+#     NAME pqxx
+#     GITHUB_REPOSITORY jtv/libpqxx
+#     GIT_TAG master
+#     OPTIONS
+#     "BUILD_TESTING OFF"
+#     "BUILD_DOCUMENTATION OFF"
+#     "BUILD_EXAMPLES OFF"
+#     "BUILD_SHARED_LIBS OFF"
+#     "CMAKE_POSITION_INDEPENDENT_CODE ON")
+
 
 
 find_package(TBB REQUIRED)

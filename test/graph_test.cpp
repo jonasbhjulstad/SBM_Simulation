@@ -1,20 +1,18 @@
 
+#define _GLIBCXX_USE_CXX11_ABI 0
 #include <Sycl_Graph/Graph/Graph.hpp>
+#include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <Sycl_Graph/Graph/Community_Mappings.hpp>
-#include <Sycl_Graph/Simulation/Simulation.hpp>
-#include <Sycl_Graph/Utils/Profiling.hpp>
+// #include <Sycl_Graph/Simulation/Simulation.hpp>
+#include <Sycl_Graph/Epidemiological/SIR_Dynamics.hpp>
+#include <Sycl_Graph/Simulation/State_Accumulation.hpp>
+#include <Sycl_Graph/Simulation/Sim_Buffers.hpp>
+
 #include <CL/sycl.hpp>
 #include <chrono>
 #include <Sycl_Graph/Database/Simulation_Tables.hpp>
 
-auto nested_vec_max(const std::vector<std::vector<uint32_t>>& vec)
-{
-    auto max = std::max_element(vec.begin(), vec.end(), [](const auto& a, const auto& b)
-    {
-        return *std::max_element(a.begin(), a.end()) < *std::max_element(b.begin(), b.end());
-    });
-    return *std::max_element(max->begin(), max->end());
-}
+// target_link_libraries(Simulation PUBLIC Sim_Buffers SIR_Dynamics Sim_Infection_Sampling String_Manipulation math State_Accumulation)
 
 
 Sim_Param create_sim_param(uint32_t N_communities)
@@ -66,30 +64,26 @@ int main()
     auto N_communities = 2;
     auto p = create_sim_param(N_communities);
 
+
     auto con = pqxx::connection("dbname=postgres user=postgres");
     drop_simulation_tables(con);
     construct_simulation_tables(con, 1, p.N_graphs, p.N_sims, p.Nt+1);
 
-    t1 = std::chrono::high_resolution_clock::now();
-
     auto [edge_lists, vertex_list] = generate_N_SBM_graphs(p.N_pop, N_communities, p.p_in, p.p_out, p.seed, p.N_graphs);
 
-    auto vcms = std::vector<std::vector<uint32_t>>(p.N_graphs, create_vcm(vertex_list[0]));
+    //create sim_buffers
+    Sim_Buffers b(q, p, con, edge_lists, vertex_list[0]);
 
-    t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "Generate graphs: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
-    t1 = t2;
-    std::mt19937 rng(p.seed);
-    // std::uniform_int_distribution<uint32_t> dist_v(0, 0);
-    // for(auto& v: vcms)
-    // {
-    //    std::generate(v.begin(), v.end(), [&dist_v, &rng]() { return dist_v(rng); });
-    // }u
-
-    Simulation_t sim(q, con, p, edge_lists, vcms);
-    sim.run();
-    q.wait();
-    t2 = std::chrono::high_resolution_clock::now();
+    sycl::range<1> compute_range(p.N_sims_tot());
+    sycl::range<1> wg_range(p.N_sims_tot());
+    // std::vector<sycl::event> infect(sycl::queue &q,
+    //                             const Sim_Param &p,
+    //                             Sim_Buffers &b,
+    //                             uint32_t t,
+    //                             sycl::range<1> compute_range,
+    //                             sycl::range<1> wg_range,
+    //                             std::vector<sycl::event> &dep_event)
+    auto inf_event = infect(q, p, b, 0, compute_range, wg_range, b.construction_events);
 
     return 0;
 }

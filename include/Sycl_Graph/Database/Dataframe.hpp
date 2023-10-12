@@ -9,9 +9,9 @@ template <typename T>
 void write_timeseries(pqxx::work &work, uint32_t p_out, uint32_t graph, uint32_t sim, Dataframe_t<T, 2> &timeseries, const std::string &table_name, uint32_t offset = 0)
 {
     auto Nt = timeseries.size();
-    auto cols = timeseries[0].size();
-    for (int t = offset; t < offset + Nt; t++)
+    for (int t = 0; t < Nt; t++)
     {
+        auto cols = timeseries[t].size();
         std::stringstream ss;
         ss << "'{ ";
         for (int i = 0; i < cols; i++)
@@ -26,7 +26,7 @@ void write_timeseries(pqxx::work &work, uint32_t p_out, uint32_t graph, uint32_t
             }
         }
         ss << " }'";
-        work.exec("INSERT INTO " + table_name + " (p_out, graph, sim, time, state) VALUES (" + std::to_string(p_out) + ", " + std::to_string(graph) + ", " + std::to_string(sim) + ", " + std::to_string(t) + ", " + ss.str() + ")"
+        work.exec("INSERT INTO " + table_name + " (p_out, graph, sim, time, state) VALUES (" + std::to_string(p_out) + ", " + std::to_string(graph) + ", " + std::to_string(sim) + ", " + std::to_string(t + offset) + ", " + ss.str() + ")"
                                                                                                                                                                                                                                 " ON CONFLICT ON CONSTRAINT " +
                   table_name + "_pkey DO UPDATE SET state = " +
                   ss.str() + ";");

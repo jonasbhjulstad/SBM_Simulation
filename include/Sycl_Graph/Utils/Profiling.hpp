@@ -22,7 +22,7 @@ struct Device_Info
     uint32_t max_work_item_sizes_1D;
     std::tuple<uint32_t, uint32_t> max_work_item_sizes_2D;
     std::tuple<uint32_t, uint32_t, uint32_t> max_work_item_sizes_3D;
-    void print();
+    void print() const;
     std::string info_string() const;
 };
 Device_Info get_device_info(sycl::queue& q);

@@ -15,7 +15,6 @@ struct Edge_t
   static std::vector<uint32_t> get_weights(const std::vector<Edge_t> &edges);
   static std::vector<uint32_t> get_from(const std::vector<Edge_t> &edges);
   static std::vector<uint32_t> get_to(const std::vector<Edge_t> &edges);
-
   static std::vector<uint32_t> get_from(const std::vector<std::pair<uint32_t, uint32_t>> &edges);
   static std::vector<uint32_t> get_to(const std::vector<std::pair<uint32_t, uint32_t>> &edges);
 };

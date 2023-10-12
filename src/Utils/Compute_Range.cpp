@@ -7,6 +7,14 @@ sycl::range<1> get_wg_range(sycl::queue &q)
     return max_wg_size;
 }
 
+sycl::range<1> get_compute_range(sycl::queue &q)
+{
+    auto device = q.get_device();
+    auto wg_size = get_wg_range(q);
+    auto max_compute_units = device.get_info<sycl::info::device::max_compute_units>();
+    return max_compute_units * wg_size;
+}
+
 sycl::range<1> get_compute_range(sycl::queue &q, uint32_t N_sims)
 {
     auto device = q.get_device();

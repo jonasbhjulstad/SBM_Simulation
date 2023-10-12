@@ -1,5 +1,6 @@
-#include <Sycl_Graph/Regression.hpp>
+#include <Sycl_Graph/Regression/Regression.hpp>
 #include <Sycl_Graph/Graph/Graph.hpp>
+#include <Sycl_Graph/Utils/math.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -145,6 +146,16 @@ std::tuple<Eigen::MatrixXf, Eigen::MatrixXf> load_N_datasets(const std::string &
 
     return std::make_tuple(F_beta_rs_mat, connection_infs_tot);
 }
+
+// std::tuple<Eigen::MatrixXf, Eigen::MatrixXf> load_N_datasets(pqxx::connection& con, uint32_t p_out, uint32_t graph, uint32_t N)
+// {
+
+//     // Eigen::MatrixXf read_simseries(con, p_out, graph, make_iota(N), 3);
+
+
+
+// }
+
 
 
 auto compute_MSE(const Eigen::VectorXf& x, const Eigen::VectorXf& y)

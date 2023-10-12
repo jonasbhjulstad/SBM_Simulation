@@ -1,7 +1,6 @@
 #ifndef SYCL_GRAPH_DATABASE_TIMESERIES_HPP
 #define SYCL_GRAPH_DATABASE_TIMESERIES_HPP
 // #include <Eigen/Dense>
-#include <pqxx/pqxx>
 #include <Sycl_Graph/Database/Table.hpp>
 
 void create_timeseries_table(pqxx::connection &con);

@@ -10,7 +10,7 @@ Dataframe_t<T, 4> read_3D_buffer(sycl::queue& q, sycl::buffer<T, 3>& buf, uint32
     auto Nt = buf.get_range()[0];
     auto N_sims_tot = buf.get_range()[1];
     auto N3 = buf.get_range()[2];
-    auto N_sims = N_sims_tot/N_graphs;
+    uint32_t N_sims = std::ceil(((float)N_sims_tot)/N_graphs);
     auto floor_div = [](auto a, auto b){return static_cast<uint32_t>(std::floor(static_cast<float>(a) / static_cast<float>(b)));};
     std::vector<T> data(buf.size());
     auto event = read_buffer<T, 3>(buf, q, data, dep_events);

@@ -1,8 +1,37 @@
-#include <Sycl_Graph/Utils/Profiling.hpp>
 #include <CL/sycl.hpp>
+#include <Sycl_Graph/Simulation/Sim_Types.hpp>
 #include <iostream>
 #include <algorithm>
 #include <numeric>
+#include <string>
+#include <tuple>
+struct Device_Info
+{
+    sycl::info::device_type type;
+    std::string vendor;
+    std::string version;
+    std::string name;
+    uint32_t max_compute_units;
+    uint32_t max_work_group_size;
+    uint32_t max_clock_frequency;
+    uint64_t global_mem_size;
+    uint64_t local_mem_size;
+    uint64_t max_mem_alloc_size;
+    uint64_t global_mem_cache_size;
+    uint32_t global_mem_cacheline_size;
+    uint32_t max_work_item_sizes_1D;
+    std::tuple<uint32_t, uint32_t> max_work_item_sizes_2D;
+    std::tuple<uint32_t, uint32_t, uint32_t> max_work_item_sizes_3D;
+    void print() const;
+    std::string info_string() const;
+};
+Device_Info get_device_info(sycl::queue& q);
+
+std::vector<Device_Info> get_device_info(std::vector<sycl::queue> &qs);
+std::vector<uint32_t> determine_device_workload(const Sim_Param& p, uint32_t N_sims, std::vector<sycl::queue>& qs);
+
+uint32_t get_event_execution_time(sycl::event& event);
+
 void Device_Info::print() const
 {
     std::cout << "Device Info:" << std::endl;
@@ -104,11 +133,47 @@ std::vector<uint32_t> determine_device_workload(const Sim_Param& p, uint32_t N_s
     std::iota(q_idxs.begin(), q_idxs.end(), 0);
 
 
+    uint32_t N_sims_left = N_sims;
     for (auto i : q_idxs)
     {
         uint32_t N_sims_i = std::round(N_sims * (float)effective_work_group_flops[i] / std::accumulate(effective_work_group_flops.begin(), effective_work_group_flops.end(), 0));
         workloads[i] = N_sims_i;
+        N_sims_left -= N_sims_i;
     }
 
     return workloads;
+}
+
+
+
+int main()
+{
+    //get all cpu queues
+    std::vector<sycl::queue> cpu_qs;
+    for (const auto &dev : sycl::device::get_devices(sycl::info::device_type::cpu))
+    {
+        cpu_qs.emplace_back(dev);
+    }
+    //get all gpu queues
+    std::vector<sycl::queue> gpu_qs;
+    for (const auto &dev : sycl::device::get_devices(sycl::info::device_type::gpu))
+    {
+        gpu_qs.emplace_back(dev);
+    }
+
+    auto cpu_infos = get_device_info(cpu_qs);
+    auto gpu_infos = get_device_info(gpu_qs);
+
+    //wall of line
+
+    std::cout << std::string(80, '-') << std::endl;
+
+    std::for_each(cpu_infos.begin(), cpu_infos.end(), [](const auto &info)
+                  { info.print();});
+
+    std::cout << std::string(80, '-') << std::endl;
+
+    std::for_each(gpu_infos.begin(), gpu_infos.end(), [](const auto &info)
+                  { info.print();});
+
 }
