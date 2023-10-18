@@ -1,11 +1,10 @@
 
-#include <Sycl_Graph/Graph/Graph.hpp>
-#include <Sycl_Graph/Graph/Community_Mappings.hpp>
-#include <Sycl_Graph/Simulation/Simulation.hpp>
-#include <Sycl_Graph/Utils/Profiling.hpp>
+#include <SBM_Simulation/Graph/Graph.hpp>
+#include <SBM_Simulation/Graph/Community_Mappings.hpp>
+#include <SBM_Simulation/Simulation/Simulation.hpp>
+#include <SBM_Simulation/Utils/Profiling.hpp>
 #include <CL/sycl.hpp>
 #include <chrono>
-#include <Sycl_Graph/Database/Simulation_Tables.hpp>
 
 auto nested_vec_max(const std::vector<std::vector<uint32_t>>& vec)
 {
@@ -54,7 +53,7 @@ Sim_Param create_sim_param(uint32_t N_communities)
 }
 int main()
 {
-
+    using namespace SBM_Database;
 
     //project root
     std::string root_dir = "/home/man/Documents/ER_Bernoulli_Robust_MPC/";
@@ -66,9 +65,9 @@ int main()
     auto N_communities = 2;
     auto p = create_sim_param(N_communities);
 
-    auto con = pqxx::connection("dbname=postgres user=postgres");
-    drop_simulation_tables(con);
-    construct_simulation_tables(con, 1, p.N_graphs, p.N_sims, p.Nt+1);
+    soci::session sql("postgresql", "user=postgres password=postgres");
+    drop_simulation_tables(sql);
+    construct_simulation_tables(sql, 1, p.N_graphs, p.N_sims, p.Nt+1);
 
     t1 = std::chrono::high_resolution_clock::now();
 
@@ -86,7 +85,7 @@ int main()
     //    std::generate(v.begin(), v.end(), [&dist_v, &rng]() { return dist_v(rng); });
     // }u
 
-    Simulation_t sim(q, con, p, edge_lists, vcms);
+    Simulation_t sim(q, sql, p, edge_lists, vcms);
     sim.run();
     q.wait();
     t2 = std::chrono::high_resolution_clock::now();

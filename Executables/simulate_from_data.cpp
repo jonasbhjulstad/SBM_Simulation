@@ -1,7 +1,7 @@
 
-#include <Sycl_Graph/Graph/Graph.hpp>
-#include <Sycl_Graph/Simulation/Simulation.hpp>
-#include <Sycl_Graph/Utils/Profiling.hpp>
+#include <SBM_Simulation/Graph/Graph.hpp>
+#include <SBM_Simulation/Simulation/Simulation.hpp>
+#include <SBM_Simulation/Utils/Profiling.hpp>
 #include <CL/sycl.hpp>
 #include <chrono>
 #include <filesystem>

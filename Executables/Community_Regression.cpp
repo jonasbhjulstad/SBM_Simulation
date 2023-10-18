@@ -1,5 +1,5 @@
 #include <Eigen/Dense>
-#include <Sycl_Graph/Regression/Regression.hpp>
+#include <SBM_Simulation/Regression/Regression.hpp>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -11,7 +11,7 @@ using namespace std;
 static constexpr size_t MAXBUFSIZE = 100000;
 
 using namespace Eigen;
-using namespace Sycl_Graph;
+using namespace SBM_Simulation;
 void linewrite(std::ofstream &file, const std::vector<float> &theta)
 {
   for (const auto &t_i_i : theta)

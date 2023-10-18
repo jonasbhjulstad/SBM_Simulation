@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
-fpath = "/home/man/Documents/Sycl_Graph_Old/build/"
+fpath = "/home/man/Documents/SBM_Simulation_Old/build/"
 N_communities = 10
 N_pop_cluster = 30
 G = nx.planted_partition_graph(N_communities, N_pop_cluster, 1.0, 1e-3, seed=42)

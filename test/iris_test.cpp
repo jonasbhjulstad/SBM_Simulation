@@ -1,5 +1,5 @@
 #include <CL/sycl.hpp>
-#include <Sycl_Graph/Utils/Profiling.hpp>
+#include <SBM_Simulation/Utils/Profiling.hpp>
 
 int main()
 {

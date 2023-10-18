@@ -1,16 +1,15 @@
 
-#define _GLIBCXX_USE_CXX11_ABI 0
-#include <Sycl_Graph/Graph/Graph.hpp>
-#include <Sycl_Graph/Simulation/Sim_Types.hpp>
-#include <Sycl_Graph/Graph/Community_Mappings.hpp>
-// #include <Sycl_Graph/Simulation/Simulation.hpp>
-#include <Sycl_Graph/Epidemiological/SIR_Dynamics.hpp>
-#include <Sycl_Graph/Simulation/State_Accumulation.hpp>
-#include <Sycl_Graph/Simulation/Sim_Buffers.hpp>
+// #define _GLIBCXX_USE_CXX11_ABI 0
+#include <SBM_Simulation/Graph/Graph.hpp>
+#include <SBM_Simulation/Simulation/Sim_Types.hpp>
+#include <SBM_Simulation/Graph/Community_Mappings.hpp>
+// #include <SBM_Simulation/Simulation/Simulation.hpp>
+#include <SBM_Simulation/Epidemiological/SIR_Dynamics.hpp>
+#include <SBM_Simulation/Simulation/State_Accumulation.hpp>
+#include <SBM_Simulation/Simulation/Sim_Buffers.hpp>
 
 #include <CL/sycl.hpp>
 #include <chrono>
-#include <Sycl_Graph/Database/Simulation_Tables.hpp>
 
 // target_link_libraries(Simulation PUBLIC Sim_Buffers SIR_Dynamics Sim_Infection_Sampling String_Manipulation math State_Accumulation)
 
@@ -66,13 +65,13 @@ int main()
 
 
     auto con = pqxx::connection("dbname=postgres user=postgres");
-    drop_simulation_tables(con);
-    construct_simulation_tables(con, 1, p.N_graphs, p.N_sims, p.Nt+1);
+    SBM_Database::drop_simulation_tables(sql);
+    SBM_Database::construct_simulation_tables(sql, 1, p.N_graphs, p.N_sims, p.Nt+1);
 
     auto [edge_lists, vertex_list] = generate_N_SBM_graphs(p.N_pop, N_communities, p.p_in, p.p_out, p.seed, p.N_graphs);
 
     //create sim_buffers
-    Sim_Buffers b(q, p, con, edge_lists, vertex_list[0]);
+    Sim_Buffers b(q, p, sql, edge_lists, vertex_list[0]);
 
     sycl::range<1> compute_range(p.N_sims_tot());
     sycl::range<1> wg_range(p.N_sims_tot());

@@ -1,0 +1,2 @@
+add_custom_library(SIR_Dynamics)
+target_link_libraries(SIR_Dynamics PUBLIC Sim_Buffers)

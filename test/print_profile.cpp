@@ -1,5 +1,5 @@
 #include <CL/sycl.hpp>
-#include <Sycl_Graph/Simulation/Sim_Types.hpp>
+#include <SBM_Simulation/Simulation/Sim_Types.hpp>
 #include <iostream>
 #include <algorithm>
 #include <numeric>

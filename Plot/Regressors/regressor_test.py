@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-data_path = "/home/man/Documents/Old_Sycl_Graph/data/SIR_sim/"
+data_path = "/home/man/Documents/Old_SBM_Simulation/data/SIR_sim/"
 
 def load_data(idx):
     community_traj = np.genfromtxt(data_path + "community_traj_" + str(idx) + ".csv", delimiter=",")
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         for i in range(N_communities):
             d_Is[i] = community_delta_I(i, c_states, c_p_Is)
         return d_Is
-    
+
     def community_delta_Rs(c_states):
         d_Rs = np.zeros(N_communities)
         for i in range(N_communities):
@@ -93,11 +93,7 @@ if __name__ == '__main__':
     ax[0][2].plot(tot_traj[:,0])
     ax[1][2].plot(tot_traj[:,1])
     ax[2][2].plot(tot_traj[:,2])
-    
+
 
 
     plt.show()
-
-
-
-

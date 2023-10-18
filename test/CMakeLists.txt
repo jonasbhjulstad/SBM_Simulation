@@ -1,21 +1,59 @@
-add_sycl_executable(drop_simulation_tables drop_simulation_tables.cpp)
-target_link_libraries(drop_simulation_tables PUBLIC Database)
-add_sycl_executable(device_info)
-target_link_libraries(device_info PUBLIC Profiling)
-add_sycl_executable(print_profile)
-target_link_libraries(print_profile PUBLIC Profiling)
+cmake_minimum_required(VERSION 3.14...3.22)
 
-function(pqxx_executable source_file)
-add_executable(${source_file} "${source_file}.cpp")
-target_include_directories(${source_file} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-target_link_libraries(${source_file} PUBLIC Eigen3::Eigen pqxx Database)
-endfunction()
-pqxx_executable(database_dataframe)
-pqxx_executable(table_test)
-pqxx_executable(sim_param_table)
+project(SBM_SimulationTests LANGUAGES CXX)
 
-add_sycl_executable(make_buffer_test)
-target_link_libraries(make_buffer_test PUBLIC Database pqxx Graph Simulation Profiling nlohmann_json::nlohmann_json)
+# ---- Options ----
 
-add_sycl_executable_nodep(graph_test)
-target_link_libraries(graph_test PUBLIC Graph Sim_Types TBB::tbb Community_Mappings Database SIR_Dynamics State_Accumulation Sim_Buffers)
+option(ENABLE_TEST_COVERAGE "Enable test coverage" OFF)
+option(TEST_INSTALLED_VERSION "Test the version found by find_package" OFF)
+
+# --- Import tools ----
+
+include(../cmake/tools.cmake)
+
+# ---- Dependencies ----
+
+include(../cmake/CPM.cmake)
+
+include(${PROJECT_SOURCE_DIR}/../cmake/external_packages.cmake)
+CPMAddPackage("gh:doctest/doctest@2.4.9")
+CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
+if(TEST_INSTALLED_VERSION)
+find_package(SBM_Simulation REQUIRED)
+else()
+CPMAddPackage(NAME SBM_Simulation SOURCE_DIR ${PROJECT_SOURCE_DIR}/..)
+endif()
+file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
+# ---- Create binary ----
+add_executable(${PROJECT_NAME} ${sources})
+
+target_link_libraries(${PROJECT_NAME} -ldl -lpq doctest::doctest SBM_Simulation::SBM_Simulation SOCI::soci_core SOCI::soci_postgresql)
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
+
+# enable compiler warnings
+if(NOT TEST_INSTALLED_VERSION)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    # target_compile_options(SBM_Simulation PUBLIC -Wall -Wpedantic -Wextra -Werror)
+  elseif(MSVC)
+    target_compile_options(SBM_Simulation PUBLIC /W4 /WX)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
+  endif()
+endif()
+
+# ---- Add SBM_SimulationTests ----
+
+enable_testing()
+
+# Note: doctest and similar testing frameworks can automatically configure CMake tests. For other
+# testing frameworks add the tests target instead: add_test(NAME ${PROJECT_NAME} COMMAND
+# ${PROJECT_NAME})
+
+include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
+doctest_discover_tests(${PROJECT_NAME})
+
+# ---- code coverage ----
+
+if(ENABLE_TEST_COVERAGE)
+  target_compile_options(SBM_Simulation PUBLIC -O0 -g -fprofile-arcs -ftest-coverage)
+  target_link_options(SBM_Simulation PUBLIC -fprofile-arcs -ftest-coverage)
+endif()

@@ -1,6 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-filename = "/home/man/Documents/Sycl_Graph/data/Edgelists/merge_graph.csv"
+filename = "/home/man/Documents/SBM_Simulation/data/Edgelists/merge_graph.csv"
 G = nx.read_edgelist(filename, delimiter=',', nodetype=int)
 nx.draw(G, with_labels=True)
 #print number of nodes and edges

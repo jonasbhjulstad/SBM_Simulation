@@ -5,8 +5,8 @@ import pandas as pd
 import pathlib
 filedir = pathlib.Path(__file__).parent.absolute()
 
-trajname = "/home/man/Documents/Sycl_Graph_Old/data/SIR_sim/SBM_traj.csv"
-groupname = "/home/man/Documents/Sycl_Graph_Old/data/SIR_sim/SBM_group_traj.csv"
+trajname = "/home/man/Documents/SBM_Simulation_Old/data/SIR_sim/SBM_traj.csv"
+groupname = "/home/man/Documents/SBM_Simulation_Old/data/SIR_sim/SBM_group_traj.csv"
 #read df without header
 df = pd.read_csv(trajname, header=None)
 df2 = pd.read_csv(groupname, header=None)

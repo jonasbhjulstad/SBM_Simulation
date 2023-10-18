@@ -1,4 +1,4 @@
-#include <Sycl_Graph/Sycl_Graph.hpp>
+#include <SBM_Simulation/SBM_Simulation.hpp>
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>

@@ -1,6 +1,6 @@
 #include <Eigen/Dense>
-#include <Sycl_Graph/Regression/Regression.hpp>
-// #include <Sycl_Graph/Utils/path_config.hpp>
+#include <SBM_Simulation/Regression/Regression.hpp>
+// #include <SBM_Simulation/Utils/path_config.hpp>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
