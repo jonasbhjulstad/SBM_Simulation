@@ -1,6 +1,6 @@
 #ifndef SIM_TIMESERIES_HPP
 #define SIM_TIMESERIES_HPP
-#include <SBM_Simulation/Utils/Buffer_Utils.hpp>
+#include <Sycl_Buffer_Routines/Buffer_Utils.hpp>
 #include <Dataframe/Dataframe.hpp>
 #include <cmath>
 

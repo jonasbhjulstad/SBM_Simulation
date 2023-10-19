@@ -1,3 +1,3 @@
 
-add_sycl_executable_nodep(parallel_SIR_Network)
-target_link_libraries(parallel_SIR_Network PRIVATE -lpqxx -lpq Graph Simulation)
+add_default_executable(parallel_SIR_Network)
+target_link_libraries(parallel_SIR_Network PUBLIC SBM_Simulation)

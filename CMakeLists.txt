@@ -21,19 +21,20 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
       "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there."
   )
 endif()
-option(ENABLE_TBB "Enable TBB" OFF)
+# option(ENABLE_TBB "Enable TBB" ON)
 option(ENABLE_CUDA "Enable CUDA" ON)
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
-
+# add_link_options("-v")
 if (${ENABLE_CUDA})
     # add_link_options(--cuda-path="/home/man/cuda_remote")
     # add_compile_options(--cuda-path="/home/man/cuda_remote")
-    # set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -fsycl-targets=nvptx64-nvidia-cuda)
-    set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -fsycl-targets=nvidia_gpu_sm_86)
-    add_link_options(-fsycl -fsycl-targets=nvidia_gpu_sm_86)
+    set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -fsycl -fsycl-targets=nvptx64-nvidia-cuda)
+    # set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -fsycl-targets=nvidia_gpu_sm_86)
+    # add_link_options(-fsycl -fsycl-targets=nvidia_gpu_sm_86)
     # add_compile_options(-Xsycl-target-backend=nvptx64-nvidia-cuda)
-    add_link_options(-Xsycl-target-backend=nvptx64-nvidia-cuda --offload-arch=sm_86)
+    # add_link_options(-Xsycl-target-backend=nvptx64-nvidia-cuda --offload-arch=sm_86)
+    # set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -Xcuda-ptxas "--verbose")
 endif()
 
 include(cmake/CPM.cmake)
@@ -62,8 +63,7 @@ include(cmake/external_packages.cmake)
 
 
 set(SBM_SIMULATION_DEFAULT_FLAGS -Wno-deprecated-declarations -Wno-unknown-cuda-version)
-include(cmake/custom_executable.cmake)
-include(cmake/custom_binder.cmake)
+include(cmake/default_targets.cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -81,7 +81,7 @@ add_subdirectory(Executables)
 
 string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
 
-set(${PROJECT_NAME}_LIBRARY_TARGETS Sim_Buffers SIR_Dynamics Sim_Infection_Sampling String_Manipulation math State_Accumulation Sim_Types Graph_Types Graph Buffer_Utils Community_Mappings Validation Complete_Graph)
+set(${PROJECT_NAME}_LIBRARY_TARGETS Sim_Buffers SIR_Dynamics Sim_Infection_Sampling String_Manipulation math State_Accumulation Sim_Types Graph_Types Graph Community_Mappings Validation Complete_Graph Simulation_Tables)
 # install export for Utils
 install(TARGETS ${${PROJECT_NAME}_LIBRARY_TARGETS}
   EXPORT ${PROJECT_NAME}Targets

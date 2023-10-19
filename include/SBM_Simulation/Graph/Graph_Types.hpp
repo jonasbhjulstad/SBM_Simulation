@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <fstream>
+#include <sstream>
 #include <vector>
 struct Edge_t
 {
@@ -11,12 +12,17 @@ struct Edge_t
   uint32_t weight;
   friend std::fstream &operator<<(std::fstream &os, const Edge_t &e);
   friend std::ofstream &operator<<(std::ofstream &os, const Edge_t &e);
+  friend std::ostream &operator<<(std::ostream &os, const Edge_t &e);
+  friend std::stringstream &operator<<(std::stringstream &os, const Edge_t &e);
 
   static std::vector<uint32_t> get_weights(const std::vector<Edge_t> &edges);
   static std::vector<uint32_t> get_from(const std::vector<Edge_t> &edges);
   static std::vector<uint32_t> get_to(const std::vector<Edge_t> &edges);
-  static std::vector<uint32_t> get_from(const std::vector<std::pair<uint32_t, uint32_t>> &edges);
-  static std::vector<uint32_t> get_to(const std::vector<std::pair<uint32_t, uint32_t>> &edges);
+  private:
+  std::string to_array_string() const;
+  // static std::vector<uint32_t> get_from(const std::vector<Edge_t> &edges);
+  // static std::vector<uint32_t> get_to(const std::vector<Edge_t> &edges);
 };
+
 
 #endif

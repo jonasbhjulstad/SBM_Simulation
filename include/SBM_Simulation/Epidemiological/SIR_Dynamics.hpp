@@ -4,8 +4,8 @@
 #include <Static_RNG/distributions.hpp>
 #include <SBM_Simulation/Simulation/Sim_Types.hpp>
 #include <SBM_Simulation/Simulation/Sim_Buffers.hpp>
-#include <SBM_Simulation/Utils/Buffer_Validation.hpp>
-#include <SBM_Simulation/Utils/Buffer_Utils.hpp>
+#include <Sycl_Buffer_Routines/Buffer_Validation.hpp>
+#include <Sycl_Buffer_Routines/Buffer_Utils.hpp>
 
 
 std::vector<sycl::event> recover(sycl::queue &q,

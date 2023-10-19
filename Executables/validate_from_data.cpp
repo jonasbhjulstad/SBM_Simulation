@@ -2,7 +2,7 @@
 #include <CL/sycl.hpp>
 #include <SBM_Simulation/Graph/Graph.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
-#include <SBM_Simulation/Utils/Profiling.hpp>
+#include <Sycl_Buffer_Routines/Profiling.hpp>
 #include <chrono>
 #include <filesystem>
 
@@ -117,7 +117,7 @@ void compute_for_p(const std::string &data_root_dir, const std::string &regressi
         return res; });
     auto p_Is = duplicate(p_Is_graph, p.N_sims);
 
-    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> edge_lists(p.N_graphs);
+    std::vector<std::vector<Edge_t>> edge_lists(p.N_graphs);
     std::transform(result_graph_dirs.begin(), result_graph_dirs.end(), edge_lists.begin(), [](const auto &dir)
                    { return read_edgelist(dir + "/edgelist.csv"); });
     std::vector<std::vector<uint32_t>> vcms(p.N_graphs);

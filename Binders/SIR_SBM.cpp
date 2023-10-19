@@ -52,16 +52,15 @@ PYBIND11_MODULE(SIR_SBM, m)
     py::class_<Device_Info>(m, "Device_Info").def(py::init<>()).def("print", &Device_Info::print);
     m.def("create_sycl_device_queue", &create_sycl_device_queue, "create_sycl_device_queue");
     m.def("get_device_info", static_cast<Device_Info (*)(sycl::queue &)>(&get_device_info), "get_device_info");
-    m.def("determine_device_workload", &determine_device_workload, "determine_device_workload");
     m.def("get_sycl_gpus", &get_sycl_gpus, "get_sycl_gpus");
     m.def("generate_planted_SBM_edges", &generate_planted_SBM_edges, "generate_planted_SBM_edges");
     m.def("generate_N_SBM_graphs", &generate_N_SBM_graphs, "generate_N_SBM_graphs");
 
     // m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, Sim_Buffers &)>(&run), "run");
-    // m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &)>(&run), "run");
-    // m.def("p_I_run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<std::pair<uint32_t, uint32_t>>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<std::vector<float>>> &)>(&p_I_run), "p_I_run");
+    // m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<Edge_t>> &, const std::vector<std::vector<uint32_t>> &)>(&run), "run");
+    // m.def("p_I_run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<Edge_t>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<std::vector<float>>> &)>(&p_I_run), "p_I_run");
 
-    // m.def("read_edgelist", static_cast<void (*)(const std::string &, std::vector<std::pair<uint32_t, uint32_t>> &)>(&read_edgelist), "read_edgelist");
+    // m.def("read_edgelist", static_cast<void (*)(const std::string &, std::vector<Edge_t> &)>(&read_edgelist), "read_edgelist");
     // m.def("write_vector", &write_vector, "write_vector");
     // m.def("ecm_from_vcm", &ecm_from_vcm, "ecm_from_vcm");
     // m.def("project_on_connection", &project_on_connection, "project_on_connection");

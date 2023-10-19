@@ -11,14 +11,14 @@
 struct Simulation_t
 {
 
-    Simulation_t(sycl::queue &q, soci::session &sql, const Sim_Param &sim_param, const Dataframe::Dataframe_t<std::pair<uint32_t, uint32_t>, 2> &edge_list, const Dataframe::Dataframe_t<uint32_t, 2> &vcm, sycl::range<1> compute_range = 0, sycl::range<1> wg_range = 0, const Dataframe::Dataframe_t<float, 3> &p_Is = {});
+    Simulation_t(sycl::queue &q, soci::session &sql, const Sim_Param &sim_param, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list, const Dataframe::Dataframe_t<uint32_t, 2> &vcm, sycl::range<1> compute_range = 0, sycl::range<1> wg_range = 0, const Dataframe::Dataframe_t<float, 3> &p_Is = {});
 
     Simulation_t(sycl::queue &q, soci::session &sql, const Sim_Param &sim_param, const Sim_Buffers &sim_buffers, sycl::range<1> compute_range, sycl::range<1> wg_range);
 
     Sim_Buffers b;
     Sim_Param p;
     sycl::queue &q;
-    soci::session &con;
+    soci::session &sql;
     sycl::range<1> compute_range = sycl::range<1>(1);
     sycl::range<1> wg_range = sycl::range<1>(1);
 

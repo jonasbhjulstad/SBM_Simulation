@@ -8,7 +8,7 @@ auto read_pairs(const std::string &fname)
     std::ifstream file(fname);
     // for each line
     std::string line;
-    std::vector<std::pair<uint32_t, uint32_t>> ccm;
+    std::vector<Edge_t> ccm;
     while (std::getline(file, line))
     {
         std::stringstream ss(line);
@@ -28,7 +28,7 @@ std::vector<float> read_float_line(const std::string& fname)
     std::ifstream file(fname);
     // for each line
     std::string line;
-    std::vector<std::pair<uint32_t, uint32_t>> ccm;
+    std::vector<Edge_t> ccm;
     auto line = std::getline(file, line);
     std::stringstream ss(line);
     std::string token;
@@ -66,10 +66,10 @@ auto c_delta_I(auto c_idx, auto c_state, auto c_p_I, const auto& ccm, const auto
     auto idx = 0;
     for (const auto&& cm : ccm)
     {
-        if (cm.first == c_idx)
+        if (cm.from == c_idx)
         {
             auto beta_c = betas[2*idx];
-            state_r = c_state(Slice(3*cm.second, 3*cm.second+3));
+            state_r = c_state(Slice(3*cm.to, 3*cm.to+3));
             d_I += delta_I(state_s, state_r, c_p_I, beta_c);
         }
         idx++;

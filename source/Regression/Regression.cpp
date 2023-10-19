@@ -123,12 +123,12 @@ std::tuple<Eigen::MatrixXf, Eigen::MatrixXf> load_N_datasets(const std::string &
     std::transform(idx.begin(), idx.end(), std::back_inserter(datasets), [&](auto idx)
                    { return load_beta_regression(datapath, idx); });
 
-    std::vector<std::pair<uint32_t, uint32_t>> sizes;
+    std::vector<Edge_t> sizes;
     std::transform(datasets.begin(), datasets.end(), std::back_inserter(sizes), [](auto &dataset)
-                   { return std::make_pair(dataset.first.rows(), dataset.first.cols()); });
+                   { return Edge_t(dataset.first.rows(), dataset.second.cols()); });
     uint32_t const tot_rows = std::accumulate(sizes.begin(), sizes.end(), 0, [](auto acc, auto &size)
-                                        { return acc + size.first; });
-    uint32_t const cols = sizes[0].second;
+                                        { return acc + size.from; });
+    uint32_t const cols = sizes[0].to;
     Mat connection_infs_tot(tot_rows, cols);
     Mat F_beta_rs_mat(tot_rows, cols);
     // fill mats with datasets
@@ -137,9 +137,9 @@ std::tuple<Eigen::MatrixXf, Eigen::MatrixXf> load_N_datasets(const std::string &
     {
         auto &dataset = datasets[i];
         auto &size = sizes[i];
-        connection_infs_tot(Eigen::seqN(row_offset, size.first), Eigen::all) = dataset.second;
-        F_beta_rs_mat(Eigen::seqN(row_offset, size.first), Eigen::all) = dataset.first;
-        row_offset += size.first;
+        connection_infs_tot(Eigen::seqN(row_offset, size.from), Eigen::all) = dataset.second;
+        F_beta_rs_mat(Eigen::seqN(row_offset, size.from), Eigen::all) = dataset.first;
+        row_offset += size.from;
     }
     assert(F_beta_rs_mat.array().sum() != 0);
     assert(connection_infs_tot.array().sum() != 0);

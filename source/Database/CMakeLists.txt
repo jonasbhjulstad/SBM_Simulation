@@ -1,2 +1,3 @@
 add_library(Simulation_Tables Simulation_Tables.cpp)
 target_link_libraries(Simulation_Tables PUBLIC SBM_Database::SBM_Database Sim_Types String_Manipulation)
+target_link_options(Simulation_Tables PUBLIC -fPIC)

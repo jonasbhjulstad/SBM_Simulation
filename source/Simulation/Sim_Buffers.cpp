@@ -1,14 +1,15 @@
 
 #include <SBM_Simulation/Simulation/Sim_Buffers.hpp>
-#include <SBM_Simulation/Utils/Buffer_Utils.hpp>
+#include <Sycl_Buffer_Routines/Buffer_Utils.hpp>
 #include <SBM_Simulation/Graph/Graph_Types.hpp>
 #include <SBM_Simulation/Graph/Graph.hpp>
 #include <SBM_Simulation/Graph/Community_Mappings.hpp>
 #include <Dataframe/Dataframe.hpp>
+#include <SBM_Database/SBM_Database.hpp>
 
 
 
-void validate_buffer_init_sizes(Sim_Param p, const Dataframe::Dataframe_t<std::pair<uint32_t, uint32_t>,2> &edge_list, const Dataframe::Dataframe_t<uint32_t,2> &vcms, const Dataframe::Dataframe_t<uint32_t, 2> &ecms, std::vector<float> p_Is_init)
+void validate_buffer_init_sizes(Sim_Param p, const Dataframe::Dataframe_t<Edge_t,2> &edge_list, const Dataframe::Dataframe_t<uint32_t,2> &vcms, const Dataframe::Dataframe_t<uint32_t, 2> &ecms, std::vector<float> p_Is_init)
 {
     if (ecms.size() != p.N_graphs)
     {
@@ -59,14 +60,14 @@ Dataframe::Dataframe_t<float, 3> generate_duplicated_p_Is(uint32_t Nt, uint32_t 
     return p_Is;
 }
 
-Dataframe::Dataframe_t<float, 3> Sim_Buffers::generate_random_p_Is(sycl::queue &q, Sim_Param p, soci::session &sql, const Dataframe::Dataframe_t<std::pair<uint32_t, uint32_t>, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms)
+Dataframe::Dataframe_t<float, 3> Sim_Buffers::generate_random_p_Is(sycl::queue &q, Sim_Param p, soci::session &sql, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms)
 {
 
     auto p_Is_init = generate_duplicated_p_Is(p.Nt, p.N_sims_tot(), p.N_connections_max(), p.p_I_min, p.p_I_max, p.seed);
     return p_Is_init;
 }
 
-Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p, soci::session &sql, const Dataframe::Dataframe_t<std::pair<uint32_t, uint32_t>, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init)
+Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p, soci::session &sql, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init)
 {
 
     const auto N_connections_max = p.N_connections_max();
@@ -75,7 +76,7 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p, soci::session &sql, const 
     auto N_vertices = vcms[0].size();
     std::vector<uint32_t> N_connections_vec(p.N_graphs, N_connections_max);
     auto edge_list = mirror_duplicate_edge_list(edge_list_undirected);
-    auto N_edges = edge_list.template apply<1, uint32_t>([](const Dataframe::Dataframe_t<std::pair<uint32_t, uint32_t>, 1> &data)
+    auto N_edges = edge_list.template apply<1, uint32_t>([](const Dataframe::Dataframe_t<Edge_t, 1> &data)
                                                          { return data.size(); });
     uint32_t N_tot_edges = std::accumulate(N_edges.begin(), N_edges.end(), 0);
     std::vector<uint32_t> edge_offsets_init(p.N_graphs + 1);
@@ -142,10 +143,17 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p, soci::session &sql, const 
     // if_false_throw(ccms.size() == p.N_graphs, "ccm.size() != p.N_graphs");
     q.wait();
 
+// soci::session &sql, const Dataframe::Dataframe_t<T, 2> &df,
+//                         const std::string &table_name,
+//                         const std::array<std::string, N_const> &constant_indices,
+//                         const std::array<uint32_t, N_const> &constant_index_values,
+//                         const std::array<std::string, 2> &iterable_index_names,
+//                         const std::string &data_name)
+    // SBM_Database::dataframe_insert(sql, state_df, "community_state", {}, {}, {"graph", "sim", "t", "community", "state"});
+    SBM_Database::dataframe_insert<Edge_t, 1>(sql, edge_list, "edgelists", {"graph", "edge"}, "data", {"p_out"}, {p.p_out_idx});
+    SBM_Database::dataframe_insert<uint32_t, 1>(sql, vcms, "vertex_community_map", {"graph", "vertex"}, "community", {"p_out"}, {p.p_out_idx});
 
-
-
-    SBM_Database::write_edgelist(sql, p.p_out_idx, edge_list);
-    SBM_Database::write_ccm(sql, p.p_out_idx, ccms);
-    SBM_Database::write_vcm(sql, p.p_out_idx, vcms);
+    // SBM_Database::write_edgelist(sql, p.p_out_idx, edge_list);
+    // SBM_Database::write_ccm(sql, p.p_out_idx, ccms);
+    // SBM_Database::write_vcm(sql, p.p_out_idx, vcms);
 }

@@ -10,22 +10,22 @@
 #include <SBM_Simulation/Utils/math.hpp>
 
 
-std::vector<std::pair<uint32_t, uint32_t>> random_connect(const std::vector<uint32_t> &to_nodes,
+std::vector<Edge_t> random_connect(const std::vector<uint32_t> &to_nodes,
                                                           const std::vector<uint32_t> &from_nodes, float p, uint32_t connection_idx, uint32_t seed)
 {
 
-    std::vector<std::pair<uint32_t, uint32_t>> edge_list(to_nodes.size() * from_nodes.size());
+    std::vector<Edge_t> edge_list(to_nodes.size() * from_nodes.size());
 
     auto prod = iter::product(to_nodes, from_nodes);
     std::transform(std::execution::par_unseq, prod.begin(), prod.end(), edge_list.begin(),
                    [&](auto &pair)
                    {
-                       return std::make_pair(std::get<0>(pair), std::get<1>(pair));
+                       return Edge_t(std::get<0>(pair), std::get<1>(pair));
                    });
 
     edge_list.erase(std::remove_if(edge_list.begin(), edge_list.end(),
                                    [&](auto &e)
-                                   { return e.first == e.second; }),
+                                   { return e.from == e.to; }),
                     edge_list.end());
     if (p == 1)
         return edge_list;
@@ -44,7 +44,7 @@ long long n_choose_2(long long n)
     return n * (n - 1) / 2;
 }
 
-std::vector<std::vector<std::pair<uint32_t, uint32_t>>> random_connect(const std::vector<std::vector<uint32_t>> &nodelists,
+std::vector<std::vector<Edge_t>> random_connect(const std::vector<std::vector<uint32_t>> &nodelists,
                                                                        float p_in, float p_out, uint32_t seed)
 {
     uint32_t N_node_pairs = n_choose_2(nodelists.size()) + nodelists.size();
@@ -72,7 +72,7 @@ std::vector<std::vector<std::pair<uint32_t, uint32_t>>> random_connect(const std
         }
         n++;
     }
-    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> edge_lists(N_node_pairs);
+    std::vector<std::vector<Edge_t>> edge_lists(N_node_pairs);
     std::vector<uint32_t> connection_idx(N_node_pairs);
     std::iota(connection_idx.begin(), connection_idx.end(), 0);
 
@@ -137,30 +137,30 @@ std::tuple<std::vector<Edge_List_Flat_t>, std::vector<Node_List_t>> generate_N_S
 }
 
 
-Dataframe::Dataframe_t<std::pair<uint32_t, uint32_t>, 2> mirror_duplicate_edge_list(const Dataframe::Dataframe_t<std::pair<uint32_t, uint32_t>, 2> &edge_list)
+Dataframe::Dataframe_t<Edge_t, 2> mirror_duplicate_edge_list(const Dataframe::Dataframe_t<Edge_t, 2> &edge_list)
 {
-    Dataframe::Dataframe_t<std::pair<uint32_t, uint32_t>, 2> result(edge_list.size());
+    Dataframe::Dataframe_t<Edge_t, 2> result(edge_list.size());
     std::transform(edge_list.begin(), edge_list.end(), result.begin(), [](const auto &edge_list_elem)
-                   { Dataframe::Dataframe_t<std::pair<uint32_t, uint32_t>, 1> result_elem(edge_list_elem.size() * 2);
+                   { Dataframe::Dataframe_t<Edge_t, 1> result_elem(edge_list_elem.size() * 2);
                        std::transform(edge_list_elem.begin(), edge_list_elem.end(), result_elem.begin(), [](const auto &edge)
                                       { return edge; });
                        std::transform(edge_list_elem.begin(), edge_list_elem.end(), result_elem.begin() + edge_list_elem.size(), [](const auto &edge)
-                                      { return std::make_pair(edge.second, edge.first); });
+                                      { return Edge_t(edge.to, edge.from); });
                        return result_elem; });
     return result;
 }
 
 
-void write_edgelist(const std::string &fname, const Dataframe::Dataframe_t<std::pair<uint32_t, uint32_t>, 1> &edges)
+void write_edgelist(const std::string &fname, const Dataframe::Dataframe_t<Edge_t, 1> &edges)
 {
     std::ofstream f(fname);
     for (auto &&e : edges)
     {
-        f << e.first << "," << e.second << "\n";
+        f << e.from << "," << e.to << "\n";
     }
 }
 
-void read_edgelist(const std::string &fname, std::vector<std::pair<uint32_t, uint32_t>> &edges)
+void read_edgelist(const std::string &fname, std::vector<Edge_t> &edges)
 {
     std::ifstream f(fname);
     std::string line;
@@ -173,7 +173,7 @@ void read_edgelist(const std::string &fname, std::vector<std::pair<uint32_t, uin
         {
             tokens.push_back(token);
         }
-        edges.push_back(std::make_pair(std::stoi(tokens[0]), std::stoi(tokens[1])));
+        edges.push_back(Edge_t(std::stoi(tokens[0]), std::stoi(tokens[1])));
     }
 }
 std::vector<uint32_t> read_vec(const std::string& fpath, size_t N)
@@ -190,9 +190,9 @@ std::vector<uint32_t> read_vec(const std::string& fpath, size_t N)
     return result;
 }
 
-std::vector<std::pair<uint32_t, uint32_t>> read_edgelist(const std::string& fname)
+std::vector<Edge_t> read_edgelist(const std::string& fname)
 {
-    std::vector<std::pair<uint32_t, uint32_t>> edges;
+    std::vector<Edge_t> edges;
     read_edgelist(fname, edges);
     return edges;
 }

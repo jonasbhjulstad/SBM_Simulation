@@ -1,6 +1,6 @@
 
 #include <SBM_Simulation/Simulation/Sim_Infection_Sampling.hpp>
-#include <SBM_Simulation/Utils/Buffer_Utils.hpp>
+#include <Sycl_Buffer_Routines/Buffer_Utils.hpp>
 #include <SBM_Simulation/Utils/math.hpp>
 #include <execution>
 #include <iostream>
@@ -174,7 +174,7 @@ std::tuple<std::vector<uint32_t>,std::vector<uint32_t>> get_related_connections(
 }
 std::vector<uint32_t> get_related_events(size_t c_idx, const std::vector<Edge_t> &ccm, const std::vector<uint32_t> &events)
 {
-    auto [r_sql, rw] = get_related_connections(c_idx, ccm);
+    auto [r_con, rw] = get_related_connections(c_idx, ccm);
     std::vector<uint32_t> r_con_events(r_con.size(), 0);
     for (int i = 0; i < r_con_events.size(); i++)
     {

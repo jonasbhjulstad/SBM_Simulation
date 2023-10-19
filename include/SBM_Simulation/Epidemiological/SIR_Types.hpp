@@ -6,26 +6,36 @@
 #include <soci/soci.h>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <vector>
+#include <SBM_Simulation/Graph/Graph_Types.hpp>
 struct State_t : public std::array<uint32_t, 3>
 {
   friend std::ofstream &operator<<(std::ofstream &os, const State_t &s)
   {
-    os << s[0] << "," << s[1] << "," << s[2];
+    os << State_t::to_string(s,true, true);
     return os;
   }
 
   // fstream
   friend std::fstream &operator<<(std::fstream &os, const State_t &s)
   {
-    os << s[0] << "," << s[1] << "," << s[2];
+    os << State_t::to_string(s, true, true);
     return os;
   }
   friend std::stringstream &operator<<(std::stringstream &os, const State_t &s)
   {
-    os << s[0] << "," << s[1] << "," << s[2];
+    os << State_t::to_string(s,true, true);
     return os;
   }
+
+  //basic ostream
+  friend std::ostream &operator<<(std::ostream &os, const State_t &s)
+  {
+    os << State_t::to_string(s,true, true);
+    return os;
+  }
+
 
   static State_t from_string(const std::string &str, bool brackets = true)
   {
@@ -47,9 +57,12 @@ struct State_t : public std::array<uint32_t, 3>
     return state;
   }
 
-  static std::string to_string(const State_t &state, bool brackets = true)
+  static std::string to_string(const State_t &state, bool brackets = true, bool quotes = false)
   {
     std::stringstream ss;
+    if(quotes){
+      ss << "'";
+    }
     if (brackets)
     {
       ss << "{";
@@ -59,48 +72,51 @@ struct State_t : public std::array<uint32_t, 3>
     {
       ss << "}";
     }
+    if(quotes){
+      ss << "'";
+    }
     return ss.str();
   }
 };
 
 namespace soci
 {
+
   template <>
   struct type_conversion<State_t>
   {
     typedef std::string base_type;
 
-    static void from_base(const std::string &s, soci::indicator ind, State_t &state)
-    {
-      if (ind == i_null)
-      {
-        throw soci_error("Null value not allowed for this type");
-      }
-      state = State_t::from_string(s);
-    }
+    static void from_base(const std::string &s, soci::indicator ind, State_t &state);
 
-    static void to_base(const State_t &state, std::string &s, soci::indicator &ind)
-    {
-      s = State_t::to_string(state);
-      ind = i_ok;
-    }
+    static void to_base(const State_t &state, std::string &s, soci::indicator &ind);
+  };
+
+  template <>
+  struct type_conversion<Edge_t>
+  {
+    typedef std::string base_type;
+
+    static void from_base(const std::string &s, soci::indicator ind, Edge_t &edge);
+
+    static void to_base(const Edge_t &edge, std::string &s, soci::indicator &ind);
   };
 } // namespace soci
 
-  struct Inf_Sample_Data_t
-  {
-    uint32_t community_idx;
-    uint32_t N_infected;
-    uint32_t seed;
-    std::vector<uint32_t> events;
-    std::vector<uint32_t> indices;
-    std::vector<uint32_t> weights;
-  };
-  enum SIR_State : unsigned char
-  {
-    SIR_INDIVIDUAL_S = 0,
-    SIR_INDIVIDUAL_I = 1,
-    SIR_INDIVIDUAL_R = 2
-  };
+struct Inf_Sample_Data_t
+{
+  uint32_t community_idx;
+  uint32_t N_infected;
+  uint32_t seed;
+  std::vector<uint32_t> events;
+  std::vector<uint32_t> indices;
+  std::vector<uint32_t> weights;
+};
+enum SIR_State : unsigned char
+{
+  SIR_INDIVIDUAL_S = 0,
+  SIR_INDIVIDUAL_I = 1,
+  SIR_INDIVIDUAL_R = 2
+};
 
 #endif

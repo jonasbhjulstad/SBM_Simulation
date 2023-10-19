@@ -23,16 +23,16 @@ std::size_t Sim_Param::N_connections_tot() const
     return std::accumulate(N_con.begin(), N_con.end(), 0);
 }
 
-std::vector<std::string> Sim_Param::string_param_names()
+std::array<std::string, Sim_Param::N_parameters> Sim_Param::string_param_names()
 {
-    return std::vector<std::string>({"N_pop", "p_in", "p_out", "N_graphs", "N_sims", "Nt", "Nt_alloc", "seed", "p_I_min", "p_I_max", "p_R", "p_I0", "p_R0", "N_communities"});
+    return {"N_pop", "p_in", "p_out", "N_graphs", "N_sims", "Nt", "Nt_alloc", "seed", "p_I_min", "p_I_max", "p_R", "p_I0", "p_R0", "N_communities"};
 }
 
 
-std::vector<std::string> Sim_Param::string_param_types()
+std::array<std::string, Sim_Param::N_parameters> Sim_Param::string_param_types()
 {
 
-    return std::vector<std::string>({"INTEGER", "real", "real", "INTEGER", "INTEGER", "INTEGER", "INTEGER", "INTEGER", "real", "real", "real", "real", "real", "INTEGER[]"});
+    return {"INTEGER", "real", "real", "INTEGER", "INTEGER", "INTEGER", "INTEGER", "INTEGER", "real", "real", "real", "real", "real", "INTEGER[]"};
 
 }
 

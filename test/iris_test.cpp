@@ -1,5 +1,5 @@
 #include <CL/sycl.hpp>
-#include <SBM_Simulation/Utils/Profiling.hpp>
+#include <Sycl_Buffer_Routines/Profiling.hpp>
 
 int main()
 {

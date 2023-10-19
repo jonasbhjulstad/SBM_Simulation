@@ -1,4 +1,4 @@
-include(${PROJECT_SOURCE_DIR}/cmake/CPM.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/CPM.cmake)
 
 
 
@@ -10,6 +10,7 @@ CPMFindPackage(
     GIT_TAG master
     OPTIONS
     "BUILD_TESTING OFF"
+    "POSITION_INDEPENDENT_CODE ON"
 )
 find_package(Boost 1.78 REQUIRED HINTS ${PYTHON_ENV_CMAKE_MODULE_DIR})
 
@@ -25,11 +26,15 @@ CPMFindPackage(
 #eigen
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
-#add pqxx
-CPMFindPackage(
-    NAME Dataframe
+#add pqxx4
+CPMFindPackage(NAME Dataframe
     GITHUB_REPOSITORY jonasbhjulstad/Dataframe
     GIT_TAG master)
+
+CPMFindPackage(NAME Buffer_Routines
+    GITHUB_REPOSITORY jonasbhjulstad/Sycl_Buffer_Routines
+    GIT_TAG master)
+
 
 
 # CPMFindPackage(
@@ -41,19 +46,14 @@ CPMFindPackage(
 find_package(SOCI REQUIRED COMPONENTS soci_core soci_postgresql)
 
 
-CPMFindPackage(
-    NAME SBM_Database
+CPMFindPackage(NAME SBM_Database
     GITHUB_REPOSITORY jonasbhjulstad/SBM_Database
     GIT_TAG master)
 
 
 find_package(TBB REQUIRED)
 include(FindThreads)
-#     GIT_TAG master
-# )
 find_package(casadi REQUIRED HINTS "/home/man/mambaforge/envs/gt/lib/cmake/casadi")
-# find_package(nlohmann_json 3.11.2 REQUIRED)
 
-find_package(TBB REQUIRED)
 
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")

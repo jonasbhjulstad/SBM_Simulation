@@ -1,5 +1,3 @@
-add_custom_library(Profiling)
-add_custom_library(Buffer_Utils)
-add_custom_library(Validation)
-add_custom_library(String_Manipulation)
-add_custom_library(math)
+add_default_library(Validation)
+add_default_library(String_Manipulation)
+add_default_library(math)

@@ -1,7 +1,7 @@
 
 #include <SBM_Simulation/Graph/Graph.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
-#include <SBM_Simulation/Utils/Profiling.hpp>
+#include <Sycl_Buffer_Routines/Profiling.hpp>
 #include <CL/sycl.hpp>
 #include <chrono>
 #include <filesystem>
@@ -66,7 +66,7 @@ void compute_for_p(const std::string& root_data_dir, const std::string& relative
 
     auto graph_dirs = get_graph_dirs(absolute_p_dir);
     assert(graph_dirs.size() == p.N_graphs);
-    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> edge_lists(p.N_graphs);
+    std::vector<std::vector<Edge_t>> edge_lists(p.N_graphs);
     std::transform(graph_dirs.begin(), graph_dirs.end(), edge_lists.begin(), [](const auto& dir)
     {
         return read_edgelist(dir + "/edgelist.csv");

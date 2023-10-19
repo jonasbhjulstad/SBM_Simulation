@@ -2,7 +2,9 @@
 #include <SBM_Simulation/Graph/Graph.hpp>
 #include <SBM_Simulation/Graph/Community_Mappings.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
-#include <SBM_Simulation/Utils/Profiling.hpp>
+#include <Sycl_Buffer_Routines/Profiling.hpp>
+#include <SBM_Simulation/Database/Simulation_Tables.hpp>
+#include <SBM_Database/SBM_Database.hpp>
 #include <CL/sycl.hpp>
 #include <chrono>
 
@@ -18,21 +20,6 @@ auto nested_vec_max(const std::vector<std::vector<uint32_t>>& vec)
 
 Sim_Param create_sim_param(uint32_t N_communities)
 {
-    //     uint32_t N_pop = 100;
-    // std::vector<uint32_t> N_communities;
-    // float p_in = 1.0f;
-    // float p_out = 0.5f;
-    // uint32_t N_graphs = 2;
-    // uint32_t N_sims = 2;
-    // uint32_t Nt = 56;
-    // uint32_t Nt_alloc = 20;
-    // uint32_t seed = 234;
-    // float p_I_min = 0.1f;
-    // float p_I_max = 0.2f;
-    // uint32_t p_out_idx = 0;
-    // float p_R = 0.1f;
-    // float p_I0 = 0.1f;
-    // float p_R0 = 0.0f;
     Sim_Param p;
     p.N_pop = 100;
     p.N_graphs = 2;

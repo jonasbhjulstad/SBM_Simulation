@@ -9,6 +9,7 @@ struct Sim_Param
         : N_pop(N_pop), N_communities(N_communities), N_graphs(N_communities.size()), p_in(p_in), p_out(p_out), N_sims(N_sims), Nt(Nt), Nt_alloc(Nt_alloc), seed(seed), p_I_min(p_I_min), p_I_max(p_I_max)
     {
     }
+    static constexpr std::size_t N_parameters = 14;
 
     Sim_Param() = default;
     uint32_t N_pop = 100;
@@ -32,8 +33,8 @@ struct Sim_Param
     std::size_t N_connections_tot() const;
     std::size_t N_connections_max() const;
 
-    static std::vector<std::string> string_param_names();
-    static std::vector<std::string> string_param_types();
+    static std::array<std::string, N_parameters> string_param_names();
+    static std::array<std::string, N_parameters> string_param_types();
     std::string string_values() const;
 };
 
