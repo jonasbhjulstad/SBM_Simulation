@@ -1,0 +1,74 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "configure - Debug",
+            "type": "shell",
+            "command": "cmake -B ${workspaceFolder}/build -S ${workspaceFolder} -DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/cmake/toolchains/Intel_x86_Arch.cmake -DCMAKE_BUILD_TYPE=Debug -GNinja",
+            "problemMatcher": []
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build --parallel 10",
+            "problemMatcher": []
+        },
+        {
+            "label": "build_target",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build --target ${fileBasenameNoExtension} --parallel 8",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "build_all",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build --parallel 8",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "build_tests",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build/test/ --parallel 8",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+
+        {
+            "label": "configure_tests",
+            "type": "shell",
+            "command": "cmake -B ${workspaceFolder}/build/test -S ${workspaceFolder}/test -DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/cmake/toolchains/Intel_x86_Arch.cmake -DCMAKE_BUILD_TYPE=Debug -GNinja",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+
+        {
+            "label": "clean_tests",
+            "type": "shell",
+            "command": "rm -rf ${workspaceFolder}/build/test/CMakeFiles ${workspaceFolder}/build/test/CMakeCache.txt",
+            "problemMatcher": []
+        },
+
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "rm -rf ${workspaceFolder}/build/CMakeFiles ${workspaceFolder}/build/CMakeCache.txt",
+            "problemMatcher": []
+        }
+    ]
+}
