@@ -47,7 +47,7 @@ int main()
     std::string output_dir = root_dir + "data/";
     std::chrono::high_resolution_clock::time_point t1, t2;
 
-    sycl::queue q(sycl::gpu_selector_v);
+    sycl::queue q(sycl::cpu_selector_v);
     uint32_t seed = 283;
     auto N_communities = 2;
     auto p = create_sim_param(N_communities);

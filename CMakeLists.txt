@@ -22,14 +22,14 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
   )
 endif()
 # option(ENABLE_TBB "Enable TBB" ON)
-option(ENABLE_CUDA "Enable CUDA" ON)
+option(ENABLE_CUDA "Enable CUDA" OFF)
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
 # add_link_options("-v")
 if (${ENABLE_CUDA})
     # add_link_options(--cuda-path="/home/man/cuda_remote")
     # add_compile_options(--cuda-path="/home/man/cuda_remote")
-    set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -fsycl -fsycl-targets=nvptx64-nvidia-cuda)
+    set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -fsycl-targets=nvptx64-nvidia-cuda)
     # set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -fsycl-targets=nvidia_gpu_sm_86)
     # add_link_options(-fsycl -fsycl-targets=nvidia_gpu_sm_86)
     # add_compile_options(-Xsycl-target-backend=nvptx64-nvidia-cuda)
@@ -77,6 +77,7 @@ configure_file("${PROJECT_SOURCE_DIR}/include/SBM_Simulation/Utils/path_config.h
 add_subdirectory(source)
 add_subdirectory(Binders)
 add_subdirectory(Executables)
+
 
 
 string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)

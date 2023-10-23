@@ -8,13 +8,14 @@ void single_community_state_accumulate(sycl::nd_item<1> &it, const auto &vcm_acc
     auto graph_id = static_cast<uint32_t>(sycl::floor(static_cast<float>(sim_id) / static_cast<float>(N_sims)));
     for (int t = 0; t < Nt; t++)
     {
-        for (int c_idx = 0; c_idx < N_communities; c_idx++)
+        uint32_t c_idx = 0;
+        for (c_idx = 0; c_idx < N_communities; c_idx++)
         {
             state_acc[t][sim_id][c_idx] = {0, 0, 0};
         }
         for (int v_idx = 0; v_idx < N_vertices; v_idx++)
         {
-            auto c_idx = vcm_acc[graph_id][v_idx];
+            c_idx = vcm_acc[graph_id][v_idx];
             auto v_state = v_acc[t][sim_id][v_idx];
             state_acc[t][sim_id][c_idx][v_state]++;
         }
@@ -54,7 +55,7 @@ sycl::event accumulate_community_state(sycl::queue &q, std::vector<sycl::event> 
         auto v_acc = construct_validate_accessor<SIR_State, 3, sycl::access_mode::read>(v_buf, h, range);
         sycl::accessor<State_t, 3, sycl::access_mode::read_write> state_acc(*community_buf, h);
         auto vcm_acc = vcm_buf->template get_access<sycl::access::mode::read>(h);
-        auto Nt = v_buf->get_range()[0];
+        auto Nt = community_buf->get_range()[0];
         auto N_vertices = v_buf->get_range()[2];
         auto N_communities = community_buf->get_range()[2];
 

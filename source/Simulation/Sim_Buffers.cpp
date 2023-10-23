@@ -6,6 +6,7 @@
 #include <SBM_Simulation/Graph/Community_Mappings.hpp>
 #include <Dataframe/Dataframe.hpp>
 #include <SBM_Database/SBM_Database.hpp>
+#include <SBM_Simulation/Utils/Validation.hpp>
 
 
 
@@ -107,10 +108,10 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p, soci::session &sql, const 
     std::transform(seeds.begin(), seeds.end(), std::back_inserter(rng_init), [](const auto seed)
                    { return Static_RNG::default_rng(seed); });
 
-
+    auto vcms_flat = vcms.flatten();
     std::vector<sycl::event> init_event(12);
     rngs = make_shared_device_buffer<Static_RNG::default_rng, 1>(q, rng_init, {rng_init.size()}, init_event[0]);
-    vertex_state = make_shared_device_buffer<SIR_State, 3>(q, traj_init, {p.Nt+1, p.N_sims_tot(), N_vertices}, init_event[1]);
+    vertex_state = make_shared_device_buffer<SIR_State, 3>(q, traj_init, {p.Nt_alloc+1, p.N_sims_tot(), N_vertices}, init_event[1]);
     accumulated_events = make_shared_device_buffer<uint32_t, 3>(q, accumulate_event_init, {p.Nt_alloc, p.N_sims_tot(), p.N_connections_max()}, init_event[2]);
     p_Is = make_shared_device_buffer<float, 3>(q, p_Is_init.flatten(), {p.Nt, p.N_sims_tot(), p.N_connections_max()}, init_event[3]);
     edge_from = make_shared_device_buffer<uint32_t, 1>(q, edge_from_init, {N_tot_edges}, init_event[4]);
@@ -130,25 +131,19 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p, soci::session &sql, const 
         }
     };
 
-    // if_false_throw(edge_from_init.size() == edge_from.size(), "edge_from_init.size() != edge_from.size(), should be " + std::to_string(N_tot_edges));
-    // if_false_throw(edge_to_init.size() == edge_to.size(), "edge_to_init.size() != edge_to.size(), should be " + std::to_string(N_tot_edges));
-    // check_sizes(ecms, N_edges, "Wrong ecm size");
-    // if_false_throw(vcm.get_range()[0] == p.N_graphs, "vcm.get_range()[0] != p.N_graphs, should be " + std::to_string(p.N_graphs));
-    // if_false_throw(vcm.get_range()[1] == vcms[0].size(), "vcm.get_range()[1] != vcms[0].size(), should be " + std::to_string(vcms[0].size()));
-    // if_false_throw(edge_counts.size() == p.N_graphs, "edge_counts.size() != p.N_graphs, should be " + std::to_string(p.N_graphs));
-    // if_false_throw(edge_offsets.size() == (p.N_graphs + 1), "edge_offsets.size() != p.N_graphs, should be " + std::to_string(p.N_graphs));
-    // if_false_throw(community_state.size() == (p.Nt_alloc + 1) * N_sims_tot * N_communities_max, "community_state.size() != (p.Nt_alloc + 1) * N_sims_tot * N_communities_max, should be " + std::to_string((p.Nt_alloc + 1) * N_sims_tot * N_communities_max));
-    // if_false_throw(accumulated_events.size() == p.Nt_alloc * N_sims_tot * N_connections_max, "accumulated_events.size() != p.Nt_alloc * N_sims_tot * N_connections_max, should be " + std::to_string(p.Nt_alloc * N_sims_tot * N_connections_max));
-    // if_false_throw(rngs.size() == rng_init.size(), "rngs.size() != rng_init.size(), should be " + std::to_string(rng_init.size()));
-    // if_false_throw(ccms.size() == p.N_graphs, "ccm.size() != p.N_graphs");
+    if_false_throw(edge_from_init.size() == edge_from->size(), "edge_from_init->size() != edge_from->size(), should be " + std::to_string(N_tot_edges));
+    if_false_throw(edge_to_init.size() == edge_to->size(), "edge_to_init->size() != edge_to->size(), should be " + std::to_string(N_tot_edges));
+    check_sizes(ecms, N_edges, "Wrong ecm size");
+    if_false_throw(vcm->get_range()[0] == p.N_graphs, "vcm.get_range()[0] != p.N_graphs, should be " + std::to_string(p.N_graphs));
+    if_false_throw(vcm->get_range()[1] == vcms[0].size(), "vcm.get_range()[1] != vcms[0]->size(), should be " + std::to_string(vcms[0].size()));
+    if_false_throw(edge_counts->size() == p.N_graphs, "edge_counts->size() != p.N_graphs, should be " + std::to_string(p.N_graphs));
+    if_false_throw(edge_offsets->size() == (p.N_graphs + 1), "edge_offsets->size() != p.N_graphs, should be " + std::to_string(p.N_graphs));
+    if_false_throw(community_state->size() == (p.Nt_alloc + 1) * N_sims_tot * N_communities_max, "community_state->size() != (p.Nt_alloc + 1) * N_sims_tot * N_communities_max, should be " + std::to_string((p.Nt_alloc + 1) * N_sims_tot * N_communities_max));
+    if_false_throw(accumulated_events->size() == p.Nt_alloc * N_sims_tot * N_connections_max, "accumulated_events->size() != p.Nt_alloc * N_sims_tot * N_connections_max, should be " + std::to_string(p.Nt_alloc * N_sims_tot * N_connections_max));
+    if_false_throw(rngs->size() == rng_init.size(), "rngs->size() != rng_init->size(), should be " + std::to_string(rng_init.size()));
+    if_false_throw(ccms.size() == p.N_graphs, "ccm->size() != p.N_graphs");
     q.wait();
 
-// soci::session &sql, const Dataframe::Dataframe_t<T, 2> &df,
-//                         const std::string &table_name,
-//                         const std::array<std::string, N_const> &constant_indices,
-//                         const std::array<uint32_t, N_const> &constant_index_values,
-//                         const std::array<std::string, 2> &iterable_index_names,
-//                         const std::string &data_name)
     // SBM_Database::dataframe_insert(sql, state_df, "community_state", {}, {}, {"graph", "sim", "t", "community", "state"});
     SBM_Database::dataframe_insert<Edge_t, 1>(sql, edge_list, "edgelists", {"graph", "edge"}, "data", {"p_out"}, {p.p_out_idx});
     SBM_Database::dataframe_insert<uint32_t, 1>(sql, vcms, "vertex_community_map", {"graph", "vertex"}, "community", {"p_out"}, {p.p_out_idx});
