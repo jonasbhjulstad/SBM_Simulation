@@ -21,7 +21,7 @@ auto nested_vec_max(const std::vector<std::vector<uint32_t>>& vec)
 Sim_Param create_sim_param(uint32_t N_communities)
 {
     Sim_Param p;
-    p.N_pop = 100;
+    p.N_pop = 10;
     p.N_graphs = 2;
     p.N_communities = std::vector<uint32_t>(p.N_graphs,N_communities);
     p.p_in = 0.5f;
@@ -55,6 +55,7 @@ int main()
     soci::session sql("postgresql", "user=postgres password=postgres");
     drop_simulation_tables(sql);
     construct_simulation_tables(sql, 1, p.N_graphs, p.N_sims, p.Nt+1);
+    // auto index_names = merge_arrays(constant_indices, iterable_index_names);
 
     t1 = std::chrono::high_resolution_clock::now();
 

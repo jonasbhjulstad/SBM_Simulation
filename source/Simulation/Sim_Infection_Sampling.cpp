@@ -289,7 +289,7 @@ Dataframe::Dataframe_t<uint32_t, 3> sample_infections(const Dataframe::Dataframe
 {
     Dataframe::Dataframe_t<uint32_t, 3> result(events.get_ranges());
     auto df_pack = Dataframe::dataframe_tie(community_state, events);
-    auto seeds = generate_seeds(df_pack.size(), seed);
+    auto seeds = Buffer_Routines::generate_seeds(df_pack.size(), seed);
     std::transform(df_pack.begin(), df_pack.end(), seeds.begin(), result.data.begin(), [ccm](const auto& pack, auto seed)
     {
         auto [community_state, events] = pack;
@@ -301,7 +301,7 @@ Dataframe::Dataframe_t<uint32_t, 4> sample_infections(const Dataframe::Dataframe
 {
     Dataframe::Dataframe_t<uint32_t, 4> result(events.get_ranges());
     auto df_pack = Dataframe::dataframe_tie(community_state, events);
-    auto seeds = generate_seeds(df_pack.size(), seed);
+    auto seeds = Buffer_Routines::generate_seeds(df_pack.size(), seed);
     auto N_graphs = community_state.size();
     for(int g_idx = 0; g_idx < N_graphs; g_idx++)
     {

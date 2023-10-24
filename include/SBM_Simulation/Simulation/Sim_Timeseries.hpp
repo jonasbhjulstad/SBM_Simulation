@@ -13,7 +13,7 @@ Dataframe::Dataframe_t<T, 4> read_3D_buffer(sycl::queue& q, sycl::buffer<T, 3>& 
     uint32_t N_sims = std::ceil(((float)N_sims_tot)/N_graphs);
     auto floor_div = [](auto a, auto b){return static_cast<uint32_t>(std::floor(static_cast<float>(a) / static_cast<float>(b)));};
     std::vector<T> data(buf.size());
-    auto event = read_buffer<T, 3>(buf, q, data, dep_events);
+    auto event = Buffer_Routines::read_buffer<T, 3>(buf, q, data, dep_events);
     event.wait();
 
     Dataframe::Dataframe_t<T,4> dataframe(N_graphs, N_sims, Nt, N3);

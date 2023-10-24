@@ -1,5 +1,6 @@
 #ifndef SIR_TYPES_HPP
 #define SIR_TYPES_HPP
+#include <SBM_Simulation/Graph/Graph_Types.hpp>
 #include <array>
 #include <cstdint>
 #include <fstream>
@@ -8,12 +9,11 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include <SBM_Simulation/Graph/Graph_Types.hpp>
 struct State_t : public std::array<uint32_t, 3>
 {
   friend std::ofstream &operator<<(std::ofstream &os, const State_t &s)
   {
-    os << State_t::to_string(s,true, true);
+    os << State_t::to_string(s, true, true);
     return os;
   }
 
@@ -25,18 +25,19 @@ struct State_t : public std::array<uint32_t, 3>
   }
   friend std::stringstream &operator<<(std::stringstream &os, const State_t &s)
   {
-    os << State_t::to_string(s,true, true);
+    os << State_t::to_string(s, true, true);
     return os;
   }
 
-  //basic ostream
+  // basic ostream
   friend std::ostream &operator<<(std::ostream &os, const State_t &s)
   {
-    os << State_t::to_string(s,true, true);
+    os << State_t::to_string(s, true, true);
     return os;
   }
 
 
+  bool is_valid(uint32_t N_pop) const;
   static State_t from_string(const std::string &str, bool brackets = true)
   {
     // comes on the form '{1,2,3}'
@@ -60,7 +61,8 @@ struct State_t : public std::array<uint32_t, 3>
   static std::string to_string(const State_t &state, bool brackets = true, bool quotes = false)
   {
     std::stringstream ss;
-    if(quotes){
+    if (quotes)
+    {
       ss << "'";
     }
     if (brackets)
@@ -72,7 +74,8 @@ struct State_t : public std::array<uint32_t, 3>
     {
       ss << "}";
     }
-    if(quotes){
+    if (quotes)
+    {
       ss << "'";
     }
     return ss.str();
@@ -92,15 +95,6 @@ namespace soci
     static void to_base(const State_t &state, std::string &s, soci::indicator &ind);
   };
 
-  template <>
-  struct type_conversion<Edge_t>
-  {
-    typedef std::string base_type;
-
-    static void from_base(const std::string &s, soci::indicator ind, Edge_t &edge);
-
-    static void to_base(const Edge_t &edge, std::string &s, soci::indicator &ind);
-  };
 } // namespace soci
 
 struct Inf_Sample_Data_t
@@ -118,5 +112,11 @@ enum SIR_State : unsigned char
   SIR_INDIVIDUAL_I = 1,
   SIR_INDIVIDUAL_R = 2
 };
+
+// std::ostream& operator<<(std::ostream & os, SIR_State & state)
+// {
+//   os << (int) state;
+//   return os;
+// }
 
 #endif

@@ -101,7 +101,7 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p, pqxx::connection &con, con
     std::vector<SIR_State> traj_init(N_sims_tot * (p.Nt_alloc + 1) * N_vertices, SIR_INDIVIDUAL_S);
     std::vector<uint32_t> accumulate_event_init(N_sims_tot * N_connections_max * p.Nt_alloc * 2, 0);
 
-    auto seeds = generate_seeds(N_sims_tot, p.seed);
+    auto seeds = Buffer_Routines::generate_seeds(N_sims_tot, p.seed);
     std::vector<Static_RNG::default_rng> rng_init;
     rng_init.reserve(N_sims_tot);
     std::transform(seeds.begin(), seeds.end(), std::back_inserter(rng_init), [](const auto seed)
@@ -109,18 +109,18 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p, pqxx::connection &con, con
 
 
     std::vector<sycl::event> init_event(12);
-    rngs = make_shared_device_buffer<Static_RNG::default_rng, 1>(q, rng_init, {rng_init.size()}, init_event[0]);
-    vertex_state = make_shared_device_buffer<SIR_State, 3>(q, traj_init, {p.Nt+1, p.N_sims_tot(), N_vertices}, init_event[1]);
-    accumulated_events = make_shared_device_buffer<uint32_t, 3>(q, accumulate_event_init, {p.Nt_alloc, p.N_sims_tot(), p.N_connections_max()}, init_event[2]);
-    p_Is = make_shared_device_buffer<float, 3>(q, p_Is_init.flatten(), {p.Nt, p.N_sims_tot(), p.N_connections_max()}, init_event[3]);
-    edge_from = make_shared_device_buffer<uint32_t, 1>(q, edge_from_init, {N_tot_edges}, init_event[4]);
-    edge_to = make_shared_device_buffer<uint32_t, 1>(q, edge_to_init, {N_tot_edges}, init_event[5]);
-    ecm = make_shared_device_buffer<uint32_t, 1>(q, ecms.flatten(), {ecms.size()}, init_event[6]);
-    vcm = make_shared_device_buffer<uint32_t, 2>(q, vcms.flatten(), {p.N_graphs, vcms[0].size()}, init_event[7]);
-    edge_counts = make_shared_device_buffer<uint32_t, 1>(q, N_connections_vec, {N_connections_vec.size()}, init_event[8]);
-    edge_offsets = make_shared_device_buffer<uint32_t, 1>(q, edge_offsets_init, {edge_offsets_init.size()}, init_event[9]);
-    community_state = make_shared_device_buffer<State_t, 3>(q, community_state_init, {p.Nt_alloc + 1, N_sims_tot, N_communities_max}, init_event[10]);
-    N_connections = make_shared_device_buffer<uint32_t, 1>(q, N_connections_vec, {N_connections_vec.size()}, init_event[11]);
+    rngs = Buffer_Routines::make_shared_device_buffer<Static_RNG::default_rng, 1>(q, rng_init, {rng_init.size()}, init_event[0]);
+    vertex_state = Buffer_Routines::make_shared_device_buffer<SIR_State, 3>(q, traj_init, {p.Nt+1, p.N_sims_tot(), N_vertices}, init_event[1]);
+    accumulated_events = Buffer_Routines::make_shared_device_buffer<uint32_t, 3>(q, accumulate_event_init, {p.Nt_alloc, p.N_sims_tot(), p.N_connections_max()}, init_event[2]);
+    p_Is = Buffer_Routines::make_shared_device_buffer<float, 3>(q, p_Is_init.flatten(), {p.Nt, p.N_sims_tot(), p.N_connections_max()}, init_event[3]);
+    edge_from = Buffer_Routines::make_shared_device_buffer<uint32_t, 1>(q, edge_from_init, {N_tot_edges}, init_event[4]);
+    edge_to = Buffer_Routines::make_shared_device_buffer<uint32_t, 1>(q, edge_to_init, {N_tot_edges}, init_event[5]);
+    ecm = Buffer_Routines::make_shared_device_buffer<uint32_t, 1>(q, ecms.flatten(), {ecms.size()}, init_event[6]);
+    vcm = Buffer_Routines::make_shared_device_buffer<uint32_t, 2>(q, vcms.flatten(), {p.N_graphs, vcms[0].size()}, init_event[7]);
+    edge_counts = Buffer_Routines::make_shared_device_buffer<uint32_t, 1>(q, N_connections_vec, {N_connections_vec.size()}, init_event[8]);
+    edge_offsets = Buffer_Routines::make_shared_device_buffer<uint32_t, 1>(q, edge_offsets_init, {edge_offsets_init.size()}, init_event[9]);
+    community_state = Buffer_Routines::make_shared_device_buffer<State_t, 3>(q, community_state_init, {p.Nt_alloc + 1, N_sims_tot, N_communities_max}, init_event[10]);
+    N_connections = Buffer_Routines::make_shared_device_buffer<uint32_t, 1>(q, N_connections_vec, {N_connections_vec.size()}, init_event[11]);
 
 
     auto check_sizes = [](const auto& args, auto sizes, const std::string& msg){

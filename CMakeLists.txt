@@ -82,7 +82,7 @@ add_subdirectory(Executables)
 
 string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
 
-set(${PROJECT_NAME}_LIBRARY_TARGETS Sim_Buffers SIR_Dynamics Sim_Infection_Sampling String_Manipulation math State_Accumulation Sim_Types Graph_Types Graph Community_Mappings Validation Complete_Graph Simulation_Tables)
+set(${PROJECT_NAME}_LIBRARY_TARGETS SIR_Types Sim_Buffers SIR_Dynamics Sim_Infection_Sampling String_Manipulation math State_Accumulation Sim_Types Graph_Types Graph Community_Mappings Validation Complete_Graph Simulation_Tables)
 # install export for Utils
 install(TARGETS ${${PROJECT_NAME}_LIBRARY_TARGETS}
   EXPORT ${PROJECT_NAME}Targets

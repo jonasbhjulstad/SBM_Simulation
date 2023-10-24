@@ -72,7 +72,7 @@ void Simulation_t::run()
         {
             q.wait();
             write_allocated_steps(t, events);
-            events[0] = clear_buffer<uint32_t, 3>(q, *b.accumulated_events, events);
+            events[0] = Buffer_Routines::clear_buffer<uint32_t, 3>(q, *b.accumulated_events, events);
             events[0] = move_buffer_row(q, b.vertex_state, p.Nt_alloc, events);
         }
         events = recover(q, p, *b.vertex_state, *b.rngs, t, compute_range, wg_range, events);

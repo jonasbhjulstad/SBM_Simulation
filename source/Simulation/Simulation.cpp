@@ -1,6 +1,6 @@
+#include <SBM_Database/SBM_Database.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
 #include <SBM_Simulation/Simulation/State_Accumulation.hpp>
-#include <SBM_Database/SBM_Database.hpp>
 #include <chrono>
 
 Simulation_t::Simulation_t(sycl::queue &q, soci::session &sql, const Sim_Param &sim_param, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list, const Dataframe::Dataframe_t<uint32_t, 2> &vcm, sycl::range<1> compute_range, sycl::range<1> wg_range, const Dataframe::Dataframe_t<float, 3> &p_Is)
@@ -32,16 +32,17 @@ void Simulation_t::write_allocated_steps(uint32_t t, std::vector<sycl::event> &d
     t1 = t2;
     auto df_range = state_df.get_ranges();
 
-
-// void dataframe_insert(soci::session &sql, const Dataframe::Dataframe_t<T, N_df> &df,
-//                         const std::string &table_name,
-//                         const std::array<std::string, N_const> &constant_indices,
-//                         const std::array<uint32_t, N_const> &constant_index_values,
-//                         const std::array<std::string, N_df> &iterable_index_names,
-//                         const std::string &data_name)
-
-    SBM_Database::dataframe_insert<State_t, 4, 1>(sql, state_df, "community_state", {"graph", "sim", "t", "community"}, "state", {"p_out"}, {p.p_out_idx});
-    SBM_Database::dataframe_insert<uint32_t, 4, 1>(sql, event_df, "connection_events", {"graph", "sim", "t", "connection"}, "event", {"p_out"}, {p.p_out_idx});
+    // void dataframe_insert(soci::session &sql, const Dataframe::Dataframe_t<T, N_df> &df,
+    //                         const std::string &table_name,
+    //                         const std::array<std::string, N_const> &constant_indices,
+    //                         const std::array<uint32_t, N_const> &constant_index_values,
+    //                         const std::array<std::string, N_df> &iterable_index_names,
+    //                         const std::string &data_name)
+    //  dataframe_insert<T, N_df, 0>(sql, df, table_name, index_names, data_name, {}, {});
+    auto po_str = std::array<std::string, 1>{"p_out"};
+    auto po_idx = std::array<uint32_t, 1>{p.p_out_idx};
+    SBM_Database::dataframe_insert(sql, state_df, "community_state", {"graph", "sim", "t", "community"}, "state", po_str, po_idx);
+    SBM_Database::dataframe_insert(sql, event_df, "connection_events", {"graph", "sim", "t", "connection"}, "event", po_str, po_idx);
 
     // SBM_Database::write_graphseries(sql, p.p_out_idx, state_df, "community_state", t - p.Nt_alloc);
     // SBM_Database::write_graphseries(sql, p.p_out_idx, event_df, "connection_events", t - p.Nt_alloc);
@@ -85,7 +86,7 @@ void Simulation_t::run()
         {
             q.wait();
             write_allocated_steps(t, events);
-            events[0] = clear_buffer<uint32_t, 3>(q, *b.accumulated_events, events);
+            events[0] = Buffer_Routines::clear_buffer<uint32_t, 3>(q, *b.accumulated_events, events);
             events[0] = move_buffer_row(q, b.vertex_state, p.Nt_alloc, events);
         }
         events = recover(q, p, *b.vertex_state, *b.rngs, t, compute_range, wg_range, events);

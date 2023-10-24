@@ -20,7 +20,7 @@ void state_accumulation_test()
     // auto vcm_buf = std::make_shared<sycl::buffer<uint32_t, 2>>(sycl::buffer<uint32_t, 2>(sycl::range<2>(N_sims, N_vertices)));
     std::vector<uint32_t> vcm_data(N_sims * N_vertices, 0);
     sycl::event event;
-    auto vcm_buf = make_shared_device_buffer<uint32_t, 2>(q, vcm_data, sycl::range<2>(N_sims, N_vertices),event);
+    auto vcm_buf = Buffer_Routines::make_shared_device_buffer<uint32_t, 2>(q, vcm_data, sycl::range<2>(N_sims, N_vertices),event);
     event.wait();
 
     auto state_buf = std::make_shared<sycl::buffer<State_t, 3>>(sycl::buffer<State_t, 3>(sycl::range<3>(Nt, N_sims, N_communities)));

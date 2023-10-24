@@ -53,7 +53,7 @@ sycl::event accumulate_community_state(sycl::queue &q, std::vector<sycl::event> 
     return q.submit([&](sycl::handler &h)
                     {
                 h.depends_on(dep_events);
-        auto v_acc = construct_validate_accessor<SIR_State, 3, sycl::access_mode::read>(v_buf, h, range);
+        auto v_acc = Buffer_Routines::construct_validate_accessor<SIR_State, 3, sycl::access_mode::read>(v_buf, h, range);
         sycl::accessor<State_t, 3, sycl::access_mode::read_write> state_acc(*community_buf, h);
         auto vcm_acc = vcm_buf->template get_access<sycl::access::mode::read>(h);
 

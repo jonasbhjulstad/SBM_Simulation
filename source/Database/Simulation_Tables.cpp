@@ -25,8 +25,8 @@ void construct_simulation_tables(soci::session &sql, uint32_t Np, uint32_t Ng, u
     std::vector<std::string> ccm_indices({"p_out", "graph", "edge"});
     table_create(sql, "connection_community_map", ccm_indices, ccm_data_names, ccm_data_types);
 
-    std::array<std::string, 1> edgelists_data_name({"data"});
-    std::array<std::string, 1> edgelists_data_types({"INTEGER[3]"});
+    std::array<std::string, 3> edgelists_data_name({"from", "to", "weight"});
+    std::array<std::string, 3> edgelists_data_types({"INTEGER", "INTEGER", "INTEGER"});
     table_create(sql, "edgelists", graph_indices, edgelists_data_name, edgelists_data_types);
     std::array<std::string, 1> vcm_data_name({"community"});
     std::array<std::string, 1> vcm_data_types({"INTEGER"});

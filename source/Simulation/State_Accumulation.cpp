@@ -21,38 +21,15 @@ void single_community_state_accumulate(sycl::nd_item<1> &it, const auto &vcm_acc
         }
     }
 }
-// void read_vcm(sycl::queue& q, auto& buf)
-// {
-//     auto Ng = buf->get_range()[0];
-//     q.submit([&](sycl::handler& h)
-//     {
-//         auto acc = buf->template get_access<sycl::access::mode::read>(h);
-//         sycl::stream out(1024, 256, h);
-//         h.single_task([=](){
-//             for(int g = 0; g < Ng; g++)
-//             {
-//             for(int i = 0; i < acc.size(); i++)
-//             {
-//                 if(acc[g][i] > 20)
-//                 {
-//                     out << "invalid element at: " << g << ", " << i << ", " << acc[g][i] <<  "\n";
-//                 }
-//                 assert(acc[g][i] <20);
-
-//             }
-//             }
-//         });
-//     });
-// }
 sycl::event accumulate_community_state(sycl::queue &q, std::vector<sycl::event> &dep_events, std::shared_ptr<sycl::buffer<SIR_State, 3>> &v_buf, std::shared_ptr<sycl::buffer<uint32_t, 2>> &vcm_buf, std::shared_ptr<sycl::buffer<State_t, 3>> &community_buf, sycl::range<1> compute_range, sycl::range<1> wg_range, uint32_t N_sims)
 {
     auto Nt = v_buf->get_range()[0];
     auto range = sycl::range<3>(Nt, v_buf->get_range()[1], v_buf->get_range()[2]);
-    // read_vcm(q, vcm_buf);
+    Buffer_Routines::validate_buffer_elements<uint32_t, 2>(q, *vcm_buf, [](auto elem){return (elem >= 0) && (elem <= 20);});
     return q.submit([&](sycl::handler &h)
                     {
                 h.depends_on(dep_events);
-        auto v_acc = construct_validate_accessor<SIR_State, 3, sycl::access_mode::read>(v_buf, h, range);
+        auto v_acc = Buffer_Routines::construct_validate_accessor<SIR_State, 3, sycl::access_mode::read>(v_buf, h, range);
         sycl::accessor<State_t, 3, sycl::access_mode::read_write> state_acc(*community_buf, h);
         auto vcm_acc = vcm_buf->template get_access<sycl::access::mode::read>(h);
         auto Nt = community_buf->get_range()[0];

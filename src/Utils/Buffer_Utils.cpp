@@ -39,7 +39,7 @@ void linewrite(std::ofstream &file,
     file << "\n";
 }
 
-std::vector<uint32_t> generate_seeds(uint32_t N_rng, uint32_t seed)
+std::vector<uint32_t> Buffer_Routines::generate_seeds(uint32_t N_rng, uint32_t seed)
 {
     std::mt19937 gen(seed);
     std::uniform_int_distribution<uint32_t> dis(0, 1000000);
@@ -49,10 +49,10 @@ std::vector<uint32_t> generate_seeds(uint32_t N_rng, uint32_t seed)
     return rngs;
 }
 
-sycl::buffer<uint32_t> generate_seeds(sycl::queue &q, uint32_t N_rng,
+sycl::buffer<uint32_t> Buffer_Routines::generate_seeds(sycl::queue &q, uint32_t N_rng,
                                       uint32_t seed, sycl::event& event)
 {
-    auto rngs = generate_seeds(N_rng, seed);
+    auto rngs = Buffer_Routines::generate_seeds(N_rng, seed);
     sycl::buffer<uint32_t> tmp(rngs.data(), rngs.size());
     sycl::buffer<uint32_t> result(sycl::range<1>(rngs.size()));
 
@@ -70,7 +70,7 @@ sycl::buffer<uint32_t> generate_seeds(sycl::queue &q, uint32_t N_rng,
 
 sycl::buffer<Static_RNG::default_rng> generate_rngs(sycl::queue& q, uint32_t N_rng, uint32_t seed, sycl::event& event)
 {
-    auto seeds = generate_seeds(N_rng, seed);
+    auto seeds = Buffer_Routines::generate_seeds(N_rng, seed);
     std::vector<Static_RNG::default_rng> rngs;
     rngs.reserve(N_rng);
     std::transform(seeds.begin(), seeds.end(), std::back_inserter(rngs), [](auto seed){return Static_RNG::default_rng(seed);});
@@ -88,7 +88,7 @@ sycl::buffer<Static_RNG::default_rng> generate_rngs(sycl::queue& q, uint32_t N_r
 sycl::buffer<Static_RNG::default_rng, 2> generate_rngs(sycl::queue& q, sycl::range<2> size, uint32_t seed, sycl::event& event)
 {
     uint32_t N_rngs = size[0] * size[1];
-    auto seeds = generate_seeds(N_rngs, seed);
+    auto seeds = Buffer_Routines::generate_seeds(N_rngs, seed);
     std::vector<Static_RNG::default_rng> rngs;
     rngs.reserve(N_rngs);
     std::transform(seeds.begin(), seeds.end(), std::back_inserter(rngs), [](auto seed){return Static_RNG::default_rng(seed);});
