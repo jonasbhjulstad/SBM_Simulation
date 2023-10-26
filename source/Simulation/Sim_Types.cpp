@@ -1,42 +1,47 @@
-#include <SBM_Simulation/Graph/Complete_Graph.hpp>
 #include <SBM_Simulation/Simulation/Sim_Types.hpp>
-#include <SBM_Simulation/Utils/String_Manipulation.hpp>
-#include <algorithm>
-#include <numeric>
-std::vector<uint32_t> Sim_Param::N_connections() const
+namespace SBM_Simulation
 {
-    std::vector<uint32_t> result(N_communities.size());
-    std::transform(N_communities.begin(), N_communities.end(), result.begin(), [](uint32_t N)
-                   { return complete_graph_max_edges(N, true, true); });
-    return result;
-}
+    QJsonObject create_simulation_parameters(uint32_t N_pop,
+                                             uint32_t p_out_id,
+                                             uint32_t graph_id,
+                                             const std::vector<uint32_t> &N_communities,
+                                             float p_in,
+                                             float p_out,
+                                             uint32_t N_sims,
+                                             uint32_t Nt,
+                                             uint32_t Nt_alloc,
+                                             uint32_t seed,
+                                             float p_I_min,
+                                             float p_I_max,
+                                             float p_R,
+                                             float p_I0,
+                                             float p_R0)
+    {
+        auto toJson = [](const std::vector<uint32_t> &myVec)
+        {
+        QJsonArray result;
+        for(int i = 0; i < myVec.size(); i++)
+        {
+            result.push_back(static_cast<int>(myVec[i]));
+        }
+        return result; };
 
-std::size_t Sim_Param::N_communities_max() const { return std::max_element(N_communities.begin(), N_communities.end())[0]; }
-std::size_t Sim_Param::N_connections_max() const
-{
-    return complete_graph_max_edges(N_communities_max(), true, true);
-}
+        QJsonObject json({{"N_pop", static_cast<int>(N_pop)},
+                          {"graph_id", static_cast<int>(graph_id)},
+                          {"N_communities", toJson(N_communities)},
+                          {"p_in", p_in},
+                          {"p_out_id", static_cast<int>(p_out_id)},
+                          {"p_out", p_out},
+                          {"N_sims", static_cast<int>(N_sims)},
+                          {"Nt", static_cast<int>(Nt)},
+                          {"Nt_alloc", static_cast<int>(Nt_alloc)},
+                          {"seed", static_cast<int>(seed)},
+                          {"p_I_min", p_I_min},
+                          {"p_I_max", p_I_max},
+                          {"p_R", p_R},
+                          {"p_I0", p_I0},
+                          {"p_R0", p_R0}});
 
-std::size_t Sim_Param::N_connections_tot() const
-{
-    auto N_con = N_connections();
-    return std::accumulate(N_con.begin(), N_con.end(), 0);
-}
-
-std::array<std::string, Sim_Param::N_parameters> Sim_Param::string_param_names()
-{
-    return {"N_pop", "p_in", "p_out", "N_graphs", "N_sims", "Nt", "Nt_alloc", "seed", "p_I_min", "p_I_max", "p_R", "p_I0", "p_R0", "N_communities"};
-}
-
-
-std::array<std::string, Sim_Param::N_parameters> Sim_Param::string_param_types()
-{
-
-    return {"INTEGER", "real", "real", "INTEGER", "INTEGER", "INTEGER", "INTEGER", "INTEGER", "real", "real", "real", "real", "real", "INTEGER[]"};
-
-}
-
-std::string Sim_Param::string_values() const
-{
-    return tuple_to_string(std::make_tuple(N_pop, p_in, p_out, N_graphs, N_sims, Nt, Nt_alloc, seed, p_I_min, p_I_max, p_out_idx, p_R, p_I0, p_R0)) + ", " + vector_to_string(N_communities);
+        return json;
+    }
 }

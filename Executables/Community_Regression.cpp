@@ -47,7 +47,7 @@ int main()
   std::for_each(subdirs.begin(), subdirs.end(), [tau](const std::string &s)
                 {
       auto graphdirs = get_subdirs(s, "Graph_");
-      Sim_Param p = parse_json(s + "/Sim_Param.json");
+      auto p = parse_json(s + "/auto.json");
       for(auto&& gdir: graphdirs)
       {
       auto [theta_LS, theta_QR] = regression_on_datasets(gdir, p.N_sims, tau, 0);

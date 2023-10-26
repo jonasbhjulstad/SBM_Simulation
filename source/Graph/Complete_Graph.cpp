@@ -16,7 +16,7 @@ std::vector<Edge_t> complete_graph(size_t N)
     std::vector<Edge_t> edge_list(N * (N - 1) / 2);
     for (auto &&comb : iter::combinations_with_replacement(make_iota(N), 2))
     {
-        edge_list.push_back(Edge_t(comb[0], comb[1]));
+        edge_list.push_back(Edge_t{comb[0], comb[1]});
     }
     return edge_list;
 }

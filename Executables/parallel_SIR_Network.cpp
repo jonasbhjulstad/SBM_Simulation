@@ -1,6 +1,5 @@
 
 #include <CL/sycl.hpp>
-#include <SBM_Database/SBM_Database.hpp>
 #include <SBM_Simulation/Database/Simulation_Tables.hpp>
 #include <SBM_Simulation/Graph/Community_Mappings.hpp>
 #include <SBM_Simulation/Graph/Graph.hpp>
@@ -17,26 +16,6 @@ auto nested_vec_max(const std::vector<std::vector<uint32_t>> &vec)
     return *std::max_element(max->begin(), max->end());
 }
 
-Sim_Param create_sim_param(uint32_t N_communities)
-{
-    Sim_Param p;
-    p.N_pop = 10;
-    p.N_graphs = 2;
-    p.N_communities = std::vector<uint32_t>(p.N_graphs, N_communities);
-    p.p_in = 0.5f;
-    p.p_out = 0.1f;
-    p.N_sims = 2;
-    p.Nt = 56;
-    p.Nt_alloc = 20;
-    p.seed = 234;
-    p.p_I_min = 0.1f;
-    p.p_I_max = 0.2f;
-    p.p_out_idx = 0;
-    p.p_R = 0.1f;
-    p.p_I0 = 0.1f;
-    p.p_R0 = 0.0f;
-    return p;
-}
 int main()
 {
     using namespace SBM_Database;
@@ -45,11 +24,29 @@ int main()
     std::string root_dir = "/home/man/Documents/ER_Bernoulli_Robust_MPC/";
     std::string output_dir = root_dir + "data/";
     std::chrono::high_resolution_clock::time_point t1, t2;
+    auto N_communities = 2;
+    auto N_pop = 10;
+    auto N_graphs = 2;
+    auto N_communities = std::vector<uint32_t>(p.N_graphs, N_communities);
+    auto p_in = 0.5f;
+    auto p_out = 0.1f;
+    auto N_sims = 2;
+    auto Nt = 56;
+    auto Nt_alloc = 20;
+    auto seed = 234;
+    auto p_I_min = 0.1f;
+    auto p_I_max = 0.2f;
+    auto p_out_idx = 0;
+    auto p_R = 0.1f;
+    auto p_I0 = 0.1f;
+    auto p_R0 = 0.0f;
+
 
     sycl::queue q(sycl::cpu_selector_v);
     uint32_t seed = 283;
     auto N_communities = 2;
-    auto p = create_sim_param(N_communities);
+    auto p = create_simulation_parameters(N_pop,N_graphs,N_communities, p_in, p_out, N_sims, Nt, Nt_alloc, seed, p_I_min, p_I_max, p_R, p_I0, p_R0);
+
 
     // auto index_names = merge_arrays(constant_indices, iterable_index_names);
 

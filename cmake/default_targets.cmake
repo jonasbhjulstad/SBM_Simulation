@@ -1,7 +1,7 @@
 
 function(default_configure_target target_name)
     target_link_libraries(${target_name} PUBLIC -ldl -lpq Static_RNG::Static_RNG Buffer_Routines::Buffer_Routines)
-    target_link_libraries(${target_name} PUBLIC TBB::tbb)
+    target_link_libraries(${target_name} PUBLIC TBB::tbb ${TINY_ORM_LIBRARIES})
     target_compile_options(${target_name} PUBLIC -fsycl ${SYCL_CUSTOM_FLAGS} -fPIC)
     target_compile_options(${target_name} PUBLIC ${DEFAULT_WARNING_FLAGS} ${SBM_SIMULATION_DEFAULT_FLAGS})
     target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${SBM_SIMULATION_INCLUDE_DIR}> $<INSTALL_INTERFACE:include>)

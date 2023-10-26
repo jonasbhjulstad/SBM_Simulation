@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14...3.22)
+cmake_minimum_required(VERSION 3.22)
 
 # ---- Project ----
 
@@ -36,7 +36,7 @@ if (${ENABLE_CUDA})
     # add_link_options(-Xsycl-target-backend=nvptx64-nvidia-cuda --offload-arch=sm_86)
     # set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -Xcuda-ptxas "--verbose")
 endif()
-
+add_compile_options("-Wfatal-errors")
 include(cmake/CPM.cmake)
 
 set(PYTHON_ROOT "/home/man/mambaforge/envs/gt/")
@@ -65,8 +65,6 @@ include(cmake/external_packages.cmake)
 set(SBM_SIMULATION_DEFAULT_FLAGS -Wno-deprecated-declarations -Wno-unknown-cuda-version)
 include(cmake/default_targets.cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SBM_DATABASE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set(SBM_SIMULATION_DATA_DIR "${PROJECT_SOURCE_DIR}/data" CACHE INTERNAL "SBM_SIMULATION_DATA_DIR")
 set(SBM_SIMULATION_LOG_DIR "${PROJECT_SOURCE_DIR}/log" CACHE INTERNAL "SBM_SIMULATION_LOG_DIR")

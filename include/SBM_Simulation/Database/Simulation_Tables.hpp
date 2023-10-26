@@ -1,6 +1,7 @@
-#ifndef SBM_DATABASE_SIMULATION_TABLES_HPP
-#define SBM_DATABASE_SIMULATION_TABLES_HPP
+#ifndef SBM_SIMULATION_SIMULATION_TABLES_HPP
+#define SBM_SIMULATION_SIMULATION_TABLES_HPP
 #include <Dataframe/Dataframe.hpp>
+#include <SBM_Simulation/Epidemiological/SIR_Types.hpp>
 #include <orm/db.hpp>
 #include <ranges>
 namespace SBM_Database
@@ -25,10 +26,22 @@ namespace SBM_Database
             "NULL,simulation "
             "INTEGER NOT NULL,t INTEGER NOT NULL, connection INTEGER NOT NULL, events INTEGER NOT "
             "NULL, PRIMARY KEY(p_out, graph, simulation, t, connection))");
-        Orm::DB::statement(
-            "CREATE TABLE IF NOT EXISTS p_Is(p_out INTEGER NOT NULL,graph INTEGER NOT NULL,simulation "
-            "INTEGER NOT NULL,t INTEGER NOT NULL, connection INTEGER NOT NULL, p_I INTEGER NOT NULL, "
-            "PRIMARY KEY(p_out, graph, simulation, t, connection))");
+
+        auto p_I_table_create = [](auto postfix)
+        {
+            auto str = "CREATE TABLE IF NOT EXISTS p_Is_" + std::string(postfix) + "(p_out INTEGER NOT NULL,graph INTEGER NOT NULL,simulation "
+                                                                                   "INTEGER NOT NULL,t INTEGER NOT NULL, connection INTEGER NOT NULL, p_I INTEGER NOT NULL, "
+                                                                                   "PRIMARY KEY(p_out, graph, simulation, t, connection))";
+            Orm::DB::statement(str.c_str());
+        };
+
+        for (auto &&control_type : {"Uniform", "Community"})
+        {
+            for (auto &&sim_type : {"Excitation", "Validation"})
+            {
+                p_I_table_create(control_type + std::string("_") + sim_type);
+            }
+        }
 
         Orm::DB::statement(
             "CREATE TABLE IF NOT EXISTS sim_params("
@@ -57,7 +70,7 @@ namespace SBM_Database
             "PRIMARY KEY(p_out, graph, simulation))");
     }
 
-    void community_state_insert(uint32_t p_out, uint32_t graph, Dataframe_t<State_t, 4> &df)
+    void community_state_insert(uint32_t p_out, uint32_t graph, Dataframe::Dataframe_t<State_t, 4> &df)
     {
         auto N_sims = df.size();
         auto Nt = df[0].size();
@@ -67,11 +80,11 @@ namespace SBM_Database
         uint32_t N_rows = N_sims * Nt * N_communities;
         row_inds.reserve(N_rows);
         row_datas.reserve(N_rows);
-        for (const auto &[sim_id, sim_df] : std::ranges::views::enumerate(df.data))
+        for (const auto &[sim_id, sim_df] : ranges::views::enumerate(df.data))
         {
-            for (const auto &[t, t_df] : std::ranges::views::enumerate(sim_df.data))
+            for (const auto &[t, t_df] : ranges::views::enumerate(sim_df.data))
             {
-                for (const auto &[community, state] : std::ranges::views::enumerate(t_df.data))
+                for (const auto &[community, state] : ranges::views::enumerate(t_df.data))
                 {
                     row_inds.push_back({{"p_out", p_out}, {"graph", graph}, {"simulation", sim_id}, {"t", t}});
                 row_datas.push_back({"community", QVariant::fromValue(QVector({community})});
@@ -82,7 +95,7 @@ namespace SBM_Database
     }
 
     template <typename T = uint32_t>
-    void connection_insert(const QString &table_name, uint32_t p_out, uint32_t graph, Dataframe_t<T, 4> &df)
+    void connection_insert(const QString &table_name, uint32_t p_out, uint32_t graph, Dataframe::Dataframe_t<T, 4> &df)
     {
         auto N_sims = df.size();
         auto Nt = df[0].size();
@@ -92,11 +105,11 @@ namespace SBM_Database
         uint32_t N_rows = N_sims * Nt * N_communities;
         row_inds.reserve(N_rows);
         row_datas.reserve(N_rows);
-        for (const auto &[sim_id, sim_df] : std::ranges::views::enumerate(df.data))
+        for (const auto &[sim_id, sim_df] : ranges::views::enumerate(df.data))
         {
-            for (const auto &[t, t_df] : std::ranges::views::enumerate(sim_df.data))
+            for (const auto &[t, t_df] : ranges::views::enumerate(sim_df.data))
             {
-                for (const auto &[community, state] : std::ranges::views::enumerate(t_df.data))
+                for (const auto &[community, state] : ranges::views::enumerate(t_df.data))
                 {
                     row_inds.push_back({{"p_out", p_out}, {"graph", graph}, {"simulation", sim_id}, {"t", t}});
                 row_datas.push_back({"community", QVariant::from_value(QVector({community})});
@@ -132,7 +145,16 @@ namespace SBM_Database
         Orm::DB::statement("DROP TABLE IF EXISTS community_state");
         Orm::DB::statement("DROP TABLE IF EXISTS connection_events");
         Orm::DB::statement("DROP TABLE IF EXISTS infection_events");
-        Orm::DB::statement("DROP TABLE IF EXISTS p_Is");
+        auto p_I_table_drop = [](auto postfix)
+        { Orm::DB::statement(("DROP TABLE IF EXISTS p_Is_" + std::string(postfix)).c_str()); };
+        for (auto &&control_type : {"Uniform", "Community"})
+        {
+            for (auto &&sim_type : {"Excitation", "Validation"})
+            {
+                p_I_table_drop(control_type + std::string("_") + sim_type);
+            }
+        }
+
         Orm::DB::statement("DROP TABLE IF EXISTS sim_params");
         Orm::DB::statement("DROP TABLE IF EXISTS N_communities");
     }

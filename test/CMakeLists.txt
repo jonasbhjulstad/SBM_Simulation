@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14...3.22)
+cmake_minimum_required(VERSION 3.22)
 
 project(SBM_SimulationTests LANGUAGES CXX)
 
@@ -45,8 +45,9 @@ endif()
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
 # ---- Create binary ----
 add_executable(${PROJECT_NAME} ${sources})
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
-target_link_libraries(${PROJECT_NAME} -ldl -lpq doctest::doctest SBM_Simulation::SBM_Simulation TinyOrm::TinyOrm)
+target_link_libraries(${PROJECT_NAME} -ldl -lpq doctest::doctest SBM_Simulation::SBM_Simulation ${TINY_ORM_LIBRARIES})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${SBM_SIMULATION_TESTS_COMPILE_DEFINITIONS})
 target_link_options(${PROJECT_NAME} PUBLIC -fPIC)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)

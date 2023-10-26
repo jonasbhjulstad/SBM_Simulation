@@ -157,9 +157,9 @@ Dataframe::Dataframe_t<int, 2> get_delta_Is(const Dataframe::Dataframe_t<State_t
     return delta_I;
 }
 
-std::tuple<std::vector<uint32_t>,std::vector<uint32_t>> get_related_connections(size_t c_idx, const std::vector<Edge_t> &ccm)
+std::tuple<std::vector<uint32_t>,std::vector<uint32_t>> get_related_connections(size_t c_idx, const std::vector<Weighted_Edge_t> &ccm)
 {
-    auto ccm_weights = Edge_t::get_weights(ccm);
+    auto ccm_weights = Weighted_Edge_t::get_weights(ccm);
     std::vector<uint32_t> connection_indices;
     std::vector<uint32_t> connection_weights;
     for (int i = 0; i < ccm.size(); i++)
@@ -231,7 +231,7 @@ std::vector<uint32_t> sample_community(const auto &related_connections, const au
     std::vector<uint32_t> r_con_events(related_connections.size(), 0);
     for (int i = 0; i < related_connections.size(); i++)
     {
-        r_con_events[i] = events[related_connections[i]];
+        r_con_events[i] = events[related_connections[i]];''
     }
     auto sample_counts = constrained_weight_sample(N_samples, related_weights, r_con_events);
     for (int sample_idx = 0; sample_idx < sample_counts.size(); sample_idx++)

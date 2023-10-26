@@ -1,4 +1,3 @@
-#include <SBM_Database/SBM_Database.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
 #include <SBM_Simulation/Simulation/State_Accumulation.hpp>
 #include <chrono>

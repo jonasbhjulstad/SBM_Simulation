@@ -6,11 +6,10 @@
 #include <SBM_Simulation/Graph/Graph.hpp>
 #include <SBM_Simulation/Graph/Community_Mappings.hpp>
 #include <Dataframe/Dataframe.hpp>
-#include <SBM_Database/SBM_Database.hpp>
 
 
 
-void validate_buffer_init_sizes(Sim_Param p, const Dataframe::Dataframe_t<Edge_t,2> &edge_list, const Dataframe::Dataframe_t<uint32_t,2> &vcms, const Dataframe::Dataframe_t<uint32_t, 2> &ecms, std::vector<float> p_Is_init)
+void validate_buffer_init_sizes(QJsonObject p, const Dataframe::Dataframe_t<Edge_t,2> &edge_list, const Dataframe::Dataframe_t<uint32_t,2> &vcms, const Dataframe::Dataframe_t<uint32_t, 2> &ecms, std::vector<float> p_Is_init)
 {
     if (ecms.size() != p.N_graphs)
     {
@@ -61,14 +60,14 @@ Dataframe::Dataframe_t<float, 3> generate_duplicated_p_Is(uint32_t Nt, uint32_t 
     return p_Is;
 }
 
-Dataframe::Dataframe_t<float, 3> Sim_Buffers::generate_random_p_Is(sycl::queue &q, Sim_Param p,  const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms)
+Dataframe::Dataframe_t<float, 3> Sim_Buffers::generate_random_p_Is(sycl::queue &q, QJsonObject p,  const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms)
 {
 
     auto p_Is_init = generate_duplicated_p_Is(p.Nt, p.N_sims_tot(), p.N_connections_max(), p.p_I_min, p.p_I_max, p.seed);
     return p_Is_init;
 }
 
-Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p,  const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init)
+Sim_Buffers::Sim_Buffers(sycl::queue &q, QJsonObject p,  const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init)
 {
 
     const auto N_connections_max = p.N_connections_max();

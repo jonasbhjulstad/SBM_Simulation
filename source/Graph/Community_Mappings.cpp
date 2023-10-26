@@ -1,28 +1,29 @@
 #include <SBM_Simulation/Graph/Community_Mappings.hpp>
+#include <Dataframe/Dataframe.hpp>
 #include <itertools.hpp>
-std::vector<Edge_t> combine_ccm(const std::vector<Edge_t> &ccm_indices, const std::vector<uint32_t> &ccm_weights)
+std::vector<Weighted_Edge_t> combine_ccm(const std::vector<Edge_t> &ccm_indices, const std::vector<uint32_t> &ccm_weights)
 {
     auto make_edges = [](const auto pair, const auto weight)
     {
-        return Edge_t{pair.from, pair.to, weight};
+        return Weighted_Edge_t{pair.from, pair.to, weight};
     };
-    std::vector<Edge_t> result;
+    std::vector<Weighted_Edge_t> result;
     result.reserve(ccm_indices.size());
     std::transform(ccm_indices.begin(), ccm_indices.end(), ccm_weights.begin(), std::back_inserter(result), make_edges);
     return result;
 }
-Dataframe::Dataframe_t<Edge_t, 2> make_ccm_df(const std::vector<std::vector<Edge_t>> &ccm_indices, const std::vector<std::vector<uint32_t>> &ccm_weights)
+Dataframe::Dataframe_t<Weighted_Edge_t, 2> make_ccm_df(const std::vector<std::vector<Edge_t>> &ccm_indices, const std::vector<std::vector<uint32_t>> &ccm_weights)
 {
-    Dataframe::Dataframe_t<Edge_t, 2> df;
+    Dataframe::Dataframe_t<Weighted_Edge_t, 2> df;
     auto N_graphs = ccm_weights.size();
     df.data.reserve(N_graphs);
-    std::vector<Dataframe::Dataframe_t<Edge_t, 1>> ccms(N_graphs);
+    std::vector<Dataframe::Dataframe_t<Weighted_Edge_t, 1>> ccms(N_graphs);
     std::transform(ccm_indices.begin(), ccm_indices.end(), ccm_weights.begin(), ccms.begin(), [](const std::vector<Edge_t>& ccm_i, const auto &ccm_w)
-                   { return Dataframe::Dataframe_t<Edge_t, 1>(combine_ccm(ccm_i, ccm_w)); });
-    return Dataframe::Dataframe_t<Edge_t, 2>(ccms);
+                   { return Dataframe::Dataframe_t<Weighted_Edge_t, 1>(combine_ccm(ccm_i, ccm_w)); });
+    return Dataframe::Dataframe_t<Weighted_Edge_t, 2>(ccms);
 }
 
-std::vector<uint32_t> ecm_from_vcm(const std::vector<Edge_t> &edges, const std::vector<uint32_t> &vcm, const std::vector<Edge_t> &ccm)
+std::vector<uint32_t> ecm_from_vcm(const std::vector<Edge_t> &edges, const std::vector<uint32_t> &vcm, const std::vector<Weighted_Edge_t> &ccm)
 {
     auto directed_equal = [](const auto& e0, const auto& e1)
     {
@@ -43,10 +44,10 @@ std::vector<uint32_t> ecm_from_vcm(const std::vector<Edge_t> &edges, const std::
     return ecm;
 }
 
-std::vector<Edge_t> complete_ccm(uint32_t N_communities, bool directed)
+std::vector<Weighted_Edge_t> complete_ccm(uint32_t N_communities, bool directed)
 {
     uint32_t N_edges = N_communities * (N_communities - 1);
-    std::vector<Edge_t> ccm;
+    std::vector<Weighted_Edge_t> ccm;
     ccm.reserve((directed ? 2 * N_edges : N_edges));
     std::vector<uint32_t> community_idx(N_communities);
     std::iota(community_idx.begin(), community_idx.end(), 0);
@@ -55,23 +56,23 @@ std::vector<Edge_t> complete_ccm(uint32_t N_communities, bool directed)
     {
         for (auto &&prod : iter::combinations_with_replacement(community_idx, 2))
         {
-            ccm.push_back(Edge_t(prod[0], prod[1]));
+            ccm.push_back(Weighted_Edge_t{prod[0], prod[1], 0});
             if (prod[0] != prod[1])
-                ccm.push_back(Edge_t(prod[1], prod[0]));
+                ccm.push_back(Weighted_Edge_t{prod[1], prod[0], 0});
         }
     }
     else
     {
         for (auto &&prod : iter::combinations_with_replacement(community_idx, 2))
         {
-            ccm.push_back(Edge_t(prod[0], prod[1]));
+            ccm.push_back(Weighted_Edge_t{prod[0], prod[1], 0});
         }
     }
 
     return ccm;
 }
 
-std::vector<Edge_t> ccm_from_vcm(const std::vector<Edge_t> &edges, const std::vector<uint32_t> &vcm)
+std::vector<Weighted_Edge_t> ccm_from_vcm(const std::vector<Edge_t> &edges, const std::vector<uint32_t> &vcm)
 {
     // std::vector<Edge_t> ccm;
     auto N_communities = *std::max_element(vcm.begin(), vcm.end()) + 1;
@@ -79,7 +80,7 @@ std::vector<Edge_t> ccm_from_vcm(const std::vector<Edge_t> &edges, const std::ve
     return ccm;
 }
 
-std::vector<std::vector<Edge_t>> ccms_from_vcms(const std::vector<std::vector<Edge_t>> &edges, const std::vector<std::vector<uint32_t>> &vcms)
+std::vector<std::vector<Weighted_Edge_t>> ccms_from_vcms(const std::vector<std::vector<Edge_t>> &edges, const std::vector<std::vector<uint32_t>> &vcms)
 {
     std::vector<std::vector<Edge_t>> result(edges.size());
     std::transform(edges.begin(), edges.end(), vcms.begin(), result.begin(), [](const auto &edge, const auto &vcm)
@@ -87,7 +88,7 @@ std::vector<std::vector<Edge_t>> ccms_from_vcms(const std::vector<std::vector<Ed
     return result;
 }
 
-std::vector<std::vector<uint32_t>> ecms_from_vcms(const std::vector<std::vector<Edge_t>> &edges, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<Edge_t>> &ccms)
+std::vector<std::vector<uint32_t>> ecms_from_vcms(const std::vector<std::vector<Edge_t>> &edges, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<Weighted_Edge_t>> &ccms)
 {
     std::vector<std::vector<uint32_t>> result(edges.size());
     for(int i = 0; i < edges.size(); i++)
@@ -118,12 +119,12 @@ std::vector<std::vector<uint32_t>> ccm_weights_from_ecms(const std::vector<std::
 }
 
 
-std::vector<Edge_t> ccm_from_edgelist(const std::vector<Edge_t> &edges, const std::vector<uint32_t> &vcm)
+std::vector<Weighted_Edge_t> ccm_from_edgelist(const std::vector<Edge_t> &edges, const std::vector<uint32_t> &vcm)
 {
     auto N_communities = *std::max_element(vcm.begin(), vcm.end()) + 1;
     std::vector<uint32_t> community_idx(N_communities);
     std::iota(community_idx.begin(), community_idx.end(), 0);
-    std::vector<Edge_t> ccm;
+    std::vector<Weighted_Edge_t> ccm;
 
     auto is_edge_in_list = [&](const auto &e_list, auto e_from, auto e_to)
     {
@@ -143,14 +144,14 @@ std::vector<Edge_t> ccm_from_edgelist(const std::vector<Edge_t> &edges, const st
         for (int i = 0; i < edges.size(); i++)
         {
             if (((edge_connects_communities(edges[i], comb[0], comb[1]))) && !is_edge_in_list(ccm, comb[0], comb[1]))
-                ccm.push_back(Edge_t(comb[0], comb[1]));
+                ccm.push_back(Weighted_Edge_t(comb[0], comb[1]));
         }
     }
     return ccm;
 }
 
 
-std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<Edge_t>> create_community_mappings(const std::vector<Edge_t>& edge_list, const std::vector<std::vector<uint32_t>>& vertex_list)
+std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<Weighted_Edge_t>> create_community_mappings(const std::vector<Edge_t>& edge_list, const std::vector<std::vector<uint32_t>>& vertex_list)
 {
     auto vcm = create_vcm(vertex_list);
     auto ccm = ccm_from_vcm(edge_list, vcm);
@@ -159,9 +160,9 @@ std::tuple<std::vector<uint32_t>, std::vector<uint32_t>, std::vector<Edge_t>> cr
 }
 
 
-std::tuple<std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<Edge_t>>> create_community_mappings(const std::vector<std::vector<Edge_t>>& edge_list, const std::vector<std::vector<std::vector<uint32_t>>>& vertex_list)
+std::tuple<std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<Weighted_Edge_t>>> create_community_mappings(const std::vector<std::vector<Edge_t>>& edge_list, const std::vector<std::vector<std::vector<uint32_t>>>& vertex_list)
 {
-    std::tuple<std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<Edge_t>>> result;
+    std::tuple<std::vector<std::vector<uint32_t>>, std::vector<std::vector<uint32_t>>, std::vector<std::vector<Weighted_Edge_t>>> result;
     auto N_mappings = edge_list.size();
     std::get<0>(result).resize(N_mappings);
     std::get<1>(result).resize(N_mappings);

@@ -26,9 +26,12 @@ CPMFindPackage(
     OPTIONS
     "cppitertools_INSTALL_CMAKE_DIR share"
 )
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
+find_package(TinyOrm 0.36.3 CONFIG REQUIRED)
+set(TINY_ORM_LIBRARIES TinyOrm::TinyOrm Qt6::Core)
 
-# qt_standard_project_setup()
-find_package(TinyOrm CONFIG REQUIRED)
+# find_package(TinyOrm CONFIG REQUIRED)
 #eigen
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
