@@ -3,13 +3,13 @@
 #include <SBM_Simulation/Simulation/State_Accumulation.hpp>
 #include <chrono>
 
-Simulation_t::Simulation_t(sycl::queue &q, soci::session &sql, const Sim_Param &sim_param, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list, const Dataframe::Dataframe_t<uint32_t, 2> &vcm, sycl::range<1> compute_range, sycl::range<1> wg_range, const Dataframe::Dataframe_t<float, 3> &p_Is)
-    : q(q), sql(sql), p(sim_param), b(q, sim_param, sql, edge_list, vcm, p_Is), compute_range(compute_range), wg_range(wg_range)
+Simulation_t::Simulation_t(sycl::queue &q,  const Sim_Param &sim_param, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list, const Dataframe::Dataframe_t<uint32_t, 2> &vcm, sycl::range<1> compute_range, sycl::range<1> wg_range, const Dataframe::Dataframe_t<float, 3> &p_Is)
+    : q(q), p(sim_param), b(q, sim_param, edge_list, vcm, p_Is), compute_range(compute_range), wg_range(wg_range)
 {
 }
 
-Simulation_t::Simulation_t(sycl::queue &q, soci::session &sql, const Sim_Param &sim_param, const Sim_Buffers &sim_buffers, sycl::range<1> compute_range, sycl::range<1> wg_range)
-    : q(q), sql(sql), p(sim_param), b(sim_buffers), compute_range(compute_range), wg_range(wg_range)
+Simulation_t::Simulation_t(sycl::queue &q,  const Sim_Param &sim_param, const Sim_Buffers &sim_buffers, sycl::range<1> compute_range, sycl::range<1> wg_range)
+    : q(q), p(sim_param), b(sim_buffers), compute_range(compute_range), wg_range(wg_range)
 {
 }
 
@@ -32,37 +32,27 @@ void Simulation_t::write_allocated_steps(uint32_t t, std::vector<sycl::event> &d
     t1 = t2;
     auto df_range = state_df.get_ranges();
 
-    // void dataframe_insert(soci::session &sql, const Dataframe::Dataframe_t<T, N_df> &df,
-    //                         const std::string &table_name,
-    //                         const std::array<std::string, N_const> &constant_indices,
-    //                         const std::array<uint32_t, N_const> &constant_index_values,
-    //                         const std::array<std::string, N_df> &iterable_index_names,
-    //                         const std::string &data_name)
     //  dataframe_insert<T, N_df, 0>(sql, df, table_name, index_names, data_name, {}, {});
     auto po_str = std::array<std::string, 1>{"p_out"};
     auto po_idx = std::array<uint32_t, 1>{p.p_out_idx};
-    SBM_Database::dataframe_insert(sql, state_df, "community_state", {"graph", "sim", "t", "community"}, "state", po_str, po_idx);
-    SBM_Database::dataframe_insert(sql, event_df, "connection_events", {"graph", "sim", "t", "connection"}, "event", po_str, po_idx);
+    // SBM_Database::dataframe_insert(sql, state_df, "community_state", {"graph", "sim", "t", "community"}, "state", po_str, po_idx);
+    // SBM_Database::dataframe_insert(sql, event_df, "connection_events", {"graph", "sim", "t", "connection"}, "event", po_str, po_idx);
 
-    // SBM_Database::write_graphseries(sql, p.p_out_idx, state_df, "community_state", t - p.Nt_alloc);
-    // SBM_Database::write_graphseries(sql, p.p_out_idx, event_df, "connection_events", t - p.Nt_alloc);
     state_df.resize_dim(2, N_steps + 1);
     event_df.resize_dim(2, N_steps);
     auto inf_gs = sample_infections(state_df, event_df, b.ccm, p.seed);
-    // SBM_Database::write_graphseries(sql, p.p_out_idx, inf_gs, "infection_events", t - p.Nt_alloc);
-    SBM_Database::dataframe_insert<uint32_t, 4, 1>(sql, inf_gs, "infection_events", {"graph", "sim", "t", "community"}, {"event"}, {"p_out"}, {p.p_out_idx});
+    // SBM_Database::dataframe_insert<uint32_t, 4, 1>(sql, inf_gs, "infection_events", {"graph", "sim", "t", "community"}, {"event"}, {"p_out"}, {p.p_out_idx});
     t2 = std::chrono::high_resolution_clock::now();
     std::cout << "Inf sample/ write graphseries: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
 }
 
-void Simulation_t::write_initial_steps(sycl::queue &q, const Sim_Param &p, soci::session &sql, Sim_Buffers &b, std::vector<sycl::event> &dep_events)
+void Simulation_t::write_initial_steps(sycl::queue &q, const Sim_Param &p,  Sim_Buffers &b, std::vector<sycl::event> &dep_events)
 {
 
     auto acc_event = accumulate_community_state(q, dep_events, b.vertex_state, b.vcm, b.community_state, compute_range, wg_range, p.N_sims);
     auto state_df = read_3D_buffer(q, *b.community_state, p.N_graphs, {acc_event});
     state_df.resize_dim(2, 1);
-    SBM_Database::dataframe_insert<State_t, 4, 1>(sql, state_df, "community_state", {"graph", "sim", "t", "community"}, {"state"}, {"p_out"}, {p.p_out_idx});
-    // SBM_Database::write_graphseries(sql, p.p_out_idx, state_df, "community_state");
+    // SBM_Database::dataframe_insert<State_t, 4, 1>(sql, state_df, "community_state", {"graph", "sim", "t", "community"}, {"state"}, {"p_out"}, {p.p_out_idx});
 }
 
 void Simulation_t::run()
@@ -77,7 +67,7 @@ void Simulation_t::run()
     q.wait();
 
     // events[0] = initialize_vertices(q, p, b.vertex_state, b.rngs, compute_range, wg_range, b.construction_events);
-    write_initial_steps(q, p, sql, b, events);
+    write_initial_steps(q, p, b, events);
     uint32_t t = 0;
     for (t = 0; t < p.Nt; t++)
     {

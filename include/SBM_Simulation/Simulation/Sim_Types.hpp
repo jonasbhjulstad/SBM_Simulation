@@ -1,41 +1,43 @@
 #ifndef SIM_TYPES_HPP
 #define SIM_TYPES_HPP
+#include <orm/db.hpp>
 #include <SBM_Simulation/Epidemiological/SIR_Types.hpp>
-
-struct Sim_Param
+namespace SBM_Simulation
 {
-    // construct with all params
-    Sim_Param(uint32_t N_pop, const std::vector<uint32_t>& N_communities, float p_in, float p_out, uint32_t N_sims, uint32_t Nt, uint32_t Nt_alloc, uint32_t seed, float p_I_min, float p_I_max)
-        : N_pop(N_pop), N_communities(N_communities), N_graphs(N_communities.size()), p_in(p_in), p_out(p_out), N_sims(N_sims), Nt(Nt), Nt_alloc(Nt_alloc), seed(seed), p_I_min(p_I_min), p_I_max(p_I_max)
+    QJsonDocument create_simulation_parameters(uint32_t N_pop,
+                                               uint32_t N_graphs,
+                                               const std::vector<uint32_t> &N_communities,
+                                               uint32_t p_out_idx,
+                                               float p_in,
+                                               float p_out,
+                                               uint32_t N_sims,
+                                               uint32_t Nt,
+                                               uint32_t Nt_alloc,
+                                               uint32_t seed,
+                                               float p_I_min,
+                                               float p_I_max,
+                                               float p_R = 0.1f;
+                                               float p_I0 = 0.1f;
+                                               float p_R0 = 0.0f;)
     {
+        QJsonObject json;
+        json["N_pop"] = N_pop;
+        json["N_graphs"] = N_graphs;
+        json["N_communities"] = QJsonArray::fromVariantList(QVariantList::fromVector(QVector<uint32_t>::fromStdVector(N_communities)));
+        json["p_in"] = p_in;
+        json["p_out_idx"] = p_out_idx;
+        json["p_out"] = p_out;
+        json["N_sims"] = N_sims;
+        json["Nt"] = Nt;
+        json["Nt_alloc"] = Nt_alloc;
+        json["seed"] = seed;
+        json["p_I_min"] = p_I_min;
+        json["p_I_max"] = p_I_max;
+        json["p_R"] = p_R;
+        json["p_I0"] = p_I0;
+        json["p_R0"] = p_R0;
+        return QJsonDocument(json);
     }
-    static constexpr std::size_t N_parameters = 14;
 
-    Sim_Param() = default;
-    uint32_t N_pop = 100;
-    std::vector<uint32_t> N_communities;
-    float p_in = 1.0f;
-    float p_out = 0.5f;
-    uint32_t N_graphs = 2;
-    uint32_t N_sims = 2;
-    uint32_t Nt = 56;
-    uint32_t Nt_alloc = 20;
-    uint32_t seed = 234;
-    float p_I_min = 0.1f;
-    float p_I_max = 0.2f;
-    uint32_t p_out_idx = 0;
-    float p_R = 0.1f;
-    float p_I0 = 0.1f;
-    float p_R0 = 0.0f;
-    std::size_t N_sims_tot() const { return N_graphs * N_sims; }
-    std::size_t N_communities_max() const;
-    std::vector<uint32_t> N_connections() const;
-    std::size_t N_connections_tot() const;
-    std::size_t N_connections_max() const;
-
-    static std::array<std::string, N_parameters> string_param_names();
-    static std::array<std::string, N_parameters> string_param_types();
-    std::string string_values() const;
-};
-
+}
 #endif

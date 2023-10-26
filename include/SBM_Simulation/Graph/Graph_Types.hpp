@@ -5,7 +5,6 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <soci/soci.h>
 struct Edge_t
 {
   uint32_t from;
@@ -38,18 +37,5 @@ struct Edge_t
   // static std::vector<uint32_t> get_to(const std::vector<Edge_t> &edges);
 };
 
-namespace soci
-{
-
-  template <>
-  struct type_conversion<Edge_t>
-  {
-    typedef std::string base_type;
-    static void from_base(const std::string &s, soci::indicator ind, Edge_t &edge);
-
-    static void to_base(const Edge_t &edge, std::string &s, soci::indicator &ind);
-
-  };
-}
 
 #endif

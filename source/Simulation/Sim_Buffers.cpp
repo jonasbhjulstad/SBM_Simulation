@@ -61,14 +61,14 @@ Dataframe::Dataframe_t<float, 3> generate_duplicated_p_Is(uint32_t Nt, uint32_t 
     return p_Is;
 }
 
-Dataframe::Dataframe_t<float, 3> Sim_Buffers::generate_random_p_Is(sycl::queue &q, Sim_Param p, soci::session &sql, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms)
+Dataframe::Dataframe_t<float, 3> Sim_Buffers::generate_random_p_Is(sycl::queue &q, Sim_Param p,  const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms)
 {
 
     auto p_Is_init = generate_duplicated_p_Is(p.Nt, p.N_sims_tot(), p.N_connections_max(), p.p_I_min, p.p_I_max, p.seed);
     return p_Is_init;
 }
 
-Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p, soci::session &sql, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init)
+Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p,  const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init)
 {
 
     const auto N_connections_max = p.N_connections_max();
@@ -91,7 +91,7 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p, soci::session &sql, const 
 
     if (!p_Is_init.size())
     {
-        p_Is_init = generate_random_p_Is(q, p, sql, edge_list_undirected, vcms);
+        p_Is_init = generate_random_p_Is(q, p, edge_list_undirected, vcms);
     }
 
     auto elist_flat = edge_list.flatten();
@@ -142,32 +142,15 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, Sim_Param p, soci::session &sql, const 
     Buffer_Routines::if_false_throw(ccms.size() == p.N_graphs, "ccm->size() != p.N_graphs");
     q.wait();
 
+
     auto N_pop_max = std::max_element(vcms.data.begin(), vcms.data.end(), [](const auto& v0, const auto& v1){return v0.size() < v1.size();})->size();
-    Buffer_Routines::validate_buffer_elements<uint32_t, 2>(q, *vcm, [](auto elem){return (elem >= 0) && (elem <= 20);});
-    Buffer_Routines::validate_buffer_elements<uint32_t, 1>(q, *ecm, [](auto elem){return (elem >= 0) && (elem <= 200);});
-    Buffer_Routines::validate_buffer_elements<uint32_t, 1>(q, *edge_from, [=](auto elem){return (elem >= 0) && (elem <= N_pop_max);});
-    Buffer_Routines::validate_buffer_elements<uint32_t, 1>(q, *edge_to, [=](auto elem){return (elem >= 0) && (elem <= N_pop_max);});
-    Buffer_Routines::validate_buffer_elements<uint32_t, 1>(q, *edge_offsets, [=](auto elem){return (elem >= 0) && (elem <= N_tot_edges);});
-    Buffer_Routines::validate_buffer_elements<uint32_t, 1>(q, *N_connections, [=](auto elem){return (elem >= 0) && (elem <= N_connections_max);});
-    // Buffer_Routines::validate_buffer_elements<SIR_State, 3>(q, *vertex_state, [=](auto elem){return (elem >= 0) && (elem <= 2);});
-    Buffer_Routines::validate_buffer_elements<uint32_t, 3>(q, *accumulated_events, [=](auto elem){return (elem >= 0) && (elem <= N_pop_max);});
-    Buffer_Routines::validate_buffer_elements<float, 3>(q, *p_Is, [=](auto elem){return (elem >= 0) && (elem <= 1);});
-    // Buffer_Routines::validate_buffer_elements<State_t, 3>(q, *community_state, [=](auto state){return state.is_valid(N_pop_max);});
-    // Buffer_Routines::validate_buffer_elements<Static_RNG::default_rng, 1>(q, *rngs, [](auto rng){return rng.is_valid();});
+    Buffer_Routines::validate_buffer_elements<uint32_t, 2>(q, *vcm, [](auto elem){return (elem >= 0) && (elem <= 20);}).wait();
+    Buffer_Routines::validate_buffer_elements<uint32_t, 1>(q, *ecm, [](auto elem){return (elem >= 0) && (elem <= 200);}).wait();
+    Buffer_Routines::validate_buffer_elements<uint32_t, 1>(q, *edge_from, [=](auto elem){return (elem >= 0) && (elem <= N_pop_max);}).wait();
+    Buffer_Routines::validate_buffer_elements<uint32_t, 1>(q, *edge_to, [=](auto elem){return (elem >= 0) && (elem <= N_pop_max);}).wait();
+    Buffer_Routines::validate_buffer_elements<uint32_t, 1>(q, *edge_offsets, [=](auto elem){return (elem >= 0) && (elem <= N_tot_edges);}).wait();
+    Buffer_Routines::validate_buffer_elements<uint32_t, 1>(q, *N_connections, [=](auto elem){return (elem >= 0) && (elem <= N_connections_max);}).wait();
+    Buffer_Routines::validate_buffer_elements<uint32_t, 3>(q, *accumulated_events, [=](auto elem){return (elem >= 0) && (elem <= N_pop_max);}).wait();
+    Buffer_Routines::validate_buffer_elements<float, 3>(q, *p_Is, [=](auto elem){return (elem >= 0) && (elem <= 1);}).wait();
 
-
-
-
-// soci::session &sql, const Dataframe::Dataframe_t<T, N_df> &df,
-//                     const std::string &table_name, const std::array<std::string, N_df> &index_names,
-//                     const std::array<std::string, N_const> & const_indices = {},
-//                     const std::array<uint32_t, N_const>& const_index_values = {},
-//                     const std::vector<uint32_t> &max_indices = {})
-    // SBM_Database::dataframe_insert(sql, state_df, "community_state", {}, {}, {"graph", "sim", "t", "community", "state"});
-    // SBM_Database::serialized_dataframe_insert(sql, edge_list, "edgelists", std::array<std::string, 2>{"graph", "edge"}, std::array<std::string, 1>{"p_out"}, {p.p_out_idx});
-    // SBM_Database::dataframe_insert(sql, vcms, "vertex_community_map", std::array<std::string, 2>{"graph", "vertex"}, "community", std::array<std::string, 1>{"p_out"}, {p.p_out_idx});
-
-    // SBM_Database::write_edgelist(sql, p.p_out_idx, edge_list);
-    // SBM_Database::write_ccm(sql, p.p_out_idx, ccms);
-    // SBM_Database::write_vcm(sql, p.p_out_idx, vcms);
 }

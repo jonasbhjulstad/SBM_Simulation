@@ -46,7 +46,7 @@ file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
 # ---- Create binary ----
 add_executable(${PROJECT_NAME} ${sources})
 
-target_link_libraries(${PROJECT_NAME} -ldl -lpq doctest::doctest SBM_Simulation::SBM_Simulation SOCI::soci_core SOCI::soci_postgresql)
+target_link_libraries(${PROJECT_NAME} -ldl -lpq doctest::doctest SBM_Simulation::SBM_Simulation TinyOrm::TinyOrm)
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${SBM_SIMULATION_TESTS_COMPILE_DEFINITIONS})
 target_link_options(${PROJECT_NAME} PUBLIC -fPIC)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)

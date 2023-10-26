@@ -4,7 +4,6 @@
 #include <array>
 #include <cstdint>
 #include <fstream>
-#include <soci/soci.h>
 #include <sstream>
 #include <string>
 #include <tuple>
@@ -81,21 +80,6 @@ struct State_t : public std::array<uint32_t, 3>
     return ss.str();
   }
 };
-
-namespace soci
-{
-
-  template <>
-  struct type_conversion<State_t>
-  {
-    typedef std::string base_type;
-
-    static void from_base(const std::string &s, soci::indicator ind, State_t &state);
-
-    static void to_base(const State_t &state, std::string &s, soci::indicator &ind);
-  };
-
-} // namespace soci
 
 struct Inf_Sample_Data_t
 {

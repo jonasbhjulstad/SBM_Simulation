@@ -51,28 +51,9 @@ int main()
     auto N_communities = 2;
     auto p = create_sim_param(N_communities);
 
-    // auto index_names = merge_arrays(constant_indices, iterable_index_names);
-
-    t1 = std::chrono::high_resolution_clock::now();
+    std::vector<uint32_t> p_out(10, 0);
 
     auto [edge_lists, vertex_list] = generate_N_SBM_graphs(p.N_pop, N_communities, p.p_in, p.p_out, p.seed, p.N_graphs);
-
-    auto vcms = std::vector<std::vector<uint32_t>>(p.N_graphs, create_vcm(vertex_list[0]));
-
-    t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "Generate graphs: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms\n";
-    t1 = t2;
-    std::mt19937 rng(p.seed);
-    // std::uniform_int_distribution<uint32_t> dist_v(0, 0);
-    // for(auto& v: vcms)
-    // {
-    //    std::generate(v.begin(), v.end(), [&dist_v, &rng]() { return dist_v(rng); });
-    // }u
-    Simulation_t sim(q, p, edge_lists, vcms);
-    Buffer_Routines::validate_buffer_elements<uint32_t, 2>(q, *sim.b.vcm, [](auto v){ return v < 2; });
-    sim.run();
-    q.wait();
-    t2 = std::chrono::high_resolution_clock::now();
 
     return 0;
 }

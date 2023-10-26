@@ -49,22 +49,16 @@ PYBIND11_MODULE(SIR_SBM, m)
         .def(py::init<const sycl::gpu_selector &>())
         .def(py::init<const sycl::cpu_selector &>());
     py::class_<sycl::event>(m, "sycl_event").def(py::init<>());
-    py::class_<Device_Info>(m, "Device_Info").def(py::init<>()).def("print", &Device_Info::print);
+    py::class_<Buffer_Routines::Device_Info>(m, "Device_Info").def(py::init<>()).def("print", &Buffer_Routines::Device_Info::print);
     m.def("create_sycl_device_queue", &create_sycl_device_queue, "create_sycl_device_queue");
-    m.def("get_device_info", static_cast<Device_Info (*)(sycl::queue &)>(&get_device_info), "get_device_info");
+    m.def("get_device_info", static_cast<Buffer_Routines::Device_Info (*)(sycl::queue &)>(&Buffer_Routines::get_device_info), "get_device_info");
     m.def("get_sycl_gpus", &get_sycl_gpus, "get_sycl_gpus");
     m.def("generate_planted_SBM_edges", &generate_planted_SBM_edges, "generate_planted_SBM_edges");
     m.def("generate_N_SBM_graphs", &generate_N_SBM_graphs, "generate_N_SBM_graphs");
+    py::class_<soci::session>(m, "soci_session")
+        .def(py::init<std::string, std::string>());
 
-    // m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, Sim_Buffers &)>(&run), "run");
-    // m.def("run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<Edge_t>> &, const std::vector<std::vector<uint32_t>> &)>(&run), "run");
-    // m.def("p_I_run", static_cast<void (*)(sycl::queue &, Sim_Param, const std::vector<std::vector<Edge_t>> &, const std::vector<std::vector<uint32_t>> &, const std::vector<std::vector<std::vector<float>>> &)>(&p_I_run), "p_I_run");
-
-    // m.def("read_edgelist", static_cast<void (*)(const std::string &, std::vector<Edge_t> &)>(&read_edgelist), "read_edgelist");
-    // m.def("write_vector", &write_vector, "write_vector");
-    // m.def("ecm_from_vcm", &ecm_from_vcm, "ecm_from_vcm");
-    // m.def("project_on_connection", &project_on_connection, "project_on_connection");
-    // m.def("complete_ccm", &complete_ccm, "complete_ccm");
+    m.def("construct_graph_tables", &SBM_Database::construct_graph_tables, "construct_graph_tables");
     py::class_<sycl::range<1>>(m, "sycl_range_1").def(py::init<std::size_t>());
 
     // py::class_<Sim_Param>(m, "Sim_Param").def(py::init<>()).def_readwrite("N_pop", &Sim_Param::N_pop).def_readwrite("N_communities", &Sim_Param::N_communities).def_readwrite("p_in", &Sim_Param::p_in).def_readwrite("p_out", &Sim_Param::p_out).def_readwrite("Nt", &Sim_Param::Nt) // p_R0, p_I0, sim_idx, seed

@@ -15,7 +15,6 @@ std::tuple<std::vector<float>, std::vector<float>, std::vector<float>, std::vect
 
 float alpha_regression(const Eigen::VectorXf &x, const Eigen::VectorXf &y);
 
-std::tuple<std::vector<float>, std::vector<float>, std::vector<float>, std::vector<float>> regression_on_datasets(soci::session& sql, uint32_t p_out, uint32_t graph, uint32_t N, float tau, uint32_t offset);
 
 std::tuple<std::vector<float>, std::vector<float>, std::vector<float>, std::vector<float>> regression_on_datasets(const std::string &datapath, uint32_t N, float tau, uint32_t offset);
 

@@ -21,18 +21,18 @@ struct Sim_Buffers
     std::shared_ptr<sycl::buffer<uint32_t>> N_connections;         // = std::make_shared(sycl::buffer<uint32_t>(sycl::range<1>(1)));
     std::vector<sycl::event> construction_events;
     const Dataframe::Dataframe_t<Edge_t, 2> ccm;
-    Sim_Buffers(sycl::queue &q, Sim_Param p, soci::session &sql, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init = {});
+    Sim_Buffers(sycl::queue &q, Sim_Param p,  const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init = {});
 
     void validate_sizes(const Sim_Param &p) const;
 
     std::size_t byte_size() const;
 
 private:
-    Dataframe::Dataframe_t<float, 3> generate_random_p_Is(sycl::queue &q, Sim_Param p, soci::session &sql, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms);
+    Dataframe::Dataframe_t<float, 3> generate_random_p_Is(sycl::queue &q, Sim_Param p, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list_undirected, const Dataframe::Dataframe_t<uint32_t, 2> &vcms);
 
-    void construct_buffers(sycl::queue &q, Sim_Param p, soci::session &sql, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init);
+    void construct_buffers(sycl::queue &q, Sim_Param p, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init);
 
-    static Sim_Buffers make_impl(sycl::queue &q, Sim_Param p, soci::session &sql, const Dataframe::Dataframe_t<Edge_t, 2> &edge_list, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init);
+    static Sim_Buffers make_impl(sycl::queue &q, Sim_Param p,  const Dataframe::Dataframe_t<Edge_t, 2> &edge_list, const Dataframe::Dataframe_t<uint32_t, 2> &vcms, Dataframe::Dataframe_t<float, 3> p_Is_init);
 };
 void validate_buffer_init_sizes(Sim_Param p, const std::vector<std::vector<Edge_t>> &edge_list, const std::vector<std::vector<uint32_t>> &vcms, const std::vector<std::vector<uint32_t>> &ecms, std::vector<float> p_Is_init);
 

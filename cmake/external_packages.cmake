@@ -27,6 +27,8 @@ CPMFindPackage(
     "cppitertools_INSTALL_CMAKE_DIR share"
 )
 
+# qt_standard_project_setup()
+find_package(TinyOrm CONFIG REQUIRED)
 #eigen
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
@@ -40,20 +42,13 @@ CPMFindPackage(NAME Buffer_Routines
     GIT_TAG master)
 
 
-
-# CPMFindPackage(
-#         NAME soci
-#         GITHUB_REPOSITORY SOCI/soci
-#         GIT_TAG master
-#     )
-
-find_package(SOCI REQUIRED COMPONENTS soci_core soci_postgresql)
-# target_link_libraries(SOCI::core INTERFACE Boost::date_time)
-
 CPMFindPackage(NAME SBM_Database
     GITHUB_REPOSITORY jonasbhjulstad/SBM_Database
-    GIT_TAG master)
-
+    GIT_TAG master
+    OPTIONS
+    #-fPIC
+    "CMAKE_POSITION_INDEPENDENT_CODE ON"
+    )
 
 find_package(TBB REQUIRED)
 include(FindThreads)
