@@ -1,0 +1,74 @@
+[
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/include -I/home/deb/Documents/SBM_Graph/build/_deps/static_rng-build/PackageProjectInclude -stdlib=libstdc++ -Wfatal-errors -O3 -Wall -std=gnu++20 -fPIC -o _deps/static_rng-build/CMakeFiles/Static_RNG.dir/src/Static_RNG.cpp.o -c /home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/src/Static_RNG.cpp",
+  "file": "/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/src/Static_RNG.cpp",
+  "output": "_deps/static_rng-build/CMakeFiles/Static_RNG.dir/src/Static_RNG.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -DDATAFRAME_ENABLE_SYCL -I/home/deb/.CPM/dataframe/c36d8cb3189f7dc2b8e488cfb9f6142d53872549/include -I/home/deb/Documents/SBM_Graph/build/_deps/dataframe-build/PackageProjectInclude -isystem /usr/local/include/eigen3 -stdlib=libstdc++ -Wfatal-errors -g -std=gnu++20 -fsycl -o _deps/dataframe-build/CMakeFiles/Dataframe.dir/source/Dataframe/Dataframe.cpp.o -c /home/deb/.CPM/dataframe/c36d8cb3189f7dc2b8e488cfb9f6142d53872549/source/Dataframe/Dataframe.cpp",
+  "file": "/home/deb/.CPM/dataframe/c36d8cb3189f7dc2b8e488cfb9f6142d53872549/source/Dataframe/Dataframe.cpp",
+  "output": "_deps/dataframe-build/CMakeFiles/Dataframe.dir/source/Dataframe/Dataframe.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/include -I/home/deb/Documents/SBM_Graph/build/_deps/buffer_routines-build/PackageProjectInclude -I/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/include -I/home/deb/Documents/SBM_Graph/build/_deps/static_rng-build/PackageProjectInclude -stdlib=libstdc++ -Wfatal-errors -g -std=gnu++20 -fsycl -Wno-deprecated-declarations -Wno-unknown-cuda-version -fPIC -o _deps/buffer_routines-build/CMakeFiles/Buffer_Routines.dir/source/Buffer_Utils.cpp.o -c /home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/source/Buffer_Utils.cpp",
+  "file": "/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/source/Buffer_Utils.cpp",
+  "output": "_deps/buffer_routines-build/CMakeFiles/Buffer_Routines.dir/source/Buffer_Utils.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/include -I/home/deb/Documents/SBM_Graph/build/_deps/buffer_routines-build/PackageProjectInclude -I/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/include -I/home/deb/Documents/SBM_Graph/build/_deps/static_rng-build/PackageProjectInclude -stdlib=libstdc++ -Wfatal-errors -g -std=gnu++20 -fsycl -Wno-deprecated-declarations -Wno-unknown-cuda-version -fPIC -o _deps/buffer_routines-build/CMakeFiles/Buffer_Routines.dir/source/Compute_Range.cpp.o -c /home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/source/Compute_Range.cpp",
+  "file": "/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/source/Compute_Range.cpp",
+  "output": "_deps/buffer_routines-build/CMakeFiles/Buffer_Routines.dir/source/Compute_Range.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/include -I/home/deb/Documents/SBM_Graph/build/_deps/buffer_routines-build/PackageProjectInclude -I/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/include -I/home/deb/Documents/SBM_Graph/build/_deps/static_rng-build/PackageProjectInclude -stdlib=libstdc++ -Wfatal-errors -g -std=gnu++20 -fsycl -Wno-deprecated-declarations -Wno-unknown-cuda-version -fPIC -o _deps/buffer_routines-build/CMakeFiles/Buffer_Routines.dir/source/Profiling.cpp.o -c /home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/source/Profiling.cpp",
+  "file": "/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/source/Profiling.cpp",
+  "output": "_deps/buffer_routines-build/CMakeFiles/Buffer_Routines.dir/source/Profiling.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/include -I/home/deb/Documents/SBM_Graph/build/_deps/buffer_routines-build/PackageProjectInclude -I/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/include -I/home/deb/Documents/SBM_Graph/build/_deps/static_rng-build/PackageProjectInclude -stdlib=libstdc++ -Wfatal-errors -g -std=gnu++20 -fsycl -Wno-deprecated-declarations -Wno-unknown-cuda-version -fPIC -o _deps/buffer_routines-build/CMakeFiles/Buffer_Routines.dir/source/Random.cpp.o -c /home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/source/Random.cpp",
+  "file": "/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/source/Random.cpp",
+  "output": "_deps/buffer_routines-build/CMakeFiles/Buffer_Routines.dir/source/Random.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/include -I/home/deb/Documents/SBM_Graph/build/_deps/buffer_routines-build/PackageProjectInclude -I/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/include -I/home/deb/Documents/SBM_Graph/build/_deps/static_rng-build/PackageProjectInclude -stdlib=libstdc++ -Wfatal-errors -g -std=gnu++20 -fsycl -Wno-deprecated-declarations -Wno-unknown-cuda-version -fPIC -o _deps/buffer_routines-build/CMakeFiles/Buffer_Routines.dir/source/Validation.cpp.o -c /home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/source/Validation.cpp",
+  "file": "/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/source/Validation.cpp",
+  "output": "_deps/buffer_routines-build/CMakeFiles/Buffer_Routines.dir/source/Validation.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -DDATAFRAME_ENABLE_SYCL -DPROJECT_TINYORM -DQT_CORE_LIB -DQT_SQL_LIB -DTINYORM_DEBUG -DTINYORM_DEBUG_SQL -DTINYORM_EXTERN_CONSTANTS -DTINYORM_LINKING_SHARED -DTINYTOM_DEBUG -I/home/deb/Documents/SBM_Graph/include -I/home/deb/Documents/SBM_Graph/build/PackageProjectInclude -I/home/deb/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -I/home/deb/.CPM/dataframe/c36d8cb3189f7dc2b8e488cfb9f6142d53872549/include -I/home/deb/Documents/SBM_Graph/build/_deps/dataframe-build/PackageProjectInclude -I/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/include -I/home/deb/Documents/SBM_Graph/build/_deps/buffer_routines-build/PackageProjectInclude -I/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/include -I/home/deb/Documents/SBM_Graph/build/_deps/static_rng-build/PackageProjectInclude -isystem /usr/include/qt6/QtCore -isystem /usr/include/qt6 -isystem /usr/lib/qt6/mkspecs/linux-g++ -isystem /usr/include/qt6/QtSql -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -Wfatal-errors -g -std=gnu++20 -fsycl -fPIC -Wno-deprecated-declarations -Wno-unknown-cuda-version -o source/CMakeFiles/SBM_Graph.dir/Community_Mappings.cpp.o -c /home/deb/Documents/SBM_Graph/source/Community_Mappings.cpp",
+  "file": "/home/deb/Documents/SBM_Graph/source/Community_Mappings.cpp",
+  "output": "source/CMakeFiles/SBM_Graph.dir/Community_Mappings.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -DDATAFRAME_ENABLE_SYCL -DPROJECT_TINYORM -DQT_CORE_LIB -DQT_SQL_LIB -DTINYORM_DEBUG -DTINYORM_DEBUG_SQL -DTINYORM_EXTERN_CONSTANTS -DTINYORM_LINKING_SHARED -DTINYTOM_DEBUG -I/home/deb/Documents/SBM_Graph/include -I/home/deb/Documents/SBM_Graph/build/PackageProjectInclude -I/home/deb/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -I/home/deb/.CPM/dataframe/c36d8cb3189f7dc2b8e488cfb9f6142d53872549/include -I/home/deb/Documents/SBM_Graph/build/_deps/dataframe-build/PackageProjectInclude -I/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/include -I/home/deb/Documents/SBM_Graph/build/_deps/buffer_routines-build/PackageProjectInclude -I/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/include -I/home/deb/Documents/SBM_Graph/build/_deps/static_rng-build/PackageProjectInclude -isystem /usr/include/qt6/QtCore -isystem /usr/include/qt6 -isystem /usr/lib/qt6/mkspecs/linux-g++ -isystem /usr/include/qt6/QtSql -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -Wfatal-errors -g -std=gnu++20 -fsycl -fPIC -Wno-deprecated-declarations -Wno-unknown-cuda-version -o source/CMakeFiles/SBM_Graph.dir/Complete_Graph.cpp.o -c /home/deb/Documents/SBM_Graph/source/Complete_Graph.cpp",
+  "file": "/home/deb/Documents/SBM_Graph/source/Complete_Graph.cpp",
+  "output": "source/CMakeFiles/SBM_Graph.dir/Complete_Graph.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -DDATAFRAME_ENABLE_SYCL -DPROJECT_TINYORM -DQT_CORE_LIB -DQT_SQL_LIB -DTINYORM_DEBUG -DTINYORM_DEBUG_SQL -DTINYORM_EXTERN_CONSTANTS -DTINYORM_LINKING_SHARED -DTINYTOM_DEBUG -I/home/deb/Documents/SBM_Graph/include -I/home/deb/Documents/SBM_Graph/build/PackageProjectInclude -I/home/deb/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -I/home/deb/.CPM/dataframe/c36d8cb3189f7dc2b8e488cfb9f6142d53872549/include -I/home/deb/Documents/SBM_Graph/build/_deps/dataframe-build/PackageProjectInclude -I/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/include -I/home/deb/Documents/SBM_Graph/build/_deps/buffer_routines-build/PackageProjectInclude -I/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/include -I/home/deb/Documents/SBM_Graph/build/_deps/static_rng-build/PackageProjectInclude -isystem /usr/include/qt6/QtCore -isystem /usr/include/qt6 -isystem /usr/lib/qt6/mkspecs/linux-g++ -isystem /usr/include/qt6/QtSql -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -Wfatal-errors -g -std=gnu++20 -fsycl -fPIC -Wno-deprecated-declarations -Wno-unknown-cuda-version -o source/CMakeFiles/SBM_Graph.dir/Graph.cpp.o -c /home/deb/Documents/SBM_Graph/source/Graph.cpp",
+  "file": "/home/deb/Documents/SBM_Graph/source/Graph.cpp",
+  "output": "source/CMakeFiles/SBM_Graph.dir/Graph.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -DDATAFRAME_ENABLE_SYCL -DPROJECT_TINYORM -DQT_CORE_LIB -DQT_SQL_LIB -DTINYORM_DEBUG -DTINYORM_DEBUG_SQL -DTINYORM_EXTERN_CONSTANTS -DTINYORM_LINKING_SHARED -DTINYTOM_DEBUG -I/home/deb/Documents/SBM_Graph/include -I/home/deb/Documents/SBM_Graph/build/PackageProjectInclude -I/home/deb/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -I/home/deb/.CPM/dataframe/c36d8cb3189f7dc2b8e488cfb9f6142d53872549/include -I/home/deb/Documents/SBM_Graph/build/_deps/dataframe-build/PackageProjectInclude -I/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/include -I/home/deb/Documents/SBM_Graph/build/_deps/buffer_routines-build/PackageProjectInclude -I/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/include -I/home/deb/Documents/SBM_Graph/build/_deps/static_rng-build/PackageProjectInclude -isystem /usr/include/qt6/QtCore -isystem /usr/include/qt6 -isystem /usr/lib/qt6/mkspecs/linux-g++ -isystem /usr/include/qt6/QtSql -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -Wfatal-errors -g -std=gnu++20 -fsycl -fPIC -Wno-deprecated-declarations -Wno-unknown-cuda-version -o source/CMakeFiles/SBM_Graph.dir/Graph_Types.cpp.o -c /home/deb/Documents/SBM_Graph/source/Graph_Types.cpp",
+  "file": "/home/deb/Documents/SBM_Graph/source/Graph_Types.cpp",
+  "output": "source/CMakeFiles/SBM_Graph.dir/Graph_Types.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/SBM_Graph/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -DDATAFRAME_ENABLE_SYCL -DPROJECT_TINYORM -DQT_CORE_LIB -DQT_SQL_LIB -DTINYORM_DEBUG -DTINYORM_DEBUG_SQL -DTINYORM_EXTERN_CONSTANTS -DTINYORM_LINKING_SHARED -DTINYTOM_DEBUG -I/home/deb/Documents/SBM_Graph/include -I/home/deb/Documents/SBM_Graph/build/PackageProjectInclude -I/home/deb/.CPM/cppitertools/a927f64ddfbd1ec4e569cd5aabbf4396506d0845 -I/home/deb/.CPM/dataframe/c36d8cb3189f7dc2b8e488cfb9f6142d53872549/include -I/home/deb/Documents/SBM_Graph/build/_deps/dataframe-build/PackageProjectInclude -I/home/deb/.CPM/buffer_routines/6c9bbf61e9b2714afe7c4dfce64278d05f2787a2/include -I/home/deb/Documents/SBM_Graph/build/_deps/buffer_routines-build/PackageProjectInclude -I/home/deb/.CPM/static_rng/74696fc3f2eef1c48ce8288f6baebe0135654f45/include -I/home/deb/Documents/SBM_Graph/build/_deps/static_rng-build/PackageProjectInclude -isystem /usr/include/qt6/QtCore -isystem /usr/include/qt6 -isystem /usr/lib/qt6/mkspecs/linux-g++ -isystem /usr/include/qt6/QtSql -isystem /opt/intel/oneapi/tbb/2021.10.0/include -stdlib=libstdc++ -Wfatal-errors -g -std=gnu++20 -fsycl -fPIC -Wno-deprecated-declarations -Wno-unknown-cuda-version -o source/CMakeFiles/SBM_Graph.dir/Utils/Math.cpp.o -c /home/deb/Documents/SBM_Graph/source/Utils/Math.cpp",
+  "file": "/home/deb/Documents/SBM_Graph/source/Utils/Math.cpp",
+  "output": "source/CMakeFiles/SBM_Graph.dir/Utils/Math.cpp.o"
+}
+]

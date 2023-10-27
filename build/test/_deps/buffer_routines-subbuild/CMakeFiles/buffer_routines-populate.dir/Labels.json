@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/deb/Documents/SBM_Graph/build/test/_deps/buffer_routines-subbuild/CMakeFiles/buffer_routines-populate"
+		},
+		{
+			"file" : "/home/deb/Documents/SBM_Graph/build/test/_deps/buffer_routines-subbuild/CMakeFiles/buffer_routines-populate.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/SBM_Graph/build/test/_deps/buffer_routines-subbuild/CMakeFiles/buffer_routines-populate-complete.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/SBM_Graph/build/test/_deps/buffer_routines-subbuild/buffer_routines-populate-prefix/src/buffer_routines-populate-stamp/buffer_routines-populate-build.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/SBM_Graph/build/test/_deps/buffer_routines-subbuild/buffer_routines-populate-prefix/src/buffer_routines-populate-stamp/buffer_routines-populate-configure.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/SBM_Graph/build/test/_deps/buffer_routines-subbuild/buffer_routines-populate-prefix/src/buffer_routines-populate-stamp/buffer_routines-populate-download.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/SBM_Graph/build/test/_deps/buffer_routines-subbuild/buffer_routines-populate-prefix/src/buffer_routines-populate-stamp/buffer_routines-populate-install.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/SBM_Graph/build/test/_deps/buffer_routines-subbuild/buffer_routines-populate-prefix/src/buffer_routines-populate-stamp/buffer_routines-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/SBM_Graph/build/test/_deps/buffer_routines-subbuild/buffer_routines-populate-prefix/src/buffer_routines-populate-stamp/buffer_routines-populate-patch.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/SBM_Graph/build/test/_deps/buffer_routines-subbuild/buffer_routines-populate-prefix/src/buffer_routines-populate-stamp/buffer_routines-populate-test.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/SBM_Graph/build/test/_deps/buffer_routines-subbuild/buffer_routines-populate-prefix/src/buffer_routines-populate-stamp/buffer_routines-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"buffer_routines-populate"
+		],
+		"name" : "buffer_routines-populate"
+	}
+}

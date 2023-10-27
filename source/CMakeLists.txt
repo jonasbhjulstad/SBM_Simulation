@@ -1,0 +1,5 @@
+file(GLOB_RECURSE ${PROJECT_NAME}_SOURCES "*.cpp")
+add_library(SBM_Graph ${${PROJECT_NAME}_SOURCES})
+target_link_libraries(SBM_Graph PUBLIC cppitertools Dataframe ${TINY_ORM_LIBRARIES} Buffer_Routines::Buffer_Routines TBB::tbb)
+target_include_directories(SBM_Graph PUBLIC $<BUILD_INTERFACE:${SBM_GRAPH_INCLUDE_DIR}> $<INSTALL_INTERFACE:include>)
+target_compile_options(${PROJECT_NAME} PUBLIC -fsycl ${SBM_GRAPH_SYCL_FLAGS} -fPIC)
