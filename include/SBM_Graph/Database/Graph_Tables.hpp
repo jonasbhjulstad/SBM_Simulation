@@ -18,8 +18,8 @@ namespace SBM_Graph
         "NULL,vertex INTEGER NOT NULL,community INTEGER NOT NULL, PRIMARY KEY(p_out, graph, "
         "vertex))");
     Orm::DB::statement(
-        "CREATE TABLE IF NOT EXISTS edge_community_map(p_out INTEGER NOT NULL,graph INTEGER NOT "
-        "NULL,edge INTEGER NOT NULL, community INTEGER NOT NULL, PRIMARY KEY(p_out, graph, edge))");
+        "CREATE TABLE IF NOT EXISTS edge_connection_map(p_out INTEGER NOT NULL,graph INTEGER NOT "
+        "NULL,edge INTEGER NOT NULL, connection INTEGER NOT NULL, PRIMARY KEY(p_out, graph, edge))");
   }
 
   void drop_graph_tables()
@@ -27,7 +27,7 @@ namespace SBM_Graph
     Orm::DB::statement("DROP TABLE IF EXISTS edgelists");
     Orm::DB::statement("DROP TABLE IF EXISTS connection_community_map");
     Orm::DB::statement("DROP TABLE IF EXISTS vertex_community_map");
-    Orm::DB::statement("DROP TABLE IF EXISTS edge_community_map");
+    Orm::DB::statement("DROP TABLE IF EXISTS edge_connection_map");
   }
   void edge_insert(const QString &table_name, uint32_t p_out, uint32_t graph,
                    const std::vector<uint32_t> &from, const std::vector<uint32_t> &to,
@@ -45,6 +45,37 @@ namespace SBM_Graph
     Orm::DB::table(table_name)
         ->insert(QVector<QString>{"p_out", "graph", "edge", "from", "to", "weight"}, rows);
   }
+
+  void vcm_insert(uint32_t p_out, uint32_t graph, const std::vector<uint32_t>& vcm)
+  {
+      QVector<Orm::WhereItem> row_inds;
+    QVector<QVariantMap> row_datas;
+    row_inds.reserve(vcm.size());
+    row_datas.reserve(vcm.size());
+    QVector<QVector<QVariant>> rows(vcm.size());
+    for (int i = 0; i < vcm.size(); i++)
+    {
+      rows[i] = {p_out, graph, i, vcm[i]};
+    }
+    Orm::DB::table(table_name)
+        ->insert(QVector<QString>{"p_out", "graph", "vertex", "community"}, rows);
+  }
+
+  void ecm_insert(uint32_t p_out, uint32_t graph, const std::vector<uint32_t>& vcm)
+  {
+      QVector<Orm::WhereItem> row_inds;
+    QVector<QVariantMap> row_datas;
+    row_inds.reserve(ecm.size());
+    row_datas.reserve(ecm.size());
+    QVector<QVector<QVariant>> rows(ecm.size());
+    for (int i = 0; i < ecm.size(); i++)
+    {
+      rows[i] = {p_out, graph, i, ecm[i]};
+    }
+    Orm::DB::table(table_name)
+        ->insert(QVector<QString>{"p_out", "graph", "edge", "connection"}, rows);
+  }
+
   std::vector<std::pair<uint32_t, uint32_t>> read_edgelist(uint32_t p_out, uint32_t graph)
   {
     auto query = Orm::DB::table("edgelists")
