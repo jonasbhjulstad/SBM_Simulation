@@ -1,3 +1,0 @@
-/home/deb/Documents/SBM_Graph/build/test/_deps/sbm_graph-subbuild/CMakeFiles/sbm_graph-populate.dir
-/home/deb/Documents/SBM_Graph/build/test/_deps/sbm_graph-subbuild/CMakeFiles/edit_cache.dir
-/home/deb/Documents/SBM_Graph/build/test/_deps/sbm_graph-subbuild/CMakeFiles/rebuild_cache.dir
