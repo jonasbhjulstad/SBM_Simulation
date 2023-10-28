@@ -1,4 +1,4 @@
-if(NOT ${${PROJECT_NAME}_EXTERNAL_PACKAGES})
+if("${${PROJECT_NAME}_EXTERNAL_PACKAGES}" STREQUAL "")
 
 # set(cppitertools_INSTALL_CMAKE_DIR share)
 # CPMFindPackage(
