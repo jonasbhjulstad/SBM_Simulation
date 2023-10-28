@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14...3.22)
 set(PARENT_PROJECT_NAME ${PROJECT_NAME})
 
 project(${PARENT_PROJECT_NAME}Tests LANGUAGES CXX)
-
+if (NOT TARGET ${PROJECT_NAME})
 # ---- Options ----
 
 option(ENABLE_TEST_COVERAGE "Enable test coverage" OFF)
@@ -38,4 +38,5 @@ add_subdirectory(source)
 if(ENABLE_TEST_COVERAGE)
   target_compile_options(${PROJECT_NAME} PUBLIC -O0 -g -fprofile-arcs -ftest-coverage)
   target_link_options(${PROJECT_NAME} PUBLIC -fprofile-arcs -ftest-coverage)
+endif()
 endif()

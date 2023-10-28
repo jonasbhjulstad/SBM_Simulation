@@ -8,6 +8,7 @@ project(
   VERSION 1.0
   LANGUAGES CXX
 )
+if (NOT TARGET ${PROJECT_NAME})
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/build)
 #export compile commands
@@ -30,16 +31,13 @@ option(ENABLE_TESTING "Enable Test Builds" ON)
 set(${PROJECT_NAME}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 # ---- Add source files ----
 include(cmake/CPM.cmake)
-if(${ENABLE_TESTING})
-if(NOT TARGET ${PROJECT_NAME}Tests)
+CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
+include(cmake/external_packages.cmake)
+add_subdirectory(source)
+if(${ENABLE_TESTING} AND NOT TARGET ${PROJECT_NAME}Tests)
 add_subdirectory(test)
 endif()
-endif()
 
-if (NOT TARGET ${PROJECT_NAME})
-add_subdirectory(source)
-include(cmake/external_packages.cmake)
-CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
 
 string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
 
