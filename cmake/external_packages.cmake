@@ -1,5 +1,4 @@
 if(NOT ${${PROJECT_NAME}_EXTERNAL_PACKAGES})
-set(${PROJECT_NAME}_EXTERNAL_PACKAGES ON CACHE BOOL "" FORCE)
 
 # set(cppitertools_INSTALL_CMAKE_DIR share)
 # CPMFindPackage(
@@ -9,5 +8,5 @@ set(${PROJECT_NAME}_EXTERNAL_PACKAGES ON CACHE BOOL "" FORCE)
 #     OPTIONS
 #     "cppitertools_INSTALL_CMAKE_DIR share"
 # )
-
+set(${PROJECT_NAME}_EXTERNAL_PACKAGES "")
 endif()
