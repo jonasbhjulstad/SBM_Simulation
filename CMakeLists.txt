@@ -25,13 +25,11 @@ endif()
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
 
-include(cmake/CPM.cmake)
 
-include(cmake/external_packages.cmake)
 option(ENABLE_TESTING "Enable Test Builds" ON)
-option(ENABLE_TEST_COVERAGE "Enable Test Coverage" ON)
 set(SBM_DATABASE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 # ---- Add source files ----
+include(cmake/CPM.cmake)
 if(${ENABLE_TESTING})
 if(NOT TARGET ${PROJECT_NAME}Tests)
 add_subdirectory(test)
@@ -40,6 +38,8 @@ endif()
 
 if (NOT TARGET ${PROJECT_NAME})
 add_subdirectory(source)
+include(cmake/external_packages.cmake)
+CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
 
 string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
 

@@ -1,5 +1,5 @@
-include(${CMAKE_CURRENT_LIST_DIR}/CPM.cmake)
-
+if(NOT ${${PROJECT_NAME}_EXTERNAL_PACKAGES})
+set(${PROJECT_NAME}_EXTERNAL_PACKAGES ON CACHE BOOL "" FORCE)
 
 # set(cppitertools_INSTALL_CMAKE_DIR share)
 # CPMFindPackage(
@@ -10,4 +10,4 @@ include(${CMAKE_CURRENT_LIST_DIR}/CPM.cmake)
 #     "cppitertools_INSTALL_CMAKE_DIR share"
 # )
 
-CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
+endif()

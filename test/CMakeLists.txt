@@ -11,14 +11,9 @@ option(TEST_INSTALLED_VERSION "Test the version found by find_package" OFF)
 # --- Import tools ----
 
 include(../cmake/tools.cmake)
-
-# ---- Dependencies ----
-
-include(../cmake/CPM.cmake)
-
-include(${PROJECT_SOURCE_DIR}/../cmake/external_packages.cmake)
+#packageproject()
+CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
 CPMAddPackage("gh:doctest/doctest@2.4.9")
-CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
 if(TEST_INSTALLED_VERSION)
 find_package(${PARENT_PROJECT_NAME} REQUIRED)
 else()
