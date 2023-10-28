@@ -3,7 +3,7 @@ if(NOT TARGET ${PROJECT_NAME})
 # ---- Create binary ----
 add_executable(${PROJECT_NAME} ${sources})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${PARENT_PROJECT_NAME}::${PARENT_PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${PARENT_PROJECT_NAME}::${PARENT_PROJECT_NAME} doctest::doctest)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
 
 doctest_discover_tests(${PROJECT_NAME})
