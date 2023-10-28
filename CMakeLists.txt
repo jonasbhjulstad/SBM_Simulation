@@ -27,7 +27,7 @@ endif()
 
 
 option(ENABLE_TESTING "Enable Test Builds" ON)
-set(SBM_DATABASE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+set(${PROJECT_NAME}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 # ---- Add source files ----
 include(cmake/CPM.cmake)
 if(${ENABLE_TESTING})
