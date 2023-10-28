@@ -26,7 +26,6 @@ endif()
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
 
-
 option(ENABLE_TESTING "Enable Test Builds" ON)
 set(${PROJECT_NAME}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 # ---- Add source files ----
