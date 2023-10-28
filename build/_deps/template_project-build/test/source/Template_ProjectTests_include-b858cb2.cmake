@@ -1,0 +1,5 @@
+if(EXISTS "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-build/test/source/Template_ProjectTests_tests-b858cb2.cmake")
+  include("/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-build/test/source/Template_ProjectTests_tests-b858cb2.cmake")
+else()
+  add_test(Template_ProjectTests_NOT_BUILT-b858cb2 Template_ProjectTests_NOT_BUILT-b858cb2)
+endif()

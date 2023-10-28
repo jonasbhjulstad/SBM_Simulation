@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/CMakeFiles/template_project-populate"
+		},
+		{
+			"file" : "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/CMakeFiles/template_project-populate.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/CMakeFiles/template_project-populate-complete.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/template_project-populate-prefix/src/template_project-populate-stamp/template_project-populate-build.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/template_project-populate-prefix/src/template_project-populate-stamp/template_project-populate-configure.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/template_project-populate-prefix/src/template_project-populate-stamp/template_project-populate-download.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/template_project-populate-prefix/src/template_project-populate-stamp/template_project-populate-install.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/template_project-populate-prefix/src/template_project-populate-stamp/template_project-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/template_project-populate-prefix/src/template_project-populate-stamp/template_project-populate-patch.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/template_project-populate-prefix/src/template_project-populate-stamp/template_project-populate-test.rule"
+		},
+		{
+			"file" : "/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/template_project-populate-prefix/src/template_project-populate-stamp/template_project-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"template_project-populate"
+		],
+		"name" : "template_project-populate"
+	}
+}

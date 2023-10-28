@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14...3.22)
+set(PARENT_PROJECT_NAME ${PROJECT_NAME})
 
-
-project(TemplateProjectTests LANGUAGES CXX)
+project(${PARENT_PROJECT_NAME}Tests LANGUAGES CXX)
 
 # ---- Options ----
 
@@ -20,28 +20,11 @@ include(${PROJECT_SOURCE_DIR}/../cmake/external_packages.cmake)
 CPMAddPackage("gh:doctest/doctest@2.4.9")
 CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
 if(TEST_INSTALLED_VERSION)
-find_package(TemplateProject REQUIRED)
+find_package(${PARENT_PROJECT_NAME} REQUIRED)
 else()
-CPMAddPackage(NAME TemplateProject SOURCE_DIR ${PROJECT_SOURCE_DIR}/..)
+CPMAddPackage(NAME ${PARENT_PROJECT_NAME} SOURCE_DIR ${PROJECT_SOURCE_DIR}/..)
 endif()
-file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
-# ---- Create binary ----
-add_executable(${PROJECT_NAME} ${sources})
 
-set(TemplateProjectTests_LIBRARIES TemplateProject::TemplateProject)
-
-target_link_libraries(${PROJECT_NAME} PUBLIC ${TemplateProjectTests_LIBRARIES})
-set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
-
-# enable compiler warnings
-if(NOT TEST_INSTALLED_VERSION)
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    # target_compile_options(SBM_Database PUBLIC -Wall -Wpedantic -Wextra -Werror)
-  elseif(MSVC)
-    target_compile_options(SBM_Database PUBLIC /W4 /WX)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
-  endif()
-endif()
 
 # ---- Add SBM_DatabaseTests ----
 
@@ -52,11 +35,12 @@ enable_testing()
 # ${PROJECT_NAME})
 
 include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
-doctest_discover_tests(${PROJECT_NAME})
+add_subdirectory(source)
+
 
 # ---- code coverage ----
 
 if(ENABLE_TEST_COVERAGE)
-  target_compile_options(SBM_Database PUBLIC -O0 -g -fprofile-arcs -ftest-coverage)
-  target_link_options(SBM_Database PUBLIC -fprofile-arcs -ftest-coverage)
+  target_compile_options(${PROJECT_NAME} PUBLIC -O0 -g -fprofile-arcs -ftest-coverage)
+  target_link_options(${PROJECT_NAME} PUBLIC -fprofile-arcs -ftest-coverage)
 endif()

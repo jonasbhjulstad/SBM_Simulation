@@ -22,17 +22,23 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
   )
 endif()
 
-option(BUILD_STRTK "Build the STRTK library" ON)
-
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
 
 include(cmake/CPM.cmake)
 
 include(cmake/external_packages.cmake)
-
+option(ENABLE_TESTING "Enable Test Builds" ON)
+option(ENABLE_TEST_COVERAGE "Enable Test Coverage" ON)
 set(SBM_DATABASE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 # ---- Add source files ----
+if(${ENABLE_TESTING})
+if(NOT TARGET ${PROJECT_NAME}Tests)
+add_subdirectory(test)
+endif()
+endif()
+
+if (NOT TARGET ${PROJECT_NAME})
 add_subdirectory(source)
 
 string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
@@ -49,3 +55,4 @@ packageProject(
   COMPATIBILITY SameMajorVersion
   DEPENDENCIES ""
 )
+endif()

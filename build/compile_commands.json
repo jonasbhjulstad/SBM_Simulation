@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/deb/Documents/CMakeTemplateProject/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -DDOCTEST_CONFIG_IMPLEMENT_WITH_MAIN -isystem /home/deb/.CPM/doctest/bbb3e61c4790cca23f5279ff9fddd6ec56ef3bd4 -stdlib=libstdc++ -g -std=gnu++11 -o _deps/doctest-build/CMakeFiles/doctest_with_main.dir/doctest/parts/doctest.cpp.o -c /home/deb/.CPM/doctest/bbb3e61c4790cca23f5279ff9fddd6ec56ef3bd4/doctest/parts/doctest.cpp",
+  "file": "/home/deb/.CPM/doctest/bbb3e61c4790cca23f5279ff9fddd6ec56ef3bd4/doctest/parts/doctest.cpp",
+  "output": "_deps/doctest-build/CMakeFiles/doctest_with_main.dir/doctest/parts/doctest.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/CMakeTemplateProject/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-build/PackageProjectInclude -stdlib=libstdc++ -g -std=gnu++20 -O0 -g -fprofile-arcs -ftest-coverage -o _deps/template_project-build/test/source/CMakeFiles/Template_ProjectTests.dir/main.cpp.o -c /home/deb/Documents/CMakeTemplateProject/test/source/main.cpp",
+  "file": "/home/deb/Documents/CMakeTemplateProject/test/source/main.cpp",
+  "output": "_deps/template_project-build/test/source/CMakeFiles/Template_ProjectTests.dir/main.cpp.o"
+},
+{
+  "directory": "/home/deb/Documents/CMakeTemplateProject/build",
+  "command": "/opt/intel/oneapi/compiler/2023.2.0/linux/bin-llvm/clang++ -I/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-build/PackageProjectInclude -stdlib=libstdc++ -g -o _deps/template_project-build/source/CMakeFiles/Template_Project.dir/source.cpp.o -c /home/deb/Documents/CMakeTemplateProject/source/source.cpp",
+  "file": "/home/deb/Documents/CMakeTemplateProject/source/source.cpp",
+  "output": "_deps/template_project-build/source/CMakeFiles/Template_Project.dir/source.cpp.o"
+}
+]

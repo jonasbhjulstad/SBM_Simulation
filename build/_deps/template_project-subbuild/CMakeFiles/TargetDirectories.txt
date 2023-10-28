@@ -1,0 +1,3 @@
+/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/CMakeFiles/template_project-populate.dir
+/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/CMakeFiles/edit_cache.dir
+/home/deb/Documents/CMakeTemplateProject/build/_deps/template_project-subbuild/CMakeFiles/rebuild_cache.dir
