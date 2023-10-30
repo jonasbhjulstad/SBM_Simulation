@@ -1,3 +1,4 @@
+if ("${${PROJECT_NAME}_EXTERNAL_PACKAGES}" STREQUAL "")
 include(${CMAKE_CURRENT_LIST_DIR}/CPM.cmake)
 
 
@@ -50,8 +51,9 @@ CPMFindPackage(NAME Buffer_Routines
 #     "CMAKE_POSITION_INDEPENDENT_CODE ON"
 #     )
 
-find_package(TBB REQUIRED)
+find_package(TBB CONFIG REQUIRED)
 # find_package(casadi REQUIRED HINTS "/home/man/mambaforge/envs/gt/lib/cmake/casadi")
-
+set(${PROJECT_NAME}_EXTERNAL_PACKAGES ${TINY_ORM_LIBRARIES} Static_RNG::Static_RNG Dataframe::Dataframe Buffer_Routines::Buffer_Routines TBB::tbb cppitertools)
 
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
+endif()

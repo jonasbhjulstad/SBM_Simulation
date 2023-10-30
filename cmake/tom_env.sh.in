@@ -1,0 +1,5 @@
+PATH="$PATH:${TOM_EXECUTABLE_DIR}"
+function tom_sqlite()
+{
+    sqlite3 ${TOM_EXECUTABLE_DIR}/example.sqlite3
+}

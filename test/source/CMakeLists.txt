@@ -5,7 +5,8 @@ add_executable(${PROJECT_NAME} ${sources})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PARENT_PROJECT_NAME}::${PARENT_PROJECT_NAME} doctest::doctest)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
-
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+configure_file(test_config.hpp.in test_config.hpp)
 doctest_discover_tests(${PROJECT_NAME})
 # enable compiler warnings
 if(NOT TEST_INSTALLED_VERSION)

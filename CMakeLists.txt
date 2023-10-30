@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.14...3.22)
 
 # Note: update this to your new project's name and version
 project(
-  Template_Project
+  SBM_Graph
   VERSION 1.0
   LANGUAGES CXX
 )
@@ -26,6 +26,8 @@ endif()
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
 
+set(DATABASE_TYPE "QSQLITE")
+set(SQLITE3_DATABASE_FILE "${PROJECT_BINARY_DIR}/database.sqlite3" CACHE STRING "Database file")
 option(ENABLE_TESTING "Enable Test Builds" ON)
 set(${PROJECT_NAME}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 # ---- Add source files ----
@@ -33,9 +35,11 @@ include(cmake/CPM.cmake)
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
 if(NOT ${PROJECT_NAME}_EXTERNAL_PACKAGES)
   set(${PROJECT_NAME}_EXTERNAL_PACKAGES "" CACHE STRING "" FORCE)
+  include(cmake/external_packages.cmake)
 endif()
-include(cmake/external_packages.cmake)
+message(WARNING "External packages: ${${PROJECT_NAME}_EXTERNAL_PACKAGES}")
 add_subdirectory(source)
+add_subdirectory(tom)
 if(${ENABLE_TESTING} AND NOT TARGET ${PROJECT_NAME}Tests)
 add_subdirectory(test)
 endif()

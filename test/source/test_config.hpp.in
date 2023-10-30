@@ -1,0 +1,8 @@
+#pragma once
+
+
+namespace test_config
+{
+const char* DB_DRIVER = "${DATABASE_TYPE}";
+const char* SQLITE3_FILENAME = "${SQLITE3_DATABASE_FILE}";
+}
