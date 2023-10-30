@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors")
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/build)
 #export compile commands
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
+option(WITH_TOM "Build with TOM" ON)
 # ---- Include guards ----
 
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
@@ -49,9 +49,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(SBM_GRAPH_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 # ---- Add source files ----
 add_subdirectory(source)
-
-
-
+# add_subdirectory(executables)
 string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
 
 set(${PROJECT_NAME}_LIBRARY_TARGETS )

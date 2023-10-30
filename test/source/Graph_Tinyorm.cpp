@@ -1,93 +1,106 @@
 #include <doctest/doctest.h>
 
+#include <SBM_Graph/Database/Generation.hpp>
+#include <SBM_Graph/Database/Graph_Tables.hpp>
+#include <SBM_Graph/Utils/Math.hpp>
 #include <cstdlib>
 #include <filesystem>
 #include <orm/db.hpp>
-#include <SBM_Graph/Database/Graph_Tables.hpp>
-#include <SBM_Graph/Utils/Math.hpp>
-void create_graph_db(auto cwd) {
-  std::system(
-      ("sqlite3 " + cwd
-       + "/HelloWorld.sqlite3 'create table if not exists posts(id INTEGER NOT NULL PRIMARY KEY "
-         "AUTOINCREMENT, name VARCHAR NOT NULL); insert into posts values(1, 'First Post'); insert "
-         "into posts values(2, 'Second Post'); select * from posts;'")
-          .c_str());
-}
 
-void remove_graph_db(auto cwd) { std::system(("rm -rf" + cwd + "HelloWorld.sqlite3").c_str()); }
-
-
-void create_edgelist_table() {
-  using Orm::DB;
-  DB::statement("CREATE TABLE IF NOT EXISTS edgelists(p_out INTEGER NOT NULL,graph INTEGER NOT NULL,edge INTEGER NOT NULL,'from' INTEGER NOT NULL,'to' INTEGER NOT NULL, weight INTEGER NOT NULL, PRIMARY KEY(p_out, graph, edge))");
-
-}
-
-void drop_edgelist_table()
+void db_create()
 {
-  using Orm::DB;
-  DB::statement("DROP TABLE IF EXISTS edgelists");
+  auto gt_str = SBM_Graph::create_graph_tables_str();
+
+  std::system(("sqlite3 HelloWorld.sqlite3 '" + gt_str + "'").c_str());
 }
 
-void edgelist_test() { create_edgelist_table();
-  using Orm::DB;
-  drop_edgelist_table();
-  create_edgelist_table();
-  DB::table("edgelists")->insert({{"p_out", 0}, {"graph", 0}, {"edge", 0},{"from", 0}, {"to", 0}, {"weight", 0}});
-
-
+void db_drop()
+{
+  std::system("rm HelloWorld.sqlite3");
 }
-TEST_CASE("graph_tables") {
+
+
+// TEST_CASE("edgelists_tests")
+// {
+//   using namespace SBM_Graph;
+//   using Orm::DB;
+//   auto cwd = std::filesystem::current_path().generic_string();
+//   auto from_vec = make_iota(100);
+//   auto to_vec = from_vec;
+//   std::reverse(to_vec.begin(), to_vec.end());
+//   std::vector<uint32_t> weights(100, 1);
+
+//   uint32_t p_out = 1;
+//   uint32_t graph = 1;
+//   {
+//   edgelist_insert(p_out, graph, from_vec, to_vec, weights);
+//   edgelist_insert(2, 4, from_vec, to_vec, weights);
+//   }
+//   read_edgelist(p_out, graph);
+// }
+
+TEST_CASE("vcm_test")
+{
+  using namespace SBM_Graph;
   using Orm::DB;
   auto cwd = std::filesystem::current_path().generic_string();
-  remove_graph_db(cwd);
-  create_graph_db(cwd);
-  edgelist_test();
+  db_drop();
+  db_create();
 
-  int a = 1;
+  auto vcm = make_iota(100);
+  vcm_insert(1, 1, vcm);
+  vcm_insert(0, 0, vcm);
+
+  vcm = vcm_read(1, 1);
 }
+
+TEST_CASE("ecm_test")
+{
+  using namespace SBM_Graph;
+  using Orm::DB;
+  auto cwd = std::filesystem::current_path().generic_string();
+  db_drop();
+  db_create();
+
+
+  auto ecm = make_iota(100);
+  ecm_insert(1, 1, ecm);
+  ecm_insert(0, 0, ecm);
+
+  ecm = ecm_read(1, 1);
+}
+
+
 TEST_CASE("graph_tables")
 {
-  using namespace SBM_Graph;
+
   using Orm::DB;
-  auto cwd = std::filesystem::current_path().generic_string();
-  drop_graph_tables();
-  create_graph_tables();
-  auto from_vec = SBM_Graph::make_iota(100);
-  auto to_vec = from_vec;
-  std::reverse(to_vec.begin(), to_vec.end());
-  std::vector<uint32_t> weights(100, 1);
-  uint32_t p_out = 1;
-  uint32_t graph = 1;
-
-  edgelist_insert(p_out, graph, from_vec, to_vec, weights);
-  auto a = 1;
-}
-
-TEST_CASE("select")
-{
   using namespace SBM_Graph;
-  using Orm::DB;
+  db_drop();
+  db_create();
+
   auto cwd = std::filesystem::current_path().generic_string();
-  drop_graph_tables();
-  create_graph_tables();
-  auto from_vec = make_iota(100);
-  auto to_vec = from_vec;
-  std::reverse(to_vec.begin(), to_vec.end());
-  std::vector<uint32_t> weights(100, 1);
+  auto p = QJsonObject();
+  p["N_communities"] = 2;
+  p["N_pop"] = 10;
+  p["N_graphs"] = 2;
+  p["N_communities"] = 2;
+  p["p_in"] = 0.5f;
+  p["p_out"] = 0.1f;
+  p["N_sims"] = 2;
+  p["Nt"] = 56;
+  p["Nt_alloc"] = 20;
+  p["seed"] = 234;
+  p["p_I_min"] = 0.1f;
+  p["p_I_max"] = 0.2f;
+  p["p_out_id"] = 0;
+  p["p_R"] = 0.1f;
+  p["p_I0"] = 0.1f;
+  p["p_R0"] = 0.0f;
 
-  uint32_t p_out = 1;
-  uint32_t graph = 1;
-  edgelist_insert(p_out, graph, from_vec, to_vec, weights);
-  auto from_q = DB::table("edgelists")->where({{"p_out", p_out}, {"graph", graph}}).select("from").get();
-  auto a = 1;
-}
+  generate_SBM_to_db(p);
 
-TEST_CASE("QVariant")
-{
-  Orm::DB::statement("CREATE TABLE IF NOT EXISTS array_test(array INTEGER[3])");
-  Orm::DB::table("array_test")->insert({{"array", QVariant::fromValue(QVector<int>{1, 2, 3})}});
-  auto a = 1;
+  int a = 1;
 }
 // TEST_CASE("simulation_tables")
 // {

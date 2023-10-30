@@ -11,17 +11,20 @@ CPMFindPackage(
 find_package(Boost 1.78 REQUIRED COMPONENTS date_time HINTS ${PYTHON_ENV_CMAKE_MODULE_DIR})
 
 set(cppitertools_INSTALL_CMAKE_DIR share)
-CPMFindPackage(
-    NAME cppitertools
-    GITHUB_REPOSITORY ryanhaining/cppitertools
-    GIT_TAG master
-    OPTIONS
-    "cppitertools_INSTALL_CMAKE_DIR share"
-)
+CPMAddPackage("gh:ryanhaining/cppitertools@2.1")
+# CPMFindPackage(
+#     NAME cppitertools
+#     GITHUB_REPOSITORY ryanhaining/cppitertools
+#     GIT_TAG master@2.1
+#     OPTIONS
+#     "cppitertools_INSTALL_CMAKE_DIR share"
+# )
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
-find_package(TinyOrm 0.36.3 CONFIG REQUIRED)
-set(TINY_ORM_LIBRARIES TinyOrm::TinyOrm Qt6::Core)
+
+CPMAddPackage("gh:silverqx/TinyORM@0.36.3")
+# find_package(TinyOrm 0.36.3 CONFIG REQUIRED)
+set(TINY_ORM_LIBRARIES Qt5::Core TinyOrm::TinyOrm)
 
 # find_package(TinyOrm CONFIG REQUIRED)
 #eigen
@@ -30,7 +33,9 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 #add pqxx4
 CPMFindPackage(NAME Dataframe
     GITHUB_REPOSITORY jonasbhjulstad/Dataframe
-    GIT_TAG master)
+    GIT_TAG master
+    OPTIONS
+    "CMAKE_POSITION_INDEPENDENT_CODE ON")
 
 CPMFindPackage(NAME Buffer_Routines
     GITHUB_REPOSITORY jonasbhjulstad/Sycl_Buffer_Routines

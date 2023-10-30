@@ -1,7 +1,7 @@
+#include <algorithm>
 #include <execution>
 #include <SBM_Graph/Graph.hpp>
 #include <Static_RNG/distributions.hpp>
-#include <algorithm>
 #include <itertools.hpp>
 #include <random>
 #include <sstream>
@@ -17,14 +17,14 @@ std::vector<Edge_t> random_connect(const std::vector<uint32_t> &to_nodes,
     std::vector<Edge_t> edge_list(to_nodes.size() * from_nodes.size());
 
     auto prod = iter::product(to_nodes, from_nodes);
-    std::transform(std::execution::par_unseq, prod.begin(), prod.end(), edge_list.begin(),
-                   [&](auto &pair)
+    std::transform(prod.begin(), prod.end(), edge_list.begin(),
+                   [](const auto& pair)
                    {
                        return Edge_t(std::get<0>(pair), std::get<1>(pair));
                    });
 
     edge_list.erase(std::remove_if(edge_list.begin(), edge_list.end(),
-                                   [&](auto &e)
+                                   [&](const auto &e)
                                    { return e.from == e.to; }),
                     edge_list.end());
     if (p == 1)
