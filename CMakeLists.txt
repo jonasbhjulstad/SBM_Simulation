@@ -1,18 +1,19 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.14...3.22)
 
 # ---- Project ----
 
 # Note: update this to your new project's name and version
 project(
-  SBM_Graph
+  Template_Project
   VERSION 1.0
   LANGUAGES CXX
 )
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors")
+if (NOT TARGET ${PROJECT_NAME})
+
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/build)
 #export compile commands
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-option(WITH_TOM "Build with TOM" ON)
+
 # ---- Include guards ----
 
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
@@ -22,45 +23,26 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
   )
 endif()
 
-include(cmake/CPM.cmake)
+# ---- Add dependencies via CPM ----
+# see https://github.com/TheLartians/CPM.cmake for more info
 
-set(PYTHON_ROOT "/home/man/mambaforge/envs/gt/")
-
-if(WIN32)
-    set(PYTHON_EXECUTABLE "C:\\Users\\jonas\\anaconda3\\envs\\Network_MPC\\python.exe")
-else()
-    set(PYTHON_EXECUTABLE "${PYTHON_ROOT}/bin/python3")
-    set(PYTHON_INCLUDE_DIR "${PYTHON_ROOT}/include/python3.9")
-    set(PYTHON_LIBS "${PYTHON_ROOT}/libs/python3.9")
-    set(Python3_ROOT_DIR "${PYTHON_ROOT}/")
-endif()
-set(PYBIND11_PYTHON_VERSION "3.9")
-set(PYTHON_ENV_CMAKE_MODULE_DIR "/home/man/mambaforge/envs/gt/lib/python3.11/site-packages/pybind11/share/cmake/pybind11")
-include(FindPython3)
-
-include(cmake/external_packages.cmake)
-if(NOT ${IntelSYCL_FOUND})
-find_package(IntelSYCL CONFIG REQUIRED)
-endif()
-
-set(SBM_SIMULATION_DEFAULT_FLAGS -Wno-deprecated-declarations -Wno-unknown-cuda-version)
-include(cmake/default_targets.cmake)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(SBM_GRAPH_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+option(ENABLE_TESTING "Enable Test Builds" ON)
+set(${PROJECT_NAME}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 # ---- Add source files ----
+include(cmake/CPM.cmake)
+CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
+if(NOT ${PROJECT_NAME}_EXTERNAL_PACKAGES)
+  set(${PROJECT_NAME}_EXTERNAL_PACKAGES "" CACHE STRING "" FORCE)
+endif()
+include(cmake/external_packages.cmake)
 add_subdirectory(source)
-# add_subdirectory(executables)
+if(${ENABLE_TESTING} AND NOT TARGET ${PROJECT_NAME}Tests)
+add_subdirectory(test)
+endif()
+
+
 string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
 
-set(${PROJECT_NAME}_LIBRARY_TARGETS )
-# install export for Utils
-install(TARGETS ${${PROJECT_NAME}_LIBRARY_TARGETS}
-  EXPORT ${PROJECT_NAME}Targets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
-)
 
 packageProject(
   NAME ${PROJECT_NAME}
@@ -71,5 +53,6 @@ packageProject(
   INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
   VERSION_HEADER "${VERSION_HEADER_LOCATION}"
   COMPATIBILITY SameMajorVersion
-  DEPENDENCIES "Eigen3 3.4.0; Dataframe 1.0.0; soci 4.2.0"
+  DEPENDENCIES ""
 )
+endif()
