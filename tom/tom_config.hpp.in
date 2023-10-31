@@ -1,0 +1,10 @@
+#pragma once
+
+
+namespace tom_config
+{
+const char* TOM_OUTPUT_DIR = "${TOM_EXECUTABLE_DIR}";
+const char* TOM_DB_DRIVER = "${DATABASE_TYPE}";
+const char* SQLITE3_FILENAME = "${SQLITE3_DATABASE_FILE}";
+
+}

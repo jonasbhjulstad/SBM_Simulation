@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.14...3.22)
+set(PARENT_PROJECT_NAME ${PROJECT_NAME})
 
-project(SBM_SimulationTests LANGUAGES CXX)
-
+project(${PARENT_PROJECT_NAME}Tests LANGUAGES CXX)
+if (NOT TARGET ${PROJECT_NAME})
 # ---- Options ----
 
 option(ENABLE_TEST_COVERAGE "Enable test coverage" OFF)
@@ -29,40 +30,17 @@ endif()
 # --- Import tools ----
 
 include(../cmake/tools.cmake)
-
-# ---- Dependencies ----
-
-include(../cmake/CPM.cmake)
-
-include(${PROJECT_SOURCE_DIR}/../cmake/external_packages.cmake)
-CPMAddPackage("gh:doctest/doctest@2.4.9")
-CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
+#packageproject()
+CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
+CPMAddPackage("gh:doctest/doctest@2.4.11")
 if(TEST_INSTALLED_VERSION)
-find_package(SBM_Simulation REQUIRED)
+find_package(${PARENT_PROJECT_NAME} REQUIRED)
 else()
-CPMAddPackage(NAME SBM_Simulation SOURCE_DIR ${PROJECT_SOURCE_DIR}/..)
-endif()
-file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
-# ---- Create binary ----
-add_executable(${PROJECT_NAME} ${sources})
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
-
-target_link_libraries(${PROJECT_NAME} -ldl -lpq doctest::doctest SBM_Simulation::SBM_Simulation ${TINY_ORM_LIBRARIES})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${SBM_SIMULATION_TESTS_COMPILE_DEFINITIONS})
-target_link_options(${PROJECT_NAME} PUBLIC -fPIC)
-set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
-
-# enable compiler warnings
-if(NOT TEST_INSTALLED_VERSION)
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    # target_compile_options(SBM_Simulation PUBLIC -Wall -Wpedantic -Wextra -Werror)
-  elseif(MSVC)
-    target_compile_options(SBM_Simulation PUBLIC /W4 /WX)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
-  endif()
+CPMAddPackage(NAME ${PARENT_PROJECT_NAME} SOURCE_DIR ${PROJECT_SOURCE_DIR}/..)
 endif()
 
-# ---- Add SBM_SimulationTests ----
+
+# ---- Add SBM_DatabaseTests ----
 
 enable_testing()
 
@@ -71,11 +49,13 @@ enable_testing()
 # ${PROJECT_NAME})
 
 include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
-doctest_discover_tests(${PROJECT_NAME})
+add_subdirectory(source)
+
 
 # ---- code coverage ----
 
 if(ENABLE_TEST_COVERAGE)
-  target_compile_options(SBM_Simulation PUBLIC -O0 -g -fprofile-arcs -ftest-coverage)
-  target_link_options(SBM_Simulation PUBLIC -fprofile-arcs -ftest-coverage)
+  target_compile_options(${PROJECT_NAME} PUBLIC -O0 -g -fprofile-arcs -ftest-coverage)
+  target_link_options(${PROJECT_NAME} PUBLIC -fprofile-arcs -ftest-coverage)
+endif()
 endif()

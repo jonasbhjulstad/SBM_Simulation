@@ -12,9 +12,23 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "cmake --build ${workspaceFolder}/build --parallel 10",
+            "command": "cmake --build ${workspaceFolder}/build --parallel 4",
             "problemMatcher": []
         },
+
+        {
+            "label": "configure - test",
+            "type": "shell",
+            "command": "cmake -B ${workspaceFolder}/build/test -S ${workspaceFolder}/test -DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/cmake/toolchains/Intel_x86_Arch.cmake -DCMAKE_BUILD_TYPE=Debug -GNinja",
+            "problemMatcher": []
+        },
+        {
+            "label": "build - test",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build/test --parallel 4",
+            "problemMatcher": []
+        },
+
         {
             "label": "build_target",
             "type": "shell",
