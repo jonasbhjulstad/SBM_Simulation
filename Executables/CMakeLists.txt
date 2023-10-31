@@ -1,3 +1,0 @@
-
-add_default_executable(parallel_SIR_Network)
-target_link_libraries(parallel_SIR_Network PUBLIC SBM_Simulation)
