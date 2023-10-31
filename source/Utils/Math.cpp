@@ -1,4 +1,4 @@
-#include <SBM_Simulation/Utils/math.hpp>
+#include <SBM_Simulation/Utils/Math.hpp>
 #include <numeric>
 std::vector<float> make_linspace(float start, float end, float step)
 {

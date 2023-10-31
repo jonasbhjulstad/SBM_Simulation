@@ -8,6 +8,8 @@ project(
   VERSION 1.0
   LANGUAGES CXX
 )
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors")
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/build)
 #export compile commands
@@ -58,7 +60,6 @@ find_package(Python3 COMPONENTS Interpreter Development)
 find_package(pybind11 CONFIG HINTS ${PYTHON_ENV_CMAKE_MODULE_DIR} REQUIRED)
 find_package(IntelSYCL CONFIG REQUIRED)
 find_package(ortools CONFIG REQUIRED)
-
 include(cmake/external_packages.cmake)
 
 
@@ -73,14 +74,14 @@ configure_file("${PROJECT_SOURCE_DIR}/include/SBM_Simulation/Utils/path_config.h
 
 # ---- Add source files ----
 add_subdirectory(source)
-add_subdirectory(Binders)
-add_subdirectory(Executables)
+add_subdirectory(binders)
+add_subdirectory(executables)
 
 
 
 string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
 
-set(${PROJECT_NAME}_LIBRARY_TARGETS SIR_Types Sim_Buffers SIR_Dynamics Sim_Infection_Sampling String_Manipulation math State_Accumulation Sim_Types Graph_Types Graph Community_Mappings Validation Complete_Graph)
+set(${PROJECT_NAME}_LIBRARY_TARGETS ${PROJECT_NAME}_Types ${PROJECT_NAME}_Utils Epidemiological)
 # install export for Utils
 install(TARGETS ${${PROJECT_NAME}_LIBRARY_TARGETS}
   EXPORT ${PROJECT_NAME}Targets

@@ -1,6 +1,6 @@
 #include <SBM_Simulation/Regression/Regression.hpp>
-#include <SBM_Simulation/Graph/Graph.hpp>
-#include <SBM_Simulation/Utils/math.hpp>
+#include <SBM_Graph/Graph.hpp>
+#include <SBM_Simulation/Utils/Math.hpp>
 
 #include <fstream>
 #include <iostream>

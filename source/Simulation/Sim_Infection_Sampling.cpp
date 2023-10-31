@@ -1,7 +1,7 @@
 
 #include <SBM_Simulation/Simulation/Sim_Infection_Sampling.hpp>
 #include <Sycl_Buffer_Routines/Buffer_Utils.hpp>
-#include <SBM_Simulation/Utils/math.hpp>
+#include <SBM_Simulation/Utils/Math.hpp>
 #include <execution>
 #include <iostream>
 #include <random>
@@ -231,7 +231,7 @@ std::vector<uint32_t> sample_community(const auto &related_connections, const au
     std::vector<uint32_t> r_con_events(related_connections.size(), 0);
     for (int i = 0; i < related_connections.size(); i++)
     {
-        r_con_events[i] = events[related_connections[i]];''
+        r_con_events[i] = events[related_connections[i]];
     }
     auto sample_counts = constrained_weight_sample(N_samples, related_weights, r_con_events);
     for (int sample_idx = 0; sample_idx < sample_counts.size(); sample_idx++)

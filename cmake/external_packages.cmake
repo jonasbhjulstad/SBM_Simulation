@@ -6,16 +6,6 @@ CPMFindPackage(
     GITHUB_REPOSITORY jonasbhjulstad/Static_RNG
     GIT_TAG master
 )
-# find_package(Static_RNG REQUIRED)
-
-CPMFindPackage(
-    NAME tinymt
-    GITHUB_REPOSITORY tueda/tinymt-cpp
-    GIT_TAG master
-    OPTIONS
-    "BUILD_TESTING OFF"
-    "POSITION_INDEPENDENT_CODE ON"
-)
 find_package(Boost 1.78 REQUIRED COMPONENTS date_time HINTS ${PYTHON_ENV_CMAKE_MODULE_DIR})
 
 set(cppitertools_INSTALL_CMAKE_DIR share)
@@ -43,7 +33,9 @@ CPMFindPackage(NAME Dataframe
 CPMFindPackage(NAME Buffer_Routines
     GITHUB_REPOSITORY jonasbhjulstad/Sycl_Buffer_Routines
     GIT_TAG master)
-
+CPMFindPackage(NAME SBM_Graph
+    GITHUB_REPOSITORY jonasbhjulstad/SBM_Graph
+    GIT_TAG master)
 
 CPMFindPackage(NAME SBM_Database
     GITHUB_REPOSITORY jonasbhjulstad/SBM_Database
@@ -52,6 +44,8 @@ CPMFindPackage(NAME SBM_Database
     #-fPIC
     "CMAKE_POSITION_INDEPENDENT_CODE ON"
     )
+
+set(${PROJECT_NAME}_CUSTOM_DEPENDENCIES Static_RNG::Static_RNG Dataframe::Dataframe Buffer_Routines::Buffer_Routines SBM_Graph::SBM_Graph SBM_Database::SBM_Database)
 
 find_package(TBB REQUIRED)
 include(FindThreads)

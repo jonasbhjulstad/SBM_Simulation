@@ -1,11 +1,12 @@
 
 function(default_configure_target target_name)
-    target_link_libraries(${target_name} PUBLIC -ldl -lpq Static_RNG::Static_RNG Buffer_Routines::Buffer_Routines)
+    target_link_libraries(${target_name} PUBLIC -ldl -lpq ${SBM_Simulation_CUSTOM_DEPENDENCIES})
     target_link_libraries(${target_name} PUBLIC TBB::tbb ${TINY_ORM_LIBRARIES})
     target_compile_options(${target_name} PUBLIC -fsycl ${SYCL_CUSTOM_FLAGS} -fPIC)
     target_compile_options(${target_name} PUBLIC ${DEFAULT_WARNING_FLAGS} ${SBM_SIMULATION_DEFAULT_FLAGS})
     target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${SBM_SIMULATION_INCLUDE_DIR}> $<INSTALL_INTERFACE:include>)
     target_link_options(${target_name} PUBLIC -fsycl ${SYCL_CUSTOM_FLAGS} ${SBM_SIMULATION_DEFAULT_FLAGS})
+    target_compile_features(${target_name} PUBLIC cxx_std_20)
     if (${ENABLE_CLANG_TIDY})
     set_target_properties(${target_name} PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
     endif()

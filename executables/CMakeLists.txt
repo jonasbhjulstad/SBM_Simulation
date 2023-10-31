@@ -1,0 +1,3 @@
+
+add_default_executable(Graph_Generation)
+target_link_libraries(Graph_Generation PUBLIC SBM_Simulation)

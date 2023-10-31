@@ -1,163 +1,169 @@
 #ifndef SBM_SIMULATION_SIMULATION_TABLES_HPP
 #define SBM_SIMULATION_SIMULATION_TABLES_HPP
 #include <Dataframe/Dataframe.hpp>
-#include <SBM_Simulation/Epidemiological/SIR_Types.hpp>
+#include <SBM_Simulation/Types/SIR_Types.hpp>
 #include <orm/db.hpp>
 #include <ranges>
-namespace SBM_Database
-{
+namespace SBM_Database {
 
-    void create_simulation_tables()
-    {
-        Orm::DB::statement(
-            "CREATE TABLE IF NOT EXISTS community_state(p_out INTEGER NOT NULL,graph INTEGER NOT "
-            "NULL,simulation "
-            "INTEGER NOT NULL,t INTEGER NOT NULL, community INTEGER NOT NULL, state INTEGER[3], "
-            "PRIMARY KEY(p_out, graph, simulation, t, community))");
 
-        Orm::DB::statement(
-            "CREATE TABLE IF NOT EXISTS connection_events(p_out INTEGER NOT NULL,graph INTEGER NOT "
-            "NULL,simulation "
-            "INTEGER NOT NULL,t INTEGER NOT NULL, connection INTEGER NOT NULL, events INTEGER NOT "
-            "NULL, "
-            "PRIMARY KEY(p_out, graph, simulation, t, connection))");
-        Orm::DB::statement(
-            "CREATE TABLE IF NOT EXISTS infection_events(p_out INTEGER NOT NULL,graph INTEGER NOT "
-            "NULL,simulation "
-            "INTEGER NOT NULL,t INTEGER NOT NULL, connection INTEGER NOT NULL, events INTEGER NOT "
-            "NULL, PRIMARY KEY(p_out, graph, simulation, t, connection))");
+void community_state_insert(uint32_t p_out, uint32_t graph,
+                            Dataframe::Dataframe_t<State_t, 3> &df,
+                            uint32_t t_offset = 0) {
+  auto N_sims = df.size();
+  auto Nt = df[0].size();
+  auto N_communities = df[0][0].size();
+  uint32_t N_rows = N_sims * Nt * N_communities;
+  QVector<QVector<QVariant>> rows(N_rows);
 
-        auto p_I_table_create = [](auto postfix)
-        {
-            auto str = "CREATE TABLE IF NOT EXISTS p_Is_" + std::string(postfix) + "(p_out INTEGER NOT NULL,graph INTEGER NOT NULL,simulation "
-                                                                                   "INTEGER NOT NULL,t INTEGER NOT NULL, connection INTEGER NOT NULL, p_I INTEGER NOT NULL, "
-                                                                                   "PRIMARY KEY(p_out, graph, simulation, t, connection))";
-            Orm::DB::statement(str.c_str());
-        };
-
-        for (auto &&control_type : {"Uniform", "Community"})
-        {
-            for (auto &&sim_type : {"Excitation", "Validation"})
-            {
-                p_I_table_create(control_type + std::string("_") + sim_type);
-            }
-        }
-
-        Orm::DB::statement(
-            "CREATE TABLE IF NOT EXISTS sim_params("
-            "p_out_idx INTEGER NOT NULL,"
-            "N_pop INTEGER NOT NULL,"
-            "p_in_value REAL NOT NULL,"
-            "p_out_value REAL NOT NULL,"
-            "N_graphs INTEGER NOT NULL,"
-            "N_sims INTEGER NOT NULL,"
-            "Nt INTEGER NOT NULL,"
-            "Nt_alloc INTEGER NOT NULL,"
-            "seed INTEGER NOT NULL,"
-            "p_I_min REAL NOT NULL,"
-            "p_I_max REAL NOT NULL,"
-            "p_out_idx INTEGER NOT NULL,"
-            "p_R REAL NOT NULL,"
-            "p_I0 REAL NOT NULL,"
-            "p_R0 REAL NOT NULL,"
-            "PRIMARY KEY (p_out)");
-        Orm::DB::statement(
-            "CREATE TABLE IF NOT EXISTS N_communities("
-            "p_out_idx INTEGER NOT NULL,"
-            "graph INTEGER NOT NULL,"
-            "simulation INTEGER NOT NULL,"
-            "communities INTEGER NOT NULL,"
-            "PRIMARY KEY(p_out, graph, simulation))");
+  for (int sim_id = 0; sim_id < N_sims; sim_id++) {
+    for (int t = 0; t < Nt; t++) {
+      for (int community = 0; community < N_communities; community++) {
+        auto row_ind = sim_id * Nt * N_communities + t * N_communities +
+                       community + t_offset * N_communities;
+        rows[row_ind] = {p_out,graph,sim_id,t, community};
+      }
     }
+  }
+  Orm::DB::table("community_state")
+      ->insert(
+          QVector<QString>{"p_out", "graph", "simulation", "t", "community"},
+          rows);
+}
 
-    void community_state_insert(uint32_t p_out, uint32_t graph, Dataframe::Dataframe_t<State_t, 4> &df)
-    {
-        auto N_sims = df.size();
-        auto Nt = df[0].size();
-        auto N_communities = df[0][0].size();
-        QVector<Orm::WhereItem> row_inds;
-        QVector<QVariantMap> row_datas;
-        uint32_t N_rows = N_sims * Nt * N_communities;
-        row_inds.reserve(N_rows);
-        row_datas.reserve(N_rows);
-        for (const auto &[sim_id, sim_df] : ranges::views::enumerate(df.data))
-        {
-            for (const auto &[t, t_df] : ranges::views::enumerate(sim_df.data))
-            {
-                for (const auto &[community, state] : ranges::views::enumerate(t_df.data))
-                {
-                    row_inds.push_back({{"p_out", p_out}, {"graph", graph}, {"simulation", sim_id}, {"t", t}});
-                row_datas.push_back({"community", QVariant::fromValue(QVector({community})});
-                }
-            }
-        }
-        Orm::DB::table("community_state")->insert(QVector<QString>{"p_out", "graph", "simulation", "t", "community"}, rows);
+template <typename T = uint32_t>
+void connection_insert(const QString &table_name, uint32_t p_out,
+                       uint32_t graph, Dataframe::Dataframe_t<T, 3> &df,
+                       uint32_t t_offset = 0) {
+  auto N_sims = df.size();
+  auto Nt = df[0].size();
+  auto N_communities = df[0][0].size();
+
+
+  uint32_t N_rows = N_sims * Nt * N_communities;
+  QVector<QVector<QVariant>> rows(N_rows);
+
+  for (int sim_id = 0; sim_id < N_sims; sim_id++) {
+    for (int t = 0; t < Nt; t++) {
+      for (int community = 0; community < N_communities; community++) {
+                auto row_ind = sim_id * Nt * N_communities + t * N_communities +
+                       community + t_offset * N_communities;
+                auto community = df[sim_id][t][community];
+                rows[row_ind] = {{p_out, graph, sim_id, t, community}};
+      }
     }
+  }
+  Orm::DB::table(table_name)
+      ->insert(
+          QVector<QString>{"p_out", "graph", "simulation", "t", "community"},
+          rows);
+}
 
-    template <typename T = uint32_t>
-    void connection_insert(const QString &table_name, uint32_t p_out, uint32_t graph, Dataframe::Dataframe_t<T, 4> &df)
-    {
-        auto N_sims = df.size();
-        auto Nt = df[0].size();
-        auto N_communities = df[0][0].size();
-        QVector<Orm::WhereItem> row_inds;
-        QVector<QVariantMap> row_datas;
-        uint32_t N_rows = N_sims * Nt * N_communities;
-        row_inds.reserve(N_rows);
-        row_datas.reserve(N_rows);
-        for (const auto &[sim_id, sim_df] : ranges::views::enumerate(df.data))
-        {
-            for (const auto &[t, t_df] : ranges::views::enumerate(sim_df.data))
-            {
-                for (const auto &[community, state] : ranges::views::enumerate(t_df.data))
-                {
-                    row_inds.push_back({{"p_out", p_out}, {"graph", graph}, {"simulation", sim_id}, {"t", t}});
-                row_datas.push_back({"community", QVariant::from_value(QVector({community})});
-                }
-            }
-        }
-        Orm::DB::table(table_name)->insert(QVector<QString>{"p_out", "graph", "simulation", "t", "community"}, rows);
+template <typename T>
+Dataframe::Dataframe_t<uint32_t, 3>
+connection_read(const QString &table_name, uint32_t p_out, uint32_t graph,
+                uint32_t N_sims, uint32_t Nt, uint32_t N_cols);
+template <>
+Dataframe::Dataframe_t<uint32_t, 3>
+connection_read(const QString &table_name, uint32_t p_out, uint32_t graph,
+                uint32_t N_sims, uint32_t Nt, uint32_t N_cols) {
+  QVector<QString> columns_qt;
+  columns_qt.reserve(columns.size());
+  for (const auto &col : columns) {
+    columns_qt.push_back(col.c_str());
+  }
+  auto query = Orm::DB::table(table_name)
+                   ->where({{"p_out", p_out}, {"graph", graph}})
+                   .select(columns_qt);
+  Dataframe::Dataframe_t<uint32_t, 3> result({N_sims, Nt, N_cols});
+  uint32_t sim = 0;
+  uint32_t t = 0;
+  uint32_t col = 0;
+  QVector<QVariant> row;
+  while (query.next()) {
+    row = query.value(0).toList();
+    result[sim][t][col] = row[0].toInt();
+    col++;
+    if (col == N_cols) {
+      col = 0;
+      t++;
+      if (t == Nt) {
+                t = 0;
+                sim++;
+      }
     }
-    void sim_param_insert(const QJsonDocument &sim_param)
-    {
-        // convert QJsonDocument to QVariant
-        QVariantMap sim_param_map = sim_param.toVariant().toMap();
-        QVector<QVariant> N_communities = sim_param_map["N_communities"].toList().toVector();
-        auto p_out_idx = sim_param_map["p_out_idx"].toInt();
-        // drop N_communities from sim_param_map
-        sim_param_map.remove("N_communities");
-        // insert sim_param_map into sim_params table
-        Orm::DB::table("sim_params")->insert(sim_param_map);
+  }
 
-        Orm::DB::table("N_communities")->insert({"p_out_idx", p_out_idx}, N_communities);
+  return result;
+}
+
+template <>
+Dataframe::Dataframe_t<float, 3>
+connection_read(const QString &table_name, uint32_t p_out, uint32_t graph,
+                uint32_t N_sims, uint32_t Nt, uint32_t N_cols) {
+  QVector<QString> columns_qt;
+  columns_qt.reserve(columns.size());
+  for (const auto &col : columns) {
+    columns_qt.push_back(col.c_str());
+  }
+  auto query = Orm::DB::table(table_name)
+                   ->where({{"p_out", p_out}, {"graph", graph}})
+                   .select(columns_qt);
+  Dataframe::Dataframe_t<uint32_t, 3> result({N_sims, Nt, N_cols});
+  uint32_t sim = 0;
+  uint32_t t = 0;
+  uint32_t col = 0;
+  QVector<QVariant> row;
+  while (query.next()) {
+    row = query.value(0).toList();
+    result[sim][t][col] = row[0].toDouble();
+    col++;
+    if (col == N_cols) {
+      col = 0;
+      t++;
+      if (t == Nt) {
+                t = 0;
+                sim++;
+      }
     }
+  }
 
-    QJsonDocument sim_param_read(uint32_t p_out)
-    {
-        auto sim_param = Orm::DB::table("sim_params")->where("p_out_idx", p_out)->first();
-        auto N_communities = Orm::DB::table("N_communities")->where("p_out_idx", p_out)->get();
-        sim_param["N_communities"] = N_communities;
-        return sim_param;
+  return result;
+}
+
+void sim_param_insert(const QJsonDocument &sim_param) {
+  QVariantMap sim_param_map = sim_param.toVariant().toMap();
+  auto p_out_id = sim_param_map["p_out_id"].toInt();
+  Orm::DB::table("simulation_parameters")->insert(sim_param_map);
+}
+
+Sim_Param sim_param_read(uint32_t p_out) {
+  auto sim_param_json = Orm::DB::table("simulation_parameters")
+                            ->whereEq("p_out_id", p_out)
+                            ->first();
+
+  // auto N_communities = Orm::DB::table("N_communities")->whereEq("p_out_id",
+  // p_out)->get();
+  return Sim_Param::from_json(sim_param_json);
+}
+
+void drop_simulation_tables() {
+  Orm::DB::statement("DROP TABLE IF EXISTS community_state");
+  Orm::DB::statement("DROP TABLE IF EXISTS connection_events");
+  Orm::DB::statement("DROP TABLE IF EXISTS infection_events");
+  auto p_I_table_drop = [](auto postfix) {
+    Orm::DB::statement(
+        ("DROP TABLE IF EXISTS p_Is_" + std::string(postfix)).c_str());
+  };
+  for (auto &&control_type : {"Uniform", "Community"}) {
+    for (auto &&sim_type : {"Excitation", "Validation"}) {
+      p_I_table_drop(control_type + std::string("_") + sim_type);
     }
+  }
 
-    void drop_simulation_tables()
-    {
-        Orm::DB::statement("DROP TABLE IF EXISTS community_state");
-        Orm::DB::statement("DROP TABLE IF EXISTS connection_events");
-        Orm::DB::statement("DROP TABLE IF EXISTS infection_events");
-        auto p_I_table_drop = [](auto postfix)
-        { Orm::DB::statement(("DROP TABLE IF EXISTS p_Is_" + std::string(postfix)).c_str()); };
-        for (auto &&control_type : {"Uniform", "Community"})
-        {
-            for (auto &&sim_type : {"Excitation", "Validation"})
-            {
-                p_I_table_drop(control_type + std::string("_") + sim_type);
-            }
-        }
-
-        Orm::DB::statement("DROP TABLE IF EXISTS sim_params");
-        Orm::DB::statement("DROP TABLE IF EXISTS N_communities");
-    }
+  Orm::DB::statement("DROP TABLE IF EXISTS simulation_parameters");
+  Orm::DB::statement("DROP TABLE IF EXISTS N_communities");
+}
 } // namespace SBM_Database
 
 #endif

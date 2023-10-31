@@ -1,5 +1,5 @@
 #include <SBM_Simulation/Database/Simulation_Tables.hpp>
-#include <SBM_Simulation/Simulation/Sim_Types.hpp>
+#include <SBM_Simulation/Types/Sim_Types.hpp>
 #include <array>
 #include <doctest/doctest.h>
 #include <filesystem>
@@ -14,7 +14,7 @@ void sim_param_test()
     uint32_t N_pop = 100;
     uint32_t N_graphs = 10;
     const std::vector<int32_t> &N_communities = 1;
-    uint32_t p_out_idx = 2;
+    uint32_t p_out_id = 2;
     float p_in = .1;
     float p_out = .1;
     uint32_t N_sims = 10;
@@ -31,7 +31,7 @@ void sim_param_test()
         N_pop,
         N_graphs,
         N_communities,
-        p_out_idx,
+        p_out_id,
         p_in,
         p_out,
         N_sims,
@@ -44,7 +44,7 @@ void sim_param_test()
         p_I0,
         p_R0);
     sim_param_insert(sim_param);
-    auto sim_param_2 = sim_param_read(p_out_idx);
+    auto sim_param_2 = sim_param_read(p_out_id);
     CHECK(sim_param_2["N_pop"] == N_pop);
     CHECK(sim_param_2["N_graphs"] == N_graphs);
     CHECK(sim_param_2["p_in"] == p_in);

@@ -1,6 +1,5 @@
 #ifndef SIR_TYPES_HPP
 #define SIR_TYPES_HPP
-#include <SBM_Simulation/Graph/Graph_Types.hpp>
 #include <array>
 #include <cstdint>
 #include <fstream>
@@ -35,8 +34,6 @@ struct State_t : public std::array<uint32_t, 3>
     return os;
   }
 
-
-  bool is_valid(uint32_t N_pop) const;
   static State_t from_string(const std::string &str, bool brackets = true)
   {
     // comes on the form '{1,2,3}'
@@ -79,17 +76,13 @@ struct State_t : public std::array<uint32_t, 3>
     }
     return ss.str();
   }
+
+  bool is_valid(uint32_t N_pop) const
+  {
+    return ((*this)[0] + (*this)[1] + (*this)[2]) <= N_pop;
+  }
 };
 
-struct Inf_Sample_Data_t
-{
-  uint32_t community_idx;
-  uint32_t N_infected;
-  uint32_t seed;
-  std::vector<uint32_t> events;
-  std::vector<uint32_t> indices;
-  std::vector<uint32_t> weights;
-};
 enum SIR_State : unsigned char
 {
   SIR_INDIVIDUAL_S = 0,

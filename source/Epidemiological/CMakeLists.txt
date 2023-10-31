@@ -1,5 +1,4 @@
-add_default_library(SIR_Dynamics)
-target_link_libraries(SIR_Dynamics PUBLIC Sim_Buffers)
-
-add_library(SIR_Types SIR_Types.cpp)
-target_include_directories(SIR_Types PUBLIC $<BUILD_INTERFACE:${SBM_SIMULATION_INCLUDE_DIR}> $<INSTALL_INTERFACE:include>)
+file(GLOB EPIDEMIOLOGICAL_SRC "*.cpp")
+add_library(Epidemiological ${EPIDEMIOLOGICAL_SRC})
+default_configure_target(Epidemiological)
+target_link_libraries(Epidemiological PUBLIC SBM_Graph::SBM_Graph ${PROJECT_NAME}_Utils ${PROJECT_NAME}_Types)

@@ -1,3 +1,4 @@
-add_default_library(Validation)
-add_default_library(String_Manipulation)
-add_default_library(math)
+file(GLOB UTILS_SRC *.cpp)
+
+add_library(${PROJECT_NAME}_Utils ${UTILS_SRC})
+default_configure_target(${PROJECT_NAME}_Utils)
