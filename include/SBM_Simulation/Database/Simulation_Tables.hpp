@@ -6,57 +6,62 @@
 #include <ranges>
 namespace SBM_Database {
 
-
-void community_state_insert(uint32_t p_out, uint32_t graph,
-                            Dataframe::Dataframe_t<State_t, 3> &df,
-                            uint32_t t_offset = 0) {
-  auto N_sims = df.size();
-  auto Nt = df[0].size();
-  auto N_communities = df[0][0].size();
-  uint32_t N_rows = N_sims * Nt * N_communities;
-  QVector<QVector<QVariant>> rows(N_rows);
-
-  for (int sim_id = 0; sim_id < N_sims; sim_id++) {
-    for (int t = 0; t < Nt; t++) {
-      for (int community = 0; community < N_communities; community++) {
-        auto row_ind = sim_id * Nt * N_communities + t * N_communities +
-                       community + t_offset * N_communities;
-        rows[row_ind] = {p_out,graph,sim_id,t, community};
-      }
-    }
-  }
-  Orm::DB::table("community_state")
-      ->insert(
-          QVector<QString>{"p_out", "graph", "simulation", "t", "community"},
-          rows);
-}
-
 template <typename T = uint32_t>
-void connection_insert(const QString &table_name, uint32_t p_out,
+void connection_upsert(const QString &table_name, uint32_t p_out,
                        uint32_t graph, Dataframe::Dataframe_t<T, 3> &df,
                        uint32_t t_offset = 0) {
   auto N_sims = df.size();
   auto Nt = df[0].size();
   auto N_communities = df[0][0].size();
 
-
   uint32_t N_rows = N_sims * Nt * N_communities;
   QVector<QVector<QVariant>> rows(N_rows);
 
   for (int sim_id = 0; sim_id < N_sims; sim_id++) {
     for (int t = 0; t < Nt; t++) {
-      for (int community = 0; community < N_communities; community++) {
-                auto row_ind = sim_id * Nt * N_communities + t * N_communities +
-                       community + t_offset * N_communities;
-                auto community = df[sim_id][t][community];
-                rows[row_ind] = {{p_out, graph, sim_id, t, community}};
+      for (int connection = 0; connection < N_communities; connection++) {
+        auto row_ind = sim_id * Nt * N_communities + t * N_communities +
+                       connection + t_offset * N_communities;
+        auto connection_value = df[sim_id][t][connection];
+        Orm::DB::table(table_name)
+            ->upsert({{{"p_out", p_out},
+                       {"graph", graph},
+                       {"simulation", sim_id},
+                       {"t", t},
+                       {"connection", connection},
+                       {"value", connection_value}}},
+                     {"p_out", "graph", "simulation", "t", "community"},
+                     {"value"});
       }
     }
   }
-  Orm::DB::table(table_name)
-      ->insert(
-          QVector<QString>{"p_out", "graph", "simulation", "t", "community"},
-          rows);
+}
+
+void community_state_upsert(uint32_t p_out, uint32_t graph,
+                            Dataframe::Dataframe_t<State_t, 3> &df,
+                            uint32_t t_offset = 0) {
+  auto N_sims = df.size();
+  auto Nt = df[0].size();
+  auto N_communities = df[0][0].size();
+  uint32_t N_rows = N_sims * Nt * N_communities;
+
+  for (int sim_id = 0; sim_id < N_sims; sim_id++) {
+    for (int t = 0; t < Nt; t++) {
+      for (int community = 0; community < N_communities; community++) {
+        Orm::DB::table("community_state")
+            ->upsert({{{"p_out", p_out},
+                       {"graph", graph},
+                       {"simulation", sim_id},
+                       {"t", t},
+                       {"community", community},
+                       {"S", df[sim_id][t][community][0]},
+                       {"I", df[sim_id][t][community][1]},
+                       {"R", df[sim_id][t][community][2]}}},
+                     {"p_out", "graph", "simulation", "t", "community"},
+                     {"S", "I", "R"});
+      }
+    }
+  }
 }
 
 template <typename T>
@@ -88,8 +93,8 @@ connection_read(const QString &table_name, uint32_t p_out, uint32_t graph,
       col = 0;
       t++;
       if (t == Nt) {
-                t = 0;
-                sim++;
+        t = 0;
+        sim++;
       }
     }
   }
@@ -122,8 +127,8 @@ connection_read(const QString &table_name, uint32_t p_out, uint32_t graph,
       col = 0;
       t++;
       if (t == Nt) {
-                t = 0;
-                sim++;
+        t = 0;
+        sim++;
       }
     }
   }
@@ -147,23 +152,6 @@ Sim_Param sim_param_read(uint32_t p_out) {
   return Sim_Param::from_json(sim_param_json);
 }
 
-void drop_simulation_tables() {
-  Orm::DB::statement("DROP TABLE IF EXISTS community_state");
-  Orm::DB::statement("DROP TABLE IF EXISTS connection_events");
-  Orm::DB::statement("DROP TABLE IF EXISTS infection_events");
-  auto p_I_table_drop = [](auto postfix) {
-    Orm::DB::statement(
-        ("DROP TABLE IF EXISTS p_Is_" + std::string(postfix)).c_str());
-  };
-  for (auto &&control_type : {"Uniform", "Community"}) {
-    for (auto &&sim_type : {"Excitation", "Validation"}) {
-      p_I_table_drop(control_type + std::string("_") + sim_type);
-    }
-  }
-
-  Orm::DB::statement("DROP TABLE IF EXISTS simulation_parameters");
-  Orm::DB::statement("DROP TABLE IF EXISTS N_communities");
-}
 } // namespace SBM_Database
 
 #endif
