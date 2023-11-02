@@ -14,9 +14,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors")
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/build)
 #export compile commands
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
+if (NOT TARGET ${PROJECT_NAME})
 # ---- Include guards ----
-
+set(SBM_Database_Migrations_DIR "/home/deb/Documents/SBM_database_migrations/build")
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
   message(
     FATAL_ERROR
@@ -58,7 +58,9 @@ include(FindPython3)
 find_package(Python3 COMPONENTS Interpreter Development)
 
 find_package(pybind11 CONFIG HINTS ${PYTHON_ENV_CMAKE_MODULE_DIR} REQUIRED)
+if (NOT TARGET IntelSYCL::SYCL_CXX)
 find_package(IntelSYCL CONFIG REQUIRED)
+endif()
 find_package(ortools CONFIG REQUIRED)
 include(cmake/external_packages.cmake)
 
@@ -66,13 +68,14 @@ include(cmake/external_packages.cmake)
 set(SBM_SIMULATION_DEFAULT_FLAGS -Wno-deprecated-declarations -Wno-unknown-cuda-version)
 include(cmake/default_targets.cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(SBM_DATABASE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+set(${PROJECT_NAME}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set(SBM_SIMULATION_DATA_DIR "${PROJECT_SOURCE_DIR}/data" CACHE INTERNAL "SBM_SIMULATION_DATA_DIR")
 set(SBM_SIMULATION_LOG_DIR "${PROJECT_SOURCE_DIR}/log" CACHE INTERNAL "SBM_SIMULATION_LOG_DIR")
 set(SBM_SIMULATION_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include" CACHE INTERNAL "SBM_SIMULATION_INCLUDE_DIR")
 configure_file("${PROJECT_SOURCE_DIR}/include/SBM_Simulation/Utils/path_config.hpp.in" "${PROJECT_SOURCE_DIR}/include/SBM_Simulation/Utils/path_config.hpp")
 
 # ---- Add source files ----
+add_subdirectory(test)
 add_subdirectory(source)
 add_subdirectory(binders)
 add_subdirectory(executables)
@@ -82,14 +85,6 @@ add_subdirectory(executables)
 string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
 
 set(${PROJECT_NAME}_LIBRARY_TARGETS ${PROJECT_NAME}_Types ${PROJECT_NAME}_Utils Epidemiological)
-# install export for Utils
-install(TARGETS ${${PROJECT_NAME}_LIBRARY_TARGETS}
-  EXPORT ${PROJECT_NAME}Targets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
-)
 
 packageProject(
   NAME ${PROJECT_NAME}
@@ -102,3 +97,4 @@ packageProject(
   COMPATIBILITY SameMajorVersion
   DEPENDENCIES "Eigen3 3.4.0; Dataframe 1.0.0; soci 4.2.0"
 )
+endif()

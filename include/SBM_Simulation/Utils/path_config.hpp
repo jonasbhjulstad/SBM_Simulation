@@ -8,8 +8,8 @@
 namespace SBM_Simulation {
 // const char *SBM_SIMULATION_ROOT_DIR = "";
 // const char *SBM_SIMULATION_INCLUDE_DIR = "/home/man/Documents/SBM_Simulation/include";
-    const char *SBM_SIMULATION_DATA_DIR = "/home/deb/Documents/ER_Bernoulli_Robust_MPC/data";
-    const char *SBM_SIMULATION_LOG_DIR = "/home/deb/Documents/ER_Bernoulli_Robust_MPC/log";
+    const char *SBM_SIMULATION_DATA_DIR = "/home/deb/Documents/SBM_Simulation/data";
+    const char *SBM_SIMULATION_LOG_DIR = "/home/deb/Documents/SBM_Simulation/log";
     std::string Sim_Datapath = SBM_Simulation::SBM_SIMULATION_DATA_DIR + std::string("/SIR_sim/");
     auto community_infs_filename = [](uint32_t idx){return std::string("community_infections_" + std::to_string(idx) + ".csv");};
     auto connection_infs_filename = [](uint32_t idx){return std::string("connection_infections_" + std::to_string(idx) + ".csv");};

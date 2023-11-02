@@ -7,6 +7,7 @@
 #include <SBM_Simulation/Database/Simulation_Tables.hpp>
 #include <Sycl_Buffer_Routines/Random.hpp>
 #include <Sycl_Buffer_Routines/ND_range.hpp>
+#include <Sycl_Buffer_Routines/Database.hpp>
 
 namespace SBM_Simulation {
 
@@ -25,8 +26,8 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, const Sim_Param &p,
       q, sycl::range<3>(p.N_sims, p.N_connections, p.Nt_alloc));
 
   std::string p_I_table_name = "p_Is_" + control_type + "_" + simulation_type;
-  p_Is = connection_read<float>(p_I_table_name.c_str(), p.p_out_id, p.graph_id,
-                                p.N_sims, p.Nt, p.N_connections);
+
+  p_Is = Buffer_Routines::table_to_buffer<float, 3>(q, p_I_table_name.c_str(), {{"p_out", p.p_out_id}, {"graph", p.graph_id}}, {"simulation", "t", "connection"});
   ecm = SBM_Graph::Sycl::read_ecm(q, p.p_out_id, p.graph_id,
                                   construction_events[1]);
   vcm = SBM_Graph::Sycl::read_vcm(q, p.p_out_id, p.graph_id,

@@ -64,6 +64,6 @@ Sim_Param Sim_Param::from_json(QJsonObject json) {
                    to_float(json["p_R"]),
                    to_float(json["p_I0"]),
                    to_float(json["p_R0"])};
-  return result;
+ return result;
 }
 } // namespace SBM_Simulation

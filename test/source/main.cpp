@@ -3,13 +3,14 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <orm/db.hpp>
 #include <doctest/doctest.h>
+#include <tom/tom_config.hpp>
 #include <filesystem>
 static const std::string cwd = std::filesystem::current_path().generic_string();
 
 // Ownership of a shared_ptr()
 auto manager = Orm::DB::create({
-    {"driver",                  "QSQLITE"},
-    {"database",                qEnvironmentVariable("DB_DATABASE", "./HelloWorld.sqlite3")},
+    {"driver",                  tom_config::TOM_DB_DRIVER},
+    {"database",                qEnvironmentVariable("DB_DATABASE", tom_config::TOM_DB_PATH)},
     {"foreign_key_constraints", qEnvironmentVariable("DB_FOREIGN_KEYS", "true")},
     {"check_database_exists",   false},
     /* Specifies what time zone all QDateTime-s will have, the overridden default is

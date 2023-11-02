@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION VERSION 3.22...3.27 FATAL_ERROR)
 
+if (NOT TARGET tom)
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -7,20 +8,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Initialize variables
 # ---
-
 set(Tom_ns tom)
 set(Tom_target tom)
 
 file(REAL_PATH "../../TinyORM" TinyMainDir)
 
-set(TinyOrmSourceDir "${TinyMainDir}/TinyORM")
-set(TinyOrmBuildDir "${TinyMainDir}/TinyORM-builds-cmake/build-debug")
 
 # TinyORM CMake modules (needed to set the executable version and RC file on Windows)
-list(APPEND CMAKE_MODULE_PATH "${TinyOrmSourceDir}/cmake/CommonModules")
+list(APPEND CMAKE_MODULE_PATH "${TinyOrm_SOURCE_DIR}/cmake/CommonModules")
 
 # build tree
-list(APPEND CMAKE_PREFIX_PATH "${TinyOrmBuildDir}")
+list(APPEND CMAKE_PREFIX_PATH "${TinyOrm_BINARY_DIR}")
 
 # Initialize Project Version
 # ---
@@ -28,7 +26,7 @@ list(APPEND CMAKE_PREFIX_PATH "${TinyOrmBuildDir}")
 include(TinyHelpers)
 tiny_read_version(TINY_VERSION
     TINY_VERSION_MAJOR TINY_VERSION_MINOR TINY_VERSION_PATCH TINY_VERSION_TWEAK
-    VERSION_HEADER "${TinyOrmSourceDir}/tom/include/tom/version.hpp"
+    VERSION_HEADER "${TinyOrm_SOURCE_DIR}/tom/include/tom/version.hpp"
     PREFIX TINYTOM
     HEADER_FOR "${Tom_ns}"
 )
@@ -79,21 +77,21 @@ target_compile_definitions(${Tom_target}
 
 # Find icons, tom/version.hpp, and Windows manifest file for MinGW
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    tiny_set_rc_flags("-I \"${TinyOrmSourceDir}/tom/resources\"")
+    tiny_set_rc_flags("-I \"${TinyOrm_SOURCE_DIR}/tom/resources\"")
 endif()
 
 include(TinyResourceAndManifest)
 tiny_resource_and_manifest(${Tom_target}
     OUTPUT_DIR "${TINY_BUILD_GENDIR}/tmp/"
-    RESOURCES_DIR "${TinyOrmSourceDir}/tom/resources"
+    RESOURCES_DIR "${TinyOrm_SOURCE_DIR}/tom/resources"
 )
 
 # Resolve and link dependencies
 # ---
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
-find_package(TinyOrm 0.36.3 CONFIG REQUIRED)
+# find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
+# find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
+# find_package(TinyOrm 0.36.3 CONFIG REQUIRED)
 
 # Unconditional dependencies
 target_link_libraries(${Tom_target}
@@ -101,3 +99,6 @@ target_link_libraries(${Tom_target}
         Qt${QT_VERSION_MAJOR}::Core
         TinyOrm::TinyOrm
 )
+else()
+    
+endif()
