@@ -45,18 +45,15 @@ CPMFindPackage(NAME SBM_Graph
     GITHUB_REPOSITORY jonasbhjulstad/SBM_Graph
     GIT_TAG tom)
 
-find_package(SBM_Database_Migrations REQUIRED CONFIG)
+# CPMFindPackage(NAME SBM_Database_Migrations
+    # GITHUB_REPOSITORY jonasbhjulstad/SBM_database_migrations
+    # GIT_TAG master)
+find_package(SBM_Database_Migrations REQUIRED)
 
-# CPMFindPackage(NAME SBM_Database
-#     GITHUB_REPOSITORY jonasbhjulstad/SBM_Database
-#     GIT_TAG master
-#     OPTIONS
-#     #-fPIC
-#     "CMAKE_POSITION_INDEPENDENT_CODE ON"
-#     )
+find_package(ortools REQUIRED CONFIG)
 
 find_package(TBB REQUIRED)
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
 # find_package(casadi REQUIRED HINTS "/home/man/mambaforge/envs/gt/lib/cmake/casadi")
-set(${PROJECT_NAME}_EXTERNAL_PACKAGES ${TINY_ORM_LIBRARIES} Static_RNG::Static_RNG Dataframe::Dataframe Buffer_Routines::Buffer_Routines SBM_Graph::SBM_Graph TBB::tbb Eigen3::Eigen cppitertools::cppitertools SBM_Database_Migrations::SBM_Database_Migrations)
+set(${PROJECT_NAME}_EXTERNAL_PACKAGES ${TINY_ORM_LIBRARIES} Static_RNG::Static_RNG Dataframe::Dataframe Buffer_Routines::Buffer_Routines SBM_Graph::SBM_Graph TBB::tbb Eigen3::Eigen cppitertools::cppitertools SBM_Database_Migrations::SBM_Database_Migrations ortools::ortools)
 endif()

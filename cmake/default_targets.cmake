@@ -9,6 +9,10 @@ function(default_configure_target target_name)
     endif()
 endfunction()
 
+function(link_default_libraries target_name)
+target_link_libraries(${target_name} PRIVATE ${${PROJECT_NAME}_EXTERNAL_PACKAGES})
+endfunction()
+
 function(add_binder source_file)
     pybind11_add_module(${source_file} "${source_file}.cpp")
     default_configure_target(${source_file})

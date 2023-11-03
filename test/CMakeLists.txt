@@ -7,25 +7,6 @@ if (NOT TARGET ${PROJECT_NAME})
 
 option(ENABLE_TEST_COVERAGE "Enable test coverage" OFF)
 option(TEST_INSTALLED_VERSION "Test the version found by find_package" OFF)
-if(NOT ${IntelSYCL_FOUND})
-find_package(IntelSYCL CONFIG REQUIRED)
-endif()
-
-option(ENABLE_CUDA "Enable CUDA" ON)
-# ---- Add dependencies via CPM ----
-# see https://github.com/TheLartians/CPM.cmake for more info
-# add_link_options("-v")
-if (${ENABLE_CUDA})
-    # add_link_options(--cuda-path="/home/man/cuda_remote")
-    # add_compile_options(--cuda-path="/home/man/cuda_remote")
-    set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -fsycl -fsycl-targets=nvptx64-nvidia-cuda)
-    set(SBM_SIMULATION_TESTS_COMPILE_DEFINITIONS ${SBM_SIMULATION_TESTS_COMPILE_DEFINITIONS} -DSBM_SIMULATION_TESTS_ENABLE_CUDA)
-    # set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -fsycl-targets=nvidia_gpu_sm_86)
-    # add_link_options(-fsycl -fsycl-targets=nvidia_gpu_sm_86)
-    # add_compile_options(-Xsycl-target-backend=nvptx64-nvidia-cuda)
-    # add_link_options(-Xsycl-target-backend=nvptx64-nvidia-cuda --offload-arch=sm_86)
-    # set(SYCL_CUSTOM_FLAGS ${SYCL_CUSTOM_FLAGS} -Xcuda-ptxas "--verbose")
-endif()
 
 # --- Import tools ----
 
@@ -38,7 +19,6 @@ find_package(${PARENT_PROJECT_NAME} REQUIRED)
 else()
 CPMAddPackage(NAME ${PARENT_PROJECT_NAME} SOURCE_DIR ${PROJECT_SOURCE_DIR}/..)
 endif()
-
 
 # ---- Add SBM_DatabaseTests ----
 

@@ -1,8 +1,9 @@
 
+#include <execution>
 #include <SBM_Simulation/Simulation/Sim_Infection_Sampling.hpp>
 #include <Sycl_Buffer_Routines/Buffer_Utils.hpp>
+#include <Sycl_Buffer_Routines/Random.hpp>
 #include <SBM_Simulation/Utils/Math.hpp>
-#include <execution>
 #include <iostream>
 #include <random>
 #define INF_MAX_SAMPLE_LIMIT 10000
@@ -172,7 +173,7 @@ std::tuple<std::vector<uint32_t>,std::vector<uint32_t>> get_related_connections(
     }
     return std::make_tuple(connection_indices, connection_weights);
 }
-std::vector<uint32_t> get_related_events(size_t c_idx, const std::vector<Edge_t> &ccm, const std::vector<uint32_t> &events)
+std::vector<uint32_t> get_related_events(size_t c_idx, const std::vector<Weighted_Edge_t> &ccm, const std::vector<uint32_t> &events)
 {
     auto [r_con, rw] = get_related_connections(c_idx, ccm);
     std::vector<uint32_t> r_con_events(r_con.size(), 0);
@@ -241,7 +242,7 @@ std::vector<uint32_t> sample_community(const auto &related_connections, const au
     return result;
 }
 
-std::vector<uint32_t> sample_timestep(const std::vector<uint32_t> &events, const std::vector<int> &delta_I, const std::vector<Edge_t> &ccm)
+std::vector<uint32_t> sample_timestep(const std::vector<uint32_t> &events, const std::vector<int> &delta_I, const Dataframe::Dataframe_t<Weighted_Edge_t,1> &ccm)
 {
     auto N_communities = delta_I.size();
     auto N_connections = ccm.size();
@@ -271,7 +272,7 @@ std::vector<uint32_t> sample_timestep(const std::vector<uint32_t> &events, const
     assert(merged_infs == true_infs && "Sampled infections do not match true infections");
     return merged_result;
 }
-Dataframe::Dataframe_t<uint32_t, 2> sample_infections(const Dataframe::Dataframe_t<State_t, 2> &community_state, const Dataframe::Dataframe_t<uint32_t, 2> &events, const std::vector<Edge_t> &ccm, uint32_t seed)
+Dataframe::Dataframe_t<uint32_t, 2> sample_infections(const Dataframe::Dataframe_t<State_t, 2> &community_state, const Dataframe::Dataframe_t<uint32_t, 2> &events, const Dataframe::Dataframe_t<Weighted_Edge_t,1> &ccm, uint32_t seed)
 {
     auto N_connections = ccm.size();
     auto delta_Is = get_delta_Is(community_state);
@@ -285,7 +286,7 @@ Dataframe::Dataframe_t<uint32_t, 2> sample_infections(const Dataframe::Dataframe
 }
 
 
-Dataframe::Dataframe_t<uint32_t, 3> sample_infections(const Dataframe::Dataframe_t<State_t, 3> &community_state, const Dataframe::Dataframe_t<uint32_t, 3> &events, const std::vector<Edge_t> &ccm, uint32_t seed)
+Dataframe::Dataframe_t<uint32_t, 3> sample_infections(const Dataframe::Dataframe_t<State_t, 3> &community_state, const Dataframe::Dataframe_t<uint32_t, 3> &events, const Dataframe::Dataframe_t<Weighted_Edge_t,1> &ccm, uint32_t seed)
 {
     Dataframe::Dataframe_t<uint32_t, 3> result(events.get_ranges());
     auto df_pack = Dataframe::dataframe_tie(community_state, events);
@@ -297,15 +298,15 @@ Dataframe::Dataframe_t<uint32_t, 3> sample_infections(const Dataframe::Dataframe
     });
     return result;
 }
-Dataframe::Dataframe_t<uint32_t, 4> sample_infections(const Dataframe::Dataframe_t<State_t, 4> &community_state, const Dataframe::Dataframe_t<uint32_t, 4> &events, const Dataframe::Dataframe_t<Edge_t, 2> &ccm, uint32_t seed)
-{
-    Dataframe::Dataframe_t<uint32_t, 4> result(events.get_ranges());
-    auto df_pack = Dataframe::dataframe_tie(community_state, events);
-    auto seeds = Buffer_Routines::generate_seeds(df_pack.size(), seed);
-    auto N_graphs = community_state.size();
-    for(int g_idx = 0; g_idx < N_graphs; g_idx++)
-    {
-        result[g_idx] = sample_infections(community_state[g_idx], events[g_idx], ccm[g_idx], seeds[g_idx]);
-    }
-    return result;
-}
+// Dataframe::Dataframe_t<uint32_t, 4> sample_infections(const Dataframe::Dataframe_t<State_t, 4> &community_state, const Dataframe::Dataframe_t<uint32_t, 4> &events, const Dataframe::Dataframe_t<Weighted_Edge_t,1> &ccm, uint32_t seed)
+// {
+//     Dataframe::Dataframe_t<uint32_t, 4> result(events.get_ranges());
+//     auto df_pack = Dataframe::dataframe_tie(community_state, events);
+//     auto seeds = Buffer_Routines::generate_seeds(df_pack.size(), seed);
+//     auto N_graphs = community_state.size();
+//     for(int g_idx = 0; g_idx < N_graphs; g_idx++)
+//     {
+//         result[g_idx] = sample_infections(community_state[g_idx], events[g_idx], ccm[g_idx], seeds[g_idx]);
+//     }
+//     return result;
+// }

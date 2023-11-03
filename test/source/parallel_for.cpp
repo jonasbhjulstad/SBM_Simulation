@@ -3,7 +3,7 @@
 
 void parallel_for_test()
 {
-    sycl::queue q(sycl::gpu_selector_v);
+    sycl::queue q(sycl::cpu_selector_v);
     sycl::buffer<uint32_t> data(sycl::range<1>(100));
     q.submit([&](sycl::handler& h)
     {
@@ -18,7 +18,7 @@ void parallel_for_test()
 
 void nd_range_test()
 {
-sycl::queue q(sycl::gpu_selector_v);
+sycl::queue q(sycl::cpu_selector_v);
     sycl::buffer<uint32_t> data(sycl::range<1>(100));
     q.submit([&](sycl::handler& h)
     {

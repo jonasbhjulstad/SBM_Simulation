@@ -10,7 +10,7 @@ static const std::string cwd = std::filesystem::current_path().generic_string();
 // Ownership of a shared_ptr()
 auto manager = Orm::DB::create({
     {"driver",                  tom_config::TOM_DB_DRIVER},
-    {"database",                qEnvironmentVariable("DB_DATABASE", tom_config::TOM_DB_PATH)},
+    {"database",                qEnvironmentVariable("DB_DATABASE", tom_config::SQLITE3_FILENAME)},
     {"foreign_key_constraints", qEnvironmentVariable("DB_FOREIGN_KEYS", "true")},
     {"check_database_exists",   false},
     /* Specifies what time zone all QDateTime-s will have, the overridden default is

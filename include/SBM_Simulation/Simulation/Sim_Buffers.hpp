@@ -24,9 +24,9 @@ struct Sim_Buffers {
             // 3>(sycl::range<3>(1,1,1)));
   std::shared_ptr<sycl::buffer<std::pair<uint32_t, uint32_t>>>
       edges; //= std::make_shared(sycl::buffer<uint32_t>(sycl::range<1>(1)));
-  std::shared_ptr<sycl::buffer<uint32_t>>
+  std::shared_ptr<sycl::buffer<uint32_t,1>>
       ecm; // = std::make_shared(sycl::buffer<uint32_t>(sycl::range<1>(1)));
-  std::shared_ptr<sycl::buffer<uint32_t>>
+  std::shared_ptr<sycl::buffer<uint32_t,1>>
       vcm; // = std::make_shared(sycl::buffer<uint32_t,
            // 2>(sycl::range<2>(1,1)));
   std::shared_ptr<sycl::buffer<State_t, 3>>

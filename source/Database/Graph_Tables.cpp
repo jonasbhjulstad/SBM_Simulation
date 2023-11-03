@@ -76,43 +76,33 @@ std::string drop_graph_tables_str() {
   return result;
 }
 
-void edge_insert(const QString &table_name, uint32_t p_out, uint32_t graph,
+void edge_upsert(const QString &table_name, uint32_t p_out, uint32_t graph,
                  const std::vector<uint32_t> &from,
                  const std::vector<uint32_t> &to,
                  std::vector<uint32_t> weight) {
-  QVector<Orm::WhereItem> row_inds;
-  QVector<QVariantMap> row_datas;
-  row_inds.reserve(from.size());
-  row_datas.reserve(from.size());
   if (!weight.size())
   {
     weight = std::vector<uint32_t>(from.size(), 1);
   }
   QVector<QVector<QVariant>> rows(from.size());
   for (int i = 0; i < from.size(); i++) {
-    rows[i] = {(uint32_t)p_out,   (uint32_t)graph, (uint32_t)i,
-               (uint32_t) from[i], (uint32_t) to[i], (uint32_t) weight[i]};
+    Orm::DB::table("edge_connection_map")
+      ->upsert({{{"p_out", p_out}, {"graph", graph}, {"edge", i}, {"from", from[i]}, {"to", to[i]}, {"weight", weight[i]}}}, {"p_out", "graph", "edge"}, {"from", "to", "weight"});
   }
-  Orm::DB::table(table_name)
-      ->insert(
-          QVector<QString>{"p_out", "graph", "edge", "from", "to", "weight"},
-          rows);
-  Orm::DB::commit();
 }
 
-void vcm_insert(uint32_t p_out, uint32_t graph,
+void vcm_upsert(uint32_t p_out, uint32_t graph,
                 const std::vector<uint32_t> &vcm) {
   // auto N_rows = std::min<uint32_t>({10, (uint32_t)vcm.size()});
   auto N_rows = vcm.size();
   QVector<QVector<QVariant>> rows(N_rows);
   for (int i = 0; i < N_rows; i++) {
-    rows[i] = {p_out, graph, i, vcm[i]};
+    Orm::DB::table("edge_connection_map")
+      ->upsert({{{"p_out", p_out}, {"graph", graph}, {"edge", i}, {"community", vcm[i]}}}, {"p_out", "graph", "edge"}, {"community"});
   }
-  Orm::DB::table("vertex_community_map")
-      ->insert(QVector<QString>{"p_out", "graph", "vertex", "community"}, rows);
 }
 
-void ecm_insert(uint32_t p_out, uint32_t graph,
+void ecm_upsert(uint32_t p_out, uint32_t graph,
                 const std::vector<uint32_t> &ecm) {
   QVector<Orm::WhereItem> row_inds;
   QVector<QVariantMap> row_datas;
@@ -120,10 +110,9 @@ void ecm_insert(uint32_t p_out, uint32_t graph,
   row_datas.reserve(ecm.size());
   QVector<QVector<QVariant>> rows(ecm.size());
   for (int i = 0; i < ecm.size(); i++) {
-    rows[i] = {p_out, graph, i, ecm[i]};
+    Orm::DB::table("edge_connection_map")
+      ->upsert({{{"p_out", p_out}, {"graph", graph}, {"edge", i}, {"connection", ecm[i]}}}, {"p_out", "graph", "edge"}, {"connection"});
   }
-  Orm::DB::table("edge_connection_map")
-      ->insert(QVector<QString>{"p_out", "graph", "edge", "connection"}, rows);
 }
 
 std::vector<std::pair<uint32_t, uint32_t>> read_edgelist(uint32_t p_out,

@@ -15,19 +15,18 @@ std::vector<sycl::event> recover(sycl::queue &q, const Sim_Param &p,
   float p_R = p.p_R;
   uint32_t N_vertices = vertex_state.get_range()[2];
   uint32_t N_sims = p.N_sims;
-  auto Nt_alloc = vertex_state.get_range()[0] - 1;
-  auto t_alloc = t % Nt_alloc;
+  auto t_alloc = t % p.Nt_alloc;
   auto cpy_event = q.submit([&](sycl::handler &h) {
     h.depends_on(dep_event);
     auto v_prev =
         Buffer_Routines::construct_validate_accessor<SIR_State, 3,
                                                      sycl::access_mode::read>(
-            vertex_state, h, sycl::range<3>(1, N_sims, N_vertices),
+            vertex_state, h, sycl::range<3>(N_sims, 1, N_vertices),
             sycl::range<3>(t_alloc, 0, 0));
     auto v_next =
         Buffer_Routines::construct_validate_accessor<SIR_State, 3,
                                                      sycl::access_mode::write>(
-            vertex_state, h, sycl::range<3>(1, N_sims, N_vertices),
+            vertex_state, h, sycl::range<3>(N_sims,1, N_vertices),
             sycl::range<3>(t_alloc + 1, 0, 0));
     h.depends_on(dep_event);
     h.copy(v_prev, v_next);
@@ -38,18 +37,18 @@ std::vector<sycl::event> recover(sycl::queue &q, const Sim_Param &p,
     auto rng_acc = rngs.template get_access<sycl::access_mode::read_write>(h);
     auto v_acc = Buffer_Routines::construct_validate_accessor<
         SIR_State, 3, sycl::access_mode::read_write>(
-        vertex_state, h, sycl::range<3>(1, N_sims, N_vertices),
-        sycl::range<3>(t_alloc + 1, 0, 0));
+        vertex_state, h, sycl::range<3>(N_sims, 1, N_vertices),
+        sycl::range<3>(0,t_alloc + 1, 0));
     h.parallel_for(sycl::nd_range<1>(compute_range, wg_range),
                    [=](sycl::nd_item<1> it) {
                      auto sim_id = it.get_global_id();
 
                      Static_RNG::bernoulli_distribution<float> bernoulli_R(p_R);
                      for (int v_idx = 0; v_idx < N_vertices; v_idx++) {
-                       auto state_prev = v_acc[0][sim_id][v_idx];
+                       auto state_prev = v_acc[sim_id][0][v_idx];
                        if (state_prev == SIR_INDIVIDUAL_I) {
                          if (bernoulli_R(rng_acc[sim_id])) {
-                           v_acc[0][sim_id][v_idx] = SIR_INDIVIDUAL_R;
+                           v_acc[sim_id][0][v_idx] = SIR_INDIVIDUAL_R;
                          }
                        }
                      }
@@ -59,12 +58,12 @@ std::vector<sycl::event> recover(sycl::queue &q, const Sim_Param &p,
 }
 
 sycl::event initialize_vertices(sycl::queue &q, const Sim_Param &p,
-                                sycl::buffer<SIR_State, 3> &vertex_state,
-                                sycl::buffer<Static_RNG::default_rng> &rngs,
+                                std::shared_ptr<sycl::buffer<SIR_State, 3>> &vertex_state,
+                                std::shared_ptr<sycl::buffer<Static_RNG::default_rng>> &rngs,
                                 sycl::range<1> compute_range,
                                 sycl::range<1> wg_range,
                                 std::vector<sycl::event> dep_events) {
-  uint32_t N_vertices = vertex_state.get_range()[2];
+  uint32_t N_vertices = vertex_state->get_range()[2];
   float p_I0 = p.p_I0;
   float p_R0 = p.p_R0;
   auto init_event = q.submit([&](sycl::handler &h) {
@@ -72,9 +71,9 @@ sycl::event initialize_vertices(sycl::queue &q, const Sim_Param &p,
     auto v_acc =
         Buffer_Routines::construct_validate_accessor<SIR_State, 3,
                                                      sycl::access::mode::write>(
-            vertex_state, h, sycl::range<3>(1, p.N_sims, N_vertices),
+            *vertex_state, h, sycl::range<3>(p.N_sims,1, N_vertices),
             sycl::range<3>(0, 0, 0));
-    auto rng_acc = rngs.template get_access<sycl::access::mode::read_write>(h);
+    auto rng_acc = rngs->template get_access<sycl::access::mode::read_write>(h);
     h.parallel_for(
         sycl::nd_range<1>(compute_range, wg_range), [=](sycl::nd_item<1> it) {
           auto sim_id = it.get_global_id();
@@ -83,11 +82,11 @@ sycl::event initialize_vertices(sycl::queue &q, const Sim_Param &p,
             Static_RNG::bernoulli_distribution<float> bernoulli_I(p_I0);
             Static_RNG::bernoulli_distribution<float> bernoulli_R(p_R0);
             if (bernoulli_I(rng)) {
-              v_acc[0][sim_id][vertex_idx] = SIR_INDIVIDUAL_I;
+              v_acc[sim_id][0][vertex_idx] = SIR_INDIVIDUAL_I;
             } else if (bernoulli_R(rng)) {
-              v_acc[0][sim_id][vertex_idx] = SIR_INDIVIDUAL_R;
+              v_acc[sim_id][0][vertex_idx] = SIR_INDIVIDUAL_R;
             } else {
-              v_acc[0][sim_id][vertex_idx] = SIR_INDIVIDUAL_S;
+              v_acc[sim_id][0][vertex_idx] = SIR_INDIVIDUAL_S;
             }
           }
         });
@@ -115,14 +114,14 @@ std::vector<sycl::event> infect(sycl::queue &q, const Sim_Param &p,
     auto p_I_acc =
         Buffer_Routines::construct_validate_accessor<float, 3,
                                                      sycl::access::mode::read>(
-            *(b.p_Is), h, sycl::range<3>(1, N_sims, p.N_connections),
-            sycl::range<3>(t, 0, 0));
+            *(b.p_Is), h, sycl::range<3>(N_sims, 1, p.N_connections),
+            sycl::range<3>(0,t, 0));
     auto rng_acc =
         b.rngs->template get_access<sycl::access::mode::read_write>(h);
     auto v_next =
         Buffer_Routines::construct_validate_accessor<SIR_State, 3,
                                                      sycl::access_mode::write>(
-            *(b.vertex_state), h, sycl::range<3>(1, N_sims, N_vertices),
+            *(b.vertex_state), h, sycl::range<3>(N_sims, 1, N_vertices),
             sycl::range<3>(t_alloc + 1, 0, 0));
     auto e_acc = b.edges->template get_access<sycl::access::mode::read>(h);
     auto get_edge_offset = [=](auto gid) {
@@ -130,8 +129,8 @@ std::vector<sycl::event> infect(sycl::queue &q, const Sim_Param &p,
     };
     auto event_acc = Buffer_Routines::construct_validate_accessor<
         uint32_t, 3, sycl::access::mode::read_write>(
-        *(b.accumulated_events), h, sycl::range<3>(1, N_sims, p.N_connections),
-        sycl::range<3>(t_alloc, 0, 0));
+        *(b.accumulated_events), h, sycl::range<3>(N_sims, 1, p.N_connections),
+        sycl::range<3>(0,t_alloc, 0));
     const auto N_edges = b.ecm->size();
     h.parallel_for(sycl::nd_range<1>(compute_range, wg_range),
                    [=](sycl::nd_item<1> it) {
@@ -144,76 +143,24 @@ std::vector<sycl::event> infect(sycl::queue &q, const Sim_Param &p,
                      for (uint32_t edge_idx = get_edge_offset(gid[0]);
                           edge_idx < get_edge_offset(gid[0] + 1); edge_idx++) {
                        auto connection_id = ecm_acc[edge_idx];
-                       float p_I = p_I_acc[0][sim_id][connection_id];
+                       float p_I = p_I_acc[sim_id][0][connection_id];
                        bernoulli_I.p = p_I;
                        auto v_from_id = e_acc[edge_idx].first;
                        auto v_to_id = e_acc[edge_idx].second;
-                       const auto v_prev_from = v_next[0][sim_id][v_from_id];
-                       const auto v_prev_to = v_next[0][sim_id][v_to_id];
+                       const auto v_prev_from = v_next[sim_id][0][v_from_id];
+                       const auto v_prev_to = v_next[sim_id][0][v_to_id];
 
                        if ((v_prev_from == SIR_INDIVIDUAL_S) &&
                            (v_prev_to == SIR_INDIVIDUAL_I)) {
                          if (bernoulli_I(rng)) {
-                           v_next[0][sim_id][v_from_id] = SIR_INDIVIDUAL_I;
-                           event_acc[0][sim_id][connection_id] += 1;
+                           v_next[sim_id][0][v_from_id] = SIR_INDIVIDUAL_I;
+                           event_acc[sim_id][0][connection_id] += 1;
                          }
                        }
                      }
                    });
   });
 
-  // auto accumulate_event = q.submit([&](sycl::handler &h)
-  //                           {
-  //                               h.depends_on(inf_event);
-  //                               auto ecm_acc = b.ecm->template
-  //                               get_access<sycl::access::mode::read>(h); auto
-  //                               p_I_acc =
-  //                               Buffer_Routines::construct_validate_accessor<float,
-  //                               3, sycl::access::mode::read>(b.p_Is, h,
-  //                               sycl::range<3>(1, N_sims*p.N_graphs,
-  //                               p.N_connections), sycl::range<3>(t, 0,
-  //                               0)); auto rng_acc = b.rngs.template
-  //                               get_access<sycl::access::mode::read_write>(h);
-  //                               auto v_next =
-  //                               Buffer_Routines::construct_validate_accessor<SIR_State,
-  //                               3, sycl::access_mode::write>(b.vertex_state,
-  //                               h, sycl::range<3>(1, N_sims*p.N_graphs,
-  //                               N_vertices), sycl::range<3>(t_alloc + 1, 0,
-  //                               0)); auto e_offset = b.edge_offsets->template
-  //                               get_access<sycl::access::mode::read>(h); auto
-  //                               N_connections_acc = b.N_connections->template
-  //                               get_access<sycl::access::mode::read>(h); auto
-  //                               edge_event_acc =
-  //                               Buffer_Routines::construct_validate_accessor<uint8_t,
-  //                               3, sycl::access::mode::read>(b.edge_events,
-  //                               h, sycl::range<3>(1, N_sims*p.N_graphs,
-  //                               b.N_edges_tot), sycl::range<3>(t_alloc, 0,
-  //                               0)); auto accumulated_event_acc =
-  //                               Buffer_Routines::construct_validate_accessor<uint32_t,
-  //                               3,
-  //                               sycl::access::mode::read_write>(b.accumulated_events,
-  //                               h, sycl::range<3>(1, N_sims*p.N_graphs,
-  //                               p.N_connections),
-  //                               sycl::range<3>(t_alloc, 0, 0));
-  //                               h.parallel_for(sycl::nd_range<1>(p.compute_range,
-  //                               p.wg_range), [=](sycl::nd_item<1> it)
-  //                                              {
-  //         auto sim_id = it.get_global_id();
-  //         auto &rng = rng_acc[sim_id]; // was lid
-  //         auto graph_id = floor_div(sim_id, N_sims);
-  //         auto edge_start_idx = e_offset[graph_id];
-  //         auto edge_end_idx = e_offset[graph_id+1];
-  //         for (uint32_t edge_idx = edge_start_idx; edge_idx < edge_end_idx;
-  //         edge_idx++)
-  //         {
-  //             auto connection_id = ecm_acc[edge_idx];
-  //             if (edge_event_acc[0][sim_id][edge_idx])
-  //             {
-  //                 accumulated_event_acc[0][sim_id][connection_id] += 1;
-  //             }
-  //         }
-  //                                              });
-  //                           });
   return {inf_event};
 }
 } // namespace SBM_Simulation

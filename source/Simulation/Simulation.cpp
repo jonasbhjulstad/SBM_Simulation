@@ -1,7 +1,9 @@
 #include <SBM_Simulation/Database/Simulation_Tables.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
 #include <SBM_Simulation/Simulation/State_Accumulation.hpp>
+#include <SBM_Simulation/Epidemiological/SIR_Dynamics.hpp>
 #include <Sycl_Buffer_Routines/ND_range.hpp>
+#include <Dataframe/Dataframe.hpp>
 #include <chrono>
 namespace SBM_Simulation {
 Simulation_t::Simulation_t(sycl::queue &q, const Sim_Param &sim_param,
@@ -37,8 +39,8 @@ void Simulation_t::write_allocated_steps(uint32_t t,
       << "ms\n";
   t1 = t2;
 
-  auto state_df = Dataframe_t<State_t, 3>(q, b.community_state);
-  auto event_df = Dataframe_t<uint32_t, 3>(q, b.accumulated_events);
+  auto state_df = Dataframe::Dataframe_t<State_t, 3>(q, *b.community_state);
+  auto event_df = Dataframe::Dataframe_t<uint32_t, 3>(q, *b.accumulated_events);
   t2 = std::chrono::high_resolution_clock::now();
   std::cout
       << "Read graphseries: "
@@ -47,7 +49,7 @@ void Simulation_t::write_allocated_steps(uint32_t t,
   t1 = t2;
 
   auto t_offset = t - p.Nt_alloc;
-  community_state_upsert(p.p_out, p.graph, state_df, t_offset);
+  community_state_upsert(p.p_out, p.graph_id, state_df, t_offset);
   connection_upsert<uint32_t>("connection_events", p.p_out_id, p.graph_id,
                               event_df, t_offset);
 
@@ -72,15 +74,15 @@ void Simulation_t::write_initial_steps(sycl::queue &q, const Sim_Param &p,
   auto acc_event = accumulate_community_state(
       q, dep_events, b.vertex_state, b.vcm, b.community_state, compute_range,
       wg_range, p.N_sims);
-  auto state_df = Dataframe_t<State_t, 3>(q, b.community_state);
+  auto state_df = Dataframe::Dataframe_t<State_t, 3>(q, *b.community_state);
   state_df.resize_dim(2, 1);
-  community_state_upsert(p.p_out, p.graph, state_df);
+  community_state_upsert(p.p_out, p.graph_id, state_df);
 }
 
 void Simulation_t::run() {
-  if ((!compute_range[0]) || (!wg_range[0])) {
-    std::tie(compute_range, wg_range) = default_compute_range(q);
-  }
+  // if ((!compute_range[0]) || (!wg_range[0])) {
+  //   std::tie(compute_range, wg_range) = Buffer_Routines::default_compute_range(q);
+  // }
   std::vector<sycl::event> events(1);
   q.wait();
 

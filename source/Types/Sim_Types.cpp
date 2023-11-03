@@ -1,6 +1,5 @@
 #include <SBM_Simulation/Types/Sim_Types.hpp>
-namespace SBM_Simulation {
-QJsonObject Sim_Param::to_json() const {
+QJsonObject SBM_Simulation::Sim_Param::to_json() const {
 
   QJsonObject json({{"N_pop", static_cast<int>(N_pop)},
                     {"graph_id", static_cast<int>(graph_id)},
@@ -21,7 +20,7 @@ QJsonObject Sim_Param::to_json() const {
   return json;
 }
 
-Sim_Param Sim_Param::from_json(QJsonObject json) {
+SBM_Simulation::Sim_Param SBM_Simulation::Sim_Param::from_json(QJsonObject json) {
   auto to_std_vector = [](const auto &json_arr) {
     auto json_vec =
         json_arr["N_communities"].toArray().toVariantList().toVector();
@@ -64,6 +63,5 @@ Sim_Param Sim_Param::from_json(QJsonObject json) {
                    to_float(json["p_R"]),
                    to_float(json["p_I0"]),
                    to_float(json["p_R0"])};
- return result;
+  return result;
 }
-} // namespace SBM_Simulation
