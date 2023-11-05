@@ -2,7 +2,7 @@
 #include <SBM_Graph/SBM_Graph.hpp>
 #include <SBM_Simulation/Database/Simulation_Tables.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
-#include <SBM_Simulation/Types/Sim_Types.hpp>
+#include <SBM_Database/Sim_Types.hpp>
 #include <Sycl_Buffer_Routines/Buffer_Routines.hpp>
 #include <Sycl_Buffer_Routines/Buffer_Validation.hpp>
 #include <Sycl_Buffer_Routines/Profiling.hpp>

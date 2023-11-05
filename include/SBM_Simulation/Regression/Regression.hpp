@@ -2,7 +2,7 @@
 #define SBM_SIMULATION_REGRESSION_HPP
 #include <Eigen/Dense>
 #include <string>
-#include <SBM_Simulation/Types/Sim_Types.hpp>
+#include <SBM_Database/Sim_Types.hpp>
 
 Eigen::MatrixXf openData(const std::string& fileToOpen);
 

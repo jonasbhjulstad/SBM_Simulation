@@ -3,7 +3,7 @@
 #include <CL/sycl.hpp>
 #include <SBM_Simulation/Simulation/Sim_Buffers.hpp>
 #include <Static_RNG/distributions.hpp>
-#include <SBM_Simulation/Types/Sim_Types.hpp>
+#include <SBM_Database/Sim_Types.hpp>
 #include <Sycl_Buffer_Routines/Buffer_Utils.hpp>
 #include <Sycl_Buffer_Routines/Buffer_Validation.hpp>
 

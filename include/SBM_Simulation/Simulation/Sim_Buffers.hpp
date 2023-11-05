@@ -4,7 +4,7 @@
 #include <SBM_Graph/Graph_Types.hpp>
 #include <SBM_Graph/Database/Sycl/Graph_Tables.hpp>
 #include <SBM_Simulation/Types/SIR_Types.hpp>
-#include <SBM_Simulation/Types/Sim_Types.hpp>
+#include <SBM_Database/Sim_Types.hpp>
 #include <Dataframe/Dataframe.hpp>
 #include <Static_RNG/distributions.hpp>
 namespace SBM_Simulation {
