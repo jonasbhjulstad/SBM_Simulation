@@ -48,7 +48,7 @@ CPMFindPackage(NAME SBM_Graph
 # CPMFindPackage(NAME SBM_Database_Migrations
     # GITHUB_REPOSITORY jonasbhjulstad/SBM_database_migrations
     # GIT_TAG master)
-find_package(SBM_Database_Migrations REQUIRED)
+find_package(SBM_Database REQUIRED)
 
 find_package(ortools REQUIRED CONFIG)
 

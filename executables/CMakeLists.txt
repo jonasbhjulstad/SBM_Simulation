@@ -1,9 +1,4 @@
-add_executable(MC_Simulations MC_Simulations.cpp)
-default_configure_target(MC_Simulations)
-link_default_libraries(MC_Simulations)
-target_link_libraries(MC_Simulations PRIVATE ${PROJECT_NAME})
 
-add_executable(Graph_Generation Graph_Generation.cpp)
-default_configure_target(Graph_Generation)
-link_default_libraries(Graph_Generation)
-target_link_libraries(MC_Simulations PRIVATE ${PROJECT_NAME})
+add_default_executable(MC_Simulations)
+
+add_default_executable(Graph_Generation)

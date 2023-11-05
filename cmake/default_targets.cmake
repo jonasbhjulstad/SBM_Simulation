@@ -26,5 +26,10 @@ endfunction()
 
 function(add_default_executable source_file)
     add_executable(${source_file} "${source_file}.cpp")
-
+    default_configure_target(${source_file})
+    link_default_libraries(${source_file})
+    target_link_libraries(${source_file} PRIVATE ${PROJECT_NAME})
+    # target_include_directories(${source_file} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_INCLUDE_DIR}> $<INSTALL_INTERFACE:include>)
+    # target_link_options(${source_file} PRIVATE -fsycl ${SYCL_CUSTOM_FLAGS} -Wno-deprecated-declarations)
+    # target_compile_options(${source_file} PRIVATE -fsycl ${SYCL_CUSTOM_FLAGS} -Wno-deprecated-declarations)
 endfunction()

@@ -19,32 +19,30 @@ void buffer_to_table<State_t>(sycl::queue &q, sycl::buffer<State_t, 3> &buf,
   sycl::event e = read_buffer<State_t, 3>(buf, q, result, {});
   e.wait();
   auto indices = indices_to_list(const_id_names, column_id_names);
-  auto row = indices_to_map(const_id_names, const_id_values);
-
-  row.insert(column_id_names[0].c_str(), 0);
-  row.insert(column_id_names[1].c_str(), 0);
-  row.insert(column_id_names[2].c_str(), 0);
-  row.insert("S", result[0][0]);
-  row.insert("I", result[0][0]);
-  row.insert("R", result[0][0]);
+  QVariantMap row = {{column_id_names[0].c_str(), 0},
+                                         {column_id_names[1].c_str(), 0},
+                                         {column_id_names[2].c_str(), 0},
+                                         {"S", 0},
+                                         {"I", 0},
+                                         {"R", 0}};
+  std::for_each(const_id_names.begin(), const_id_names.end(),
+                [&row](const auto &name) { row[name.c_str()] = 0; });
+  QVector<QVariantMap> rows(buf.size(), row);
 
   for (int i = 0; i < N0; i++) {
     for (int j = 0; j < N1; j++) {
       for (int k = 0; k < N2; k++) {
         auto row_ind = i * N1 * N2 + j * N2 + k;
-      row[column_id_names[0].c_str()] = i;
-      row[column_id_names[1].c_str()] = j;
-      row[column_id_names[2].c_str()] = k;
-      row["S"] = result[row_ind][0];
-      row["I"] = result[row_ind][1];
-      row["R"] = result[row_ind][2];
-
-        Orm::DB::table(table_name.c_str())
-        ->upsert({row}, indices, {"S", "I", "R"});
+        rows[row_ind][column_id_names[0].c_str()] = i;
+        rows[row_ind][column_id_names[1].c_str()] = j;
+        rows[row_ind][column_id_names[2].c_str()] = k;
+        rows[row_ind]["S"] = result[row_ind][0];
+        rows[row_ind]["I"] = result[row_ind][1];
+        rows[row_ind]["R"] = result[row_ind][2];
       }
     }
-
   }
+  Orm::DB::table(table_name.c_str())->upsert(rows, indices, {"S", "I", "R"});
 }
 } // namespace Buffer_Routines
 
@@ -70,32 +68,25 @@ TEST_CASE("Simulation_Buffer_Table_Write") {
   float p_R0 = 0.0f;
   sycl::queue q(sycl::cpu_selector_v);
   std::vector<sycl::event> buf_events(4);
-  auto p_I_vec = Buffer_Routines::generate_floats(
-      N_sims * N_connections * Nt, p_I_min, p_I_max, seed);
+  auto p_I_vec = Buffer_Routines::generate_floats(N_sims * N_connections * Nt,
+                                                  p_I_min, p_I_max, seed);
   auto p_Is = Buffer_Routines::make_shared_device_buffer<float, 3>(
       q, p_I_vec, sycl::range<3>(N_sims, Nt, N_connections), buf_events[0]);
 
-  // template <typename T>
-  // void buffer_to_table(sycl::queue &q, sycl::buffer<T, 3> &buf,
-  //                      const std::string &table_name,
-  //                      const std::vector<std::string> &column_id_names)
-
   Buffer_Routines::buffer_to_table(q, *p_Is, "p_Is",
-                                   {"simulation","t", "connection"}, {"value"}, {"p_out", "graph"}, {p_out_id, graph_id});
+                                   {"simulation", "t", "connection"}, {"value"},
+                                   {"p_out", "graph"}, {p_out_id, graph_id});
 
   std::vector<State_t> community_state_vec(N_sims * (Nt + 1) * N_communities,
                                            State_t{});
   auto community_state = Buffer_Routines::make_shared_device_buffer<State_t, 3>(
       q, community_state_vec, sycl::range<3>(N_sims, Nt + 1, N_communities),
       buf_events[1]);
-  // void buffer_to_table(sycl::queue &q, sycl::buffer<T, 3> &buf,
-  //  const std::string &table_name,
-  //  const std::vector<std::string> &column_id_names)
   Buffer_Routines::buffer_to_table<State_t>(
-      q, *community_state, "community_state", {"simulation", "t","community"}, "", {"p_out", "graph"}, {p_out_id, graph_id});
+      q, *community_state, "community_state", {"simulation", "t", "community"},
+      "", {"p_out", "graph"}, {p_out_id, graph_id});
 
-  std::vector<uint32_t> connection_events_vec(
-      N_sims * N_connections * Nt, 0);
+  std::vector<uint32_t> connection_events_vec(N_sims * N_connections * Nt, 0);
 
   auto connection_events =
       Buffer_Routines::make_shared_device_buffer<uint32_t, 3>(
@@ -103,17 +94,18 @@ TEST_CASE("Simulation_Buffer_Table_Write") {
           buf_events[2]);
 
   Buffer_Routines::buffer_to_table(q, *connection_events, "connection_events",
-                                   {"simulation", "t", "connection"}, "value", {"p_out", "graph"}, {p_out_id, graph_id});
+                                   {"simulation", "t", "connection"}, "value",
+                                   {"p_out", "graph"}, {p_out_id, graph_id});
 
-  std::vector<uint32_t> infection_events_vec(
-      N_sims * N_connections * Nt, 0);
+  std::vector<uint32_t> infection_events_vec(N_sims * N_connections * Nt, 0);
   auto infection_events =
       Buffer_Routines::make_shared_device_buffer<uint32_t, 3>(
           q, infection_events_vec, sycl::range<3>(N_sims, N_connections, Nt),
           buf_events[3]);
 
   Buffer_Routines::buffer_to_table(q, *infection_events, "infection_events",
-                                   {"simulation", "t", "connection"}, "value", {"p_out", "graph"}, {p_out_id, graph_id});
+                                   {"simulation", "t", "connection"}, "value",
+                                   {"p_out", "graph"}, {p_out_id, graph_id});
 
   SBM_Simulation::Sim_Param p(N_pop, p_out_id, graph_id, N_communities,
                               N_connections, N_sims, Nt, Nt_alloc, seed, p_in,
