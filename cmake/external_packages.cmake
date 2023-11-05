@@ -43,7 +43,7 @@ CPMFindPackage(NAME Buffer_Routines
     GIT_TAG master)
 CPMFindPackage(NAME SBM_Graph
     GITHUB_REPOSITORY jonasbhjulstad/SBM_Graph
-    GIT_TAG tom)
+    GIT_TAG master)
 
 # CPMFindPackage(NAME SBM_Database_Migrations
     # GITHUB_REPOSITORY jonasbhjulstad/SBM_database_migrations
