@@ -41,9 +41,10 @@ CPMFindPackage(NAME Buffer_Routines
 CPMFindPackage(NAME SBM_Graph
     GITHUB_REPOSITORY jonasbhjulstad/SBM_Graph
     GIT_TAG master)
-CPMFindPackage(NAME SBM_Database
-    GITHUB_REPOSITORY jonasbhjulstad/SBM_Database
-    GIT_TAG main)
+find_package(SBM_Database CONFIG REQUIRED)
+# CPMFindPackage(NAME SBM_Database
+#     GITHUB_REPOSITORY jonasbhjulstad/SBM_Database
+#     GIT_TAG main)
 
 message(WARNING ${SBM_Database_DIR})
 
