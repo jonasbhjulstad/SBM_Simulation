@@ -1,25 +1,28 @@
 #include <SBM_Simulation/SBM_Simulation.hpp>
 #include <SBM_Graph/Graph.hpp>
-
+#include <tom/tom_config.hpp>
 int main()
 {
-// {
-//     using namespace SBM_Simulation;
-//     uint32_t N_pop;
-//     uint32_t p_out_id;
-//     uint32_t graph_id;
-//     uint32_t N_communities;
-//     uint32_t N_connections;
-//     uint32_t N_sims;
-//     uint32_t Nt;
-//     uint32_t Nt_alloc;
-//     uint32_t seed;
-//     float p_in = 0.01;
-//     float p_out = 0.1;
-//     float p_I_min = 0.01;
-//     float p_I_max = 0.1;
-//     float p_R = 0.1f;
-//     float p_I0 = 0.1f;
-//     float p_R0 = 0.0f;
-//     SBM_Database::Sim_Param p{}
+    using namespace SBM_Database;
+    using namespace SBM_Simulation;
+    auto DB = tom_config::default_db_connection();
+    // project root
+    std::string root_dir = "/home/man/Documents/ER_Bernoulli_Robust_MPC/";
+    std::string output_dir = root_dir + "data/";
+    std::chrono::high_resolution_clock::time_point t1, t2;
+
+    sycl::queue q(sycl::cpu_selector_v);
+    uint32_t seed = 283;
+    auto N_communities = 2;
+    auto p_out_id = 0;
+    auto p = SBM_Database::sim_param_read(p_out_id);
+// (sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
+//                            const std::string &control_type,
+//                            const std::string &simulation_type)
+    Simulation_t sim(q, p, "");
+    sim.run();
+    q.wait();
+    t2 = std::chrono::high_resolution_clock::now();
+
+    return 0;
 }

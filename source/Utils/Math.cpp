@@ -1,5 +1,7 @@
 #include <SBM_Simulation/Utils/Math.hpp>
 #include <numeric>
+namespace SBM_Simulation
+{
 std::vector<float> make_linspace(float start, float end, float step)
 {
     std::vector<float> vec;
@@ -31,4 +33,5 @@ SYCL_EXTERNAL uint32_t ceil_div(uint32_t a, uint32_t b)
 SYCL_EXTERNAL uint32_t floor_div(uint32_t a, uint32_t b)
 {
     return std::floor(static_cast<float>(a) / static_cast<float>(b));
+}
 }

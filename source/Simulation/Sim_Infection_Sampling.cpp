@@ -260,7 +260,7 @@ std::vector<uint32_t> sample_timestep(const std::vector<uint32_t> &events, const
     };
 
     std::vector<std::vector<uint32_t>> result(N_communities, std::vector<uint32_t>(N_connections, 0));
-    auto community_idx = make_iota(N_communities);
+    auto community_idx = SBM_Simulation::make_iota(N_communities);
     std::transform(std::execution::par_unseq, community_idx.begin(), community_idx.end(), result.begin(), [&](auto c_idx)
                    {
                     auto [r_sql, r_weight] = get_related_connections(c_idx, ccm);
@@ -278,7 +278,7 @@ Dataframe::Dataframe_t<uint32_t, 2> sample_infections(const Dataframe::Dataframe
     auto delta_Is = get_delta_Is(community_state);
     auto Nt = delta_Is.size();
     Dataframe::Dataframe_t<uint32_t, 2> sampled_infections(Nt, N_connections * 2);
-    auto t_vec = make_iota(Nt);
+    auto t_vec = SBM_Simulation::make_iota(Nt);
     std::transform(std::execution::par_unseq, t_vec.begin(), t_vec.end(), sampled_infections.data.begin(), [&events, &delta_Is, &ccm](auto t)
                    { return sample_timestep(events[t], delta_Is[t], ccm); });
 

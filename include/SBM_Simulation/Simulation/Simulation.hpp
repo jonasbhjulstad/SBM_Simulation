@@ -5,11 +5,12 @@
 #include <SBM_Simulation/Epidemiological/SIR_Dynamics.hpp>
 #include <SBM_Simulation/Simulation/Sim_Buffers.hpp>
 #include <SBM_Simulation/Simulation/Sim_Infection_Sampling.hpp>
+#include <QString>
 
 namespace SBM_Simulation {
 struct Simulation_t {
 
-  Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param, const std::string &control_type = "Community", const std::string &simulation_type = "Excitation");
+  Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param, const char* control_type = "Community", const char* regression_type = "Community");
 
   Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
                const Sim_Buffers &sim_buffers);
@@ -19,7 +20,8 @@ struct Simulation_t {
   sycl::queue &q;
   sycl::range<1> compute_range = sycl::range<1>(1);
   sycl::range<1> wg_range = sycl::range<1>(1);
-
+  QString control_type;
+  QString regression_type;
   void run();
 
 private:
