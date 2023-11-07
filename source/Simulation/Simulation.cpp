@@ -1,4 +1,4 @@
-#include <SBM_Simulation/Database/Simulation_Tables.hpp>
+#include <SBM_Database/Simulation/Simulation_Tables.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
 #include <SBM_Simulation/Simulation/State_Accumulation.hpp>
 #include <SBM_Simulation/Epidemiological/SIR_Dynamics.hpp>
@@ -6,14 +6,14 @@
 #include <Dataframe/Dataframe.hpp>
 #include <chrono>
 namespace SBM_Simulation {
-Simulation_t::Simulation_t(sycl::queue &q, const Sim_Param &sim_param,
+Simulation_t::Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
                            const std::string &control_type,
                            const std::string &simulation_type)
     : q(q), p(sim_param), b(q, sim_param, control_type, simulation_type),
       compute_range(Buffer_Routines::get_compute_range(q, p.N_sims)),
       wg_range(std::min<uint32_t>({(uint32_t)Buffer_Routines::get_wg_range(q)[0], sim_param.N_sims})) {}
 
-Simulation_t::Simulation_t(sycl::queue &q, const Sim_Param &sim_param,
+Simulation_t::Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
                            const Sim_Buffers &sim_buffers)
     : q(q), p(sim_param), b(sim_buffers),
       compute_range(Buffer_Routines::get_compute_range(q, p.N_sims)),
@@ -49,15 +49,15 @@ void Simulation_t::write_allocated_steps(uint32_t t,
   t1 = t2;
 
   auto t_offset = t - p.Nt_alloc;
-  community_state_upsert(p.p_out, p.graph_id, state_df, t_offset);
-  connection_upsert<uint32_t>("connection_events", p.p_out_id, p.graph_id,
+  SBM_Database::community_state_upsert(p.p_out, p.graph_id, state_df, t_offset);
+  SBM_Database::connection_upsert<uint32_t>("connection_events", p.p_out_id, p.graph_id,
                               event_df, t_offset);
 
   state_df.resize_dim(2, N_steps + 1);
   event_df.resize_dim(2, N_steps);
   auto inf_gs = sample_infections(state_df, event_df, b.ccm, p.seed);
 
-  connection_upsert<uint32_t>("infection_events", p.p_out_id, p.graph_id,
+  SBM_Database::connection_upsert<uint32_t>("infection_events", p.p_out_id, p.graph_id,
                               inf_gs, t_offset);
 
   t2 = std::chrono::high_resolution_clock::now();
@@ -67,7 +67,7 @@ void Simulation_t::write_allocated_steps(uint32_t t,
       << "ms\n";
 }
 
-void Simulation_t::write_initial_steps(sycl::queue &q, const Sim_Param &p,
+void Simulation_t::write_initial_steps(sycl::queue &q, const SBM_Database::Sim_Param &p,
                                        Sim_Buffers &b,
                                        std::vector<sycl::event> &dep_events) {
 
@@ -76,7 +76,7 @@ void Simulation_t::write_initial_steps(sycl::queue &q, const Sim_Param &p,
       wg_range, p.N_sims);
   auto state_df = Dataframe::Dataframe_t<State_t, 3>(q, *b.community_state);
   state_df.resize_dim(2, 1);
-  community_state_upsert(p.p_out, p.graph_id, state_df);
+  SBM_Database::community_state_upsert(p.p_out, p.graph_id, state_df);
 }
 
 void Simulation_t::run() {

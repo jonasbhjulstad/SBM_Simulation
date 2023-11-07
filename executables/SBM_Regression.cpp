@@ -71,7 +71,7 @@ int main()
       auto graphdirs = get_subdirs(s, "/Excitation/Graph_");
       auto true_dirs = str_append(graphdirs, "True_Communities/");
       auto detected_dirs = str_append(graphdirs, "Detected_Communities/");
-      Sim_Param p = Sim_Param::parse_json(s + "/Sim_Param.json");
+      SBM_Database::Sim_Param p = Sim_Param::parse_json(s + "/Sim_Param.json");
       for(auto&& td: true_dirs)
       {
         regression_routine(td, p.N_sims, tau);

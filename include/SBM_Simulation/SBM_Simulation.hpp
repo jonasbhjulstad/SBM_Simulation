@@ -4,5 +4,5 @@
 #include <SBM_Simulation/Simulation/Sim_Buffers.hpp>
 #include <SBM_Simulation/Regression/Regression.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
-#include <SBM_Simulation/Database/Simulation_Tables.hpp>
+#include <SBM_Database/Simulation/Simulation_Tables.hpp>
 #endif

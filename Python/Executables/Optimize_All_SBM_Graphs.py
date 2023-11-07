@@ -15,7 +15,7 @@ def read_graph_data(p_dir):
 
 
 def simulate_with_solution(q, p_dir, u_opt, N_sims):
-    sim_param = json.load(open(p_dir + "Sim_Param.json"))
+    SBM_Database::Sim_Param = json.load(open(p_dir + "Sim_Param.json"))
     edge_lists, ecms, vcms = read_graph_data(p_dir)
     N_communities = sim_param["N_communities"]
     N_connections = complete_graph_max_edges(N_communities)

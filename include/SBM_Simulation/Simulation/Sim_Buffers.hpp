@@ -2,9 +2,9 @@
 #define SBM_SIMULATION_SIMULATION_SIM_BUFFERS_HPP
 #include <CL/sycl.hpp>
 #include <SBM_Graph/Graph_Types.hpp>
-#include <SBM_Graph/Database/Sycl/Graph_Tables.hpp>
-#include <SBM_Simulation/Types/SIR_Types.hpp>
-#include <SBM_Database/Sim_Types.hpp>
+#include <SBM_Database/Graph/Sycl/Graph_Tables.hpp>
+#include <SBM_Database/Simulation/SIR_Types.hpp>
+#include <SBM_Database/Simulation/Sim_Types.hpp>
 #include <Dataframe/Dataframe.hpp>
 #include <Static_RNG/distributions.hpp>
 namespace SBM_Simulation {
@@ -34,7 +34,7 @@ struct Sim_Buffers {
                        //3>(sycl::range<3>(1,1,1)));
   std::vector<sycl::event> construction_events;
   const Dataframe::Dataframe_t<Weighted_Edge_t, 1> ccm;
-  Sim_Buffers(sycl::queue &q, const Sim_Param &p,
+  Sim_Buffers(sycl::queue &q, const SBM_Database::Sim_Param &p,
               const std::string &control_type = "Community",
               const std::string &simulation_type = "Excitation");
 };

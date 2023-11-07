@@ -4,7 +4,7 @@ import numpy as np
 def regression_over_p_out(base_dir):
     p_dirs = get_p_dirs(base_dir)
     for p_dir in p_dirs:
-        sim_param = json.load(open(p_dir + "/Sim_Param.json"))
+        SBM_Database::Sim_Param = json.load(open(p_dir + "/Sim_Param.json"))
         graph_dirs = get_graph_dirs(p_dir)
         for g_idx, g_dir in enumerate(graph_dirs):
             print(g_idx)

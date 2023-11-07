@@ -21,5 +21,5 @@ int main()
 //     float p_R = 0.1f;
 //     float p_I0 = 0.1f;
 //     float p_R0 = 0.0f;
-//     Sim_Param p{}
+//     SBM_Database::Sim_Param p{}
 }

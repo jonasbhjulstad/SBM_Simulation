@@ -25,7 +25,7 @@ endif()
 option(BUILD_TOM "Build tom" OFF)
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
-set(SBM_Database_DIR "~/Documents/SBM_Database/build/")
+# set(SBM_Database_DIR "~/Documents/SBM_Database/build/")
 set(DATABASE_TYPE "QSQLITE")
 set(SQLITE3_DATABASE_FILE "${PROJECT_BINARY_DIR}/database.sqlite3" CACHE STRING "Database file")
 option(ENABLE_TESTING "Enable Test Builds" ON)

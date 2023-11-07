@@ -1,7 +1,7 @@
 #ifndef SIR_INFECTION_SAMPLING_HPP
 #define SIR_INFECTION_SAMPLING_HPP
 #include <Dataframe/Dataframe.hpp>
-#include <SBM_Simulation/Types/SIR_Types.hpp>
+#include <SBM_Database/Simulation/SIR_Types.hpp>
 #include <SBM_Graph/Graph_Types.hpp>
 
 void event_inf_summary(const Dataframe::Dataframe_t<State_t, 4> &community_state, const Dataframe::Dataframe_t<uint32_t, 4> &events, const std::vector<std::vector<uint32_t>> &ccms);

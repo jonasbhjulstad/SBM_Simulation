@@ -19,7 +19,7 @@ def get_edges(fname):
 def validate_for_solution(q, base_dir, subdirname, regression_type):
     gdirs = get_graph_dirs(base_dir)
     edgelists, vcms, p_Is = [], [], []
-    sim_param = Sim_Param(base_dir + "/Sim_Param.json")
+    SBM_Database::Sim_Param = Sim_Param(base_dir + "/Sim_Param.json")
     for gdir in gdirs:
         edgelists.append(get_edges(gdir + "/" + subdirname + "/edgelist.csv"))
         vcms.append(np.genfromtxt(gdir + "/" + subdirname + "/vcm.csv", dtype=int))

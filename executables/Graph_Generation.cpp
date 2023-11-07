@@ -1,8 +1,8 @@
 
 #include <SBM_Graph/SBM_Graph.hpp>
-#include <SBM_Simulation/Database/Simulation_Tables.hpp>
+#include <SBM_Database/Simulation/Simulation_Tables.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
-#include <SBM_Database/Sim_Types.hpp>
+#include <SBM_Database/Simulation/Sim_Types.hpp>
 #include <Sycl_Buffer_Routines/Buffer_Routines.hpp>
 #include <Sycl_Buffer_Routines/Buffer_Validation.hpp>
 #include <Sycl_Buffer_Routines/Profiling.hpp>
@@ -52,12 +52,12 @@ int main() {
   float p_I0 = 0.1f;
   float p_R0 = 0.0f;
 
-  Sim_Param p{N_pop,         p_out_id, graph_id, N_communities,
+  SBM_Database::Sim_Param p{N_pop,         p_out_id, graph_id, N_communities,
               N_connections, N_sims,   Nt,       Nt_alloc,
               seed,          p_in,     p_out,    p_I_min,
               p_I_max,       p_R,      p_I0,     p_R0};
 
-  SBM_Graph::generate_SBM_to_db(p.to_json());
+  SBM_Database::generate_SBM_to_db(p.to_json());
 
   return 0;
 }
