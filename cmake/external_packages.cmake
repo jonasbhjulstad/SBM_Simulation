@@ -27,20 +27,29 @@ include(cmake/TinyOrm.cmake)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 
-
+if (${SBM_SIMULATION_USE_LOCAL_PACKAGES})
+find_package(Dataframe CONFIG REQUIRED)
+find_package(Buffer_Routines CONFIG REQUIRED)
+find_package(SBM_Graph CONFIG REQUIRED)
+else()
 #add pqxx4
 CPMFindPackage(NAME Dataframe
     GITHUB_REPOSITORY jonasbhjulstad/Dataframe
-    GIT_TAG master
-    OPTIONS
-    "CMAKE_POSITION_INDEPENDENT_CODE ON")
-
+    GIT_TAG master)
+    # OPTIONS
+    # "CMAKE_POSITION_INDEPENDENT_CODE ON")
 CPMFindPackage(NAME Buffer_Routines
     GITHUB_REPOSITORY jonasbhjulstad/Sycl_Buffer_Routines
-    GIT_TAG master)
+    GIT_TAG master
+    OPTIONS
+    "Dataframe_DIR ${Dataframe_DIR}")
 CPMFindPackage(NAME SBM_Graph
     GITHUB_REPOSITORY jonasbhjulstad/SBM_Graph
-    GIT_TAG master)
+    GIT_TAG master
+    OPTIONS
+    "Dataframe_DIR ${Dataframe_DIR}"
+    "Buffer_Routines_DIR ${Buffer_Routines_DIR}")
+endif()
 find_package(SBM_Database CONFIG REQUIRED)
 # CPMFindPackage(NAME SBM_Database
 #     GITHUB_REPOSITORY jonasbhjulstad/SBM_Database

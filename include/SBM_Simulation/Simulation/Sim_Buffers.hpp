@@ -2,7 +2,6 @@
 #define SBM_SIMULATION_SIMULATION_SIM_BUFFERS_HPP
 #include <CL/sycl.hpp>
 #include <Dataframe/Dataframe.hpp>
-#include <SBM_Database/Graph/Sycl/Graph_Tables.hpp>
 #include <SBM_Database/Simulation/SIR_Types.hpp>
 #include <SBM_Database/Simulation/Sim_Types.hpp>
 #include <SBM_Graph/Graph_Types.hpp>
@@ -10,35 +9,27 @@
 namespace SBM_Simulation {
 struct Sim_Buffers {
 
-  std::shared_ptr<sycl::buffer<Static_RNG::default_rng>>
-      rngs; // =
-            // std::make_shared(sycl::buffer<Static_RNG::default_rng>(sycl::range<1>(1)));
-  std::shared_ptr<sycl::buffer<SIR_State, 3>>
-      vertex_state; // = std::make_shared(sycl::buffer<SIR_State,
-                    // 3>(sycl::range<3>(1,1,1)));
-  std::shared_ptr<sycl::buffer<uint32_t, 3>>
-      accumulated_events; // = std::make_shared(sycl::buffer<uint32_t,
-                          // 3>(sycl::range<3>(1,1,1)));
-  std::shared_ptr<sycl::buffer<float, 3>>
-      p_Is; // = std::make_shared(sycl::buffer<float,
-            // 3>(sycl::range<3>(1,1,1)));
-  std::shared_ptr<sycl::buffer<std::pair<uint32_t, uint32_t>>>
-      edges; //= std::make_shared(sycl::buffer<uint32_t>(sycl::range<1>(1)));
-  std::shared_ptr<sycl::buffer<uint32_t, 1>>
-      ecm; // = std::make_shared(sycl::buffer<uint32_t>(sycl::range<1>(1)));
-  std::shared_ptr<sycl::buffer<uint32_t, 1>>
-      vcm; // = std::make_shared(sycl::buffer<uint32_t,
-           // 2>(sycl::range<2>(1,1)));
-  std::shared_ptr<sycl::buffer<State_t, 3>>
-      community_state; //= std::make_shared(sycl::buffer<State_t,
-                       // 3>(sycl::range<3>(1,1,1)));
-  std::vector<sycl::event> construction_events;
+
+  sycl::buffer<SIR_State, 3> vertex_state;
+  sycl::buffer<uint32_t, 3> accumulated_events;
+  sycl::buffer<float, 3> p_Is;
+  sycl::buffer<Static_RNG::default_rng, 1> rngs;
+  sycl::buffer<std::pair<uint32_t, uint32_t>, 1> edges;
+  sycl::buffer<uint32_t, 1> ecm;
+  sycl::buffer<uint32_t, 1> vcm;
+  sycl::buffer<State_t, 3> community_state;
+  std::vector<sycl::event> construction_events = std::vector<sycl::event>(4);
   const Dataframe::Dataframe_t<Weighted_Edge_t, 1> ccm;
 
   Sim_Buffers(sycl::queue &q, const SBM_Database::Sim_Param &p,
-              const std::string &p_I_table_name,
-              const char *control_type = "Community",
-              const char *regression_type = "LS");
+              const QString &control_type);
+
+  Sim_Buffers(sycl::queue &q, const SBM_Database::Sim_Param &p,
+              const QString &control_type, const QString &regression_type);
 };
+sycl::buffer<float, 3> generate_upsert_p_Is(sycl::queue &q,
+                                            const SBM_Database::Sim_Param &p,
+                                            const QString &table_name,
+                                            const QString &control_type);
 } // namespace SBM_Simulation
 #endif

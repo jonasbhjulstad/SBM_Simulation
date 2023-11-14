@@ -22,9 +22,13 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
       "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there."
   )
 endif()
-
+option(SBM_SIMULATION_USE_LOCAL_PACKAGES "Use local packages instead of fetching packages from the internet" ON)
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
+set(${PROJECT_NAME}_SYCL_TARGETS "spir64")
+set(Dataframe_DIR "~/Documents/Dataframe/build/")
+set(SBM_Graph_DIR "~/Documents/SBM_Graph/build/")
+set(Buffer_Routines_DIR "~/Documents/Buffer_Routines/build/")
 set(SBM_Database_DIR "~/Documents/SBM_Database/build/")
 set(DATABASE_TYPE "QSQLITE")
 set(SQLITE3_DATABASE_FILE "${PROJECT_BINARY_DIR}/database.sqlite3" CACHE STRING "Database file")

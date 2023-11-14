@@ -1,4 +1,5 @@
 
 add_default_executable(MC_Simulations)
-
+target_compile_options(MC_Simulations PRIVATE -fPIC)
 add_default_executable(Graph_Generation)
+target_compile_options(Graph_Generation PRIVATE -fPIC)

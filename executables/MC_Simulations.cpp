@@ -16,10 +16,7 @@ int main()
     auto N_communities = 2;
     auto p_out_id = 0;
     auto p = SBM_Database::sim_param_read(p_out_id);
-// (sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
-//                            const std::string &control_type,
-//                            const std::string &simulation_type)
-    Simulation_t sim(q, p, "");
+    Simulation_t sim(q, p, "Community");
     sim.run();
     q.wait();
     t2 = std::chrono::high_resolution_clock::now();

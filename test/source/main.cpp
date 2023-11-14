@@ -5,7 +5,6 @@
 #include <doctest/doctest.h>
 #include <tom/tom_config.hpp>
 #include <filesystem>
-static const std::string cwd = std::filesystem::current_path().generic_string();
 
 // Ownership of a shared_ptr()
 auto manager = Orm::DB::create({

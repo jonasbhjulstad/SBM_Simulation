@@ -1,17 +1,20 @@
 #ifndef SBM_SIMULATION_SIMULATION_HPP
 #define SBM_SIMULATION_SIMULATION_HPP
 #include <CL/sycl.hpp>
+#include <QString>
 #include <SBM_Graph/Graph.hpp>
 #include <SBM_Simulation/Epidemiological/SIR_Dynamics.hpp>
 #include <SBM_Simulation/Simulation/Sim_Buffers.hpp>
 #include <SBM_Simulation/Simulation/Sim_Infection_Sampling.hpp>
-#include <QString>
 
 namespace SBM_Simulation {
 struct Simulation_t {
 
-  Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param, const char* control_type = "Community", const char* regression_type = "Community");
-
+  Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
+               const char *control_type,
+               const char *regression_type);
+  Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
+               const char *control_type);
   Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
                const Sim_Buffers &sim_buffers);
 
@@ -25,11 +28,11 @@ struct Simulation_t {
   void run();
 
 private:
-  void write_initial_steps(sycl::queue &q, const SBM_Database::Sim_Param &p, Sim_Buffers &b,
-                           std::vector<sycl::event> &dep_events);
+  void write_initial_steps(sycl::queue &q, const SBM_Database::Sim_Param &p,
+                           Sim_Buffers &b,
+                           sycl::event &dep_event);
 
-  void write_allocated_steps(uint32_t t, std::vector<sycl::event> &dep_events,
-                             uint32_t N_max_steps = 0);
+  void write_allocated_steps(uint32_t t, sycl::event &dep_event);
 };
 } // namespace SBM_Simulation
 #endif
