@@ -5,7 +5,7 @@ int main()
 {
     using namespace SBM_Database;
     using namespace SBM_Simulation;
-    auto DB = tom_config::default_db_connection();
+    auto DB = tom_config::default_db_connection_postgres();
     // project root
     std::string root_dir = "/home/man/Documents/ER_Bernoulli_Robust_MPC/";
     std::string output_dir = root_dir + "data/";
@@ -13,9 +13,9 @@ int main()
 
     sycl::queue q(sycl::cpu_selector_v);
     uint32_t seed = 283;
-    auto N_communities = 2;
     auto p_out_id = 0;
-    auto p = SBM_Database::sim_param_read(p_out_id);
+    auto graph_id = 0;
+    auto p = SBM_Database::sim_param_read(p_out_id, graph_id);
     Simulation_t sim(q, p, "Community");
     sim.run();
     q.wait();

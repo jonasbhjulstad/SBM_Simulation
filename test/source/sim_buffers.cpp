@@ -50,7 +50,8 @@ TEST_CASE("Sim_Buffers") {
   auto [edge_lists, node_lists] = SBM_Graph::generate_N_SBM_graphs(
       N_pop, N_communities, p_in, p_out, seeds[p_out_id], 1);
   auto graph_id = 0;
-  SBM_Database::SBM_Database_to_db(edge_lists[graph_id], node_lists[graph_id],
+  SBM_Database::remove_db_graphs();
+  SBM_Database::SBM_Graph_to_db(edge_lists[graph_id], node_lists[graph_id],
                                    p_out_id, graph_id);
 
   auto q = sycl::queue(sycl::default_selector_v);

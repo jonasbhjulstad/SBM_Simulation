@@ -43,7 +43,8 @@ sycl::buffer<float, 3> generate_upsert_p_Is(sycl::queue& q, const SBM_Database::
     auto N = N_connections*p.Nt*p.N_sims;
     auto p_Is_vec = Buffer_Routines::generate_floats(N, p.p_I_min, p.p_I_max, p.seed);
     sycl::event event;
-    auto p_Is_buf = sycl::buffer<float, 3>(p_Is_vec.data(), sycl::range<3>(p.N_sims, p.Nt, N_connections));
+    // auto p_Is_buf = sycl::buffer<float, 3>(p_Is_vec.data(), sycl::range<3>(p.N_sims, p.Nt, N_connections));
+    auto p_Is_buf = Buffer_Routines::construct_device_buffer<float, 3>(q, p_Is_vec, sycl::range<3>(p.N_sims, p.Nt, N_connections));
     const std::vector<std::string> column_id_names = {"simulation", "t", "connection"};
                     // table.primary({"p_out", "graph", "simulation", "t", "connection", "Control_Type"});
 

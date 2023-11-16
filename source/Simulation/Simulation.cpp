@@ -36,7 +36,7 @@ void Simulation_t::write_allocated_steps(uint32_t t,
   t1 = std::chrono::high_resolution_clock::now();
   event = accumulate_community_state(
       q, event, b.vertex_state, b.vcm, b.community_state, compute_range,
-      wg_range, p.N_sims, 1, N_steps);
+      wg_range, p.N_sims, 1, N_steps+1);
   event.wait();
   t2 = std::chrono::high_resolution_clock::now();
   std::cout
@@ -55,12 +55,12 @@ void Simulation_t::write_allocated_steps(uint32_t t,
   t1 = t2; 
 
   auto t_offset = t - p.Nt_alloc + 1;
-  SBM_Database::community_state_upsert(p.p_out, p.graph_id, state_df, t_offset,control_type, regression_type);
+  SBM_Database::community_state_upsert(p.p_out_id, p.graph_id, state_df, t_offset,control_type, regression_type, 1);
   SBM_Database::connection_upsert<uint32_t>("connection_events", p.p_out_id, p.graph_id,
                               event_df, t_offset, control_type, regression_type);
 
-  // state_df.resize_dim(2, N_steps + 1);
-  // event_df.resize_dim(2, N_steps);
+  state_df.resize_dim(2, N_steps + 1);
+  event_df.resize_dim(2, N_steps);
   auto inf_gs = sample_infections(state_df, event_df, b.ccm, p.seed);
 
   SBM_Database::connection_upsert<uint32_t>("infection_events", p.p_out_id, p.graph_id,
@@ -83,7 +83,7 @@ void Simulation_t::write_initial_steps(sycl::queue &q, const SBM_Database::Sim_P
   acc_event.wait();
   auto state_df = Dataframe::make_dataframe<State_t>(q, b.community_state);
   state_df.resize_dim(1, 1);
-  SBM_Database::community_state_upsert(p.p_out, p.graph_id, state_df, 0, control_type, regression_type);
+  SBM_Database::community_state_upsert(p.p_out_id, p.graph_id, state_df, 0, control_type, regression_type);
 }
 
 void Simulation_t::run() {
