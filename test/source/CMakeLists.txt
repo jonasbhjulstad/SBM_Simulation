@@ -1,6 +1,7 @@
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 if(NOT TARGET ${PROJECT_NAME})
 # ---- Create binary ----
+
 add_executable(${PROJECT_NAME} ${sources})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PARENT_PROJECT_NAME}::${PARENT_PROJECT_NAME} doctest::doctest)

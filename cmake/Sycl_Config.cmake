@@ -1,0 +1,5 @@
+if (NOT ${${PROJECT_NAME}_SYCL_TARGETS})
+set(${PROJECT_NAME}_SYCL_TARGETS nvptx64-nvidia-cuda)
+set(${PROJECT_NAME}_CUDA_ARCH sm_86)
+set(${PROJECT_NAME}_SYCL_FLAGS -fsycl -fsycl-targets=${${PROJECT_NAME}_SYCL_TARGETS} -Xsycl-target-backend --cuda-gpu-arch=${${PROJECT_NAME}_CUDA_ARCH} -Wno-deprecated-declarations -Wno-unknown-cuda-version)
+endif()

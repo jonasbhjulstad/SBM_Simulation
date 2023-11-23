@@ -2,11 +2,6 @@ if ("${${PROJECT_NAME}_EXTERNAL_PACKAGES}" STREQUAL "")
 include(${CMAKE_CURRENT_LIST_DIR}/CPM.cmake)
 
 
-CPMFindPackage(
-    NAME Static_RNG
-    GITHUB_REPOSITORY jonasbhjulstad/Static_RNG
-    GIT_TAG master
-)
 # find_package(Static_RNG REQUIRED)
 
 find_package(Boost 1.78 REQUIRED COMPONENTS date_time HINTS ${PYTHON_ENV_CMAKE_MODULE_DIR})
@@ -25,37 +20,50 @@ include(cmake/TinyOrm.cmake)
 # find_package(TinyOrm CONFIG REQUIRED)
 #eigen
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(pybind11 CONFIG)
 
-
+#spdlog
+CPMFindPackage(NAME spdlog
+GITHUB_REPOSITORY gabime/spdlog)
 if (${SBM_SIMULATION_USE_LOCAL_PACKAGES})
 find_package(Dataframe CONFIG REQUIRED)
 find_package(Buffer_Routines CONFIG REQUIRED)
 find_package(SBM_Graph CONFIG REQUIRED)
+find_package(Static_RNG CONFIG REQUIRED)
 else()
+CPMFindPackage(
+    NAME Static_RNG
+    GITHUB_REPOSITORY jonasbhjulstad/Static_RNG
+    GIT_TAG master
+    "Static_RNG_SYCL_TARGETS ${${PROJECT_NAME}_SYCL_TARGETS}"
+)
 #add pqxx4
 CPMFindPackage(NAME Dataframe
     GITHUB_REPOSITORY jonasbhjulstad/Dataframe
-    GIT_TAG master)
+    GIT_TAG master
+    OPTIONS
+    "Dataframe_SYCL_TARGETS ${${PROJECT_NAME}_SYCL_TARGETS}")
     # OPTIONS
     # "CMAKE_POSITION_INDEPENDENT_CODE ON")
 CPMFindPackage(NAME Buffer_Routines
     GITHUB_REPOSITORY jonasbhjulstad/Sycl_Buffer_Routines
     GIT_TAG master
     OPTIONS
-    "Dataframe_DIR ${Dataframe_DIR}")
+    "Dataframe_DIR ${Dataframe_DIR}"
+    "Buffer_Routines_SYCL_TARGETS ${${PROJECT_NAME}_SYCL_TARGETS}")
 CPMFindPackage(NAME SBM_Graph
     GITHUB_REPOSITORY jonasbhjulstad/SBM_Graph
     GIT_TAG master
     OPTIONS
     "Dataframe_DIR ${Dataframe_DIR}"
-    "Buffer_Routines_DIR ${Buffer_Routines_DIR}")
+    "Buffer_Routines_DIR ${Buffer_Routines_DIR}"
+    "SBM_Graph_SYCL_TARGETS ${${PROJECT_NAME}_SYCL_TARGETS}")
 endif()
 find_package(SBM_Database CONFIG REQUIRED)
 # CPMFindPackage(NAME SBM_Database
 #     GITHUB_REPOSITORY jonasbhjulstad/SBM_Database
 #     GIT_TAG main)
 
-message(WARNING ${SBM_Database_DIR})
 
 # CPMFindPackage(NAME SBM_Database_Migrations
     # GITHUB_REPOSITORY jonasbhjulstad/SBM_database_migrations

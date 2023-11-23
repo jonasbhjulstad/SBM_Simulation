@@ -2,7 +2,7 @@
 #define DYNAMICS_HPP
 #include <CL/sycl.hpp>
 #include <SBM_Simulation/Simulation/Sim_Buffers.hpp>
-#include <Static_RNG/distributions.hpp>
+#include <Static_RNG/Distributions/Bernoulli.hpp>
 #include <SBM_Database/Simulation/Sim_Types.hpp>
 #include <Sycl_Buffer_Routines/Buffer_Utils.hpp>
 #include <Sycl_Buffer_Routines/Buffer_Validation.hpp>

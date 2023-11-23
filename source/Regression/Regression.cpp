@@ -123,9 +123,9 @@ std::tuple<Eigen::MatrixXf, Eigen::MatrixXf> load_N_datasets(const std::string &
     std::transform(idx.begin(), idx.end(), std::back_inserter(datasets), [&](auto idx)
                    { return load_beta_regression(datapath, idx); });
 
-    std::vector<Edge_t> sizes;
+    std::vector<SBM_Graph::Edge_t> sizes;
     std::transform(datasets.begin(), datasets.end(), std::back_inserter(sizes), [](auto &dataset)
-                   { return Edge_t(dataset.first.rows(), dataset.second.cols()); });
+                   { return SBM_Graph::Edge_t(dataset.first.rows(), dataset.second.cols()); });
     uint32_t const tot_rows = std::accumulate(sizes.begin(), sizes.end(), 0, [](auto acc, auto &size)
                                         { return acc + size.from; });
     uint32_t const cols = sizes[0].to;

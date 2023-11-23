@@ -6,13 +6,12 @@
 #include <SBM_Simulation/Epidemiological/SIR_Dynamics.hpp>
 #include <SBM_Simulation/Simulation/Sim_Buffers.hpp>
 #include <SBM_Simulation/Simulation/Sim_Infection_Sampling.hpp>
-
+#include <spdlog/async_logger.h>
 namespace SBM_Simulation {
 struct Simulation_t {
 
   Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
-               const char *control_type,
-               const char *regression_type);
+               const char *control_type, const char *regression_type);
   Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
                const char *control_type);
   Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
@@ -25,14 +24,18 @@ struct Simulation_t {
   sycl::range<1> wg_range = sycl::range<1>(1);
   QString control_type;
   QString regression_type;
+  std::shared_ptr<spdlog::logger> logger;
+
+
   void run();
 
 private:
   void write_initial_steps(sycl::queue &q, const SBM_Database::Sim_Param &p,
-                           Sim_Buffers &b,
-                           sycl::event &dep_event);
+                           Sim_Buffers &b, sycl::event &dep_event);
 
-  void write_allocated_steps(uint32_t t, sycl::event &dep_event);
+  void write_allocated_steps(uint32_t t, sycl::event &event,
+                             uint32_t t_start = 1, uint32_t t_end = 0);
+  
 };
 } // namespace SBM_Simulation
 #endif

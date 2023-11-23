@@ -1,2 +1,3 @@
-# add_binder(SIR_SBM)
-# target_link_libraries(SIR_SBM PUBLIC ${PROJECT_NAME} Graph Regression)
+add_binder(Binder_SBM_Simulation Binder_SBM_Simulation.cpp)
+target_link_libraries(Binder_SBM_Simulation PUBLIC ${PROJECT_NAME})
+set_target_properties(Binder_SBM_Simulation PROPERTIES OUTPUT_NAME "SBM_Simulation")

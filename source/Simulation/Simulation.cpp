@@ -28,49 +28,24 @@ Simulation_t::Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_pa
       wg_range(Buffer_Routines::get_wg_range(q)) {}
 
 void Simulation_t::write_allocated_steps(uint32_t t,
-                                         sycl::event& event) {
+                                         sycl::event& event, uint32_t t_start, uint32_t t_end) {
   auto N_steps = t % p.Nt_alloc;
+  t_end = (t_end == 0) ? p.Nt_alloc : t_end;
+  assert(t_start > 0);
   N_steps = (N_steps == 0) ? p.Nt_alloc : N_steps;
-  std::chrono::high_resolution_clock::time_point t1, t2;
   N_steps = std::min<size_t>({N_steps, p.Nt_alloc});
-  t1 = std::chrono::high_resolution_clock::now();
-  event = accumulate_community_state(
+  accumulate_community_state(
       q, event, b.vertex_state, b.vcm, b.community_state, compute_range,
-      wg_range, p.N_sims, 1, N_steps+1);
-  event.wait();
-  t2 = std::chrono::high_resolution_clock::now();
-  std::cout
-      << "Accumulate community state: "
-      << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
-      << "ms\n";
-  t1 = t2;
+      wg_range, p.N_sims, 1, N_steps+1).wait();
+
 
   auto state_df = Dataframe::make_dataframe<State_t>(q, b.community_state);
   auto event_df = Dataframe::make_dataframe<uint32_t>(q, b.accumulated_events);
-  t2 = std::chrono::high_resolution_clock::now();
-  std::cout
-      << "Read graphseries: "
-      << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
-      << "ms\n";
-  t1 = t2; 
 
-  auto t_offset = t - p.Nt_alloc + 1;
-  SBM_Database::community_state_upsert(p.p_out_id, p.graph_id, state_df, t_offset,control_type, regression_type, 1);
+  auto t_offset = t - (t_end - t_start);
+  SBM_Database::community_state_upsert(p.p_out_id, p.graph_id, state_df, t_offset,control_type, regression_type, t_start, t_end+1);
   SBM_Database::connection_upsert<uint32_t>("connection_events", p.p_out_id, p.graph_id,
-                              event_df, t_offset, control_type, regression_type);
-
-  state_df.resize_dim(2, N_steps + 1);
-  event_df.resize_dim(2, N_steps);
-  auto inf_gs = sample_infections(state_df, event_df, b.ccm, p.seed);
-
-  SBM_Database::connection_upsert<uint32_t>("infection_events", p.p_out_id, p.graph_id,
-                              inf_gs, t_offset,control_type, regression_type);
-
-  t2 = std::chrono::high_resolution_clock::now();
-  std::cout
-      << "Inf sample/ write graphseries: "
-      << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
-      << "ms\n";
+                              event_df, t_offset, control_type, regression_type, t_start-1, t_end);
 }
 
 void Simulation_t::write_initial_steps(sycl::queue &q, const SBM_Database::Sim_Param &p,
@@ -87,9 +62,6 @@ void Simulation_t::write_initial_steps(sycl::queue &q, const SBM_Database::Sim_P
 }
 
 void Simulation_t::run() {
-  // if ((!compute_range[0]) || (!wg_range[0])) {
-  //   std::tie(compute_range, wg_range) = Buffer_Routines::default_compute_range(q);
-  // }
   q.wait();
 
   sycl::event event = initialize_vertices(q, p, b.vertex_state, b.rngs, compute_range, wg_range, b.construction_events);
@@ -113,7 +85,7 @@ void Simulation_t::run() {
     event = infect(q, p, b, t, compute_range, wg_range, event);
     std::cout << "t: " << t << "\n";
   }
-  // write_allocated_steps(t, event);
+  write_allocated_steps(t, event, 1, t % p.Nt_alloc);
 }
 
 } // namespace SBM_Simulation

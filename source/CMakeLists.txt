@@ -1,5 +1,4 @@
 file(GLOB_RECURSE SOURCES *.cpp)
 add_library(${PROJECT_NAME} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_INCLUDE_DIR}> $<INSTALL_INTERFACE:include>)
-target_link_libraries(${PROJECT_NAME} PUBLIC ${${PROJECT_NAME}_EXTERNAL_PACKAGES})
-
+default_configure_target(${PROJECT_NAME})
+default_link_target(${PROJECT_NAME})

@@ -1,5 +1,11 @@
 
 add_default_executable(MC_Simulations)
 target_compile_options(MC_Simulations PRIVATE -fPIC)
+add_default_executable(Async_MC)
+target_compile_options(Async_MC PRIVATE -fPIC)
 add_default_executable(Graph_Generation)
 target_compile_options(Graph_Generation PRIVATE -fPIC)
+add_default_executable(Infection_Sampling)
+target_compile_options(Infection_Sampling PRIVATE -fPIC)
+add_default_executable(Sim_Param_Upsert)
+target_compile_options(Infection_Sampling PRIVATE -fPIC)

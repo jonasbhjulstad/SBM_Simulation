@@ -2,9 +2,9 @@ import sys
 import os
 import numpy as np
 Project_root = "/home/man/Documents/ER_Bernoulli_Robust_MPC/"  # nopep 8
-Binder_path = Project_root + "/build/Binders/"  # nopep 8
+SBM_Database_path = "~/Documents/SBM_Database/build/binders/"
 Data_dir = Project_root + "data/SIR_sim/"  # nopep 8
-sys.path.append(Binder_path)  # nopep 8
+sys.path.append(SBM_Database_path)  # nopep 8
 
 
 def create_dir(dir):

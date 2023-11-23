@@ -2,7 +2,7 @@
 #include <SBM_Graph/Complete_Graph.hpp>
 #include <SBM_Simulation/Simulation/Sim_Buffers.hpp>
 #include <SBM_Simulation/Utils/Math.hpp>
-#include <Sycl_Buffer_Routines/Random.hpp>
+#include <Static_RNG/Generation/Generation.hpp>
 #include <doctest/doctest.h>
 
 bool check_3d_range(uint32_t N0, uint32_t N1, uint32_t N2, const auto& buf)
@@ -39,7 +39,7 @@ TEST_CASE("Sim_Buffers") {
   auto Np = 1;
   auto Ng = 1;
   float p_out = 0.5f;
-  auto seeds = Buffer_Routines::generate_seeds(Np, seed);
+  auto seeds = Static_RNG::generate_seeds(Np, seed);
 
   std::vector<float> p_out_vec =
       SBM_Simulation::make_linspace(0.0f, 1.0f, 0.1f);

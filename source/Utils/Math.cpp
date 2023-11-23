@@ -5,7 +5,7 @@ namespace SBM_Simulation
 std::vector<float> make_linspace(float start, float end, float step)
 {
     std::vector<float> vec;
-    for(float i = start; i < end; i += step)
+    for(float i = start; i <= end; i += step)
     {
         vec.push_back(i);
     }

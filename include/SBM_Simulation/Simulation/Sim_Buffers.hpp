@@ -5,7 +5,7 @@
 #include <SBM_Database/Simulation/SIR_Types.hpp>
 #include <SBM_Database/Simulation/Sim_Types.hpp>
 #include <SBM_Graph/Graph_Types.hpp>
-#include <Static_RNG/distributions.hpp>
+#include <Static_RNG/Distributions/Uniform.hpp>
 namespace SBM_Simulation {
 struct Sim_Buffers {
 
@@ -19,7 +19,7 @@ struct Sim_Buffers {
   sycl::buffer<uint32_t, 1> vcm;
   sycl::buffer<State_t, 3> community_state;
   std::vector<sycl::event> construction_events = std::vector<sycl::event>(4);
-  const Dataframe::Dataframe_t<Weighted_Edge_t, 1> ccm;
+  const Dataframe::Dataframe_t<SBM_Graph::Weighted_Edge_t, 1> ccm;
 
   Sim_Buffers(sycl::queue &q, const SBM_Database::Sim_Param &p,
               const QString &control_type);

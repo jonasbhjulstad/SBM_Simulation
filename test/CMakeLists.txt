@@ -31,7 +31,6 @@ enable_testing()
 include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
 add_subdirectory(source)
 
-
 # ---- code coverage ----
 
 if(ENABLE_TEST_COVERAGE)

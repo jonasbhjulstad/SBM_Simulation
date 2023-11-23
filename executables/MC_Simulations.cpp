@@ -1,5 +1,6 @@
 #include <SBM_Simulation/SBM_Simulation.hpp>
 #include <SBM_Graph/Graph.hpp>
+#include <Sycl_Buffer_Routines/Profiling.hpp>
 #include <tom/tom_config.hpp>
 int main()
 {
@@ -10,8 +11,9 @@ int main()
     std::string root_dir = "/home/man/Documents/ER_Bernoulli_Robust_MPC/";
     std::string output_dir = root_dir + "data/";
     std::chrono::high_resolution_clock::time_point t1, t2;
-
-    sycl::queue q(sycl::cpu_selector_v);
+    sycl::queue q(sycl::gpu_selector_v);
+    auto info = Buffer_Routines::get_device_info(q);
+    info.print();
     uint32_t seed = 283;
     auto p_out_id = 0;
     auto graph_id = 0;
