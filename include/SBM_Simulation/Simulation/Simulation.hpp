@@ -25,9 +25,9 @@ struct Simulation_t {
   QString control_type;
   QString regression_type;
   std::shared_ptr<spdlog::logger> logger;
+  int connect_run();
 
-
-  void run();
+  int run();
 
 private:
   void write_initial_steps(sycl::queue &q, const SBM_Database::Sim_Param &p,
@@ -35,7 +35,6 @@ private:
 
   void write_allocated_steps(uint32_t t, sycl::event &event,
                              uint32_t t_start = 1, uint32_t t_end = 0);
-  
 };
 } // namespace SBM_Simulation
 #endif

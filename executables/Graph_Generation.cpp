@@ -63,6 +63,7 @@ int main() {
     auto p_out = p_out_vec[p_out_id];
     param.p_out_id = p_out_id;
     param.p_out = p_out;
+    param.seed = seeds[p_out_id];
     begin = std::chrono::steady_clock::now();
     auto [edge_lists, node_lists] = SBM_Graph::generate_N_SBM_graphs(
         N_pop, N_communities, p_in, p_out, seeds[p_out_id], Ng);
@@ -79,6 +80,7 @@ int main() {
     std::vector<uint32_t> p_outs(Ng, p_out_id);
     begin = std::chrono::steady_clock::now();
     // Orm::DB::beginTransaction();
+
     SBM_Database::bulk_generate_SBM_to_db(param, Ng, N_graphs_per_bulk, seeds[p_out_id], manager);
     // Orm::DB::commit();
     // auto query = manager->qtQuery();

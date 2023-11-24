@@ -4,6 +4,8 @@
 #include <SBM_Simulation/Epidemiological/SIR_Dynamics.hpp>
 #include <Sycl_Buffer_Routines/ND_range.hpp>
 #include <Dataframe/Dataframe.hpp>
+#include <tom/tom_config.hpp>
+#include <future>
 namespace SBM_Simulation {
 Simulation_t::Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
                            const char *control_type,
@@ -39,8 +41,8 @@ void Simulation_t::write_allocated_steps(uint32_t t,
       wg_range, p.N_sims, 1, N_steps+1).wait();
 
 
-  auto state_df = Dataframe::make_dataframe<State_t>(q, b.community_state);
-  auto event_df = Dataframe::make_dataframe<uint32_t>(q, b.accumulated_events);
+  auto [state_df, cs_df_event] = Dataframe::make_future_dataframe<State_t>(q, b.community_state);
+  auto [event_df, ae_df_event] = Dataframe::make_future_dataframe<uint32_t>(q, b.accumulated_events);
 
   auto t_offset = t - (t_end - t_start);
   SBM_Database::community_state_upsert(p.p_out_id, p.graph_id, state_df, t_offset,control_type, regression_type, t_start, t_end+1);
@@ -61,7 +63,7 @@ void Simulation_t::write_initial_steps(sycl::queue &q, const SBM_Database::Sim_P
   SBM_Database::community_state_upsert(p.p_out_id, p.graph_id, state_df, 0, control_type, regression_type);
 }
 
-void Simulation_t::run() {
+int Simulation_t::run() {
   q.wait();
 
   sycl::event event = initialize_vertices(q, p, b.vertex_state, b.rngs, compute_range, wg_range, b.construction_events);
@@ -86,6 +88,36 @@ void Simulation_t::run() {
     std::cout << "t: " << t << "\n";
   }
   write_allocated_steps(t, event, 1, t % p.Nt_alloc);
+  return 0;
+}
+
+
+int Simulation_t::connect_run() {
+  auto manager = tom_config::default_db_connection_postgres();
+  q.wait();
+  sycl::event event = initialize_vertices(q, p, b.vertex_state, b.rngs, compute_range, wg_range, b.construction_events);
+  event.wait();
+  write_initial_steps(q, p, b, event);
+  event = Buffer_Routines::clear_buffer<uint32_t, 3>(
+        q, b.accumulated_events, event);
+  uint32_t t = 0;
+  for (t = 0; t < p.Nt; t++) {
+    bool is_initial_write = (t == 0);
+    if (is_allocated_space_full(t, p.Nt_alloc)) {
+      q.wait();
+      write_allocated_steps(t, event);
+      q.wait();
+      event = Buffer_Routines::clear_buffer<uint32_t, 3>(
+          q, b.accumulated_events, event);
+      event = move_buffer_row(q, b.vertex_state, p.Nt_alloc, event);
+    }
+    event = recover(q, p, b.vertex_state, b.rngs, t, compute_range, wg_range,
+                     event);
+    event = infect(q, p, b, t, compute_range, wg_range, event);
+    std::cout << "t: " << t << "\n";
+  }
+  write_allocated_steps(t, event, 1, t % p.Nt_alloc);
+  return 0;
 }
 
 } // namespace SBM_Simulation

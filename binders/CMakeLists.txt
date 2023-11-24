@@ -1,3 +1,5 @@
+if(${PROJECT_NAME}_BUILD_BINDER)
 add_binder(Binder_SBM_Simulation Binder_SBM_Simulation.cpp)
 target_link_libraries(Binder_SBM_Simulation PUBLIC ${PROJECT_NAME})
 set_target_properties(Binder_SBM_Simulation PROPERTIES OUTPUT_NAME "SBM_Simulation")
+endif()

@@ -1,0 +1,15 @@
+[submodule "submodules/SBM_Graph"]
+	path = submodules/SBM_Graph
+	url = https://github.com/jonasbhjulstad/SBM_Graph.git
+[submodule "submodules/Dataframe"]
+	path = submodules/Dataframe
+	url = https://github.com/jonasbhjulstad/Dataframe.git
+[submodule "submodules/SBM_Database"]
+	path = submodules/SBM_Database
+	url = https://github.com/jonasbhjulstad/SBM_Database.git
+[submodule "submodules/Buffer_Routines"]
+	path = submodules/Buffer_Routines
+	url = https://github.com/jonasbhjulstad/Sycl_Buffer_Routines.git
+[submodule "submodules/Static_RNG"]
+	path = submodules/Static_RNG
+	url = https://github.com/jonasbhjulstad/Static_RNG.git

@@ -11,7 +11,7 @@ function(default_configure_target target_name)
 endfunction()
 
 function(default_link_target target_name)
-target_link_libraries(${target_name} PUBLIC ${${PROJECT_NAME}_EXTERNAL_PACKAGES})
+target_link_libraries(${target_name} PUBLIC ${${PROJECT_NAME}_EXTERNAL_PACKAGES} ${TINY_ORM_LIBRARIES})
 endfunction()
 
 function(add_binder source_file)
