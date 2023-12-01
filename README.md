@@ -28,6 +28,9 @@ A `vertex_partition_map` (with `uint32_t` `partition`) is allocated to determine
 ## Memory Synchronization
 When simulations surpass a given number of timesteps $N_{t,alloc}$, results are transferred from the compute device to the host.
 
+## MC Simulation Workflow
+![](https://github.com/jonasbhjulstad/SBM_Simulation/blob/master/SBM_Simulation_Workflow.png?raw=true)
+
 
 ## Top-level
 
