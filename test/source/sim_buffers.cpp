@@ -18,7 +18,7 @@ void check_buffer_ranges(const SBM_Simulation::Sim_Buffers& b, const SBM_Databas
     CHECK(check_3d_range(p.N_sims, p.Nt, p.N_connections, b.p_Is));
     CHECK(b.rngs.get_range()[0] == p.N_sims);
     CHECK(b.ecm.get_range()[0] == b.edges.get_range()[0]);
-    CHECK(b.vcm.get_range()[0] == p.N_pop*p.N_communities);
+    CHECK(b.vpm.get_range()[0] == p.N_pop*p.N_communities);
     CHECK(check_3d_range(p.N_sims, p.Nt_alloc+1, p.N_communities, b.community_state));
 }
 
@@ -50,7 +50,7 @@ TEST_CASE("Sim_Buffers") {
   auto [edge_lists, node_lists] = SBM_Graph::generate_N_SBM_graphs(
       N_pop, N_communities, p_in, p_out, seeds[p_out_id], 1);
   auto graph_id = 0;
-  SBM_Database::remove_db_graphs();
+  SBM_Database::drop_graph_tables();
   SBM_Database::SBM_Graph_to_db(edge_lists[graph_id], node_lists[graph_id],
                                    p_out_id, graph_id);
 

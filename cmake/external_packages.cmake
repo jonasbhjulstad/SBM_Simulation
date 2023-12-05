@@ -25,7 +25,7 @@ CPMFindPackage(NAME fmt
 GITHUB_REPOSITORY fmtlib/fmt)
 CPMFindPackage(NAME spdlog
 GITHUB_REPOSITORY gabime/spdlog)
-
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 custom_submodule_add(Static_RNG)
 custom_submodule_add(Dataframe)
 custom_submodule_add(Buffer_Routines)
@@ -42,5 +42,5 @@ find_package(ortools REQUIRED CONFIG)
 find_package(TBB REQUIRED)
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
 # find_package(casadi REQUIRED HINTS "/home/man/mambaforge/envs/gt/lib/cmake/casadi")
-set(${PROJECT_NAME}_EXTERNAL_PACKAGES ${TINY_ORM_LIBRARIES} Static_RNG::Static_RNG Dataframe::Dataframe SBM_Database::SBM_Database Buffer_Routines::Buffer_Routines SBM_Graph::SBM_Graph TBB::tbb Eigen3::Eigen cppitertools::cppitertools ortools::ortools fmt::fmt spdlog::spdlog)
+set(${PROJECT_NAME}_EXTERNAL_PACKAGES ${TINY_ORM_LIBRARIES} Static_RNG::Static_RNG Dataframe::Dataframe SBM_Database::SBM_Database Buffer_Routines::Buffer_Routines SBM_Graph::SBM_Graph TBB::tbb Eigen3::Eigen cppitertools::cppitertools ortools::ortools fmt::fmt spdlog::spdlog Eigen3::Eigen)
 endif()

@@ -18,8 +18,8 @@ int main()
     auto p_out_id = 0;
     auto graph_id = 0;
     auto p = SBM_Database::sim_param_read(p_out_id, graph_id);
-    Simulation_t sim(q, p, "Community");
-    sim.run();
+
+    Sim_Buffers b(q, p, "Community");
     q.wait();
     t2 = std::chrono::high_resolution_clock::now();
 

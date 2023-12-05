@@ -1,123 +1,258 @@
+#include <Dataframe/Dataframe.hpp>
 #include <SBM_Database/Simulation/Simulation_Tables.hpp>
+#include <SBM_Simulation/Epidemiological/SIR_Dynamics.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
 #include <SBM_Simulation/Simulation/State_Accumulation.hpp>
-#include <SBM_Simulation/Epidemiological/SIR_Dynamics.hpp>
+#include <Sycl_Buffer_Routines/Database.hpp>
 #include <Sycl_Buffer_Routines/ND_range.hpp>
-#include <Dataframe/Dataframe.hpp>
-#include <tom/tom_config.hpp>
 #include <future>
+#include <tom/tom_config.hpp>
 namespace SBM_Simulation {
-Simulation_t::Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
-                           const char *control_type,
-                           const char *regression_type)
-    : q(q), p(sim_param), b(Sim_Buffers(q, sim_param, control_type, regression_type)),
-      compute_range(p.N_sims),
-      wg_range(std::min<uint32_t>({(uint32_t)Buffer_Routines::get_wg_range(q)[0], sim_param.N_sims})), control_type(control_type), regression_type(regression_type) 
-      {
-      }
-Simulation_t::Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
-                           const char *control_type)
-    : q(q), p(sim_param), b(Sim_Buffers(q, sim_param, control_type)),
-      compute_range(p.N_sims),
-      wg_range(std::min<uint32_t>({(uint32_t)Buffer_Routines::get_wg_range(q)[0], sim_param.N_sims})), control_type(control_type)
-      {
-      }
 
-Simulation_t::Simulation_t(sycl::queue &q, const SBM_Database::Sim_Param &sim_param,
-                           const Sim_Buffers &sim_buffers)
-    : q(q), p(sim_param), b(sim_buffers),
-      compute_range(p.N_sims),
-      wg_range(Buffer_Routines::get_wg_range(q)) {}
+void write_simulation_steps(sycl::queue &q, Sim_Buffers &b,
+                            const SBM_Database::Sim_Param &p,
+                            sycl::event &dep_event,
+                            const sycl::nd_range<1> &nd_range,
+                            const QString &control_type,
+                            const QString &regression_type, uint32_t t_start,
+                            uint32_t t_end) {
+  assert(t_end > t_start);
+  auto N_steps = t_end - t_start;
+  auto event = accumulate_community_state(q, dep_event, b.vertex_state, b.vpm,
+                                          b.community_state, nd_range);
+  auto state_df = Dataframe::make_dataframe<State_t>(q, b.community_state);
+  auto event_df = Dataframe::make_dataframe<SBM_Graph::Edge_t>(q, b.accumulated_events);
 
-void Simulation_t::write_allocated_steps(uint32_t t,
-                                         sycl::event& event, uint32_t t_start, uint32_t t_end) {
-  auto N_steps = t % p.Nt_alloc;
-  t_end = (t_end == 0) ? p.Nt_alloc : t_end;
-  assert(t_start > 0);
-  N_steps = (N_steps == 0) ? p.Nt_alloc : N_steps;
-  N_steps = std::min<size_t>({N_steps, p.Nt_alloc});
-  accumulate_community_state(
-      q, event, b.vertex_state, b.vcm, b.community_state, compute_range,
-      wg_range, p.N_sims, 1, N_steps+1).wait();
-
-
-  auto [state_df, cs_df_event] = Dataframe::make_future_dataframe<State_t>(q, b.community_state);
-  auto [event_df, ae_df_event] = Dataframe::make_future_dataframe<uint32_t>(q, b.accumulated_events);
-
-  auto t_offset = t - (t_end - t_start);
-  SBM_Database::community_state_upsert(p.p_out_id, p.graph_id, state_df, t_offset,control_type, regression_type, t_start, t_end+1);
-  SBM_Database::connection_upsert<uint32_t>("connection_events", p.p_out_id, p.graph_id,
-                              event_df, t_offset, control_type, regression_type, t_start-1, t_end);
+  SBM_Database::community_state_to_table(p.p_out_id, p.graph_id, state_df,
+                                         control_type, regression_type, t_start,
+                                         t_end + 1);
+  SBM_Database::edge_to_table(
+      "connection_events", p.p_out_id, p.graph_id, event_df, control_type,
+      regression_type, t_start - 1, t_end);
+  // SBM_Database::community_state_upsert(p.p_out_id, p.graph_id, state_df,
+  //                                      control_type, regression_type,
+  //                                      t_start, t_end + 1);
+  // SBM_Database::connection_upsert<uint32_t>(
+  //     "connection_events", p.p_out_id, p.graph_id, event_df, control_type,
+  //     regression_type, t_start - 1, t_end);
 }
 
-void Simulation_t::write_initial_steps(sycl::queue &q, const SBM_Database::Sim_Param &p,
-                                       Sim_Buffers &b,
-                                       sycl::event &dep_event) {
+void write_simulation_steps(sycl::queue &q, std::vector<Sim_Buffers> &bs,
+                            const std::vector<SBM_Database::Sim_Param> &ps,
+                            std::vector<sycl::event> &dep_events,
+                            std::vector<sycl::nd_range<1>> nd_ranges,
+                            const QString &control_type,
+                            const QString &regression_type, uint32_t t_start,
+                            uint32_t t_end) {
+  std::vector<sycl::event> events(ps.size());
+  for (int i = 0; i < ps.size(); i++) {
+    events[i] = accumulate_community_state(q, dep_events[i], bs[i].vertex_state,
+                                           bs[i].vpm, bs[i].community_state,
+                                           nd_ranges[i]);
+  }
+
+  std::vector<Dataframe::Dataframe_t<State_t, 3>> state_dfs(ps.size());
+  std::transform(bs.begin(), bs.end(), state_dfs.begin(), [&](Sim_Buffers &b) {
+    return Dataframe::make_dataframe<State_t>(q, b.community_state);
+  });
+  std::vector<Dataframe::Dataframe_t<SBM_Graph::Edge_t, 3>> event_dfs(ps.size());
+
+  std::transform(bs.begin(), bs.end(), event_dfs.begin(), [&](Sim_Buffers &b) {
+    return Dataframe::make_dataframe<SBM_Graph::Edge_t>(q, b.accumulated_events);
+  });
+
+  std::for_each(ps.begin(), ps.end(),
+                [&, i = 0](const SBM_Database::Sim_Param &p) mutable {
+
+                  SBM_Database::community_state_to_table(
+                      p.p_out_id, p.graph_id, state_dfs[i], control_type,
+                      regression_type, t_start+1, t_end + 1);
+                  SBM_Database::edge_to_table(
+                      "connection_events", p.p_out_id, p.graph_id, event_dfs[i],
+                      control_type, regression_type, t_start, t_end);
+                  i++;
+                });
+}
+
+void write_initial_steps(sycl::queue &q, const SBM_Database::Sim_Param &p,
+                         Sim_Buffers &b, const sycl::nd_range<1> &nd_range,
+                         const QString &control_type,
+                         const QString &regression_type,
+                         sycl::event &dep_event) {
 
   auto acc_event = accumulate_community_state(
-      q, dep_event, b.vertex_state, b.vcm, b.community_state, compute_range,
-      wg_range, p.N_sims, 0, 1);
-  acc_event.wait();
+      q, dep_event, b.vertex_state, b.vpm, b.community_state, nd_range);
+
   auto state_df = Dataframe::make_dataframe<State_t>(q, b.community_state);
-  state_df.resize_dim(1, 1);
-  SBM_Database::community_state_upsert(p.p_out_id, p.graph_id, state_df, 0, control_type, regression_type);
+  SBM_Database::community_state_upsert(p.p_out_id, p.graph_id, state_df,
+                                       control_type, regression_type, 0, 1);
 }
 
-int Simulation_t::run() {
-  q.wait();
+void write_initial_steps(sycl::queue &q,
+                         const std::vector<SBM_Database::Sim_Param> &ps,
+                         std::vector<Sim_Buffers> &b,
+                         std::vector<sycl::nd_range<1>> nd_ranges,
+                         const QString &control_type,
+                         const QString &regression_type,
+                         std::vector<sycl::event> &dep_events) {
+  std::vector<sycl::event> acc_events(ps.size());
 
-  sycl::event event = initialize_vertices(q, p, b.vertex_state, b.rngs, compute_range, wg_range, b.construction_events);
-  event.wait();
-  write_initial_steps(q, p, b, event);
-  event = Buffer_Routines::clear_buffer<uint32_t, 3>(
-        q, b.accumulated_events, event);
-  uint32_t t = 0;
-  for (t = 0; t < p.Nt; t++) {
-    bool is_initial_write = (t == 0);
-    if (is_allocated_space_full(t, p.Nt_alloc)) {
-      q.wait();
-      write_allocated_steps(t, event);
-      q.wait();
-      event = Buffer_Routines::clear_buffer<uint32_t, 3>(
-          q, b.accumulated_events, event);
-      event = move_buffer_row(q, b.vertex_state, p.Nt_alloc, event);
-    }
-    event = recover(q, p, b.vertex_state, b.rngs, t, compute_range, wg_range,
-                     event);
-    event = infect(q, p, b, t, compute_range, wg_range, event);
-    std::cout << "t: " << t << "\n";
+  for (int i = 0; i < ps.size(); i++) {
+    acc_events[i] = accumulate_community_state(
+        q, dep_events[i], b[i].vertex_state, b[i].vpm, b[i].community_state,
+        nd_ranges[i]);
   }
-  write_allocated_steps(t, event, 1, t % p.Nt_alloc);
-  return 0;
+  sycl::event::wait_and_throw(acc_events);
+  std::vector<Dataframe::Dataframe_t<State_t, 3>> state_dfs(ps.size());
+  std::transform(b.begin(), b.end(), state_dfs.begin(), [&](Sim_Buffers &b) {
+    return Dataframe::make_dataframe<State_t>(q, b.community_state);
+  });
+
+  std::for_each(ps.begin(), ps.end(),
+                [&, i = 0](const SBM_Database::Sim_Param &p) mutable {
+                  SBM_Database::community_state_upsert(
+                      p.p_out_id, p.graph_id, state_dfs[i], control_type,
+                      regression_type, 0, 1);
+                  i++;
+                });
 }
 
+sycl::event initialize_simulation(sycl::queue &q,
+                                  const SBM_Database::Sim_Param &p,
+                                  Sim_Buffers &b, const QString &control_type,
+                                  const QString &regression_type,
+                                  const sycl::nd_range<1> &nd_range) {
+  auto event = initialize_vertices(q, p, b.vertex_state, b.rngs, nd_range,
+                                   b.construction_events);
+  write_initial_steps(q, p, b, nd_range, control_type, regression_type, event);
+  return event;
+}
 
-int Simulation_t::connect_run() {
-  auto manager = tom_config::default_db_connection_postgres();
-  q.wait();
-  sycl::event event = initialize_vertices(q, p, b.vertex_state, b.rngs, compute_range, wg_range, b.construction_events);
-  event.wait();
-  write_initial_steps(q, p, b, event);
-  event = Buffer_Routines::clear_buffer<uint32_t, 3>(
-        q, b.accumulated_events, event);
-  uint32_t t = 0;
-  for (t = 0; t < p.Nt; t++) {
-    bool is_initial_write = (t == 0);
-    if (is_allocated_space_full(t, p.Nt_alloc)) {
-      q.wait();
-      write_allocated_steps(t, event);
-      q.wait();
-      event = Buffer_Routines::clear_buffer<uint32_t, 3>(
-          q, b.accumulated_events, event);
-      event = move_buffer_row(q, b.vertex_state, p.Nt_alloc, event);
-    }
-    event = recover(q, p, b.vertex_state, b.rngs, t, compute_range, wg_range,
-                     event);
-    event = infect(q, p, b, t, compute_range, wg_range, event);
-    std::cout << "t: " << t << "\n";
+std::vector<sycl::event> initialize_simulations(
+    sycl::queue &q, const std::vector<SBM_Database::Sim_Param> &ps,
+    std::vector<Sim_Buffers> &bs, const QString &control_type,
+    const QString &regression_type, std::vector<sycl::nd_range<1>> nd_ranges) {
+  std::vector<sycl::event> events(ps.size());
+  for (int i = 0; i < ps.size(); i++) {
+    events[i] = initialize_vertices(q, ps[i], bs[i].vertex_state, bs[i].rngs,
+                                    nd_ranges[i], bs[i].construction_events);
   }
-  write_allocated_steps(t, event, 1, t % p.Nt_alloc);
-  return 0;
+  write_initial_steps(q, ps, bs, nd_ranges, control_type, regression_type,
+                      events);
+  return events;
+}
+
+sycl::event p_I_table_to_buffer(sycl::queue &q,
+                                const SBM_Database::Sim_Param &p,
+                                sycl::buffer<float, 3> &p_Is,
+                                const QString &control_type,
+                                const QString &regression_type,
+                                uint32_t t_start, uint32_t t_end,
+                                 sycl::event dep_event) {
+  if (t_end == t_start)
+    {
+      return sycl::event{};
+    }
+  auto table_name = QString("p_Is_") +
+                    ((regression_type.isEmpty()) ? "excitation" : "validation");
+  QVector<Orm::WhereItem> const_indices = {{"p_out", p.p_out_id},
+                                           {"graph", p.graph_id},
+                                           {"Control_Type", control_type}};
+  QStringList var_indices = {"simulation", "t", "connection"};
+  std::array<uint32_t, 3> start = {0, t_start, 0};
+  std::array<uint32_t, 3> end = {p.N_sims, t_end,
+                                 p.N_connections};
+  return Buffer_Routines::table_to_buffer<float, 3>(
+      q, p_Is, table_name, const_indices, var_indices, "value", start, end,
+      "simulation", "t", dep_event);
+}
+
+void simulate_allocated_steps(sycl::queue &q, const SBM_Database::Sim_Param &p,
+                              Sim_Buffers &b, sycl::event &dep_event,
+                              const sycl::nd_range<1> &nd_range,
+                              const QString &control_type,
+                              const QString &regression_type, uint32_t t_offset,
+                              uint32_t N_steps) {
+  sycl::event event = dep_event;
+
+  event = p_I_table_to_buffer(q, p, b.p_Is, control_type, regression_type,
+                              t_offset, t_offset + N_steps,  event);
+  for (int t = t_offset; t < t_offset + p.Nt_alloc; t++) {
+    event = recover(q, p, b.vertex_state, b.rngs, t, nd_range, event);
+    event = infect(q, p, b, t, nd_range, event);
+  }
+
+  write_simulation_steps(q, b, p, event, nd_range, control_type,
+                         regression_type, 1, N_steps + 1);
+}
+
+std::vector<sycl::event> simulate_allocated_steps(
+    sycl::queue &q, const std::vector<SBM_Database::Sim_Param> &ps,
+    std::vector<Sim_Buffers> &bs, std::vector<sycl::event> &events,
+    std::vector<sycl::nd_range<1>> nd_ranges, const QString &control_type,
+    const QString &regression_type, uint32_t t_start, uint32_t N_steps) {
+  auto t_end = std::min<uint32_t>({t_start + N_steps, ps[0].Nt});
+  for (int i = 0; i < ps.size(); i++) {
+    events[i] = p_I_table_to_buffer(q, ps[i], bs[i].p_Is, control_type,
+                                    regression_type, t_start, t_end, events[i]);
+    for (int t = t_start; t < t_end; t++) {
+      events[i] = recover(q, ps[i], bs[i].vertex_state, bs[i].rngs, t,
+                          nd_ranges[i], events[i]);
+      events[i] = infect(q, ps[i], bs[i], t, nd_ranges[i], events[i]);
+    }
+  }
+  write_simulation_steps(q, bs, ps, events, nd_ranges, control_type,
+                         regression_type, t_start, t_end);
+  std::vector<sycl::event> new_events(ps.size());
+  std::transform(bs.begin(), bs.end(), new_events.begin(), [&](Sim_Buffers &b) {
+    return shift_buffer(q, b.vertex_state);
+  });
+  return new_events;
+}
+void run_simulation(sycl::queue &q, const SBM_Database::Sim_Param &p,
+                    Sim_Buffers &b, const QString &control_type,
+                    const QString &regression_type) {
+  auto nd_range = Buffer_Routines::get_nd_range(q, p.N_sims);
+
+  auto event =
+      initialize_simulation(q, p, b, control_type, regression_type, nd_range);
+  uint32_t N_bulks = std::floor((double)p.Nt_alloc / p.Nt);
+  for (int i = 0; i < N_bulks; i++) {
+    simulate_allocated_steps(q, p, b, event, nd_range, control_type,
+                             regression_type, i * p.Nt_alloc + 1, p.Nt_alloc);
+  }
+  simulate_allocated_steps(q, p, b, event, nd_range, control_type,
+                           regression_type, N_bulks * p.Nt_alloc + 1,
+                           p.Nt % p.Nt_alloc);
+}
+
+void run_simulations(sycl::queue &q,
+                     const std::vector<SBM_Database::Sim_Param> &ps,
+                     std::vector<Sim_Buffers> &bs, const QString &control_type,
+                     const QString &regression_type, bool verbose) {
+  std::vector<sycl::nd_range<1>> nd_ranges;
+  std::transform(ps.begin(), ps.end(), std::back_inserter(nd_ranges),
+                 [&](const SBM_Database::Sim_Param &p) {
+                   return Buffer_Routines::get_nd_range(q, p.N_sims);
+                 });
+  auto events = initialize_simulations(q, ps, bs, control_type, regression_type,
+                                       nd_ranges);
+  uint32_t N_bulks = std::floor((double)ps[0].Nt / (ps[0].Nt_alloc - 1));
+  std::cout << "Running concurrent MC-simulations with (p_out, N_graphs, "
+               "N_sims, Nt, Nt_alloc) = ("
+            << ps[0].p_out_id << ", " << ps.size() << ", " << ps[0].N_sims
+            << ", " << ps[0].Nt << ", " << ps[0].Nt_alloc << ") \n over "
+            << N_bulks << " bulks" << std::endl;
+  for (int i = 0; i < N_bulks; i++) {
+    std::cout << i + 1 << " of " << N_bulks << std::endl;
+    events = simulate_allocated_steps(q, ps, bs, events, nd_ranges,
+                                      control_type, regression_type,
+                                      i * (ps[0].Nt_alloc-1), ps[0].Nt_alloc-1);
+  }
+  events = simulate_allocated_steps(q, ps, bs, events, nd_ranges, control_type,
+                                    regression_type, N_bulks * (ps[0].Nt_alloc - 1),
+                                    ps[0].Nt % (ps[0].Nt_alloc - 1));
+  sycl::event::wait_and_throw(events);
 }
 
 } // namespace SBM_Simulation

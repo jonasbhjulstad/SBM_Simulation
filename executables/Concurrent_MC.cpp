@@ -1,6 +1,7 @@
 #define QT_FATAL_WARNINGS 1
 #include <SBM_Graph/Graph.hpp>
 #include <SBM_Simulation/SBM_Simulation.hpp>
+#include <SBM_Database/Simulation/Simulation_Tables.hpp>
 // #include <execution>
 // #include <algorithm>
 #include <thread>
@@ -24,9 +25,10 @@ auto get_Ng_out(auto p_out_id) {
 
 auto read_sim_params() {
   std::vector<SBM_Database::Sim_Param> params;
-  auto N_p_out = get_N_p_out();
+  // auto N_p_out = get_N_p_out();
+  auto N_p_out = 1;
   for (int i = 0; i < N_p_out; i++) {
-    auto Ng = get_Ng_out(i);
+    auto Ng = 2;
     for (int j = 0; j < Ng; j++) {
       auto p = SBM_Database::sim_param_read(i, j);
       params.push_back(p);
@@ -35,55 +37,50 @@ auto read_sim_params() {
   return params;
 }
 
-struct run_sim {
-  std::shared_ptr<Orm::DatabaseManager> manager;
-  SBM_Simulation::Simulation_t sim;
-  run_sim(auto& manager, auto& default_connection, auto& sim) : manager(manager), sim(sim) {
-    manager->setDefaultConnection(default_connection);
-  }
-  void run() { 
-    sim.run(); 
-    }
-};
+auto allocate_buffers(const std::vector<SBM_Database::Sim_Param> &ps,
+                      sycl::queue &q) {
+  auto t1 = std::chrono::high_resolution_clock::now();
+  std::vector<SBM_Simulation::Sim_Buffers> bs;
+  auto tot_byte_size = std::accumulate(ps.begin(), ps.end(), 0, [](auto acc, auto p){return acc + p.buffer_byte_size();});
+  Buffer_Routines::validate_memory_size(q, tot_byte_size);
+
+  bs.reserve(ps.size());
+  std::transform(ps.begin(), ps.end(), std::back_inserter(bs), [&q](auto &p) {
+    return SBM_Simulation::Sim_Buffers(q, p, "Community");
+  });
+
+
+  auto buffer_byte_size =
+      std::accumulate(bs.begin(), bs.end(), 0, [](auto acc, const auto &b) {
+        return acc + b.byte_size();
+      });
+  std::cout << "Total buffer size: " << buffer_byte_size << std::endl;
+  auto t2 = std::chrono::high_resolution_clock::now();
+  std::cout
+      << "Buffer allocation time: "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
+      << " ms" << std::endl;
+  return bs;
+}
+
 int main() {
   using namespace SBM_Database;
   using namespace SBM_Simulation;
   auto manager = tom_config::default_db_connection_postgres();
   auto default_connection = manager->getDefaultConnection();
-  
 
   // project root
   std::string root_dir = "/home/man/Documents/ER_Bernoulli_Robust_MPC/";
   std::string output_dir = root_dir + "data/";
-  std::chrono::high_resolution_clock::time_point t1, t2;
-  auto selector = sycl::gpu_selector_v;
+  sycl::queue q{sycl::gpu_selector_v};
 
   auto ps = read_sim_params();
-  auto Np = ps.size();
-  Np = 2;
-  std::vector<sycl::queue> qs(Np, sycl::queue(selector));
+  auto bs = allocate_buffers(ps, q);
   uint32_t seed = 283;
-  std::vector<Simulation_t> sims;
-  sims.reserve(Np);
-  t1 = std::chrono::high_resolution_clock::now();
-  // std::vector<uint32_t> dummy(Np);
-  // std::transform(std::execution::par_unseq, sims.begin(), sims.end(),
-  // dummy.begin(),
-  //                [&](auto &sim) {
-  //                  sim.run();
-  //                  return 0;
-  //                });
-
-  std::vector<std::thread> threads;
-  for (int i = 0; i < Np; i++) {
-    sims.push_back(Simulation_t(qs[i], ps[i], "Community"));
-    run_sim rs(manager, default_connection, sims[i]);
-    threads.push_back(std::thread(&run_sim::run, &rs));
-  }
-
-  std::for_each(threads.begin(), threads.end(), [](auto &t) { t.join(); });
-
-  t2 = std::chrono::high_resolution_clock::now();
+  SBM_Database::drop_simulation_tables("excitation");
+  auto t1 = std::chrono::high_resolution_clock::now();
+  run_simulations(q, ps, bs, "Community");
+  auto t2 = std::chrono::high_resolution_clock::now();
   std::cout
       << "Execution time: "
       << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()

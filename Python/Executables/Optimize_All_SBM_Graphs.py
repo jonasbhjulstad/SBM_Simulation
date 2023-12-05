@@ -6,17 +6,17 @@ def read_graph_data(p_dir):
     graph_dirs = get_graph_dirs(p_dir)
     edgelists = []
     ecms = []
-    vcms = []
+    vpms = []
     for g_dir in graph_dirs:
         edgelists.append(np.genfromtxt(g_dir + "/edgelist.csv", delimiter=","))
         ecms.append(np.genfromtxt(g_dir + "/ecm.csv", delimiter=","))
-        vcms.append(np.genfromtxt(g_dir + "/vcm.csv", delimiter=","))
-    return edgelists, ecms, vcms
+        vpms.append(np.genfromtxt(g_dir + "/vpm.csv", delimiter=","))
+    return edgelists, ecms, vpms
 
 
 def simulate_with_solution(q, p_dir, u_opt, N_sims):
     SBM_Database::Sim_Param = json.load(open(p_dir + "Sim_Param.json"))
-    edge_lists, ecms, vcms = read_graph_data(p_dir)
+    edge_lists, ecms, vpms = read_graph_data(p_dir)
     N_communities = sim_param["N_communities"]
     N_connections = complete_graph_max_edges(N_communities)
 
@@ -24,9 +24,9 @@ def simulate_with_solution(q, p_dir, u_opt, N_sims):
     if not os.path.exists(sim_param.output_dir):
         os.makedirs(sim_param.output_dir)
     sim_param.N_sims = N_sims
-    sim_param.N_graphs = len(vcms)
+    sim_param.N_graphs = len(vpms)
     # write json to file
-    p_I_run(q, sim_param, edge_lists, ecms, vcms, N_connections, u_opt)
+    p_I_run(q, sim_param, edge_lists, ecms, vpms, N_connections, u_opt)
 
 
 def read_ccm(fname):

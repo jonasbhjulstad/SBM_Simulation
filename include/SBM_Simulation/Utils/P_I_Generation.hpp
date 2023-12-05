@@ -17,10 +17,16 @@ generate_p_Is_validation(sycl::queue &q, const SBM_Database::Sim_Param &p,
 // std::vector<float> generate_floats(uint32_t N, float min, float max, uint32_t
 // seed);
 
-sycl::buffer<float, 3> generate_upsert_p_Is(sycl::queue &q,
+std::vector<float> generate_insert_p_Is(const SBM_Database::Sim_Param &p,
+                                        const QString &table_name,
+                                        const QString &control_type,
+                                        const QString &tmp_dir = "/tmp/");
+sycl::buffer<float, 3> generate_insert_p_Is(sycl::queue &q,
                                             const SBM_Database::Sim_Param &p,
                                             const QString &table_name,
-                                            const QString &control_type);
+                                            const QString &control_type,
+                                            const QString &tmp_dir = "/tmp/");
+
 } // namespace SBM_Simulation
 
 #endif

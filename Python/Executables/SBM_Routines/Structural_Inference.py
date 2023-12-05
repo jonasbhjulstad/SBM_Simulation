@@ -85,20 +85,20 @@ def structural_inference(edgelists, nodelists):
     state = gt.minimize_blockmodel_dl(G, state_args=dict(
         recs=[weight], rec_types=["discrete-poisson"]))
     edges = G.get_edges()
-    vcm = index_relabel_ascending(list(state.get_state()))
+    vpm = index_relabel_ascending(list(state.get_state()))
     N_blocks = state.get_nonempty_B()
     entropy = state.entropy()
-    return N_blocks, entropy, vcm
+    return N_blocks, entropy, vpm
 
 
 def multiple_structural_inference(edgelists, nodelists):
-    N_blocks, entropies, ecms, vcms = [], [], [], []
+    N_blocks, entropies, ecms, vpms = [], [], [], []
     for elist, nodelist in zip(edgelists, nodelists):
-        Nb, entropy, vcm = structural_inference(elist, nodelist)
+        Nb, entropy, vpm = structural_inference(elist, nodelist)
         N_blocks.append(Nb)
         entropies.append(entropy)
-        vcms.append(vcm)
-    return N_blocks, entropies, vcms
+        vpms.append(vpm)
+    return N_blocks, entropies, vpms
 
 
 def flatten_sublists(l):
@@ -110,9 +110,9 @@ def flatten_sublists(l):
 
 
 def create_graphs(p):
-    edgelists, vertexlists, base_ecm, base_vcm = generate_N_SBM_graphs(
+    edgelists, vertexlists, base_ecm, base_vpm = generate_N_SBM_graphs(
         p.N_pop, p.N_communities, p.p_in, p.p_out, p.seed, p.N_graphs)
-    return edgelists, vertexlists, base_ecm, base_vcm
+    return edgelists, vertexlists, base_ecm, base_vpm
 
 
 def multiple_structural_inference_over_p_out(sim_params):
@@ -130,16 +130,16 @@ def multiple_structural_inference_over_p_out(sim_params):
 def inference_over_p_out(sim_params):
     seeds = np.random.randint(0, 100000, sim_params[0].N_graphs)
 
-    edgelists, vertex_lists, entropies, N_blocks, ecms, vcms = [], [], [], [], [], []
+    edgelists, vertex_lists, entropies, N_blocks, ecms, vpms = [], [], [], [], [], []
     for p in sim_params:
-        elist, vlist, base_ecms, base_vcms = create_graphs(p)
+        elist, vlist, base_ecms, base_vpms = create_graphs(p)
         elist_flat = flatten_sublists(elist)
         edgelists.append(elist_flat)
         vertex_lists.append(vlist)
-        Nb, entropy, inferred_vcms = multiple_structural_inference(
+        Nb, entropy, inferred_vpms = multiple_structural_inference(
             elist, vlist)
         N_blocks.append(Nb)
         entropies.append(entropy)
-        vcms.append([(vcm_0, vcm_1)
-                    for vcm_1, vcm_0 in zip(inferred_vcms, base_vcms)])
-    return edgelists, vertex_lists, N_blocks, entropies, vcms, sim_params
+        vpms.append([(vpm_0, vpm_1)
+                    for vpm_1, vpm_0 in zip(inferred_vpms, base_vpms)])
+    return edgelists, vertex_lists, N_blocks, entropies, vpms, sim_params

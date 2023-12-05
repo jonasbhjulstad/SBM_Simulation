@@ -18,14 +18,14 @@ def get_edges(fname):
 
 def validate_for_solution(q, base_dir, subdirname, regression_type):
     gdirs = get_graph_dirs(base_dir)
-    edgelists, vcms, p_Is = [], [], []
+    edgelists, vpms, p_Is = [], [], []
     SBM_Database::Sim_Param = Sim_Param(base_dir + "/Sim_Param.json")
     for gdir in gdirs:
         edgelists.append(get_edges(gdir + "/" + subdirname + "/edgelist.csv"))
-        vcms.append(np.genfromtxt(gdir + "/" + subdirname + "/vcm.csv", dtype=int))
+        vpms.append(np.genfromtxt(gdir + "/" + subdirname + "/vpm.csv", dtype=int))
         p_Is.extend([get_p_Is(gdir + subdirname, regression_type)]*sim_param.N_sims)
 
-    p_I_run(q, sim_param, edgelists, vcms, p_Is)
+    p_I_run(q, sim_param, edgelists, vpms, p_Is)
 
 if __name__ == '__main__':
     Nt_per_u = 7

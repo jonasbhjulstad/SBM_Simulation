@@ -31,9 +31,9 @@ float ER_p_I(auto edgelist, uint32_t N_pop, float R0, float p_R=0.1f) {
 
 int main() {
   auto manager = tom_config::default_db_connection_postgres();
-  uint32_t N_pop = 10;
+  uint32_t N_pop = 100;
   uint32_t N_communities = 10;
-  uint32_t N_connections = SBM_Graph::complete_graph_max_edges(2);
+  uint32_t N_connections = SBM_Graph::complete_graph_max_edges(N_communities, true);
   uint32_t N_sims = 1024;
   uint32_t Nt = 20;
   uint32_t Nt_alloc = 6;
@@ -45,7 +45,7 @@ int main() {
   float p_I0 = 0.1f;
   float p_R0 = 0.0f;
   auto Ng = 2;
-  auto N_graphs_per_bulk = 2;
+  auto N_graphs_per_bulk = 10;
 
   std::chrono::steady_clock::time_point begin =
       std::chrono::steady_clock::now();
@@ -57,7 +57,8 @@ int main() {
   auto Np = p_out_vec.size();
   auto seeds = Static_RNG::generate_seeds(Np, seed);
   SBM_Database::Sim_Param param = {N_pop, 0, 0, N_communities, N_connections, N_sims, Nt, Nt_alloc, seed, p_in, 0.0f, p_I_min, p_I_max, p_R, p_I0, p_R0};
-  SBM_Database::remove_db_graphs();
+  
+  SBM_Database::drop_graph_tables();
   auto graph_ids = SBM_Simulation::make_iota(Ng);
   for (uint32_t p_out_id = 0; p_out_id < p_out_vec.size(); p_out_id++) {
     auto p_out = p_out_vec[p_out_id];
@@ -79,13 +80,8 @@ int main() {
     }
     std::vector<uint32_t> p_outs(Ng, p_out_id);
     begin = std::chrono::steady_clock::now();
-    // Orm::DB::beginTransaction();
 
-    SBM_Database::bulk_generate_SBM_to_db(param, Ng, N_graphs_per_bulk, seeds[p_out_id], manager);
-    // Orm::DB::commit();
-    // auto query = manager->qtQuery();
-    //   SBM_Database::SBM_Graphs_to_db(
-    //       edge_lists, node_lists, p_outs, graph_ids, query);
+    SBM_Database::bulk_generate_SBM_to_db(param, Ng, N_graphs_per_bulk, seeds[p_out_id]);
     end = std::chrono::steady_clock::now();
     std::cout << "Graph insertion time for p_out = " << p_out << " time: "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end -
