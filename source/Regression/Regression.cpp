@@ -6,6 +6,7 @@
 #include <SBM_Database/Regression/Regression_Tables.hpp>
 #include <SBM_Database/Simulation/Simulation_Tables.hpp>
 #include <SBM_Database/Simulation/Size_Queries.hpp>
+#include <Dataframe/Eigen_Conversions.hpp>
 #include <fstream>
 #include <iostream>
 #include <ortools/linear_solver/linear_solver.h>
@@ -140,12 +141,15 @@ load_beta_regression(uint32_t p_out, uint32_t graph, uint32_t sim_id,
 
   auto N_connections = SBM_Database::get_N_connections(
       "infection_events_excitation", p_out, graph);
-  Mat connection_infs = Eigen::MatrixXf(SBM_Database::connection_read<uint32_t>(
+  
+  auto connection_infs_df = SBM_Database::connection_read<uint32_t>(
       "infection_events_excitation", p_out, graph, sim_id, "value",
-      control_type, ""));
+      control_type, "");
+  Mat connection_infs = Dataframe::to_eigen_matrix<uint32_t>(connection_infs_df);
   auto ccm = SBM_Database::ccm_read(p_out, graph);
-  Mat community_traj = Eigen::MatrixXf(SBM_Database::community_state_read(
-      p_out, graph, sim_id, control_type, ""));
+  auto community_traj_df = SBM_Database::community_state_read(
+      p_out, graph, sim_id, control_type, "");
+  Mat community_traj = Dataframe::to_eigen_matrix<uint32_t>(community_traj_df);
   if ((connection_infs.array() == 0).all()) {
     return std::make_pair(Mat(0, N_connections), Mat(0, N_connections));
   }
@@ -168,8 +172,9 @@ load_beta_regression(uint32_t p_out, uint32_t graph, uint32_t sim_id,
   }
   assert((connection_infs.array() <= 1000).all());
   assert((community_traj.array() <= 1000).all());
-  Mat p_Is = Eigen::MatrixXf(SBM_Database::connection_read<float>(
-      "p_Is_excitation", p_out, graph, "value", control_type, ""));
+  auto p_I_df = SBM_Database::connection_read<float>(
+      "p_Is_excitation", p_out, graph, "value", control_type, "");
+  Mat p_Is = Dataframe::to_eigen_matrix<float>(p_I_df);
 
   auto compute_beta_rs_col = [&](auto from_idx, auto to_idx, const Vec &p_I) {
     Mat target_traj =
