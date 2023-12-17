@@ -3,6 +3,7 @@
 #include <SBM_Database/Graph/Generation.hpp>
 #include <SBM_Database/Simulation/Sim_Types.hpp>
 #include <SBM_Database/Simulation/Simulation_Tables.hpp>
+#include <SBM_Database/Graph/Graph_Tables.hpp>
 #include <SBM_Graph/SBM_Graph.hpp>
 #include <SBM_Simulation/Simulation/Simulation.hpp>
 #include <SBM_Simulation/Utils/Math.hpp>

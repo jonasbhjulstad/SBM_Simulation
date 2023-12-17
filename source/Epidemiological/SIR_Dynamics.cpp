@@ -102,9 +102,6 @@ sycl::event infect(sycl::queue &q, const SBM_Database::Sim_Param &p,
   // auto N_threads_per_sim = floor_div(compute_range[0], N_sims);
   // auto N_edges_per_thread = ceil_div(N_edges, N_threads_per_sim);
 
-  Buffer_Routines::validate_buffer_elements<float, 3>(
-      q, b.p_Is,
-      [p](auto elem) { return elem >= p.p_I_min && elem <= p.p_I_max; }, dep_event);
 
   auto inf_event = q.submit([&](sycl::handler &h) {
     h.depends_on(dep_event);

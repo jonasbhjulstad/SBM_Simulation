@@ -18,13 +18,11 @@ namespace SBM_Simulation
 {
 
   const std::vector<uint32_t> get_delta_I(uint32_t p_out_id, uint32_t graph_id,
-                                          uint32_t sim_id, uint32_t community,
+                                          uint32_t sim_id, uint32_t community, uint32_t Nt,
                                           const QString &control_type,
                                           const QString &regression_type)
   {
 
-    auto [N_graphs, N_sims, Nt, N_connections, N_communities] =
-        SBM_Database::query_default_sim_dimensions(control_type, regression_type);
     auto get_community_state_traj = [&](const QString &state)
     {
       auto query = Orm::DB::unprepared("SELECT \"" + state + "\" FROM community_state WHERE (p_out, graph, simulation, community) = (" + QString::number(p_out_id) + ", " + QString::number(graph_id) + ", " + QString::number(sim_id) + ", " + QString::number(community) + ") ORDER BY t ASC");
@@ -40,9 +38,9 @@ namespace SBM_Simulation
     auto Is = get_community_state_traj("I");
     auto Rs = get_community_state_traj("R");
 
-    std::vector<uint32_t> delta_I(Nt - 1, 0);
-    std::vector<uint32_t> delta_R(Nt - 1, 0);
-    for (int t = 0; t < Nt - 1; t++)
+    std::vector<uint32_t> delta_I(Nt, 0);
+    std::vector<uint32_t> delta_R(Nt, 0);
+    for (int t = 0; t < Nt; t++)
     {
       delta_R[t] = Rs[t + 1] - Rs[t];
       delta_I[t] = Is[t + 1] - Is[t] + delta_R[t];
@@ -160,15 +158,14 @@ namespace SBM_Simulation
       const std::vector<SBM_Graph::Weighted_Edge_t> &ccm, uint32_t seed)
   {
 
-    auto [N_graphs, N_sims, Nt, N_connections, N_communities] =
-        SBM_Database::query_default_sim_dimensions(control_type, regression_type);
-    auto dIs = get_delta_I(p_out_id, graph_id, sim_id, community, control_type,
+    auto dims = SBM_Database::get_simulation_dimensions();
+    auto dIs = get_delta_I(p_out_id, graph_id, sim_id, community, dims.Nt, control_type,
                            regression_type);
 
     auto related_events = get_related_events(community, ccm, connection_events);
     auto seeds = Static_RNG::generate_seeds(dIs.size(), seed);
     Dataframe::Dataframe_t<SBM_Graph::Edge_t, 2> community_infections(
-        std::array<uint32_t, 2>({Nt, N_connections}));
+        std::array<uint32_t, 2>({dims.Nt, dims.N_connections}));
     auto ccm_weights = get_ccm_weights(ccm);
 
     for (int t = 0; t < dIs.size(); t++)
@@ -188,23 +185,22 @@ namespace SBM_Simulation
       const QString &control_type, const QString &regression_type,
       const std::vector<SBM_Graph::Weighted_Edge_t> &ccm, uint32_t seed)
   {
-    auto [N_graphs, N_sims, Nt, N_connections, N_communities] =
-        SBM_Database::query_default_sim_dimensions(control_type, regression_type);
+    auto dims = SBM_Database::get_simulation_dimensions();
     Dataframe::Dataframe_t<SBM_Graph::Edge_t, 2> simulation_infections(
-        std::array<uint32_t, 2>({(uint32_t)Nt, (uint32_t)N_communities}));
-    auto seeds = Static_RNG::generate_seeds(N_communities, seed);
+        std::array<uint32_t, 2>({(uint32_t)dims.Nt, (uint32_t)dims.N_communities}));
+    auto seeds = Static_RNG::generate_seeds(dims.N_communities, seed);
     Dataframe::Dataframe_t<SBM_Graph::Edge_t, 2> community_infections(
-        std::array<uint32_t, 2>({(uint32_t)Nt, (uint32_t)N_communities}));
+        std::array<uint32_t, 2>({(uint32_t)dims.Nt, (uint32_t)dims.N_communities}));
     // connection_events
     auto connection_events = get_connection_events(p_out_id, graph_id, sim_id, control_type, regression_type);
-    for (int c_idx = 0; c_idx < N_communities; c_idx++)
+    for (int c_idx = 0; c_idx < dims.N_communities; c_idx++)
     {
       community_infections = sample_community_infections(
           p_out_id, graph_id, sim_id, c_idx, connection_events, control_type, regression_type, ccm,
           seeds[c_idx]);
-      for (int t = 0; t < Nt; t++)
+      for (int t = 0; t < dims.Nt; t++)
       {
-        for (int c_idx = 0; c_idx < N_connections; c_idx++)
+        for (int c_idx = 0; c_idx < dims.N_connections; c_idx++)
         {
           simulation_infections.data[t][c_idx].from +=
               community_infections.data[t][c_idx].from;
@@ -222,14 +218,13 @@ namespace SBM_Simulation
   {
     auto ccm = SBM_Database::ccm_read(p_out_id, graph_id);
 
-    auto [N_graphs, N_sims, Nt, N_connections, N_communities] =
-        SBM_Database::query_default_sim_dimensions(control_type, regression_type);
-    auto seeds = Static_RNG::generate_seeds(N_sims, seed);
+auto dims = SBM_Database::get_simulation_dimensions();
+    auto seeds = Static_RNG::generate_seeds(dims.N_sims, seed);
     Dataframe::Dataframe_t<SBM_Graph::Edge_t, 3> graph_infections(
         std::array<uint32_t, 3>(
-            {(uint32_t)N_sims, (uint32_t)Nt, (uint32_t)N_communities}));
+            {(uint32_t)dims.N_sims, (uint32_t)dims.Nt, (uint32_t)dims.N_communities}));
 
-    for (int sim_id = 0; sim_id < N_sims; sim_id++)
+    for (int sim_id = 0; sim_id < dims.N_sims; sim_id++)
     {
       graph_infections.data[sim_id] =
           sample_simulation_infections(p_out_id, graph_id, sim_id, control_type,

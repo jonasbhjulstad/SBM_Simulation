@@ -20,9 +20,8 @@ int main() {
 
   float R0_min = .8f;
   float R0_max = 1.4f;
-
   // get value
-  auto Np = get_N_p_out("vertex_partition_map");
+  auto Np = get_N_p_out("simulation_parameters");
   auto Ng = get_N_graphs("vertex_partition_map");
   Orm::DB::table("p_Is_excitation")->remove();
   for(int i = 0; i < Np; i++)
