@@ -25,12 +25,9 @@ namespace SBM_Simulation
 
     auto [N_graphs, N_sims, Nt, N_connections, N_communities] =
         SBM_Database::query_default_sim_dimensions(control_type, regression_type);
-    auto community_table = (regression_type.isEmpty())
-                               ? "community_state_excitation"
-                               : "community_state_validation";
     auto get_community_state_traj = [&](const QString &state)
     {
-      auto query = Orm::DB::unprepared("SELECT \"" + state + "\" FROM \"" + community_table + "\" WHERE (p_out, graph, simulation, community) = (" + QString::number(p_out_id) + ", " + QString::number(graph_id) + ", " + QString::number(sim_id) + ", " + QString::number(community) + ") ORDER BY t ASC");
+      auto query = Orm::DB::unprepared("SELECT \"" + state + "\" FROM community_state WHERE (p_out, graph, simulation, community) = (" + QString::number(p_out_id) + ", " + QString::number(graph_id) + ", " + QString::number(sim_id) + ", " + QString::number(community) + ") ORDER BY t ASC");
 
       std::vector<uint32_t> res;
       res.reserve(Nt);
@@ -60,10 +57,7 @@ namespace SBM_Simulation
 
     auto [N_graphs, N_sims, Nt, N_connections, N_communities] =
         SBM_Database::query_default_sim_dimensions(control_type, regression_type);
-    QString connection_table = (regression_type.isEmpty())
-                                   ? "connection_events_excitation"
-                                   : "connection_events_validation";
-    auto query = Orm::DB::unprepared("SELECT t, value, connection, \"Direction\" FROM \"" + connection_table + "\" WHERE (p_out, graph, simulation) = (" + QString::number(p_out_id) + ", " + QString::number(graph_id) + ", " + QString::number(sim_id) + ")  ORDER BY t ASC");
+    auto query = Orm::DB::unprepared("SELECT t, value, connection, \"Direction\" FROM connection_events WHERE (p_out, graph, simulation) = (" + QString::number(p_out_id) + ", " + QString::number(graph_id) + ", " + QString::number(sim_id) + ")  ORDER BY t ASC");
 
     Dataframe::Dataframe_t<SBM_Graph::Edge_t, 2> events(
         std::array<uint32_t, 2>({(uint32_t)Nt, (uint32_t)N_connections}));
@@ -194,13 +188,6 @@ namespace SBM_Simulation
       const QString &control_type, const QString &regression_type,
       const std::vector<SBM_Graph::Weighted_Edge_t> &ccm, uint32_t seed)
   {
-
-    auto event_table_name = (regression_type.isEmpty())
-                                ? "connection_events_excitation"
-                                : "connection_events_validation";
-    auto community_table_name = (regression_type.isEmpty())
-                                    ? "community_state_excitation"
-                                    : "community_state_validation";
     auto [N_graphs, N_sims, Nt, N_connections, N_communities] =
         SBM_Database::query_default_sim_dimensions(control_type, regression_type);
     Dataframe::Dataframe_t<SBM_Graph::Edge_t, 2> simulation_infections(
@@ -234,12 +221,7 @@ namespace SBM_Simulation
                                const QString &regression_type, uint32_t seed)
   {
     auto ccm = SBM_Database::ccm_read(p_out_id, graph_id);
-    auto event_table_name = (regression_type.isEmpty())
-                                ? "connection_events_excitation"
-                                : "connection_events_validation";
-    auto community_table_name = (regression_type.isEmpty())
-                                    ? "community_state_excitation"
-                                    : "community_state_validation";
+
     auto [N_graphs, N_sims, Nt, N_connections, N_communities] =
         SBM_Database::query_default_sim_dimensions(control_type, regression_type);
     auto seeds = Static_RNG::generate_seeds(N_sims, seed);
@@ -261,14 +243,8 @@ namespace SBM_Simulation
   void sample_all_infections(const QString &control_type,
                              const QString &regression_type, uint32_t seed)
   {
-    QString table_name = (regression_type.isEmpty())
-                             ? "infection_events_excitation"
-                             : "infection_events_validation";
-    QString connection_table = (regression_type.isEmpty())
-                                   ? "connection_events_excitation"
-                                   : "connection_events_validation";
-    auto N_graphs = SBM_Database::get_N_graphs(connection_table);
-    auto Np = SBM_Database::get_N_p_out(connection_table);
+    auto N_graphs = SBM_Database::get_N_graphs("connection_events");
+    auto Np = SBM_Database::get_N_p_out("connection_events");
 
     auto seeds = Static_RNG::generate_seeds(N_graphs * Np, seed);
     for (int p_out_id = 0; p_out_id < Np; p_out_id++)
