@@ -1,48 +1,23 @@
 #include <SBM_Graph/Graph.hpp>
 #include <SBM_Simulation/Regression/Regression.hpp>
 #include <SBM_Simulation/Utils/Math.hpp>
-
+#include <SBM_Simulation/Regression/Filesystem.hpp>
 #include <SBM_Database/Graph/Graph_Tables.hpp>
 #include <SBM_Database/Regression/Regression_Tables.hpp>
-#include <SBM_Database/Simulation/Simulation_Tables.hpp>
 #include <SBM_Database/Simulation/Size_Queries.hpp>
 #include <fstream>
 #include <iostream>
+#include <orm/db.hpp>
 #include <ortools/linear_solver/linear_solver.h>
 #include <sstream>
 #include <tuple>
 #include <utility>
 namespace SBM_Regression {
-Eigen::MatrixXf openData(const std::string &fileToOpen) {
-  using namespace Eigen;
-  std::vector<float> matrixEntries;
 
-  std::ifstream matrixDataFile(fileToOpen);
 
-  std::string matrixRowString;
 
-  std::string matrixEntry;
-
-  int matrixRowNumber = 0;
-
-  while (std::getline(matrixDataFile, matrixRowString)) {
-    std::stringstream matrixRowStringStream(matrixRowString);
-
-    while (std::getline(matrixRowStringStream, matrixEntry, ',')) {
-      matrixEntries.push_back(stod(matrixEntry));
-    }
-    matrixRowNumber++;
-  }
-
-  return Map<Matrix<float, Dynamic, Dynamic, RowMajor>>(
-      matrixEntries.data(), matrixRowNumber,
-      matrixEntries.size() / matrixRowNumber);
-}
-
-std::pair<Eigen::MatrixXf, Eigen::MatrixXf>
+std::pair<Mat, Mat>
 load_beta_regression(const std::string &datapath, uint32_t idx, bool truncate) {
-  using Mat = Eigen::MatrixXf;
-  using Vec = Eigen::VectorXf;
   auto connection_infs_filename = [](uint32_t idx) {
     return std::string("Connection_Infections/connection_infections_" +
                        std::to_string(idx) + ".csv");
@@ -125,11 +100,9 @@ load_beta_regression(const std::string &datapath, uint32_t idx, bool truncate) {
   return std::make_pair(F_beta_rs_mat, connection_infs);
 }
 
-std::pair<Eigen::MatrixXf, Eigen::MatrixXf>
+std::pair<Mat, Mat>
 load_beta_regression(uint32_t p_out, uint32_t graph, uint32_t sim_id,
                      const QString &control_type, bool truncate) {
-  using Mat = Eigen::MatrixXf;
-  using Vec = Eigen::VectorXf;
   auto connection_community_map_filename = [](uint32_t idx) {
     return std::string("ccm.csv");
   };
@@ -175,23 +148,6 @@ load_beta_regression(uint32_t p_out, uint32_t graph, uint32_t sim_id,
       "p_Is_excitation", p_out, graph, "value", control_type, "");
   Mat p_Is = Dataframe::to_eigen_matrix<float>(p_I_df);
 
-  auto compute_beta_rs_col = [&](auto from_idx, auto to_idx, const Vec &p_I) {
-    Mat target_traj =
-        community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * to_idx, 3));
-    Mat source_traj =
-        community_traj(Eigen::seqN(0, Nt), Eigen::seqN(3 * from_idx, 3));
-    Vec p_I_trunc = p_I(Eigen::seqN(0, Nt));
-    Vec const S_r = source_traj.col(0);
-    Vec I_r = source_traj.col(1);
-    Vec const R_r = source_traj.col(2);
-    Vec S_s = target_traj.col(0);
-    Vec const I_s = target_traj.col(1);
-    Vec R_s = target_traj.col(2);
-
-    Vec denom = (S_s.array() + I_r.array() + R_s.array()).matrix();
-    Vec nom = (S_s.array() * I_r.array()).matrix();
-    return Vec(p_I_trunc.array() * nom.array() / denom.array());
-  };
 
   Mat F_beta_rs_mat(Nt, N_connections);
   for (int i = 0; i < ccm.size(); i++) {
@@ -203,10 +159,9 @@ load_beta_regression(uint32_t p_out, uint32_t graph, uint32_t sim_id,
   return std::make_pair(F_beta_rs_mat, connection_infs);
 }
 
-std::tuple<Eigen::MatrixXf, Eigen::MatrixXf>
+std::tuple<Mat, Mat>
 load_N_datasets(const std::string &datapath, uint32_t N, uint32_t offset) {
-  using Mat = Eigen::MatrixXf;
-  using Vec = Eigen::VectorXf;
+
   std::vector<uint32_t> idx(N);
   std::iota(idx.begin(), idx.end(), offset);
   std::vector<std::pair<Mat, Mat>> datasets;
@@ -241,11 +196,10 @@ load_N_datasets(const std::string &datapath, uint32_t N, uint32_t offset) {
   return std::make_tuple(F_beta_rs_mat, connection_infs_tot);
 }
 
-std::tuple<Eigen::MatrixXf, Eigen::MatrixXf>
+std::tuple<Mat, Mat>
 load_database_datasets(uint32_t p_out, uint32_t graph,
                        const QString &control_type) {
-  using Mat = Eigen::MatrixXf;
-  using Vec = Eigen::VectorXf;
+
   auto N_sims = SBM_Database::get_N_sims("community_state_excitation");
   std::vector<std::pair<Mat, Mat>> datasets(N_sims);
   std::vector<uint32_t> idx(N_sims);
@@ -283,18 +237,18 @@ load_database_datasets(uint32_t p_out, uint32_t graph,
   return std::make_tuple(F_beta_rs_mat, connection_infs_tot);
 }
 
-auto compute_MSE(const Eigen::VectorXf &x, const Eigen::VectorXf &y) {
+auto compute_MSE(const Vec &x, const Vec &y) {
   return (x - y).squaredNorm() / x.rows();
 }
 
-auto compute_MAE(const Eigen::VectorXf &x, const Eigen::VectorXf &y) {
+auto compute_MAE(const Vec &x, const Vec &y) {
   return (x - y).cwiseAbs().sum() / x.rows();
 }
 
 std::tuple<std::vector<float>, std::vector<float>, std::vector<float>,
            std::vector<float>>
-beta_regression(const Eigen::MatrixXf &F_beta_rs_mat,
-                const Eigen::MatrixXf &connection_infs, float tau) {
+beta_regression(const Mat &F_beta_rs_mat,
+                const Mat &connection_infs, float tau) {
 
   uint32_t const N_connections = connection_infs.cols();
   std::vector<float> thetas_LS(N_connections);
@@ -316,37 +270,8 @@ beta_regression(const Eigen::MatrixXf &F_beta_rs_mat,
   return std::make_tuple(thetas_LS, thetas_QR, MSE, MAE);
 }
 
-float alpha_regression(const Eigen::VectorXf &x, const Eigen::VectorXf &y) {
+float alpha_regression(const Vec &x, const Vec &y) {
   return y.dot(x) / x.dot(x);
-}
-Eigen::MatrixXf filter_columns(const Eigen::MatrixXf &mat,
-                               const std::vector<uint32_t> &indices) {
-  Eigen::MatrixXf filtered_mat(mat.rows(), indices.size());
-  for (int i = 0; i < indices.size(); i++) {
-    filtered_mat.col(i) = mat.col(indices[i]);
-  }
-  return filtered_mat;
-}
-
-auto filter_zero_columns(const Eigen::MatrixXf &mat) {
-  std::vector<uint32_t> non_zero_cols;
-  for (int i = 0; i < mat.cols(); i++) {
-    if (mat.col(i).array().sum() != 0) {
-      non_zero_cols.push_back(i);
-    }
-  }
-  return std::make_tuple(filter_columns(mat, non_zero_cols), non_zero_cols);
-}
-template <typename T>
-std::vector<T> project(const std::vector<T> &data,
-                       const std::vector<uint32_t> &indices, auto size) {
-  std::vector<T> projected_data(size, T{});
-  for (int i = 0; i < size; i++) {
-    if (std::find(indices.begin(), indices.end(), i) != indices.end()) {
-      projected_data[i] = data[i];
-    }
-  }
-  return projected_data;
 }
 
 std::tuple<std::vector<float>, std::vector<float>, std::vector<float>,
@@ -375,7 +300,7 @@ std::tuple<std::vector<float>, std::vector<float>, std::vector<float>,
            std::vector<float>>
 regression_on_datasets(const std::vector<std::string> &datapaths, uint32_t N,
                        float tau, uint32_t offset) {
-  using Mat = Eigen::MatrixXf;
+  using Mat = Mat;
   std::vector<std::tuple<Mat, Mat>> datasets(datapaths.size());
   std::transform(
       datapaths.begin(), datapaths.end(), datasets.begin(),
@@ -404,7 +329,6 @@ regression_on_datasets(const std::vector<std::string> &datapaths, uint32_t N,
 
 void regression_on_database(float tau, uint32_t tau_id, uint32_t p_out,
                             uint32_t graph, const QString &control_type) {
-  using Mat = Eigen::MatrixXf;
   auto N_sims = SBM_Database::get_N_sims("community_state_excitation");
   std::vector<std::tuple<Mat, Mat>> datasets(N_sims);
   std::transform(datasets.begin(), datasets.end(), datasets.begin(),
@@ -439,7 +363,6 @@ void regression_on_database(float tau, uint32_t tau_id, uint32_t p_out,
 }
 void regression_on_database(float tau, uint32_t tau_id,
                             const QString &control_type) {
-  using Mat = Eigen::MatrixXf;
   auto Np = SBM_Database::get_N_p_out();
   auto Ng = SBM_Database::get_N_graphs();
   for (int i = 0; i < Np; i++) {
@@ -449,10 +372,9 @@ void regression_on_database(float tau, uint32_t tau_id,
   }
 }
 
-float quantile_regression(const Eigen::VectorXf &x, const Eigen::VectorXf &y,
+float quantile_regression(const Vec &x, const Vec &y,
                           float tau, float y_tol, float x_tol) {
-  using Mat = Eigen::MatrixXf;
-  using Vec = Eigen::VectorXf;
+
   using namespace operations_research;
   operations_research::MPSolver::OptimizationProblemType problem_type =
       operations_research::MPSolver::GLOP_LINEAR_PROGRAMMING;
