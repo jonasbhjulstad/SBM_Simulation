@@ -34,6 +34,8 @@ struct Sim_Buffers {
            ecm.byte_size() + vpm.byte_size() + community_state.byte_size();
   }
 };
+
+
 sycl::buffer<float, 3> generate_upsert_p_Is(sycl::queue &q,
                                             const SBM_Database::Sim_Param &p,
                                             const QString &table_name,

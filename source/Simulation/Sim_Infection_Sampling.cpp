@@ -52,13 +52,12 @@ namespace SBM_Simulation
   get_connection_events(uint32_t p_out_id, uint32_t graph_id, uint32_t sim_id, const QString &control_type,
                         const QString &regression_type = "")
   {
+    auto dims = SBM_Database::get_simulation_dimensions();
 
-    auto [N_graphs, N_sims, Nt, N_connections, N_communities] =
-        SBM_Database::query_default_sim_dimensions(control_type, regression_type);
     auto query = Orm::DB::unprepared("SELECT t, value, connection, \"Direction\" FROM connection_events WHERE (p_out, graph, simulation) = (" + QString::number(p_out_id) + ", " + QString::number(graph_id) + ", " + QString::number(sim_id) + ")  ORDER BY t ASC");
 
     Dataframe::Dataframe_t<SBM_Graph::Edge_t, 2> events(
-        std::array<uint32_t, 2>({(uint32_t)Nt, (uint32_t)N_connections}));
+        std::array<uint32_t, 2>({(uint32_t)dims.Nt, (uint32_t)dims.N_connections}));
     while (query.next())
     {
       auto t = query.value(0).toUInt();
@@ -165,7 +164,7 @@ namespace SBM_Simulation
     auto related_events = get_related_events(community, ccm, connection_events);
     auto seeds = Static_RNG::generate_seeds(dIs.size(), seed);
     Dataframe::Dataframe_t<SBM_Graph::Edge_t, 2> community_infections(
-        std::array<uint32_t, 2>({dims.Nt, dims.N_connections}));
+        std::array<uint32_t, 2>({(uint32_t)dims.Nt, (uint32_t)dims.N_connections}));
     auto ccm_weights = get_ccm_weights(ccm);
 
     for (int t = 0; t < dIs.size(); t++)

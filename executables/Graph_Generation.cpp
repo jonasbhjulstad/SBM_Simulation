@@ -58,7 +58,6 @@ int main() {
   auto Np = p_out_vec.size();
   auto seeds = Static_RNG::generate_seeds(Np, seed);
   SBM_Database::Sim_Param param = {N_pop, 0, 0, N_communities, N_connections, N_sims, Nt, Nt_alloc, seed, p_in, 0.0f, p_I_min, p_I_max, p_R, p_I0, p_R0};
-  
   SBM_Database::drop_graph_tables();
   auto graph_ids = SBM_Simulation::make_iota(Ng);
   for (uint32_t p_out_id = 0; p_out_id < p_out_vec.size(); p_out_id++) {
@@ -82,7 +81,8 @@ int main() {
     std::vector<uint32_t> p_outs(Ng, p_out_id);
     begin = std::chrono::steady_clock::now();
 
-    SBM_Database::bulk_generate_SBM_to_db(param, Ng, N_graphs_per_bulk, seeds[p_out_id]);
+    // auto [edge_lists, node_lists] = SBM_Graph::generate_N_SBM_graphs(param.N_pop, param.N_communities, param.p_in, param.p_out, param.seed, Ng);
+    SBM_Database::SBM_Graphs_to_db(edge_lists, node_lists, p_outs, graph_ids);
     end = std::chrono::steady_clock::now();
     std::cout << "Graph insertion time for p_out = " << p_out << " time: "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end -

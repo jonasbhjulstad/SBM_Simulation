@@ -47,34 +47,6 @@ void write_simulation_steps(sycl::queue &q, std::vector<Sim_Buffers> &bs,
 }
 
 
-void write_initial_steps(sycl::queue &q,
-                         const std::vector<SBM_Database::Sim_Param> &ps,
-                         std::vector<Sim_Buffers> &b,
-                         std::vector<sycl::nd_range<1>> nd_ranges,
-                         const QString &control_type,
-                         const QString &simulation_type,
-                         std::vector<sycl::event> &dep_events) {
-  std::vector<sycl::event> acc_events(ps.size());
-
-  for (int i = 0; i < ps.size(); i++) {
-    acc_events[i] = accumulate_community_state(
-        q, dep_events[i], b[i].vertex_state, b[i].vpm, b[i].community_state,
-        nd_ranges[i]);
-  }
-  sycl::event::wait_and_throw(acc_events);
-  std::vector<Dataframe::Dataframe_t<State_t, 3>> state_dfs(ps.size());
-  std::transform(b.begin(), b.end(), state_dfs.begin(), [&](Sim_Buffers &b) {
-    return Dataframe::make_dataframe<State_t>(q, b.community_state);
-  });
-
-  std::for_each(ps.begin(), ps.end(),
-                [&, i = 0](const SBM_Database::Sim_Param &p) mutable {
-                  SBM_Database::community_state_upsert(
-                      p.p_out_id, p.graph_id, state_dfs[i], control_type,
-                      simulation_type, 0, 1);
-                  i++;
-                });
-}
 
 
 std::vector<sycl::event> initialize_simulations(
@@ -111,9 +83,22 @@ sycl::event p_I_table_to_buffer(sycl::queue &q,
   std::array<uint32_t, 3> start = {0, t_start, 0};
   std::array<uint32_t, 3> end = {p.N_sims, t_end,
                                  p.N_connections};
-  return Buffer_Routines::table_to_buffer<float, 3>(
-      q, p_Is, table_name, const_indices, var_indices, "value", start, end,
-      "simulation", "t", dep_event);
+  
+  auto N = p.N_sims*(p.Nt_alloc-1)*p.N_connections;
+  auto query = Orm::DB::table("p_Is")->select("value").whereBetween("t", {t_start, t_end}).orderBy("simulation", "asc").orderBy("t", "asc").orderBy("connection", "asc").get();
+  std::vector<float> data(N);
+  auto idx = 0;
+  while(query.next())
+  {
+
+    data[idx] = query.value(0).toFloat();
+    idx++;
+  }
+  assert(idx == (N-1));
+  return q.submit([&](sycl::handler& h){
+    auto acc = p_Is.template get_access<sycl::access_mode::write>(h);
+    h.copy(data.data(), acc);
+  });
 }
 
 std::vector<sycl::event> simulate_allocated_steps(
@@ -138,22 +123,6 @@ std::vector<sycl::event> simulate_allocated_steps(
     return shift_buffer(q, b.vertex_state);
   });
   return new_events;
-}
-void run_simulation(sycl::queue &q, const SBM_Database::Sim_Param &p,
-                    Sim_Buffers &b, const QString &control_type,
-                    const QString &simulation_type) {
-  auto nd_range = Buffer_Routines::get_nd_range(q, p.N_sims);
-
-  auto event =
-      initialize_simulation(q, p, b, control_type, simulation_type, nd_range);
-  uint32_t N_bulks = std::floor((double)p.Nt_alloc / p.Nt);
-  for (int i = 0; i < N_bulks; i++) {
-    simulate_allocated_steps(q, p, b, event, nd_range, control_type,
-                             simulation_type, i * p.Nt_alloc + 1, p.Nt_alloc);
-  }
-  simulate_allocated_steps(q, p, b, event, nd_range, control_type,
-                           simulation_type, N_bulks * p.Nt_alloc + 1,
-                           p.Nt % p.Nt_alloc);
 }
 
 void run_simulations(sycl::queue &q,

@@ -41,8 +41,8 @@ auto allocate_buffers(const std::vector<SBM_Database::Sim_Param> &ps,
                       sycl::queue &q) {
   auto t1 = std::chrono::high_resolution_clock::now();
   std::vector<SBM_Simulation::Sim_Buffers> bs;
-  auto tot_byte_size = std::accumulate(ps.begin(), ps.end(), 0, [](auto acc, auto p){return acc + p.buffer_byte_size();});
-  Buffer_Routines::validate_memory_size(q, tot_byte_size);
+  // auto tot_byte_size = std::accumulate(ps.begin(), ps.end(), 0, [](auto acc, auto p){return acc + p.buffer_byte_size();});
+  // Buffer_Routines::validate_memory_size(q, tot_byte_size);
 
   bs.reserve(ps.size());
   std::transform(ps.begin(), ps.end(), std::back_inserter(bs), [&q](auto &p) {

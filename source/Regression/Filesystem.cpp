@@ -1,4 +1,6 @@
 #include <SBM_Simulation/Regression/Filesystem.hpp>
+#include <SBM_Database/Simulation/Size_Queries.hpp>
+#include <fstream>
 namespace SBM_Regression {
 
 
@@ -54,6 +56,8 @@ void readRowMajor(const char* fileToOpen, Mat& res, uint32_t N_entries_per_row) 
   }
 
 }
+
+
 
 Mat read_community_X_data(uint32_t p_out_id, uint32_t graph, const char* control_type, const char* fname)
 {
