@@ -101,4 +101,17 @@ Mat read_community_U_data(uint32_t p_out_id, uint32_t graph, const char* control
   return result;
 }
 
+Mat read_connection_infections(uint32_t p_out_id, uint32_t graph, const char* control_type, const char* fname)
+{
+  std::stringstream st; 
+  st << "\\copy (select value from infection_events where (p_out, graph, \\\"Control_Type\\\") = (";
+  st << p_out_id << ", " << graph << ", '" << control_type << "'";
+  st <<  ") order by simulation, t, connection asc)";
+  st << "TO '" << fname << "' CSV";
+  auto dims = SBM_Database::get_simulation_dimensions();
+  Mat result(dims.N_sims*dims.Nt, dims.N_connections);
+  readRowMajor(fname, result);
+  std::remove(fname);
+  return result;
 }
+} // namespace SBM_Regression

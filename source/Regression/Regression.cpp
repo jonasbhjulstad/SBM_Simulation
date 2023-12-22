@@ -15,51 +15,51 @@
 namespace SBM_Regression
 {
 
-  std::tuple<Mat, Mat>
-  load_database_datasets(uint32_t p_out, uint32_t graph,
-                         const QString &control_type)
-  {
+  // std::tuple<Mat, Mat>
+  // load_database_datasets(uint32_t p_out, uint32_t graph,
+  //                        const QString &control_type)
+  // {
 
-    auto N_sims = SBM_Database::get_N_sims("community_state_excitation");
-    std::vector<std::pair<Mat, Mat>> datasets(N_sims);
-    std::vector<uint32_t> idx(N_sims);
-    std::iota(idx.begin(), idx.end(), 0);
-    std::transform(idx.begin(), idx.end(), std::back_inserter(datasets),
-                   [&](auto idx)
-                   {
-                     return load_beta_regression(p_out, graph, idx, control_type);
-                   });
+  //   auto N_sims = SBM_Database::>get_N_sims("community_state_excitation");
+  //   std::vector<std::pair<Mat, Mat>> datasets(N_sims);
+  //   std::vector<uint32_t> idx(N_sims);
+  //   std::iota(idx.begin(), idx.end(), 0);
+  //   std::transform(idx.begin(), idx.end(), std::back_inserter(datasets),
+  //                  [&](auto idx)
+  //                  {
+  //                    return load_beta_regression(p_out, graph, idx, control_type);
+  //                  });
 
-    std::vector<SBM_Graph::Edge_t> sizes;
-    std::transform(datasets.begin(), datasets.end(), std::back_inserter(sizes),
-                   [](auto &dataset)
-                   {
-                     return SBM_Graph::Edge_t(dataset.first.rows(),
-                                              dataset.second.cols());
-                   });
-    uint32_t const tot_rows =
-        std::accumulate(sizes.begin(), sizes.end(), 0,
-                        [](auto acc, auto &size)
-                        { return acc + size.from; });
-    uint32_t const cols = sizes[0].to;
-    Mat connection_infs_tot(tot_rows, cols);
-    Mat F_beta_rs_mat(tot_rows, cols);
-    uint32_t row_offset = 0;
-    for (int i = 0; i < datasets.size(); i++)
-    {
-      auto &dataset = datasets[i];
-      auto &size = sizes[i];
-      connection_infs_tot(Eigen::seqN(row_offset, size.from), Eigen::all) =
-          dataset.second;
-      F_beta_rs_mat(Eigen::seqN(row_offset, size.from), Eigen::all) =
-          dataset.first;
-      row_offset += size.from;
-    }
-    assert(F_beta_rs_mat.array().sum() != 0);
-    assert(connection_infs_tot.array().sum() != 0);
+  //   std::vector<SBM_Graph::Edge_t> sizes;
+  //   std::transform(datasets.begin(), datasets.end(), std::back_inserter(sizes),
+  //                  [](auto &dataset)
+  //                  {
+  //                    return SBM_Graph::Edge_t(dataset.first.rows(),
+  //                                             dataset.second.cols());
+  //                  });
+  //   uint32_t const tot_rows =
+  //       std::accumulate(sizes.begin(), sizes.end(), 0,
+  //                       [](auto acc, auto &size)
+  //                       { return acc + size.from; });
+  //   uint32_t const cols = sizes[0].to;
+  //   Mat connection_infs_tot(tot_rows, cols);
+  //   Mat F_beta_rs_mat(tot_rows, cols);
+  //   uint32_t row_offset = 0;
+  //   for (int i = 0; i < datasets.size(); i++)
+  //   {
+  //     auto &dataset = datasets[i];
+  //     auto &size = sizes[i];
+  //     connection_infs_tot(Eigen::seqN(row_offset, size.from), Eigen::all) =
+  //         dataset.second;
+  //     F_beta_rs_mat(Eigen::seqN(row_offset, size.from), Eigen::all) =
+  //         dataset.first;
+  //     row_offset += size.from;
+  //   }
+  //   assert(F_beta_rs_mat.array().sum() != 0);
+  //   assert(connection_infs_tot.array().sum() != 0);
 
-    return std::make_tuple(F_beta_rs_mat, connection_infs_tot);
-  }
+  //   return std::make_tuple(F_beta_rs_mat, connection_infs_tot);
+  // }
 
   auto compute_MSE(const Vec &x, const Vec &y)
   {
@@ -116,118 +116,56 @@ namespace SBM_Regression
     return result;
   }
 
-  void filter_data(Mat &X_data, Mat &Y_data, Mat &U_data)
+  void filter_data(Mat &X_data, Mat &Y_data, Mat &U_data, Mat& connection_infs)
   {
     auto indices = get_nonzero_rows(X_data);
     X_data = X_data(indices, Eigen::all);
     Y_data = Y_data(indices, Eigen::all);
     U_data = U_data(indices, Eigen::all);
+    connection_infs = connection_infs(indices, Eigen::all);
+
   }
 
-  std::tuple<std::vector<float>, std::vector<float>, std::vector<float>,
-             std::vector<float>>
-  regression_on_datasets(const std::string &datapath, uint32_t N, float tau,
-                         uint32_t offset)
-  {
-    auto [F_beta_rs_mat_raw, connection_infs_raw] =
-        load_N_datasets(datapath, N, offset);
-    auto N_connections = connection_infs_raw.cols();
 
-    auto [thetas_LS, thetas_QR, MSE, MAE] =
-        beta_regression(F_beta_rs_mat, connection_infs, tau);
-    auto LS_proj = project(thetas_LS, non_zero_cols, N_connections);
-    auto QR_proj = project(thetas_QR, non_zero_cols, N_connections);
+  
 
-    auto MSE_proj = project(MSE, non_zero_cols, N_connections);
-    auto MAE_proj = project(MAE, non_zero_cols, N_connections);
-
-    return std::make_tuple(LS_proj, QR_proj, MSE_proj, MAE_proj);
-  }
-
-  std::tuple<std::vector<float>, std::vector<float>, std::vector<float>,
-             std::vector<float>>
-  regression_on_datasets(const std::vector<std::string> &datapaths, uint32_t N,
-                         float tau, uint32_t offset)
-  {
-    using Mat = Mat;
-    std::vector<std::tuple<Mat, Mat>> datasets(datapaths.size());
-    std::transform(
-        datapaths.begin(), datapaths.end(), datasets.begin(),
-        [&](auto &datapath)
-        { return load_N_datasets(datapath, N, offset); });
-
-    Mat F_beta_rs_mat_tot;
-    Mat connection_infs_tot;
-
-    uint32_t row_offset = 0;
-    for (auto &dataset : datasets)
-    {
-      auto &F_beta_rs_mat = std::get<0>(dataset);
-      auto &connection_infs = std::get<1>(dataset);
-      uint32_t const N_rows = F_beta_rs_mat.rows();
-
-      F_beta_rs_mat_tot(Eigen::seqN(row_offset, N_rows), Eigen::all) =
-          F_beta_rs_mat;
-      connection_infs_tot(Eigen::seqN(row_offset, N_rows), Eigen::all) =
-          connection_infs;
-      row_offset += N_rows;
-    }
-
-    auto [thetas_LS, thetas_QR, MSE, MAE] =
-        beta_regression(F_beta_rs_mat_tot, connection_infs_tot, tau);
-    return std::make_tuple(thetas_LS, thetas_QR, MSE, MAE);
-  }
 
   void regression_on_database(float tau, uint32_t tau_id, uint32_t p_out,
-                              uint32_t graph, const QString &control_type)
+                              uint32_t graph, const char* control_type)
   {
-    auto N_sims = SBM_Database::get_N_sims("community_state_excitation");
-    std::vector<std::tuple<Mat, Mat>> datasets(N_sims);
-    std::transform(datasets.begin(), datasets.end(), datasets.begin(),
-                   [&](auto &dataset)
-                   {
-                     return load_database_datasets(p_out, graph, control_type);
-                   });
-
-    Mat F_beta_rs_mat_tot;
-    Mat connection_infs_tot;
-
-    uint32_t row_offset = 0;
-    for (auto &dataset : datasets)
-    {
-      auto &F_beta_rs_mat = std::get<0>(dataset);
-      auto &connection_infs = std::get<1>(dataset);
-      uint32_t const N_rows = F_beta_rs_mat.rows();
-
-      F_beta_rs_mat_tot(Eigen::seqN(row_offset, N_rows), Eigen::all) =
-          F_beta_rs_mat;
-      connection_infs_tot(Eigen::seqN(row_offset, N_rows), Eigen::all) =
-          connection_infs;
-      row_offset += N_rows;
-    }
-    SBM_Database::drop_regression_tables();
+    Mat X_data = read_community_X_data(p_out, graph, control_type);
+    Mat Y_data = read_community_Y_data(p_out, graph, control_type);
+    Mat U_data = read_community_U_data(p_out, graph, control_type);
+    Mat connection_infs = read_connection_infections(p_out, graph, control_type);
+    filter_data(X_data, Y_data, U_data, connection_infs);
 
     auto [thetas_LS, thetas_QR, MSE, MAE] =
-        beta_regression(F_beta_rs_mat_tot, connection_infs_tot, tau);
+        beta_regression(X_data, connection_infs, tau);
 
-    SBM_Database::regression_parameters_upsert(
-        p_out, graph, tau, tau_id, control_type, "LS", thetas_LS, MSE);
-    SBM_Database::regression_parameters_upsert(
-        p_out, graph, tau, tau_id, control_type, "QR", thetas_QR, MAE);
+    auto alpha = alpha_regression(X_data, Y_data);
+  
+    SBM_Database::regression_param_insert(p_out, graph, thetas_LS, alpha, MSE, tau, tau_id, control_type, "LS");
+    SBM_Database::regression_param_insert(p_out, graph, thetas_QR, alpha, MAE, tau, tau_id, control_type, "QR");
+
+
   }
-  void regression_on_database(float tau, uint32_t tau_id,
-                              const QString &control_type)
+
+  void regression_on_database(float tau, uint32_t tau_id, const char* control_type)
   {
-    auto Np = SBM_Database::get_N_p_out();
-    auto Ng = SBM_Database::get_N_graphs();
-    for (int i = 0; i < Np; i++)
-    {
-      for (int j = 0; j < Ng; j++)
+      auto Np = SBM_Database::get_N_p_out("infection_events");
+      auto Ng = SBM_Database::get_N_graphs("infection_events");
+      for (int p_out_id = 0; p_out_id < Np; p_out_id ++)
       {
-        regression_on_database(tau, tau_id, i, j, control_type);
+        for(int graph_id = 0; graph_id < Ng; graph_id++)
+        {
+          regression_on_database(tau, tau_id, p_out_id, graph_id, control_type);
+        }
       }
-    }
+
+
   }
+
+
 
   float quantile_regression(const Vec &x, const Vec &y,
                             float tau, float y_tol, float x_tol)

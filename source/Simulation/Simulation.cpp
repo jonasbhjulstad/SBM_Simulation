@@ -58,8 +58,6 @@ std::vector<sycl::event> initialize_simulations(
     events[i] = initialize_vertices(q, ps[i], bs[i].vertex_state, bs[i].rngs,
                                     nd_ranges[i], bs[i].construction_events);
   }
-  write_initial_steps(q, ps, bs, nd_ranges, control_type, simulation_type,
-                      events);
   return events;
 }
 
