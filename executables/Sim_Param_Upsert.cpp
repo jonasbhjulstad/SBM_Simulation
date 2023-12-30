@@ -21,7 +21,7 @@ int main()
   float R0_max = 1.4f;
   auto Np = get_N_p_out("simulation_parameters");
   auto Ng = get_N_graphs("vertex_partition_map");
-  Orm::DB::table("p_Is_excitation")->remove();
+  Orm::DB::table("p_Is")->truncate();
   std::ofstream f("p_Is.csv");
   auto single_graph_write = [&f](const Sim_Param &p)
   {
@@ -39,7 +39,13 @@ int main()
       }
     }
   };
-
+              //  table.integer("p_out");
+              //   table.integer("graph");
+              //   table.integer("simulation");
+              //   table.integer("t");
+              //   table.integer("connection");
+              //   table.Float("value");
+              //   table.Enum("Control_Type", {"Uniform", "Community", "Partition"});
   for (int i = 0; i < Np; i++)
   {
     for (int j = 0; j < Ng; j++)
@@ -58,4 +64,9 @@ int main()
       single_graph_write(p);
     }
   }
+  f.close();
+  std::string statement = "\\copy \\\"p_Is\\\" FROM 'p_Is.csv' DELIMITER ',' CSV";
+  std::system(("psql -d postgres -c \"" + statement + "\"").c_str());
+
+  std::remove("p_Is.csv");
 }

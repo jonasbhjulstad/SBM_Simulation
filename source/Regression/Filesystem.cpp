@@ -66,7 +66,7 @@ Mat read_community_X_data(uint32_t p_out_id, uint32_t graph, const char* control
   st << p_out_id << ", " << graph << ", '" << control_type << "'";
   st <<  ") AND t < (select count(distinct(t)) from community_state)) order by simulation, community, t asc)";
   st << "TO '" << fname << "' CSV";
-  std::system(("psql -d sbm_database -c \"" + st.str() + "\"").c_str());
+  std::system(("psql -d postgres -c \"" + st.str() + "\"").c_str());
   auto dims = SBM_Database::get_simulation_dimensions();
   Mat result(dims.N_sims*dims.Nt, dims.N_communities*3);
   readRowMajor(fname, result, 3);

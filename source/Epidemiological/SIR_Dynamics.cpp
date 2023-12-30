@@ -13,19 +13,18 @@ sycl::event recover(sycl::queue &q, const SBM_Database::Sim_Param &p,
   float p_R = p.p_R;
   uint32_t N_vertices = vertex_state.get_range()[2];
   uint32_t N_sims = p.N_sims;
-  auto t_alloc = t % (p.Nt_alloc-1);
   auto cpy_event = q.submit([&](sycl::handler &h) {
     h.depends_on(dep_event);
     auto v_prev =
         Buffer_Routines::construct_validate_accessor<SIR_State, 3,
                                                      sycl::access_mode::read>(
             vertex_state, h, sycl::range<3>(N_sims, 1, N_vertices),
-            sycl::range<3>(0, t_alloc, 0));
+            sycl::range<3>(0, t, 0));
     auto v_next =
         Buffer_Routines::construct_validate_accessor<SIR_State, 3,
                                                      sycl::access_mode::write>(
             vertex_state, h, sycl::range<3>(N_sims, 1, N_vertices),
-            sycl::range<3>(0, t_alloc + 1, 0));
+            sycl::range<3>(0, t + 1, 0));
     h.depends_on(dep_event);
     h.copy(v_prev, v_next);
   });
@@ -36,7 +35,7 @@ sycl::event recover(sycl::queue &q, const SBM_Database::Sim_Param &p,
     auto v_acc = Buffer_Routines::construct_validate_accessor<
         SIR_State, 3, sycl::access_mode::read_write>(
         vertex_state, h, sycl::range<3>(N_sims, 1, N_vertices),
-        sycl::range<3>(0, t_alloc + 1, 0));
+        sycl::range<3>(0, t + 1, 0));
     h.parallel_for(nd_range, [=](sycl::nd_item<1> it) {
       auto sim_id = it.get_global_id();
 
@@ -98,7 +97,6 @@ sycl::event infect(sycl::queue &q, const SBM_Database::Sim_Param &p,
   uint32_t N_edges = b.ecm.size();
   uint32_t N_vertices = b.vertex_state.get_range()[2];
   uint32_t N_sims = p.N_sims;
-  uint32_t t_alloc = t % (p.Nt_alloc-1);
   // auto N_threads_per_sim = floor_div(compute_range[0], N_sims);
   // auto N_edges_per_thread = ceil_div(N_edges, N_threads_per_sim);
 
@@ -110,19 +108,19 @@ sycl::event infect(sycl::queue &q, const SBM_Database::Sim_Param &p,
         Buffer_Routines::construct_validate_accessor<float, 3,
                                                      sycl::access::mode::read>(
             b.p_Is, h, sycl::range<3>(N_sims, 1, p.N_connections),
-            sycl::range<3>(0, t_alloc, 0));
+            sycl::range<3>(0, t, 0));
     auto rng_acc =
         b.rngs.template get_access<sycl::access::mode::read_write>(h);
     auto v_next =
         Buffer_Routines::construct_validate_accessor<SIR_State, 3,
                                                      sycl::access_mode::write>(
             b.vertex_state, h, sycl::range<3>(N_sims, 1, N_vertices),
-            sycl::range<3>(0, t_alloc + 1, 0));
+            sycl::range<3>(0, t + 1, 0));
     auto e_acc = b.edges.template get_access<sycl::access::mode::read>(h);
     auto event_acc = Buffer_Routines::construct_validate_accessor<
         SBM_Graph::Edge_t, 3, sycl::access::mode::read_write>(
         b.accumulated_events, h, sycl::range<3>(N_sims, 1, p.N_connections),
-        sycl::range<3>(0, t_alloc, 0));
+        sycl::range<3>(0, t, 0));
     const auto N_edges = b.ecm.size();
     h.parallel_for(nd_range, [=](sycl::nd_item<1> it) {
       auto gid = it.get_global_id();

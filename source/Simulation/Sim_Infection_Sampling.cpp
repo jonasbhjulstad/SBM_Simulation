@@ -20,23 +20,33 @@ namespace SBM_Simulation
   const std::vector<uint32_t> get_delta_I(uint32_t p_out_id, uint32_t graph_id,
                                           uint32_t sim_id, uint32_t community, uint32_t Nt,
                                           const QString &control_type,
-                                          const QString &regression_type)
+                                          const QString &simulation_type)
   {
 
-    auto get_community_state_traj = [&](const QString &state)
+    auto get_community_state_traj = [&]()
     {
-      auto query = Orm::DB::unprepared("SELECT \"" + state + "\" FROM community_state WHERE (p_out, graph, simulation, community) = (" + QString::number(p_out_id) + ", " + QString::number(graph_id) + ", " + QString::number(sim_id) + ", " + QString::number(community) + ") ORDER BY t ASC");
+      auto query = Orm::DB::table("community_state")->select({"t", "i", "r"}).where(
+          {{"p_out", p_out_id},
+           {"graph", graph_id},
+           {"simulation", sim_id},
+           {"community", community},
+           {"Control_Type", control_type},
+           {"Simulation_Type", simulation_type}}).get();
+      std::vector<uint32_t> Is(Nt + 1, 0);
+      std::vector<uint32_t> Rs(Nt + 1, 0);
 
-      std::vector<uint32_t> res;
-      res.reserve(Nt);
-      while (query.next())
+      while(query.next())
       {
-        res.push_back(query.value(0).toUInt());
+        auto t = query.value(0).toUInt();
+        auto i = query.value(1).toUInt();
+        auto r = query.value(2).toUInt();
+        Is[t] = i;
+        Rs[t] = r;
+        assert(t <= Nt);
       }
-      return res;
+      return std::make_pair(Is, Rs);
     };
-    auto Is = get_community_state_traj("I");
-    auto Rs = get_community_state_traj("R");
+    auto [Is, Rs] = get_community_state_traj();
 
     std::vector<uint32_t> delta_I(Nt, 0);
     std::vector<uint32_t> delta_R(Nt, 0);

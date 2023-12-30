@@ -58,7 +58,7 @@ int main() {
   auto Np = p_out_vec.size();
   auto seeds = Static_RNG::generate_seeds(Np, seed);
   SBM_Database::Sim_Param param = {N_pop, 0, 0, N_communities, N_connections, N_sims, Nt, Nt_alloc, seed, p_in, 0.0f, p_I_min, p_I_max, p_R, p_I0, p_R0};
-  SBM_Database::drop_graph_tables();
+  SBM_Database::truncate_graph_tables();
   auto graph_ids = SBM_Simulation::make_iota(Ng);
   for (uint32_t p_out_id = 0; p_out_id < p_out_vec.size(); p_out_id++) {
     auto p_out = p_out_vec[p_out_id];
