@@ -1,3 +1,4 @@
+#define QT_FATAL_WARNINGS
 #include <SBM_Simulation/Simulation/Sim_Infection_Sampling.hpp>
 #include <tom/tom_config.hpp>
 int main()

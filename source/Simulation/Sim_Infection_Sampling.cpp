@@ -26,7 +26,7 @@ namespace SBM_Simulation
     auto get_community_state_traj = [&]()
     {
       auto query = Orm::DB::table("community_state")->select({"t", "i", "r"}).where(
-          {{"p_out", p_out_id},
+          {{"p_out",p_out_id},
            {"graph", graph_id},
            {"simulation", sim_id},
            {"community", community},
@@ -221,42 +221,27 @@ namespace SBM_Simulation
     return simulation_infections;
   }
 
-  void sample_graph_infections(uint32_t p_out_id, uint32_t graph_id,
-                               const QString &control_type,
-                               const QString &regression_type, uint32_t seed)
-  {
-    auto ccm = SBM_Database::ccm_read(p_out_id, graph_id);
-
-auto dims = SBM_Database::get_simulation_dimensions();
-    auto seeds = Static_RNG::generate_seeds(dims.N_sims, seed);
-    Dataframe::Dataframe_t<SBM_Graph::Edge_t, 3> graph_infections(
-        std::array<uint32_t, 3>(
-            {(uint32_t)dims.N_sims, (uint32_t)dims.Nt, (uint32_t)dims.N_communities}));
-
-    for (int sim_id = 0; sim_id < dims.N_sims; sim_id++)
-    {
-      graph_infections.data[sim_id] =
-          sample_simulation_infections(p_out_id, graph_id, sim_id, control_type,
-                                       regression_type, ccm, seeds[sim_id]);
-    }
-    SBM_Database::edge_to_table("infection_events", p_out_id, graph_id,
-                                graph_infections, control_type, regression_type,
-                                0, graph_infections.data[0].size());
-  }
 
   void sample_all_infections(const QString &control_type,
                              const QString &regression_type, uint32_t seed)
   {
-    auto N_graphs = SBM_Database::get_N_graphs("connection_events");
-    auto Np = SBM_Database::get_N_p_out("connection_events");
-
-    auto seeds = Static_RNG::generate_seeds(N_graphs * Np, seed);
-    for (int p_out_id = 0; p_out_id < Np; p_out_id++)
+    auto dims = SBM_Database::get_simulation_dimensions(); 
+    auto seeds = Static_RNG::generate_seeds(dims.Np*dims.N_graphs*dims.N_sims, seed);
+    std::vector<Dataframe::Dataframe_t<SBM_Graph::Edge_t, 3>> graph_infections(
+        dims.Np * dims.N_graphs * dims.N_sims,
+        Dataframe::Dataframe_t<SBM_Graph::Edge_t, 3>(
+            std::array<uint32_t, 3>(
+                {(uint32_t)dims.N_sims, (uint32_t)dims.Nt, (uint32_t)dims.N_communities})));
+    for (int p_out_id = 0; p_out_id < dims.Np; p_out_id++)
     {
-      for (int graph_id = 0; graph_id < Np; graph_id++)
+      for (int graph_id = 0; graph_id < dims.N_graphs; graph_id++)
       {
-        sample_graph_infections(p_out_id, graph_id, control_type, regression_type,
-                                seeds[p_out_id * N_graphs + graph_id]);
+        for(int sim_id = 0; sim_id < dims.N_sims; sim_id++)
+        {
+          graph_infections[p_out_id*dims.N_graphs*dims.N_sims + graph_id][sim_id] =
+              sample_simulation_infections(p_out_id, graph_id, sim_id, control_type,
+                                           regression_type, SBM_Database::ccm_read(p_out_id, graph_id), seeds[p_out_id*dims.N_graphs*dims.N_sims + graph_id*dims.N_sims + sim_id]);
+        }
       }
     }
   }
