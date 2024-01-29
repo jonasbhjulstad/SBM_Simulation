@@ -1,0 +1,14 @@
+Bootstrap: docker
+From: intel/oneapi-basekit
+
+%files
+    ./ /SBM_Simulation
+
+%post
+    dpkg -i /SBM_Simulation/cuda-keyring_1.1-1_all.deb    
+    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates build-essential pkg-config curl
+    apt-get -y install cuda-toolkit-12-0
+    curl -LOJ "https://developer.codeplay.com/api/v1/products/download?product=oneapi&variant=nvidia&version=2024.0.2&filters[]=12.0&filters[]=linux"
+
+    bash ./oneapi-for-nvidia-gpus-2024.0.2-cuda-12.0-linux.sh -y
