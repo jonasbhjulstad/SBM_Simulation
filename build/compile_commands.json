@@ -1,0 +1,37 @@
+[
+{
+  "directory": "/home/deb/Documents/SBM_New/build",
+  "command": "/opt/intel/oneapi/compiler/2024.0/bin/compiler/clang++ -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3 -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20 -o test/CMakeFiles/comb.dir/comb.cpp.o -c /home/deb/Documents/SBM_New/test/comb.cpp",
+  "file": "/home/deb/Documents/SBM_New/test/comb.cpp"
+},
+{
+  "directory": "/home/deb/Documents/SBM_New/build",
+  "command": "/opt/intel/oneapi/compiler/2024.0/bin/compiler/clang++ -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3 -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20 -o test/CMakeFiles/graph.dir/graph.cpp.o -c /home/deb/Documents/SBM_New/test/graph.cpp",
+  "file": "/home/deb/Documents/SBM_New/test/graph.cpp"
+},
+{
+  "directory": "/home/deb/Documents/SBM_New/build",
+  "command": "/opt/intel/oneapi/compiler/2024.0/bin/compiler/clang++ -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3 -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20 -o test/CMakeFiles/collision.dir/collision.cpp.o -c /home/deb/Documents/SBM_New/test/collision.cpp",
+  "file": "/home/deb/Documents/SBM_New/test/collision.cpp"
+},
+{
+  "directory": "/home/deb/Documents/SBM_New/build",
+  "command": "/opt/intel/oneapi/compiler/2024.0/bin/compiler/clang++ -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3 -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20 -o test/CMakeFiles/initialize.dir/initialize.cpp.o -c /home/deb/Documents/SBM_New/test/initialize.cpp",
+  "file": "/home/deb/Documents/SBM_New/test/initialize.cpp"
+},
+{
+  "directory": "/home/deb/Documents/SBM_New/build",
+  "command": "/opt/intel/oneapi/compiler/2024.0/bin/compiler/clang++ -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3 -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20 -o test/CMakeFiles/population_count.dir/population_count.cpp.o -c /home/deb/Documents/SBM_New/test/population_count.cpp",
+  "file": "/home/deb/Documents/SBM_New/test/population_count.cpp"
+},
+{
+  "directory": "/home/deb/Documents/SBM_New/build",
+  "command": "/opt/intel/oneapi/compiler/2024.0/bin/compiler/clang++ -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3 -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20 -o test/CMakeFiles/recover.dir/recover.cpp.o -c /home/deb/Documents/SBM_New/test/recover.cpp",
+  "file": "/home/deb/Documents/SBM_New/test/recover.cpp"
+},
+{
+  "directory": "/home/deb/Documents/SBM_New/build",
+  "command": "/opt/intel/oneapi/compiler/2024.0/bin/compiler/clang++ -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1 -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3 -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20 -o test/CMakeFiles/bernoulli.dir/bernoulli.cpp.o -c /home/deb/Documents/SBM_New/test/bernoulli.cpp",
+  "file": "/home/deb/Documents/SBM_New/test/bernoulli.cpp"
+}
+]
