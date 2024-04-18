@@ -35,5 +35,7 @@
 /home/deb/Documents/SBM_New/build/test/CMakeFiles/population_count.dir
 /home/deb/Documents/SBM_New/build/test/CMakeFiles/recover.dir
 /home/deb/Documents/SBM_New/build/test/CMakeFiles/bernoulli.dir
+/home/deb/Documents/SBM_New/build/test/CMakeFiles/state_copy.dir
+/home/deb/Documents/SBM_New/build/test/CMakeFiles/simulation_step.dir
 /home/deb/Documents/SBM_New/build/test/CMakeFiles/edit_cache.dir
 /home/deb/Documents/SBM_New/build/test/CMakeFiles/rebuild_cache.dir

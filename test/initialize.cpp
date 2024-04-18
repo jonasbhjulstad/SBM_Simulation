@@ -1,5 +1,6 @@
 #include <SIR_SBM/simulation.hpp>
 #include <SIR_SBM/ticktock.hpp>
+#include <SIR_SBM/queue_select.hpp>
 using namespace SIR_SBM;
 
 // std::pair<Sim_Buffers, std::vector<sycl::event>> construct_buffers(sycl::queue& q, const SBM_Graph& G, const Sim_Param& p)
@@ -16,7 +17,7 @@ int main()
     auto graph = generate_planted_SBM<oneapi::dpl::ranlux48>(N_pop, N_communities, p_in, p_out, seed);
     t.tock_print();
 
-    sycl::queue q{sycl::gpu_selector_v}; // Create a queue on the default device
+    sycl::queue q{SIR_SBM::default_queue()}; // Create a queue on the default device
     Sim_Param p;
     p.Nt = 100;
     p.Nt_alloc = 100;

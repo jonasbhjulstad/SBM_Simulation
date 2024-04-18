@@ -6,6 +6,9 @@ namespace SIR_SBM {
 template <typename T, int N = 1>
 sycl::event buffer_copy(sycl::queue &q, sycl::buffer<T, N> &buf,
                         const std::vector<T> &data) {
+  if (data.size() < buf.size()) {
+    throw std::runtime_error("Data size is less than buffer size");
+  }
   return q.submit([&](sycl::handler &cgh) {
     auto acc = buf.template get_access<sycl::access::mode::write>(cgh);
     cgh.copy(data.data(), acc);
@@ -15,6 +18,9 @@ sycl::event buffer_copy(sycl::queue &q, sycl::buffer<T, N> &buf,
 template <typename T, int N = 1>
 sycl::event buffer_copy(sycl::queue &q, sycl::buffer<T, N> &buf,
                         const std::vector<T> &&data) {
+  if (data.size() < buf.size()) {
+    throw std::runtime_error("Data size is less than buffer size");
+  }
   return q.submit([&](sycl::handler &cgh) {
     auto acc = buf.template get_access<sycl::access::mode::write>(cgh);
     cgh.copy(data.data(), acc);
@@ -39,24 +45,23 @@ std::tuple<size_t, size_t, size_t> get_range(const sycl::buffer<T, 3> &buf) {
 
 template <typename T, size_t N>
 sycl::event read_buffer(sycl::queue &q, sycl::buffer<T, N> &buf,
-                        std::vector<T> &data, auto events = std::vector<sycl::event>()) {
+                        std::vector<T> &data, sycl::event dep_event) {
   auto [N_vertices, N_sims, Nt_alloc] = get_range(buf);
   data.resize(N_vertices * N_sims * Nt_alloc);
   return q.submit([&](sycl::handler &h) {
-    h.depends_on(events);
+    h.depends_on(dep_event);
     auto acc = buf.template get_access<sycl::access::mode::read>(h);
     h.copy(acc, data.data());
   });
 }
 
 template <typename T, size_t N>
-std::vector<T> read_buffer(sycl::queue &q, sycl::buffer<T, N> &buf, auto events = std::vector<sycl::event>())
-{
+std::vector<T> read_buffer(sycl::queue &q, sycl::buffer<T, N> &buf,
+                           sycl::event dep_event) {
   std::vector<T> data;
-  read_buffer(q, buf, data, events).wait();
+  read_buffer<T, N>(q, buf, data, dep_event).wait();
   return data;
 }
-
 
 template <typename T> sycl::buffer<T> dummy_buf_1() {
   return sycl::buffer<T>(sycl::range<1>(1));

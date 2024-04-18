@@ -238,6 +238,9 @@ SIR_SBM_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 SIR_SBM_SOURCE_DIR:STATIC=/home/deb/Documents/SBM_New
 
+//Use GPU
+SIR_SBM_USE_GPU:BOOL=OFF
+
 //Name of the computer/site where compile is being run
 SITE:STRING=deb
 
@@ -254,6 +257,9 @@ SYCL_PACKAGE_DIR:STRING=/opt/intel/oneapi/compiler/2024.0/bin
 
 //The directory containing a CMake configuration file for TBB.
 TBB_DIR:PATH=/opt/intel/oneapi/tbb/2021.11/lib/cmake/tbb
+
+//Use GPU
+USE_GPU:BOOL=OFF
 
 //Path to a program.
 XIAR:FILEPATH=/opt/intel/oneapi/compiler/2024.0/bin/xiar

@@ -1,6 +1,8 @@
 #include <SIR_SBM/graph.hpp>
 #include <SIR_SBM/exceptions.hpp>
 #include <SIR_SBM/ticktock.hpp>
+#include <SIR_SBM/queue_select.hpp>
+
 using namespace SIR_SBM;
 
 int main()

@@ -248,7 +248,7 @@ build cmake_object_order_depends_target_comb: phony || test/CMakeFiles/comb.dir
 build test/CMakeFiles/comb.dir/comb.cpp.o: CXX_COMPILER__comb_Debug /home/deb/Documents/SBM_New/test/comb.cpp || cmake_object_order_depends_target_comb
   DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1
   DEP_FILE = test/CMakeFiles/comb.dir/comb.cpp.o.d
-  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20
+  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=spir64_x86_64 -std=gnu++20
   INCLUDES = -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3
   OBJECT_DIR = test/CMakeFiles/comb.dir
   OBJECT_FILE_DIR = test/CMakeFiles/comb.dir
@@ -263,7 +263,7 @@ build test/CMakeFiles/comb.dir/comb.cpp.o: CXX_COMPILER__comb_Debug /home/deb/Do
 
 build test/comb: CXX_EXECUTABLE_LINKER__comb_Debug test/CMakeFiles/comb.dir/comb.cpp.o | /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12
   FLAGS = -g
-  LINK_FLAGS = -fsycl-targets=nvptx64-nvidia-cuda
+  LINK_FLAGS = -fsycl-targets=spir64_x86_64
   LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12  -fsycl
   OBJECT_DIR = test/CMakeFiles/comb.dir
   POST_BUILD = :
@@ -283,7 +283,7 @@ build cmake_object_order_depends_target_graph: phony || test/CMakeFiles/graph.di
 build test/CMakeFiles/graph.dir/graph.cpp.o: CXX_COMPILER__graph_Debug /home/deb/Documents/SBM_New/test/graph.cpp || cmake_object_order_depends_target_graph
   DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1
   DEP_FILE = test/CMakeFiles/graph.dir/graph.cpp.o.d
-  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20
+  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=spir64_x86_64 -std=gnu++20
   INCLUDES = -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3
   OBJECT_DIR = test/CMakeFiles/graph.dir
   OBJECT_FILE_DIR = test/CMakeFiles/graph.dir
@@ -298,7 +298,7 @@ build test/CMakeFiles/graph.dir/graph.cpp.o: CXX_COMPILER__graph_Debug /home/deb
 
 build test/graph: CXX_EXECUTABLE_LINKER__graph_Debug test/CMakeFiles/graph.dir/graph.cpp.o | /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12
   FLAGS = -g
-  LINK_FLAGS = -fsycl-targets=nvptx64-nvidia-cuda
+  LINK_FLAGS = -fsycl-targets=spir64_x86_64
   LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12  -fsycl
   OBJECT_DIR = test/CMakeFiles/graph.dir
   POST_BUILD = :
@@ -318,7 +318,7 @@ build cmake_object_order_depends_target_collision: phony || test/CMakeFiles/coll
 build test/CMakeFiles/collision.dir/collision.cpp.o: CXX_COMPILER__collision_Debug /home/deb/Documents/SBM_New/test/collision.cpp || cmake_object_order_depends_target_collision
   DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1
   DEP_FILE = test/CMakeFiles/collision.dir/collision.cpp.o.d
-  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20
+  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=spir64_x86_64 -std=gnu++20
   INCLUDES = -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3
   OBJECT_DIR = test/CMakeFiles/collision.dir
   OBJECT_FILE_DIR = test/CMakeFiles/collision.dir
@@ -333,7 +333,7 @@ build test/CMakeFiles/collision.dir/collision.cpp.o: CXX_COMPILER__collision_Deb
 
 build test/collision: CXX_EXECUTABLE_LINKER__collision_Debug test/CMakeFiles/collision.dir/collision.cpp.o | /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12
   FLAGS = -g
-  LINK_FLAGS = -fsycl-targets=nvptx64-nvidia-cuda
+  LINK_FLAGS = -fsycl-targets=spir64_x86_64
   LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12  -fsycl
   OBJECT_DIR = test/CMakeFiles/collision.dir
   POST_BUILD = :
@@ -353,7 +353,7 @@ build cmake_object_order_depends_target_initialize: phony || test/CMakeFiles/ini
 build test/CMakeFiles/initialize.dir/initialize.cpp.o: CXX_COMPILER__initialize_Debug /home/deb/Documents/SBM_New/test/initialize.cpp || cmake_object_order_depends_target_initialize
   DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1
   DEP_FILE = test/CMakeFiles/initialize.dir/initialize.cpp.o.d
-  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20
+  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=spir64_x86_64 -std=gnu++20
   INCLUDES = -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3
   OBJECT_DIR = test/CMakeFiles/initialize.dir
   OBJECT_FILE_DIR = test/CMakeFiles/initialize.dir
@@ -368,7 +368,7 @@ build test/CMakeFiles/initialize.dir/initialize.cpp.o: CXX_COMPILER__initialize_
 
 build test/initialize: CXX_EXECUTABLE_LINKER__initialize_Debug test/CMakeFiles/initialize.dir/initialize.cpp.o | /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12
   FLAGS = -g
-  LINK_FLAGS = -fsycl-targets=nvptx64-nvidia-cuda
+  LINK_FLAGS = -fsycl-targets=spir64_x86_64
   LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12  -fsycl
   OBJECT_DIR = test/CMakeFiles/initialize.dir
   POST_BUILD = :
@@ -388,7 +388,7 @@ build cmake_object_order_depends_target_population_count: phony || test/CMakeFil
 build test/CMakeFiles/population_count.dir/population_count.cpp.o: CXX_COMPILER__population_count_Debug /home/deb/Documents/SBM_New/test/population_count.cpp || cmake_object_order_depends_target_population_count
   DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1
   DEP_FILE = test/CMakeFiles/population_count.dir/population_count.cpp.o.d
-  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20
+  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=spir64_x86_64 -std=gnu++20
   INCLUDES = -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3
   OBJECT_DIR = test/CMakeFiles/population_count.dir
   OBJECT_FILE_DIR = test/CMakeFiles/population_count.dir
@@ -403,7 +403,7 @@ build test/CMakeFiles/population_count.dir/population_count.cpp.o: CXX_COMPILER_
 
 build test/population_count: CXX_EXECUTABLE_LINKER__population_count_Debug test/CMakeFiles/population_count.dir/population_count.cpp.o | /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12
   FLAGS = -g
-  LINK_FLAGS = -fsycl-targets=nvptx64-nvidia-cuda
+  LINK_FLAGS = -fsycl-targets=spir64_x86_64
   LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12  -fsycl
   OBJECT_DIR = test/CMakeFiles/population_count.dir
   POST_BUILD = :
@@ -423,7 +423,7 @@ build cmake_object_order_depends_target_recover: phony || test/CMakeFiles/recove
 build test/CMakeFiles/recover.dir/recover.cpp.o: CXX_COMPILER__recover_Debug /home/deb/Documents/SBM_New/test/recover.cpp || cmake_object_order_depends_target_recover
   DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1
   DEP_FILE = test/CMakeFiles/recover.dir/recover.cpp.o.d
-  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20
+  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=spir64_x86_64 -std=gnu++20
   INCLUDES = -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3
   OBJECT_DIR = test/CMakeFiles/recover.dir
   OBJECT_FILE_DIR = test/CMakeFiles/recover.dir
@@ -438,7 +438,7 @@ build test/CMakeFiles/recover.dir/recover.cpp.o: CXX_COMPILER__recover_Debug /ho
 
 build test/recover: CXX_EXECUTABLE_LINKER__recover_Debug test/CMakeFiles/recover.dir/recover.cpp.o | /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12
   FLAGS = -g
-  LINK_FLAGS = -fsycl-targets=nvptx64-nvidia-cuda
+  LINK_FLAGS = -fsycl-targets=spir64_x86_64
   LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12  -fsycl
   OBJECT_DIR = test/CMakeFiles/recover.dir
   POST_BUILD = :
@@ -458,7 +458,7 @@ build cmake_object_order_depends_target_bernoulli: phony || test/CMakeFiles/bern
 build test/CMakeFiles/bernoulli.dir/bernoulli.cpp.o: CXX_COMPILER__bernoulli_Debug /home/deb/Documents/SBM_New/test/bernoulli.cpp || cmake_object_order_depends_target_bernoulli
   DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1
   DEP_FILE = test/CMakeFiles/bernoulli.dir/bernoulli.cpp.o.d
-  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=nvptx64-nvidia-cuda -std=gnu++20
+  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=spir64_x86_64 -std=gnu++20
   INCLUDES = -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3
   OBJECT_DIR = test/CMakeFiles/bernoulli.dir
   OBJECT_FILE_DIR = test/CMakeFiles/bernoulli.dir
@@ -473,13 +473,83 @@ build test/CMakeFiles/bernoulli.dir/bernoulli.cpp.o: CXX_COMPILER__bernoulli_Deb
 
 build test/bernoulli: CXX_EXECUTABLE_LINKER__bernoulli_Debug test/CMakeFiles/bernoulli.dir/bernoulli.cpp.o | /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12
   FLAGS = -g
-  LINK_FLAGS = -fsycl-targets=nvptx64-nvidia-cuda
+  LINK_FLAGS = -fsycl-targets=spir64_x86_64
   LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12  -fsycl
   OBJECT_DIR = test/CMakeFiles/bernoulli.dir
   POST_BUILD = :
   PRE_LINK = :
   TARGET_FILE = test/bernoulli
   TARGET_PDB = bernoulli.dbg
+
+# =============================================================================
+# Object build statements for EXECUTABLE target state_copy
+
+
+#############################################
+# Order-only phony target for state_copy
+
+build cmake_object_order_depends_target_state_copy: phony || test/CMakeFiles/state_copy.dir
+
+build test/CMakeFiles/state_copy.dir/state_copy.cpp.o: CXX_COMPILER__state_copy_Debug /home/deb/Documents/SBM_New/test/state_copy.cpp || cmake_object_order_depends_target_state_copy
+  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1
+  DEP_FILE = test/CMakeFiles/state_copy.dir/state_copy.cpp.o.d
+  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=spir64_x86_64 -std=gnu++20
+  INCLUDES = -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3
+  OBJECT_DIR = test/CMakeFiles/state_copy.dir
+  OBJECT_FILE_DIR = test/CMakeFiles/state_copy.dir
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target state_copy
+
+
+#############################################
+# Link the executable test/state_copy
+
+build test/state_copy: CXX_EXECUTABLE_LINKER__state_copy_Debug test/CMakeFiles/state_copy.dir/state_copy.cpp.o | /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12
+  FLAGS = -g
+  LINK_FLAGS = -fsycl-targets=spir64_x86_64
+  LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12  -fsycl
+  OBJECT_DIR = test/CMakeFiles/state_copy.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = test/state_copy
+  TARGET_PDB = state_copy.dbg
+
+# =============================================================================
+# Object build statements for EXECUTABLE target simulation_step
+
+
+#############################################
+# Order-only phony target for simulation_step
+
+build cmake_object_order_depends_target_simulation_step: phony || test/CMakeFiles/simulation_step.dir
+
+build test/CMakeFiles/simulation_step.dir/simulation_step.cpp.o: CXX_COMPILER__simulation_step_Debug /home/deb/Documents/SBM_New/test/simulation_step.cpp || cmake_object_order_depends_target_simulation_step
+  DEFINES = -DONEDPL_USE_OPENMP_BACKEND=0 -DONEDPL_USE_TBB_BACKEND=1
+  DEP_FILE = test/CMakeFiles/simulation_step.dir/simulation_step.cpp.o.d
+  FLAGS = -g -fsycl -fcolor-diagnostics -fsycl-targets=spir64_x86_64 -std=gnu++20
+  INCLUDES = -I/opt/intel/oneapi/compiler/2024.0/include -I/home/deb/Documents/SBM_New/include -isystem /opt/intel/oneapi/dpl/2022.3/include -isystem /opt/intel/oneapi/tbb/2021.11/include -isystem /usr/include/eigen3
+  OBJECT_DIR = test/CMakeFiles/simulation_step.dir
+  OBJECT_FILE_DIR = test/CMakeFiles/simulation_step.dir
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target simulation_step
+
+
+#############################################
+# Link the executable test/simulation_step
+
+build test/simulation_step: CXX_EXECUTABLE_LINKER__simulation_step_Debug test/CMakeFiles/simulation_step.dir/simulation_step.cpp.o | /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12
+  FLAGS = -g
+  LINK_FLAGS = -fsycl-targets=spir64_x86_64
+  LINK_LIBRARIES = /opt/intel/oneapi/tbb/2021.11/lib/libtbb_debug.so.12  -fsycl
+  OBJECT_DIR = test/CMakeFiles/simulation_step.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = test/simulation_step
+  TARGET_PDB = simulation_step.dbg
 
 
 #############################################
@@ -801,6 +871,10 @@ build population_count: phony test/population_count
 
 build recover: phony test/recover
 
+build simulation_step: phony test/simulation_step
+
+build state_copy: phony test/state_copy
+
 # =============================================================================
 # Folder targets.
 
@@ -816,7 +890,7 @@ build all: phony test/all
 #############################################
 # Folder: /home/deb/Documents/SBM_New/build/test
 
-build test/all: phony test/comb test/graph test/collision test/initialize test/population_count test/recover test/bernoulli
+build test/all: phony test/comb test/graph test/collision test/initialize test/population_count test/recover test/bernoulli test/state_copy test/simulation_step
 
 # =============================================================================
 # Built-in targets

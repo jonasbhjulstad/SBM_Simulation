@@ -1,10 +1,12 @@
 #include <SIR_SBM/random.hpp>
 #include <oneapi/dpl/random>
 #include <SIR_SBM/sycl_routines.hpp>
+#include <SIR_SBM/queue_select.hpp>
+
 using namespace SIR_SBM;
 int main() {
   // sycl queue
-  sycl::queue q{sycl::gpu_selector_v};
+  sycl::queue q{SIR_SBM::default_queue()};
   // get work group size
   auto work_group_size =
       q.get_device().get_info<sycl::info::device::max_work_group_size>();

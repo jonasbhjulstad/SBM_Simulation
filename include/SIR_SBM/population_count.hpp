@@ -1,5 +1,6 @@
 #pragma once
 #include <SIR_SBM/sycl_routines.hpp>
+#include <SIR_SBM/epidemiological.hpp>
 namespace SIR_SBM {
 void validate_population(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
                          sycl::range<3> range, sycl::range<3> offset) {
@@ -46,7 +47,7 @@ sycl::event partition_population_count(sycl::queue &q,
     h.parallel_for(sycl::range<2>(N_sims, Nt_alloc), [=](sycl::id<2> idx) {
       for (int v_idx = 0; v_idx < N_vertices; v_idx++) {
         auto p_idx = vpm_acc[v_idx];
-        const SIR_State &v = state_acc[sycl::id<3>(v_idx, idx[0], idx[1])];
+        const SIR_State v = state_acc[sycl::id<3>(v_idx, idx[0], idx[1])];
         count_acc[sycl::id<3>(p_idx, idx[0], idx[1])][v]++;
       }
     });

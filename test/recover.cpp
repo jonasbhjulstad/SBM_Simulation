@@ -1,6 +1,8 @@
 #include <SIR_SBM/simulation.hpp>
 #include <SIR_SBM/ticktock.hpp>
 #include <SIR_SBM/population_count.hpp>
+#include <SIR_SBM/queue_select.hpp>
+
 using namespace SIR_SBM;
 
 int main()
@@ -15,7 +17,7 @@ int main()
     auto graph = generate_planted_SBM<oneapi::dpl::ranlux48>(N_pop, N_communities, p_in, p_out, seed);
     t.tock_print();
 
-    sycl::queue q{sycl::gpu_selector_v}; // Create a queue on the default device
+    sycl::queue q{SIR_SBM::default_queue()}; // Create a queue on the default device
     Sim_Param p;
     p.Nt = 100;
     p.Nt_alloc = 100;
@@ -37,6 +39,8 @@ int main()
     auto rec_evt = recover(q, SB.state, SB.rngs, 0.1, 0);
 
     rec_evt.wait();
+
+    count = std::vector<Population_Count>(N_communities*p.N_sims*p.Nt, {0, 0, 0});
 
     {
         auto count_buf = sycl::buffer<Population_Count, 3>{count.data(), sycl::range<3>(N_communities, p.N_sims, p.Nt)};

@@ -15,6 +15,7 @@ enum class SIR_State: char
 struct Population_Count
 {
     uint32_t S, I, R;
+    Population_Count(): S{0}, I{0}, R{0} {}
     Population_Count(uint32_t S, uint32_t I, uint32_t R): S{S}, I{I}, R{R} {}
     Population_Count(const std::array<uint32_t, 3>& arr): S{arr[0]}, I{arr[1]}, R{arr[2]} {}
     Population_Count operator+(const Population_Count& other) const
