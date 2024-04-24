@@ -1,5 +1,0 @@
-if (FROLS_USE_SYCL)
-cmake_policy(SET CMP0079 NEW)
-target_include_directories(FROLS_Network INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(FROLS_Network INTERFACE FROLS_Sycl)
-endif()

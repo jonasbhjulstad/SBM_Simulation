@@ -1,0 +1,9 @@
+aesara==2.9.3
+bokeh==3.4.1
+casadi==3.6.5
+matplotlib==3.8.3
+ndlib==5.1.1
+networkx==3.2.1
+numpy==1.26.4
+pandas==2.2.2
+pysindy==1.7.5

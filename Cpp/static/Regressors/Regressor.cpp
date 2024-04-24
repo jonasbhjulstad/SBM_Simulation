@@ -1,6 +1,6 @@
 #include "Regressor.hpp"
 #include <FROLS_Eigen.hpp>
-#include <FROLS_Execution.hpp>
+
 #include <fmt/format.h>
 
 namespace FROLS::Regression {

@@ -2,7 +2,6 @@
 #define FROLS_BERNOULLI_SIR_MC_HPP
 
 #include <FROLS_Path_Config.hpp>
-#include <FROLS_Random.hpp>
 #include <quantiles.hpp>
 #include <FROLS_Math.hpp>
 #include <FROLS_Eigen.hpp>

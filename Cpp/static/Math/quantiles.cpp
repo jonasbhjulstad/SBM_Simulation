@@ -1,7 +1,7 @@
 #include "quantiles.hpp"
 #include <FROLS_Path_Config.hpp>
 #include <FROLS_Math.hpp>
-#include <FROLS_Execution.hpp>
+
 #include <thread>
 namespace FROLS {
     float quantile(std::vector<float> list, float tau) {
@@ -68,7 +68,7 @@ namespace FROLS {
                 df.assign("t", t);
                 df.resize(t.size());
 
-                std::for_each(std::execution::par_unseq, colnames.begin(), colnames.end(), [&](const auto& colname){df.assign(colname, dataframe_quantiles(dfs, colname, tau[i]));});
+                std::for_each(colnames.begin(), colnames.end(), [&](const auto& colname){df.assign(colname, dataframe_quantiles(dfs, colname, tau[i]));});
                 df.write_csv(q_fname_f(uint32_t(tau[i]*100)), ",");
 
             }

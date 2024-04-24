@@ -8,7 +8,7 @@
 #include <itertools.hpp>
 #include <memory>
 #include <random>
-
+#include <FROLS/FROLS_Random.hpp>
 namespace Network_Models
 {
     template <typename Graph, typename RNG, typename dType = float>

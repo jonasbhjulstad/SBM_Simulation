@@ -8,7 +8,7 @@
 
 namespace FROLS::Integrators
 {
-
+    typedef float realtype;
     template <typename dType = float>
     struct SIR_Param
     {

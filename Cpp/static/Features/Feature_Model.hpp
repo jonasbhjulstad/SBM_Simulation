@@ -4,6 +4,8 @@
 #include <Typedefs.hpp>
 #include <FROLS_Path_Config.hpp>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace FROLS::Features {
     struct Feature_Model {

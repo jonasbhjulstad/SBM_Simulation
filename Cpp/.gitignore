@@ -1,6 +1,6 @@
-build/**
-data/**
-figures/**
+./build/**
+./data/**
+./figures/**
 log/**
 cmake-build-release/**
 cmake-build-debug/**

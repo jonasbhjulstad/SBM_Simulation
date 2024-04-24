@@ -7,8 +7,8 @@
 namespace FROLS {
 // const char *FROLS_ROOT_DIR = "";
 // const char *FROLS_INCLUDE_DIR = "";
-    const char *FROLS_DATA_DIR = "/home/man/Documents/ER_Bernoulli/Cpp/data";
-    const char *FROLS_LOG_DIR = "/home/man/Documents/ER_Bernoulli/Cpp/log";
+    const char *FROLS_DATA_DIR = "/home/deb/Downloads/SBM_Simulation/Cpp/data";
+    const char *FROLS_LOG_DIR = "/home/deb/Downloads/SBM_Simulation/Cpp/log";
 
 
     std::string MC_filename(uint32_t N_pop, float p_ER, uint32_t iter, std::string network_type) {

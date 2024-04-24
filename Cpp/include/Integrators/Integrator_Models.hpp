@@ -7,15 +7,15 @@
 #define SUNDIALS_SINGLE_PRECISION
 
 #include <cvode/cvode.h>
-#include <cvode/cvode_spils.h>
+// #include <cvode/cvode_spils.h>
 #include <fstream>
 #include <iostream>
 #include <nvector/nvector_serial.h>
+#include <sundials/sundials_types.h>
 #include <sundials/sundials_math.h>
 #include <sundials/sundials_types.h>
 #include <sunlinsol/sunlinsol_spgmr.h>
 #include <sunlinsol/sunlinsol_dense.h>
-#include <cvode/cvode_direct.h>
 #include <vector>
 #include <array>
 

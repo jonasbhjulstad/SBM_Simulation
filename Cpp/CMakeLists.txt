@@ -7,14 +7,9 @@ set(CMAKE_CXX_COMPILER_WORKS ON)
 SET(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 set(CMAKE_C_COMPILER_FORCED ON)
-if(WIN32)
-    set(PYTHON_EXECUTABLE "C:\\Users\\jonas\\anaconda3\\envs\\Network_MPC\\python.exe")
-else()
-    set(PYTHON_EXECUTABLE "/home/man/.pyenv/versions/3.9.13/bin/python3")
-    set(PYTHON_INCLUDE_DIR "/home/man/.pyenv/versions/3.9.13/include/python3.9")
-    set(PYTHON_LIBS "/home/man/.pyenv/versions/3.9.13/libs/python3.9")
-    set(Python3_ROOT_DIR "/home/man/.pyenv/versions/3.9.13/")
-endif()
+
+include(FindPython3)
+find_package (Python3 COMPONENTS Interpreter Development)
 find_package(PkgConfig)
 list(APPEND CMAKE_MODULE_PATH "/home/arch/Downloads/cmake-checks-cache/CMakeChecksCache/")
 find_package(Eigen3 REQUIRED)
@@ -24,42 +19,17 @@ find_package(fmt REQUIRED)
 find_package(re2 REQUIRED)
 find_package(absl CONFIG REQUIRED)
 
-# pkg_check_modules(ortools REQUIRED IMPORTED_TARGET ortools)
 find_package(ortools CONFIG REQUIRED)
-# target_link_libraries(ortools PUBLIC )
-get_property(importTargets DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-get_property(importTargetsAfter DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-find_package(range-v3 REQUIRED)
-set(HIPSYCL_TARGETS "cuda:sm_60")
-set(SPIR_FORMAT __DEVICE_SPIR64__)
-list(REMOVE_ITEM importTargetsAfter ${importTargets})
-message("${importTargetsAfter}")
 find_package(SUNDIALS REQUIRED)
-set(PYBIND11_PYTHON_VERSION "3.9")
-find_package(pybind11 CONFIG)
-# find_package(PythonLibs REQUIRED)
+find_package(pybind11 CONFIG REQUIRED)
 find_package(Python3 3.9 REQUIRED)
-set(FROLS_USE_INTEL ON)
-set(FROLS_USE_AMD OFF)
-set(FROLS_USE_INTEL_SYCL OFF)
-set(FROLS_USE_HIPSYCL OFF)
 
-if(${FROLS_USE_INTEL_SYCL})
-add_compile_definitions(FROLS_USE_INTEL_SYCL)
-endif()
-if (${FROLS_USE_INTEL_SYCL} OR ${FROLS_USE_HIPSYCL})
-    set(FROLS_USE_SYCL ON)
-    add_compile_definitions(FROLS_USE_SYCL)
-endif()
-if(${FROLS_USE_INTEL} OR ${FROLS_USE_AMD})
+set(FROLS_USE_INTEL ON)
+
 add_compile_definitions(FROLS_USE_INTEL)
 find_package(TBB CONFIG REQUIRED)
 set(ONEAPI_LIBS TBB::tbb)
-endif()
 
-include(cmake/HIP_Sycl_config.cmake)
-include(cmake/Intel_Sycl_config.cmake)
-include(cmake/Sycl_executable.cmake)
 
 
 # find_package(nlohmann_json REQUIRED)
@@ -73,6 +43,7 @@ add_compile_options("-fPIC")
 # set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 # endif()
+
 set(SUNDIALS_LIBS SUNDIALS::cvode SUNDIALS::nvecserial)
 include(FetchContent)
 
@@ -86,8 +57,6 @@ if(ENABLE_TESTING)
 endif()
 
 # option(cppitertools_INSTALL_CMAKE_DIR "share/cppitertools/cmake")
-# find_package(cppitertools QUIET)
-find_package(GTest REQUIRED)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
@@ -106,15 +75,6 @@ FetchContent_MakeAvailable(cppitertools_repo)
 
 set(COMMON_LIBRARIES "Common;FROLS_Math;DataFrame;FROLS_Eigen;cppitertools")
 
-# set(GRAPH_LITE_SUPPORT_DOT OFF)
-# FetchContent_Declare(graphlite_repo
-#     GIT_REPOSITORY https://github.com/haasdo95/graphlite.git
-#     GIT_TAG master)
-
-# FetchContent_MakeAvailable(graphlite_repo)
-# set_target_properties(graphlite
-#     PROPERTIES
-#     CXX_STANDARD 17)
 
 set(FROLS_DATA_DIR "${PROJECT_SOURCE_DIR}/data" CACHE INTERNAL "FROLS_DATA_DIR")
 set(FROLS_LOG_DIR "${PROJECT_SOURCE_DIR}/log" CACHE INTERNAL "FROLS_LOG_DIR")
@@ -135,6 +95,6 @@ if(ENABLE_TESTING)
     message(STATUS "Testing enabled")
 endif()
 
-set(FROLS_COMMON_LIBS DataFrame Common FROLS_Math FROLS_Eigen FROLS_Network ${ONEAPI_LIBS} ${HIPSYCL_LIBS})
+set(FROLS_COMMON_LIBS DataFrame Common FROLS_Math FROLS_Eigen FROLS_Network ${ONEAPI_LIBS})
 
 add_subdirectory(Executables)
