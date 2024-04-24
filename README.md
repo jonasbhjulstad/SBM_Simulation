@@ -1,12 +1,25 @@
 # SBM_Simulation
 Main repository for epidemiological MC-simulations on stochastic blockmodels
 
+Individual-based network models enables association of highly detailed data to epidemics,
+but optimal control on such large network models face challenging dimensionalities for the control inputs.
+`SBM_Simulation` aims to reduce the dimensionality by fitting ODEs to these network models.
+
+This is done by performing Monte Carlo simulations on network models and inferring ODEs from the result.
+Inference of the ODEs requires community detection ([graph_tools](https://graph-tool.skewed.de/static/doc/demos/inference/inference.html))
+and nonlinear regression (implemented with [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page)).
+
+Simulations are offloaded to GPU-devices using SYCL. 
+
+
 ## 
 
 Offloads $N_{graph}\times N_{sim}$ simulations to a given SYCL-device, 
 where vertices of graphs are grouped into `communities`, and edges between communities are grouped into `connections`. 
 
 Each pack of $N_{sim}$ simulations are allocated as an individual unit, and its kernels are enqueued to a single (shared) SYCL queue separately.
+
+# Implementation Details
 
 ## Buffer Allocations
 
@@ -20,7 +33,7 @@ between communities at each timestep.
 
 ### Graph
 All graph properties are allocated to global buffers shared between the $N_{sim}$ simulations.
-$N_{edge}$ edges with (`uint32_t` from, `uint32_t` to) indices are allocated
+$N_{edge}$ edges with (`uint32_t` from, `uint32_t` to) indices are allocated.
 An `edge_connection_map` (with `uint32_t` `connection`) is allocated to determine which `connection` each edge belongs to.
 A `vertex_partition_map` (with `uint32_t` `partition`) is allocated to determine which `partition` each vertex belongs to.
 
