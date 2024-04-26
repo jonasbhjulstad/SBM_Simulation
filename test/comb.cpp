@@ -3,7 +3,7 @@
 
 int main()
 {
-    auto c = combinations_with_replacement(10, 2);
+    auto c = SIR_SBM::combinations_with_replacement(10, 2);
 
     for(auto && ci: c)
     {

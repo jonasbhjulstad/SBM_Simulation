@@ -1,7 +1,7 @@
 #include <SIR_SBM/population_count.hpp>
+#include <SIR_SBM/queue_select.hpp>
 #include <SIR_SBM/simulation.hpp>
 #include <SIR_SBM/ticktock.hpp>
-#include <SIR_SBM/queue_select.hpp>
 
 using namespace SIR_SBM;
 
@@ -13,7 +13,7 @@ int main() {
   float p_out = 1.0;
   TickTock t;
   t.tick();
-  auto graph = generate_planted_SBM<oneapi::dpl::ranlux48>(N_pop, N_communities,
+  auto graph = generate_planted_SBM(N_pop, N_communities,
                                                            p_in, p_out, seed);
   t.tock_print();
 
@@ -22,18 +22,23 @@ int main() {
   p.Nt = 100;
   p.Nt_alloc = 100;
   p.N_I_terminate = 1;
-  p.N_sims = 100;
+  p.N_sims = 2;
   p.seed = 10;
-  Sim_Result result;
+  Sim_Result result(p, graph);
   {
-  auto SB = Sim_Buffers<oneapi::dpl::ranlux48>(q, graph, p, result);
-  SB.wait();
+    auto SB = Sim_Buffers::make(q, graph, p, result);
+    SB->wait();
+    q.wait();
+    SB->validate(q);
 
-  initialize(q, SB.state, SB.rngs, 0.1).wait();
+    initialize(q, SB->state, SB->rngs, 0.1).wait();
 
-  simulation_step<oneapi::dpl::ranlux48>(q, SB, 1.0, 0.1, 0).wait();
+    SB->validate(q);
 
-  }  
+    simulation_step(q, SB, .01, 0.1, 0, 0).wait();
+    partition_population_count(q, SB->state, SB->population_count, SB->vpc, 0)
+        .wait();
+  }
 
   return 0;
 }
