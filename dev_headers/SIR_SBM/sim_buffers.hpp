@@ -30,7 +30,7 @@ struct Sim_Buffers {
         state(sycl::range<3>(G.N_vertices(), p.N_sims, p.Nt_alloc)),
         infected_count(
             result.infected_count.data(),
-            sycl::range<3>(G.N_connections() * 2, p.N_sims, p.Nt + 1)),
+            sycl::range<3>(G.N_connections() * 2, p.N_sims, p.Nt)),
         population_count(result.population_count.data(),
                          sycl::range<3>(G.N_partitions(), p.N_sims, p.Nt + 1)),
         edges(make_buffer<Edge_t, 1>(q, G.flat_edges(),
@@ -137,7 +137,7 @@ private:
     validate_elements(
         q, infected_count, [](uint32_t elem) { return elem == 0; },
         "Invalid infected count");
-    validate_range(sycl::range<3>(N_partitions * 2, N_sims, Nt + 1),
+    validate_range(sycl::range<3>(N_partitions * 2, N_sims, Nt),
                    infected_count.get_range());
   }
 

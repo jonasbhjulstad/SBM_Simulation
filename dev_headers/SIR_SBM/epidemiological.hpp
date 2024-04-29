@@ -16,16 +16,16 @@ enum class SIR_State : char {
 #end
 
 struct Population_Count {
-  uint32_t S, I, R;
+  int S, I, R;
   Population_Count() : S(0), I(0), R(0) {}
-  Population_Count(uint32_t S, uint32_t I, uint32_t R) : S(S), I(I), R(R) {}
-  Population_Count(const std::array<uint32_t, 3> &arr)
+  Population_Count(int S, int I, int R) : S(S), I(I), R(R) {}
+  Population_Count(const std::array<int, 3> &arr)
       : S(arr[0]), I(arr[1]), R(arr[2]) {}
   Population_Count operator+(const Population_Count &other) const {
     return Population_Count{S + other.S, I + other.I, R + other.R};
   }
   bool is_zero() const { return S == 0 && I == 0 && R == 0; }
-  uint32_t &operator[](SIR_State s) {
+  int &operator[](SIR_State s) {
     switch (s) {
     case SIR_State::Susceptible:
       return S;

@@ -1,5 +1,6 @@
 #pragma once
 #hdr
+#include <cppitertools/combinations_with_replacement.hpp>
 #include <SIR_SBM/combination.hpp>
 #include <SIR_SBM/random.hpp>
 #include <SIR_SBM/vector.hpp>
@@ -85,11 +86,11 @@ SBM_Graph generate_planted_SBM(size_t N_pop, size_t N_communities, float p_in,
                                float p_out, uint32_t seed) {
   SBM_Graph graph;
   graph.vertices = SBM_vertices(N_pop, N_communities);
-  auto combs = combinations_with_replacement(N_communities, 2);
-  graph.edges.resize(combs.size());
-  auto rngs = generate_rngs<oneapi::dpl::ranlux48>(seed, combs.size());
+  auto combs = iter::combinations_with_replacement(make_iota(N_communities), 2);
+  
+  auto rngs = generate_rngs<oneapi::dpl::ranlux48>(seed, n_choose_k(N_communities, 2));
 
-  std::transform(combs.begin(), combs.end(), rngs.begin(), graph.edges.begin(),
+  std::transform(combs.begin(), combs.end(), rngs.begin(), std::back_inserter(graph.edges),
                  [N_pop, p_in, p_out](auto comb, auto &rng) {
                    Vertexlist_t N0(N_pop);
                    Vertexlist_t N1(N_pop);

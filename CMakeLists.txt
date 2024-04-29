@@ -10,10 +10,11 @@ add_compile_options("-fsycl")
 add_compile_options("-fcolor-diagnostics")
 option(SIR_SBM_USE_GPU "Use GPU" OFF)
 
-
+find_program(iwyu_path NAMES include-what-you-use iwyu REQUIRED)
 include(cmake/external_packages.cmake)
 include(cmake/default_targets.cmake)
-
+#export compile commands
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #make dir
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/include/SIR_SBM/)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/src/SIR_SBM/)
@@ -32,33 +33,37 @@ foreach(DEV_HEADER ${DEV_HEADERS})
     set(HEADER_NAME ${CMAKE_BINARY_DIR}/include/SIR_SBM/${DEV_HEADER_NAME}.hpp)
     list(APPEND SIR_SBM_SOURCE_FILES ${SOURCE_NAME})
     list(APPEND SIR_SBM_HEADER_FILES ${HEADER_NAME})
+    set_source_files_properties(${SOURCE_NAME} OBJECT_DEPENDS ${DEV_HEADER})
+    set_source_files_properties(${HEADER_NAME} OBJECT_DEPENDS ${DEV_HEADER})
 endforeach()
-message(WARNING ${SYCL_INCLUDE_DIR})
-add_custom_command(
-    OUTPUT ${SIR_SBM_SOURCE_FILES} ${SIR_SBM_HEADER_FILES}
-    #-I/usr/include/c++/11/ 
-    COMMAND lzz -sx cpp -hx hpp -hd -sd ${DEV_HEADERS} 
-    -I${PROJECT_SOURCE_DIR}/dev_headers/ 
-    # -I${SYCL_INCLUDE_DIR} 
-    # -I${SYCL_INCLUDE_DIR}/sycl/
-    # -I/opt/intel/oneapi/tbb/2021.11/env/../include
-    # -I/opt/intel/oneapi/dpl/2022.3/include
-    # -I/opt/intel/oneapi/dev-utilities/2024.0/include
-    # -I/opt/intel/oneapi/compiler/2024.0/opt/oclfpga/include
-    # -I/usr/lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11
-    # -I/usr/lib/gcc/x86_64-linux-gnu/11/../../../../include/x86_64-linux-gnu/c++/11
-    # -I/usr/lib/gcc/x86_64-linux-gnu/11/../../../../include/c++/11/backward
-    # -I/opt/intel/oneapi/compiler/2024.0/lib/clang/17/include
-    # -I/usr/local/include
-    # -I/usr/include/x86_64-linux-gnu
-    # -I/usr/include
-    -o ${CMAKE_BINARY_DIR}/include/SIR_SBM/
-    DEPENDS ${DEV_HEADERS}
+
+#create files if they do not exist (in order to satisfy cmake library target)
+foreach(SOURCE_FILE ${SIR_SBM_SOURCE_FILES})
+    if(NOT EXISTS ${SOURCE_FILE})
+        file(WRITE ${SOURCE_FILE} "//auto generated file")
+    endif()
+endforeach()
+
+foreach(HEADER_FILE ${SIR_SBM_HEADER_FILES})
+    if(NOT EXISTS ${HEADER_FILE})
+        file(WRITE ${HEADER_FILE} "//auto generated file")
+    endif()
+endforeach()
+
+add_custom_target(DEV_HEADERS_target DEPENDS ${DEV_HEADERS})
+
+#LZZ generation
+add_custom_target(SIR_SBM_LZZ_Generation DEPENDS ${DEV_HEADERS}
+COMMAND lzz -sx cpp -hx hpp -sl -il -hl -tl -hd -sd ${DEV_HEADERS} 
+-I${PROJECT_SOURCE_DIR}/dev_headers/ 
+-o ${CMAKE_BINARY_DIR}/include/SIR_SBM/
+SOURCES ${DEV_HEADERS}
 )
-
-file(GLOB SIR_SBM_SOURCE_FILES ${PROJECT_BINARY_DIR}/include/SIR_SBM/*.*pp)
-
+add_dependencies(SIR_SBM_LZZ_Generation DEV_HEADERS_target)
 add_library(SIR_SBM ${SIR_SBM_SOURCE_FILES})
+add_dependencies(SIR_SBM SIR_SBM_LZZ_Generation)
+
+#make SIR_SBM depend on the generated files
 target_include_directories(SIR_SBM PUBLIC ${SIR_SBM_INCLUDE_DIR})
 target_link_options(SIR_SBM PUBLIC "-fsycl")
 

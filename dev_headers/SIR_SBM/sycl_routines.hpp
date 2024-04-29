@@ -54,7 +54,8 @@ template <int N> void validate_range(sycl::range<N> r, sycl::range<N> r_buf) {
   for (size_t i = 0; i < N; i++) {
     if (r[i] > r_buf[i]) {
       throw std::runtime_error("Ranges do not match at idx " +
-                               std::to_string(i));
+                               std::to_string(i) + " " + std::to_string(r[i]) +
+                               " " + std::to_string(r_buf[i]));
     }
   }
 }
