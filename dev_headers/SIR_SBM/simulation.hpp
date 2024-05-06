@@ -39,6 +39,7 @@ sycl::event simulation_alloc_step(sycl::queue &q,
 
 sycl::event run_simulation(sycl::queue &q, std::shared_ptr<Sim_Buffers> &SB,
                            const Sim_Param& p) {
+                            
   auto step_evt = initialize(q, SB->state, SB->rngs, p.p_I0);
   
   for (int t = 0; t < p.Nt+1; t += SB->Nt_alloc) {

@@ -80,7 +80,8 @@ sycl::event initialize(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
 }
 
 sycl::event state_copy(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
-                       size_t t_src, size_t t_dest, sycl::event dep_event = {}) {
+                       size_t t_src, size_t t_dest,
+                       sycl::event dep_event = {}) {
   throw_if(t_dest >= state.get_range()[2], "Invalid dest time step");
   throw_if(t_src >= state.get_range()[2], "Invalid source time step");
 
@@ -124,21 +125,23 @@ sycl::event recover(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
   });
 }
 
-// runs inplace infection on vertices at time t
-
 sycl::event infect(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
                    sycl::buffer<Edge_t> &edges, sycl::buffer<uint32_t> &ecc,
                    sycl::buffer<uint32_t, 3> &infected_count,
                    sycl::buffer<oneapi::dpl::ranlux48> &rngs, float p_I,
                    uint32_t t, uint32_t t_offset, sycl::event dep_event = {}) {
   throw_if(t_offset > infected_count.get_range()[2], "Invalid time step");
+  size_t N_vertices = state.get_range()[0];
+  size_t N_sims = state.get_range()[1];
+  size_t N_edges = edges.size();
+  size_t N_connections = infected_count.get_range()[0] / 2;
+  size_t t_offset_inf_count = t + t_offset - 1;
+  auto zero_evt =
+      zero_fill(q, infected_count, sycl::range<3>(2 * N_connections, N_sims, 1),
+                sycl::range<3>(0, 0, t_offset_inf_count), dep_event);
 
   return q.submit([&](sycl::handler &h) {
-    h.depends_on(dep_event);
-    size_t N_vertices = state.get_range()[0];
-    size_t N_sims = state.get_range()[1];
-    size_t N_edges = edges.size();
-    size_t N_connections = infected_count.get_range()[0] / 2;
+    h.depends_on(zero_evt);
     // uint32_t Nt_alloc = state.get_range()[2];
     auto state_acc =
         sycl::accessor<SIR_State, 3, sycl::access::mode::read_write>(
@@ -150,12 +153,13 @@ sycl::event infect(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
     auto infected_count_acc =
         sycl::accessor<uint32_t, 3, sycl::access::mode::read_write>(
             infected_count, h, sycl::range<3>(2 * N_connections, N_sims, 1),
-            sycl::range<3>(0, 0, t_offset + t - 1));
+            sycl::range<3>(0, 0, t_offset_inf_count));
     h.parallel_for(sycl::range<1>(N_sims), [=](sycl::id<1> idx) {
       auto rng = rng_acc[idx];
       auto is_directed_sus_inf_pair = [](SIR_State from, SIR_State to) {
         return from == SIR_State::Infected && to == SIR_State::Susceptible;
       };
+
       oneapi::dpl::bernoulli_distribution dist(p_I);
       uint32_t e_offset = 0;
       for (int c_idx = 0; c_idx < N_connections; c_idx++) {
@@ -165,8 +169,9 @@ sycl::event infect(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
           auto edge = edges_acc[e_idx];
           auto [from_id, to_id] = edge;
           auto connection_id = c_idx;
-          SIR_State& from = state_acc[sycl::range<3>(from_id, idx[0], 0)];
-          SIR_State& to = state_acc[sycl::range<3>(to_id, idx[0], 0)];
+
+          SIR_State &from = state_acc[sycl::range<3>(from_id, idx[0], 0)];
+          SIR_State &to = state_acc[sycl::range<3>(to_id, idx[0], 0)];
           if (is_directed_sus_inf_pair(from, to) && dist(rng)) {
             to = SIR_State::Infected;
             infected_count_acc[sycl::range<3>(2 * connection_id, idx[0], 0)] +=

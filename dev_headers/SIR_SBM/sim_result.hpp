@@ -40,7 +40,7 @@ struct Sim_Result {
       f.open(dir / ("infected_count_" + std::to_string(sim_idx) + ".csv"));
       for (int t_idx = 0; t_idx < Nt; t_idx++) {
         for (int c_idx = 0; c_idx < 2 * N_connections; c_idx++) {
-          f << infected_count(sim_idx, t_idx, c_idx) << ",";
+          f << infected_count(c_idx, sim_idx, t_idx) << ",";
         }
         f << std::endl;
       }
@@ -57,7 +57,7 @@ struct Sim_Result {
       f.open(dir / ("population_count_" + std::to_string(sim_idx) + ".csv"));
       for (int t_idx = 0; t_idx < Nt; t_idx++) {
         for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
-          pc = population_count(sim_idx, p_idx, t_idx);
+          pc = population_count(p_idx, sim_idx, t_idx);
           f << pc.S << "," << pc.I << "," << pc.R << ",";
         }
         f << std::endl;
@@ -106,10 +106,10 @@ private:
   std::vector<int> get_t_dI(uint32_t sim_idx, uint32_t t_idx) const {
     std::vector<int> t_dI(N_partitions, 0);
     for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
-      auto R_diff = population_count(sim_idx, p_idx, t_idx + 1).R -
-                    population_count(sim_idx, p_idx, t_idx).R;
-      auto I_diff = population_count(sim_idx, p_idx, t_idx + 1).I -
-                    population_count(sim_idx, p_idx, t_idx).I;
+      auto R_diff = population_count(p_idx, sim_idx, t_idx + 1).R -
+                    population_count(p_idx, sim_idx, t_idx).R;
+      auto I_diff = population_count(p_idx, sim_idx, t_idx + 1).I -
+                    population_count(p_idx, sim_idx, t_idx).I;
       t_dI[p_idx] = I_diff + R_diff;
     }
     return t_dI;
@@ -140,9 +140,9 @@ private:
       auto from = comb[0];
       auto to = comb[1];
 
-      connection_infections[to] += infected_count(sim_idx, t_idx, 2 * con_idx);
+      connection_infections[to] += infected_count(2*con_idx, sim_idx, t_idx);
       connection_infections[from] +=
-          infected_count(sim_idx, t_idx, 2 * con_idx + 1);
+          infected_count(2*con_idx + 1, sim_idx, t_idx);
       con_idx++;
     }
     return connection_infections;

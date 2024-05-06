@@ -62,7 +62,8 @@ SOURCES ${DEV_HEADERS}
 add_dependencies(SIR_SBM_LZZ_Generation DEV_HEADERS_target)
 add_library(SIR_SBM ${SIR_SBM_SOURCE_FILES})
 add_dependencies(SIR_SBM SIR_SBM_LZZ_Generation)
-
+option(SIR_SBM_BUFFER_LOG "Enable buffer logging" OFF)
+target_compile_definitions(SIR_SBM PUBLIC SIR_SBM_BUFFER_LOG=${SIR_SBM_BUFFER_LOG})
 #make SIR_SBM depend on the generated files
 target_include_directories(SIR_SBM PUBLIC ${SIR_SBM_INCLUDE_DIR})
 target_link_options(SIR_SBM PUBLIC "-fsycl")

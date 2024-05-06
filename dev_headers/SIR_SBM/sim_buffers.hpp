@@ -36,6 +36,7 @@ struct Sim_Buffers {
         edges(make_buffer<Edge_t, 1>(q, G.flat_edges(),
                                      sycl::range<1>(G.N_edges()))) {
     events.push_back(buffer_fill(q, state, SIR_State::Susceptible));
+    events.push_back(zero_fill(q, infected_count, infected_count.get_range(), sycl::range<3>(0,0,0)));
   }
   static std::shared_ptr<Sim_Buffers> make(sycl::queue &q, const SBM_Graph &G,
                                            const Sim_Param &p,

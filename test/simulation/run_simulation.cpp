@@ -20,7 +20,7 @@ int main() {
   sycl::queue q{sycl::cpu_selector_v}; // Create a queue on the default device
   Sim_Param p;
   p.Nt = 56;
-  p.Nt_alloc = 57;
+  p.Nt_alloc = 56;
   p.N_I_terminate = 1;
   p.N_sims = 2;
   p.seed = 10;

@@ -39,6 +39,9 @@ int main() {
     partition_population_count(q, SB->state, SB->population_count, SB->vpc, 0)
         .wait();
   }
+  auto cwd = std::filesystem::current_path();
+  auto output_dir = cwd / "simulation_step_data";
+  result.write(output_dir);
 
   return 0;
 }

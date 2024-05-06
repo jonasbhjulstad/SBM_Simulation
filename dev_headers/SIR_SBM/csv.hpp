@@ -24,4 +24,19 @@ Vec2D<int> read_csv(const std::filesystem::path &path) {
   }
   return result;
 }
+
+template <typename T>
+void write_csv(const std::vector<T> &data, const std::filesystem::path &path, int N0, int N1) {
+  std::ofstream file(path);
+  if (!file.is_open()) {
+    throw std::runtime_error("Could not open file: " + path.string());
+  }
+  for (int i = 0; i < N0; i++) {
+    for (int j = 0; j < N1; j++) {
+      file << data[i * N1 + j] << ",";
+    }
+    file << std::endl;
+  }
+  file.close();
+}
 } // namespace SIR_SBM

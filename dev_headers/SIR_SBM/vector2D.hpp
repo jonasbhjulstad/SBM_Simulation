@@ -2,6 +2,7 @@
 #hdr
 #include <SIR_SBM/common.hpp>
 #include <numeric>
+#include <fstream>
 #end
 
 namespace SIR_SBM {
@@ -38,6 +39,16 @@ template <typename T> struct LinearVector2D : public std::vector<T> {
       }
     }
     return result;
+  }
+
+  friend std::ofstream& operator<<(std::ofstream &f, const LinearVector2D<T> &vec) {
+    for (size_t i = 0; i < vec.N1; i++) {
+      for (size_t j = 0; j < vec.N2; j++) {
+        f << vec(i, j) << ",";
+      }
+      f << std::endl;
+    }
+    return f;
   }
 
   size_t N1, N2;
