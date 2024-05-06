@@ -25,6 +25,30 @@ Vec2D<int> read_csv(const std::filesystem::path &path) {
   return result;
 }
 
+std::vector<int> read_csv(const std::filesystem::path &file_prefix, int N0, int N1, int N2) {
+  std::ifstream f;
+  std::vector<int> result(N0 * N1 * N2);
+  for(int n0 = 0; n0 < N0; n0++)
+  {
+    f.open(file_prefix + std::to_string(n0) + ".csv");
+    if (!f.is_open()) {
+      throw std::runtime_error("Could not open file: " + file_prefix.string());
+    }
+    std::string line;
+    int n1 = 0;
+    while (std::getline(f, line)) {
+      std::stringstream ss(line);
+      std::string cell;
+      while (std::getline(ss, cell, ',')) {
+        result[n0 * N1 * N2 + n1 * N2] = std::stoi(cell);
+        n1++;
+      }
+    }
+  }
+  return result; 
+}
+
+
 template <typename T>
 void write_csv(const std::vector<T> &data, const std::filesystem::path &path, int N0, int N1) {
   std::ofstream file(path);
