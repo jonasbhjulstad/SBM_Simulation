@@ -29,15 +29,15 @@ std::vector<uint32_t> get_connection_indices(uint32_t N_partitions,
 }
 
 std::vector<uint32_t>
-sample_infections(const LinearVector2D<uint32_t> &infected_count,
+sample_infections(const LinearVector2D<uint32_t> &contact_events,
                   const LinearVector2D<Population_Count> &population_count,
                   uint32_t p_idx, uint32_t t_idx, std::mt19937_64 &rng) {
-  auto N_connections = infected_count.N1 / 2;
+  auto N_connections = contact_events.N1 / 2;
   auto N_partitions = population_count.N1;
-  auto Nt = infected_count.N2;
+  auto Nt = contact_events.N2;
 
   auto connection_infections = get_at(
-      infected_count(p_idx), get_connection_indices(N_partitions, p_idx));
+      contact_events(p_idx), get_connection_indices(N_partitions, p_idx));
   auto new_infs = get_new_infections(population_count, p_idx, t_idx);
   auto inf_index_samples =
       discrete_finite_sample(rng, connection_infections, new_infs);
@@ -45,12 +45,12 @@ sample_infections(const LinearVector2D<uint32_t> &infected_count,
 }
 
 LinearVector2D<uint32_t> simulation_sample_infections(
-    const LinearVector2D<uint32_t> &infected_count,
+    const LinearVector2D<uint32_t> &contact_events,
     const LinearVector2D<Population_Count> &population_count,
     std::mt19937_64 &rng) {
-  auto N_connections = infected_count.N1 / 2;
+  auto N_connections = contact_events.N1 / 2;
   auto N_partitions = population_count.N1;
-  auto Nt = infected_count.N2;
+  auto Nt = contact_events.N2;
   auto vector_plus = [](const std::vector<uint32_t> &a,
                         const std::vector<uint32_t> &b) {
     std::vector<uint32_t> result(a.size());
@@ -65,7 +65,7 @@ LinearVector2D<uint32_t> simulation_sample_infections(
     auto infections = std::transform_reduce(
         p_idx.begin(), p_idx.end(), std::vector<uint32_t>(2 * N_connections, 0),
         vector_plus, [&](uint32_t p_idx) {
-          return sample_infections(infected_count, population_count, p_idx,
+          return sample_infections(contact_events, population_count, p_idx,
                                    t_idx, rng);
         });
     set_at_row(result, infections, t_idx);
@@ -74,13 +74,13 @@ LinearVector2D<uint32_t> simulation_sample_infections(
 }
 
 LinearVector3D<uint32_t>
-sample_infections(const LinearVector3D<uint32_t> &infected_count,
+sample_infections(const LinearVector3D<uint32_t> &contact_events,
                   const LinearVector3D<Population_Count> &population_count,
                   uint32_t seed) {
-  auto N_connections = infected_count.N1 / 2;
+  auto N_connections = contact_events.N1 / 2;
   auto N_partitions = population_count.N1;
-  auto Nt = infected_count.N2;
-  auto N_sims = infected_count.N3;
+  auto Nt = contact_events.N2;
+  auto N_sims = contact_events.N3;
 
   auto rngs = generate_rngs<std::mt19937_64>(N_sims, seed);
 
@@ -90,7 +90,7 @@ sample_infections(const LinearVector3D<uint32_t> &infected_count,
   std::transform(std::execution::par_unseq, sim_vec.begin(), sim_vec.end(), rngs.begin(), 
                  unmerged.begin(), [&](auto sim_idx, auto& rng) {
                    return simulation_sample_infections(
-                       infected_count.get_row(sim_idx),
+                       contact_events.get_row(sim_idx),
                        population_count.get_row(sim_idx), rng);
                  });
   for (auto sim_idx : sim_vec) {

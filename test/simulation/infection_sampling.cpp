@@ -45,7 +45,7 @@ int main() {
   result.write(output_dir);
   result.validate();
   
-//   auto sampled_infections = sample_infections(result.infected_count, result.population_count, seed);
+//   auto sampled_infections = sample_infections(result.contact_events, result.population_count, seed);
 
   return 0;
 }

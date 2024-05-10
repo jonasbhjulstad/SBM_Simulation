@@ -2,9 +2,10 @@
 #hdr
 #include <SIR_SBM/common.hpp>
 #include <string>
-#include <unordered_map>
 #end
+
 namespace SIR_SBM {
+
 size_t n_choose_k(size_t n, size_t k) {
   if (k > n) {
     return 0;

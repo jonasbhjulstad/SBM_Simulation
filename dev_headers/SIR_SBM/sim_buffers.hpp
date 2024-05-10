@@ -28,15 +28,15 @@ struct Sim_Buffers {
         ecc(ecc_vec.data(), G.N_connections()),
         vpc(vpc_vec.data(), G.N_partitions()), rngs(rng_vec.data(), p.N_sims),
         state(sycl::range<3>(G.N_vertices(), p.N_sims, p.Nt_alloc)),
-        infected_count(
-            result.infected_count.data(),
+        contact_events(
+            result.contact_events.data(),
             sycl::range<3>(G.N_connections() * 2, p.N_sims, p.Nt)),
         population_count(result.population_count.data(),
                          sycl::range<3>(G.N_partitions(), p.N_sims, p.Nt + 1)),
         edges(make_buffer<Edge_t, 1>(q, G.flat_edges(),
                                      sycl::range<1>(G.N_edges()))) {
     events.push_back(buffer_fill(q, state, SIR_State::Susceptible));
-    events.push_back(zero_fill(q, infected_count, infected_count.get_range(), sycl::range<3>(0,0,0)));
+    events.push_back(zero_fill(q, contact_events, contact_events.get_range(), sycl::range<3>(0,0,0)));
   }
   static std::shared_ptr<Sim_Buffers> make(sycl::queue &q, const SBM_Graph &G,
                                            const Sim_Param &p,
@@ -70,7 +70,7 @@ struct Sim_Buffers {
   sycl::buffer<uint32_t> vpc; // vertex partition count
   sycl::buffer<Edge_t> edges;
   sycl::buffer<SIR_State, 3> state;
-  sycl::buffer<uint32_t, 3> infected_count;
+  sycl::buffer<uint32_t, 3> contact_events;
   sycl::buffer<Population_Count, 3> population_count;
   sycl::buffer<oneapi::dpl::ranlux48, 1> rngs;
 
@@ -136,10 +136,10 @@ private:
 
   void validate_infected_count(sycl::queue &q) {
     validate_elements(
-        q, infected_count, [](uint32_t elem) { return elem == 0; },
+        q, contact_events, [](uint32_t elem) { return elem == 0; },
         "Invalid infected count");
     validate_range(sycl::range<3>(N_partitions * 2, N_sims, Nt),
-                   infected_count.get_range());
+                   contact_events.get_range());
   }
 
   void validate_population_count(sycl::queue &q) {

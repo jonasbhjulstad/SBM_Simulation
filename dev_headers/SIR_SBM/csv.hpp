@@ -30,7 +30,9 @@ std::vector<int> read_csv(const std::filesystem::path &file_prefix, int N0, int 
   std::vector<int> result(N0 * N1 * N2);
   for(int n0 = 0; n0 < N0; n0++)
   {
-    f.open(file_prefix + std::to_string(n0) + ".csv");
+    std::filesystem::path file = file_prefix;
+    file += std::to_string(n0) + ".csv";
+    f.open(file);
     if (!f.is_open()) {
       throw std::runtime_error("Could not open file: " + file_prefix.string());
     }

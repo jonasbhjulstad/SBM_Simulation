@@ -127,17 +127,17 @@ sycl::event recover(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
 
 sycl::event infect(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
                    sycl::buffer<Edge_t> &edges, sycl::buffer<uint32_t> &ecc,
-                   sycl::buffer<uint32_t, 3> &infected_count,
+                   sycl::buffer<uint32_t, 3> &contact_events,
                    sycl::buffer<oneapi::dpl::ranlux48> &rngs, float p_I,
                    uint32_t t, uint32_t t_offset, sycl::event dep_event = {}) {
-  throw_if(t_offset > infected_count.get_range()[2], "Invalid time step");
+  throw_if(t_offset > contact_events.get_range()[2], "Invalid time step");
   size_t N_vertices = state.get_range()[0];
   size_t N_sims = state.get_range()[1];
   size_t N_edges = edges.size();
-  size_t N_connections = infected_count.get_range()[0] / 2;
+  size_t N_connections = contact_events.get_range()[0] / 2;
   size_t t_offset_inf_count = t + t_offset - 1;
   auto zero_evt =
-      zero_fill(q, infected_count, sycl::range<3>(2 * N_connections, N_sims, 1),
+      zero_fill(q, contact_events, sycl::range<3>(2 * N_connections, N_sims, 1),
                 sycl::range<3>(0, 0, t_offset_inf_count), dep_event);
 
   return q.submit([&](sycl::handler &h) {
@@ -152,7 +152,7 @@ sycl::event infect(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
     auto rng_acc = rngs.template get_access<sycl::access::mode::read_write>(h);
     auto infected_count_acc =
         sycl::accessor<uint32_t, 3, sycl::access::mode::read_write>(
-            infected_count, h, sycl::range<3>(2 * N_connections, N_sims, 1),
+            contact_events, h, sycl::range<3>(2 * N_connections, N_sims, 1),
             sycl::range<3>(0, 0, t_offset_inf_count));
     h.parallel_for(sycl::range<1>(N_sims), [=](sycl::id<1> idx) {
       auto rng = rng_acc[idx];

@@ -7,6 +7,16 @@ find_package(IntelSYCL REQUIRED HINTS "/opt/intel/oneapi/compiler/latest/lib/cma
 find_package(oneDPL REQUIRED)
 find_package(TBB REQUIRED)
 find_package(Eigen3 REQUIRED)
+include(ExternalProject)
+ExternalProject_Add(
+        casadi-3.6.5
+        URL https://github.com/casadi/casadi/releases/download/3.6.5/casadi-3.6.5-linux64-py39.zip
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
+        PREFIX ${CMAKE_BINARY_DIR}/external/casadi)
+
+find_package(casadi HINTS ${CMAKE_BINARY_DIR}/external/casadi/src/casadi-3.6.5/casadi)
 
 
 CPMFindPackage(NAME cppitertools

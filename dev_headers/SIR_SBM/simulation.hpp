@@ -19,7 +19,7 @@ sycl::event simulation_step(sycl::queue &q, std::shared_ptr<Sim_Buffers> &SB,
                             sycl::event dep_event = {}) {
   auto cpy_event = state_copy(q, SB->state, t, t + 1, dep_event);
   auto rec_event = recover(q, SB->state, SB->rngs, p_R, t + 1, cpy_event);
-  auto inf_event = infect(q, SB->state, SB->edges, SB->ecc, SB->infected_count,
+  auto inf_event = infect(q, SB->state, SB->edges, SB->ecc, SB->contact_events,
                           SB->rngs, p_I, t + 1, t_offset, rec_event);
   return inf_event;
 }

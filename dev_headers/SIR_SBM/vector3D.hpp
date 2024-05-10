@@ -1,6 +1,7 @@
 #pragma once
 #hdr
 #include <SIR_SBM/common.hpp>
+#include <SIR_SBM/vector2D.hpp>
 #include <numeric>
 #include <fstream>
 #end
@@ -8,6 +9,9 @@ namespace SIR_SBM {
 template <typename T> struct LinearVector3D : public std::vector<T> {
   LinearVector3D(size_t N1, size_t N2, size_t N3)
       : std::vector<T>(N1 * N2 * N3, T{}), N1(N1), N2(N2), N3(N3) {}
+  LinearVector3D(std::vector<T>& vec, size_t N1, size_t N2, size_t N3)
+      : std::vector<T>(std::move(vec)), N1(N1), N2(N2), N3(N3) {}
+  
   const T &operator()(size_t i, size_t j, size_t k) const {
     return (*this)[i * N2 * N3 + j * N3 + k];
   }

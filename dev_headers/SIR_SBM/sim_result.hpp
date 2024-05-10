@@ -12,35 +12,36 @@
 namespace SIR_SBM {
 struct Sim_Result {
   explicit Sim_Result(const Sim_Param &p, const SBM_Graph &G)
-      : infected_count(G.N_connections() * 2, p.N_sims, (p.Nt)),
+      : contact_events(G.N_connections() * 2, p.N_sims, (p.Nt)),
         population_count(G.N_partitions(), p.N_sims, (p.Nt + 1)),
         N_partitions(G.N_partitions()), N_connections(G.N_connections()),
         N_sims(p.N_sims), Nt(p.Nt) {}
   void resize(const Sim_Param &p, const SBM_Graph &G) {
-    infected_count.resize(G.N_connections() * 2,  p.N_sims, p.Nt);
+    contact_events.resize(G.N_connections() * 2,  p.N_sims, p.Nt);
     population_count.resize(G.N_partitions(), p.N_sims,  (p.Nt + 1));
     N_partitions = G.N_partitions();
     N_connections = G.N_connections();
     N_sims = p.N_sims;
     Nt = p.Nt;
   }
-  LinearVector3D<uint32_t> infected_count;
+  LinearVector3D<uint32_t> contact_events;
   LinearVector3D<Population_Count> population_count;
 
   void write(const std::filesystem::path &dir) {
-    write_infected_count(dir);
+    write_contact_events(dir);
     write_population_count(dir);
+    
   }
 
-  void write_infected_count(const std::filesystem::path &dir) {
+  void write_contact_events(const std::filesystem::path &dir) {
     std::ofstream f;
     std::filesystem::create_directories(dir);
 
     for (int sim_idx = 0; sim_idx < N_sims; sim_idx++) {
-      f.open(dir / ("infected_count_" + std::to_string(sim_idx) + ".csv"));
+      f.open(dir / ("contact_events_" + std::to_string(sim_idx) + ".csv"));
       for (int t_idx = 0; t_idx < Nt; t_idx++) {
         for (int c_idx = 0; c_idx < 2 * N_connections; c_idx++) {
-          f << infected_count(c_idx, sim_idx, t_idx) << ",";
+          f << contact_events(c_idx, sim_idx, t_idx) << ",";
         }
         f << std::endl;
       }
@@ -140,9 +141,9 @@ private:
       auto from = comb[0];
       auto to = comb[1];
 
-      connection_infections[to] += infected_count(2*con_idx, sim_idx, t_idx);
+      connection_infections[to] += contact_events(2*con_idx, sim_idx, t_idx);
       connection_infections[from] +=
-          infected_count(2*con_idx + 1, sim_idx, t_idx);
+          contact_events(2*con_idx + 1, sim_idx, t_idx);
       con_idx++;
     }
     return connection_infections;
