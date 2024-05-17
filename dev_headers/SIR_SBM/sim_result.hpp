@@ -12,13 +12,13 @@
 namespace SIR_SBM {
 struct Sim_Result {
   explicit Sim_Result(const Sim_Param &p, const SBM_Graph &G)
-      : contact_events(G.N_connections() * 2, p.N_sims, (p.Nt)),
-        population_count(G.N_partitions(), p.N_sims, (p.Nt + 1)),
+      : contact_events(p.N_sims, G.N_connections() * 2, (p.Nt)),
+        population_count(p.N_sims, G.N_partitions(), (p.Nt + 1)),
         N_partitions(G.N_partitions()), N_connections(G.N_connections()),
         N_sims(p.N_sims), Nt(p.Nt) {}
   void resize(const Sim_Param &p, const SBM_Graph &G) {
-    contact_events.resize(G.N_connections() * 2,  p.N_sims, p.Nt);
-    population_count.resize(G.N_partitions(), p.N_sims,  (p.Nt + 1));
+    contact_events.resize(p.N_sims, G.N_connections() * 2, p.Nt);
+    population_count.resize(p.N_sims, G.N_partitions(),  (p.Nt + 1));
     N_partitions = G.N_partitions();
     N_connections = G.N_connections();
     N_sims = p.N_sims;
@@ -41,7 +41,7 @@ struct Sim_Result {
       f.open(dir / ("contact_events_" + std::to_string(sim_idx) + ".csv"));
       for (int t_idx = 0; t_idx < Nt; t_idx++) {
         for (int c_idx = 0; c_idx < 2 * N_connections; c_idx++) {
-          f << contact_events(c_idx, sim_idx, t_idx) << ",";
+          f << contact_events(sim_idx, c_idx, t_idx) << ",";
         }
         f << std::endl;
       }
@@ -58,7 +58,7 @@ struct Sim_Result {
       f.open(dir / ("population_count_" + std::to_string(sim_idx) + ".csv"));
       for (int t_idx = 0; t_idx < Nt; t_idx++) {
         for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
-          pc = population_count(p_idx, sim_idx, t_idx);
+          pc = population_count(sim_idx, p_idx, t_idx);
           f << pc.S << "," << pc.I << "," << pc.R << ",";
         }
         f << std::endl;
@@ -107,10 +107,10 @@ private:
   std::vector<int> get_t_dI(uint32_t sim_idx, uint32_t t_idx) const {
     std::vector<int> t_dI(N_partitions, 0);
     for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
-      auto R_diff = population_count(p_idx, sim_idx, t_idx + 1).R -
-                    population_count(p_idx, sim_idx, t_idx).R;
-      auto I_diff = population_count(p_idx, sim_idx, t_idx + 1).I -
-                    population_count(p_idx, sim_idx, t_idx).I;
+      auto R_diff = population_count(sim_idx, p_idx, t_idx + 1).R -
+                    population_count(sim_idx, p_idx, t_idx).R;
+      auto I_diff = population_count(sim_idx, p_idx, t_idx + 1).I -
+                    population_count(sim_idx, p_idx, t_idx).I;
       t_dI[p_idx] = I_diff + R_diff;
     }
     return t_dI;
@@ -141,9 +141,9 @@ private:
       auto from = comb[0];
       auto to = comb[1];
 
-      connection_infections[to] += contact_events(2*con_idx, sim_idx, t_idx);
+      connection_infections[to] += contact_events(sim_idx, 2*con_idx, t_idx);
       connection_infections[from] +=
-          contact_events(2*con_idx + 1, sim_idx, t_idx);
+          contact_events(sim_idx, 2*con_idx + 1, t_idx);
       con_idx++;
     }
     return connection_infections;

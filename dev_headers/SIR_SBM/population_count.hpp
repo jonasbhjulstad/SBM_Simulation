@@ -36,7 +36,7 @@ sycl::event partition_population_count(sycl::queue &q,
                                        sycl::event dep_event = {}) {
 
   validate_population(q, state);
-  auto [N_vertices, N_sims, Nt_alloc] = get_range(state);
+  auto [N_sims, N_vertices, Nt_alloc] = get_range(state);
   Nt_alloc = std::min({Nt_alloc, count.get_range()[2] - t_offset});
   return Nt_alloc <= 0 ? sycl::event{} : q.submit([&](sycl::handler &h) {
     h.depends_on(dep_event);
@@ -57,21 +57,23 @@ sycl::event partition_population_count(sycl::queue &q,
     };
     auto N_partitions = count.get_range()[0];
     auto state_acc = sycl::accessor<SIR_State, 3, sycl::access::mode::read>(
-        state, h, sycl::range<3>(N_vertices, N_sims, Nt_alloc),
+        state, h, sycl::range<3>(N_sims, N_vertices, Nt_alloc),
         sycl::id<3>(0, 0, 0));
     auto count_acc =
         sycl::accessor<Population_Count, 3, sycl::access::mode::read_write>(
-            count, h, sycl::range<3>(N_partitions, N_sims, Nt_alloc),
+            count, h, sycl::range<3>(N_sims, N_partitions, Nt_alloc),
             sycl::id<3>(0, 0, t_offset));
     auto vpc_acc = vpc.get_access<sycl::access::mode::read>(h);
     h.parallel_for(sycl::range<2>(N_sims, Nt_alloc), [=](sycl::id<2> idx) {
       uint32_t v_offset = 0;
+      auto sim_idx = idx[0];
+      auto t_idx = idx[1];
       for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
         auto N_partition_vertices = vpc_acc[p_idx];
         for (int v_idx = v_offset; v_idx < v_offset + N_partition_vertices;
              v_idx++) {
-          const SIR_State v = state_acc[sycl::id<3>(v_idx, idx[0], idx[1])];
-          pop_inc(count_acc[sycl::id<3>(p_idx, idx[0], idx[1])], v);
+          const SIR_State v = state_acc[sycl::id<3>(sim_idx, v_idx, t_idx)];
+          pop_inc(count_acc[sycl::id<3>(sim_idx, p_idx, t_idx)], v);
         }
         v_offset += N_partition_vertices;
       }
@@ -98,25 +100,5 @@ uint32_t get_new_infections(const LinearVector2D<Population_Count> &pop_count,
   return dI + dR;
 }
 
-// std::vector<uint32_t>
-// get_new_infections(const LinearVector2D<Population_Count> &pop_count,
-//                    uint32_t p_idx) {
-//   std::vector<uint32_t> result(pop_count.N2 - 1);
-//   for (size_t j = 0; j < pop_count.N2; j++) {
-//     result(p_idx, j) = get_new_infections(pop_count, p_idx, j);
-//   }
-//   return result;
-// }
-
-// LinearVector2D<uint32_t>
-// get_new_infections(const LinearVector2D<Population_Count> &pop_count) {
-//   LinearVector2D<uint32_t> result(pop_count.N1 - 1, pop_count.N2);
-//   for (size_t i = 0; i < pop_count.N1; i++) {
-//     for (size_t j = 0; j < pop_count.N2; j++) {
-//       result(i, j) = get_new_infections(pop_count, i, j);
-//     }
-//   }
-//   return result;
-// }
 
 } // namespace SIR_SBM

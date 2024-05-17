@@ -27,12 +27,12 @@ struct Sim_Buffers {
         // buffer initialization
         ecc(ecc_vec.data(), G.N_connections()),
         vpc(vpc_vec.data(), G.N_partitions()), rngs(rng_vec.data(), p.N_sims),
-        state(sycl::range<3>(G.N_vertices(), p.N_sims, p.Nt_alloc)),
+        state(sycl::range<3>(p.N_sims, G.N_vertices(), p.Nt_alloc)),
         contact_events(
             result.contact_events.data(),
-            sycl::range<3>(G.N_connections() * 2, p.N_sims, p.Nt)),
+            sycl::range<3>(p.N_sims, G.N_connections() * 2, p.Nt)),
         population_count(result.population_count.data(),
-                         sycl::range<3>(G.N_partitions(), p.N_sims, p.Nt + 1)),
+                         sycl::range<3>(p.N_sims, G.N_partitions(), p.Nt + 1)),
         edges(make_buffer<Edge_t, 1>(q, G.flat_edges(),
                                      sycl::range<1>(G.N_edges()))) {
     events.push_back(buffer_fill(q, state, SIR_State::Susceptible));
@@ -49,14 +49,7 @@ struct Sim_Buffers {
   template <typename... Ts>
   using Shared_Tup = std::tuple<std::shared_ptr<Ts>...>;
 #end
-  //   static Shared_Tup<Sim_Buffers, Sim_Result>
-  //   make(sycl::queue &q, const SBM_Graph &G, const Sim_Param &p) {
-  //     auto result =
-  //         std::make_shared<Sim_Result>(G.N_connections(), G.N_partitions(),
-  //         p.Nt);
-  //     auto sb = std::make_shared<Sim_Buffers>(q, G, p, *result);
-  //     return {sb, result};
-  //   }
+
 
   void wait() const { sycl::event::wait(events); }
 
@@ -130,7 +123,7 @@ private:
                  elem == SIR_State::Infected || elem == SIR_State::Recovered;
         },
         "Invalid state");
-    validate_range(sycl::range<3>(N_vertices, N_sims, Nt_alloc),
+    validate_range(sycl::range<3>(N_sims, N_vertices, Nt_alloc),
                    state.get_range());
   }
 
@@ -138,7 +131,7 @@ private:
     validate_elements(
         q, contact_events, [](uint32_t elem) { return elem == 0; },
         "Invalid infected count");
-    validate_range(sycl::range<3>(N_partitions * 2, N_sims, Nt),
+    validate_range(sycl::range<3>(N_sims, N_partitions * 2, Nt),
                    contact_events.get_range());
   }
 
@@ -151,7 +144,7 @@ private:
         q, population_count,
         [](Population_Count elem) { return elem.is_zero(); },
         "Invalid population count");
-    validate_range(sycl::range<3>(N_partitions, N_sims, Nt + 1),
+    validate_range(sycl::range<3>(N_sims, N_partitions, Nt + 1),
                    population_count.get_range());
   }
 
