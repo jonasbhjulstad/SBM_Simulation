@@ -5,6 +5,9 @@
 #include <random>
 #include <sycl.hpp>
 #end
+#src
+#include <numeric>
+#end
 namespace SIR_SBM {
 template <typename RNG>
 std::vector<RNG> generate_rngs(uint32_t seed, size_t N) {
@@ -18,18 +21,27 @@ std::vector<RNG> generate_rngs(uint32_t seed, size_t N) {
 }
 
 
-std::vector<uint32_t> discrete_finite_sample(std::mt19937_64& rng, const std::vector<uint32_t>& weights, size_t N_samples) {
-    std::vector<double> vals(weights.size());
-    std::uniform_real_distribution<double> dist(0, 1);
-    std::transform(weights.begin(), weights.end(), vals.begin(), [&](auto w){return std::pow(dist(rng), 1. / w);});
-    std::vector<std::pair<int, double>> valsWithIndices;
-    for (size_t iter = 0; iter < vals.size(); iter++) {
-        valsWithIndices.emplace_back(iter, vals[iter]);
+std::vector<uint32_t> repeat_N_indices(const std::vector<uint32_t> weights)
+{
+  auto N_indices = std::accumulate(weights.begin(), weights.end(), 0);
+  std::vector<uint32_t> indices(N_indices);
+  uint32_t idx = 0;
+  for (size_t i = 0; i < weights.size(); i++)
+  {
+    for (size_t j = 0; j < weights[i]; j++)
+    {
+      indices[idx] = i;
+      idx++;
     }
-    std::sort(valsWithIndices.begin(), valsWithIndices.end(), [](auto x, auto y) {return x.second > y.second; });
-    std::vector<uint32_t> samples(N_samples);
-    std::transform(valsWithIndices.begin(), valsWithIndices.begin() + N_samples, samples.begin(), [](auto x) {return x.first; });
-    return samples;
+  }
+  return indices;
+}
+
+std::vector<uint32_t> discrete_finite_sample(std::mt19937_64& rng, const std::vector<uint32_t>& weights, size_t N_samples) {
+  auto indices = repeat_N_indices(weights);
+  std::vector<uint32_t> result(N_samples);
+  std::sample(indices.begin(), indices.end(), result.begin(), N_samples, rng);
+  return result;
 }
 
 

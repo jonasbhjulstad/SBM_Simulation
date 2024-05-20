@@ -32,9 +32,9 @@ std::vector<uint32_t>
 sample_infections(const LinearVector2D<uint32_t> &contact_events,
                   const LinearVector2D<Population_Count> &population_count,
                   uint32_t p_idx, uint32_t t_idx, std::mt19937_64 &rng) {
-  auto N_connections = contact_events.N1 / 2;
-  auto N_partitions = population_count.N1;
-  auto Nt = contact_events.N2;
+  auto N_connections = contact_events.N0 / 2;
+  auto N_partitions = population_count.N0;
+  auto Nt = contact_events.N1;
 
   auto connection_infections = get_at(
       contact_events(p_idx), get_connection_indices(N_partitions, p_idx));
@@ -48,27 +48,28 @@ LinearVector2D<uint32_t> simulation_sample_infections(
     const LinearVector2D<uint32_t> &contact_events,
     const LinearVector2D<Population_Count> &population_count,
     std::mt19937_64 &rng) {
-  auto N_connections = contact_events.N1 / 2;
-  auto N_partitions = population_count.N1;
-  auto Nt = contact_events.N2;
-  auto vector_plus = [](const std::vector<uint32_t> &a,
-                        const std::vector<uint32_t> &b) {
-    std::vector<uint32_t> result(a.size());
-    std::transform(a.begin(), a.end(), b.begin(), result.begin(),
-                   std::plus<uint32_t>());
-    return result;
-  };
+  auto N_connections = contact_events.N0 / 2;
+  auto N_partitions = population_count.N0;
+  auto Nt = contact_events.N1;
 
   LinearVector2D<uint32_t> result(2 * N_connections, Nt);
-  for (auto t_idx : make_iota(Nt)) {
-    auto p_idx = make_iota(N_partitions);
-    auto infections = std::transform_reduce(
-        p_idx.begin(), p_idx.end(), std::vector<uint32_t>(2 * N_connections, 0),
-        vector_plus, [&](uint32_t p_idx) {
-          return sample_infections(contact_events, population_count, p_idx,
-                                   t_idx, rng);
-        });
-    set_at_row(result, infections, t_idx);
+  // for (auto t_idx : make_iota(Nt)) {
+  //   auto p_idx = make_iota(N_partitions);
+  //   auto infections = std::transform_reduce(
+  //       p_idx.begin(), p_idx.end(), std::vector<uint32_t>(2 * N_connections, 0),
+  //       vector_plus, [&](uint32_t p_idx) {
+  //         return sample_infections(contact_events, population_count, p_idx,
+  //                                  t_idx, rng);
+  //       });
+  //   set_at_row(result, infections, t_idx);
+  // }
+  for(auto t_idx : make_iota(Nt))
+  {
+    for(auto p_idx : make_iota(N_partitions))
+    {
+      auto infections = sample_infections(contact_events, population_count, p_idx, t_idx, rng);
+      result.add_to_row(infections, t_idx);
+    }
   }
   return result;
 }
@@ -77,25 +78,26 @@ LinearVector3D<uint32_t>
 sample_infections(const LinearVector3D<uint32_t> &contact_events,
                   const LinearVector3D<Population_Count> &population_count,
                   uint32_t seed) {
-  auto N_connections = contact_events.N1 / 2;
-  auto N_partitions = population_count.N1;
-  auto Nt = contact_events.N2;
-  auto N_sims = contact_events.N3;
+  auto N_connections = contact_events.N0 / 2;
+  auto N_partitions = population_count.N0;
+  auto Nt = contact_events.N1;
+  auto N_sims = contact_events.N2;
 
   auto rngs = generate_rngs<std::mt19937_64>(N_sims, seed);
 
   LinearVector3D<uint32_t> result(N_sims, 2 * N_connections, Nt);
-  auto sim_vec = make_iota(N_sims);
-  std::vector<LinearVector2D<uint32_t>> unmerged;
-  std::transform(std::execution::par_unseq, sim_vec.begin(), sim_vec.end(), rngs.begin(), 
-                 unmerged.begin(), [&](auto sim_idx, auto& rng) {
-                   return simulation_sample_infections(
-                       contact_events.get_row(sim_idx),
-                       population_count.get_row(sim_idx), rng);
-                 });
-  for (auto sim_idx : sim_vec) {
-    set_at_row(result, unmerged[sim_idx], sim_idx);
+  // auto sim_vec = make_iota(N_sims);
+  // std::transform(sim_vec.begin(), sim_vec.end(), rngs.begin(), 
+  //                unmerged.begin(), [&](auto sim_idx, auto& rng) {
+  //                  return simulation_sample_infections(
+  //                      contact_events.get_row(sim_idx),
+  //                      population_count.get_row(sim_idx), rng);
+  //                });
+  for(auto sim_idx : make_iota(N_sims))
+  {
   }
+
+
   return result;
 }
 } // namespace SIR_SBM

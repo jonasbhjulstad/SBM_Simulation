@@ -64,11 +64,11 @@ regression_data_from_simulations(const std::filesystem::path &filenameprefix,
 
   using namespace casadi;
   auto linvec_to_dm = [](const LinearVector3D<int> &vec, size_t start, size_t end) {
-    DM result(vec.N1 * vec.N2 * (end - start));
-    for (size_t i = 0; i < vec.N1; i++) {
-      for (size_t j = 0; j < vec.N2; j++) {
+    DM result(vec.N0 * vec.N1 * (end - start));
+    for (size_t i = 0; i < vec.N0; i++) {
+      for (size_t j = 0; j < vec.N1; j++) {
         for (size_t k = start; k < end; k++) {
-          result(i * vec.N2 * vec.N3 + j * vec.N3 + k) = vec(i, j, k);
+          result(i * vec.N1 * vec.N2 + j * vec.N2 + k) = vec(i, j, k);
         }
       }
     }
@@ -76,9 +76,9 @@ regression_data_from_simulations(const std::filesystem::path &filenameprefix,
   };
 
   DM population_counts =
-      linvec_to_dm(community_state, 0, community_state.N3 - 1);
+      linvec_to_dm(community_state, 0, community_state.N2 - 1);
 
-  DM infection_counts = linvec_to_dm(infection_count, 0, infection_count.N3);
+  DM infection_counts = linvec_to_dm(infection_count, 0, infection_count.N2);
 
   auto [population_sources, population_targets] = connection_expand_population(
       std::make_tuple(population_counts, infection_counts),
