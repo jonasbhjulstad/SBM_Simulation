@@ -20,7 +20,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/include/SIR_SBM/)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/src/SIR_SBM/)
 set(SIR_SBM_DEV_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/dev_headers/SIR_SBM/)
 set(SIR_SBM_INCLUDE_DIR ${PROJECT_BINARY_DIR}/include/)
-
+set(CMAKE_CXX_STANDARD 20)
 set(SIR_SBM_LIBRARY_INCLUDE_DIRS ${SIR_SBM_INCLUDE_DIR} ${SYCL_INCLUDE_DIR} /usr/include/c++/11/)
 file(GLOB DEV_HEADERS ${SIR_SBM_DEV_INCLUDE_DIR}/*.hpp)
 #get ${PROJECT_BINARY_DIR}/include/SIR_SBM/dev_header_name.hpp/.cpp names
@@ -31,7 +31,7 @@ include(${PROJECT_SOURCE_DIR}/cmake/lzz_routines.cmake)
 add_lzz_library(SIR_SBM "${PROJECT_SOURCE_DIR}/dev_headers/SIR_SBM/")
 add_lzz_library(SIR_SBM_Regression "${PROJECT_SOURCE_DIR}/dev_headers/SIR_SBM/regression/")
 target_link_libraries(SIR_SBM_Regression PRIVATE SIR_SBM casadi)
-target_include_directories(SIR_SBM PUBLIC ${SIR_SBM_INCLUDE_DIR})
+target_include_directories(SIR_SBM PUBLIC ${SIR_SBM_INCLUDE_DIR} ${SIR_SBM_EXTERNAL_INCLUDE_DIRS})
 target_link_options(SIR_SBM PUBLIC "-fsycl")
 
 add_subdirectory(test)

@@ -12,25 +12,26 @@
 namespace SIR_SBM {
 struct Sim_Result {
   explicit Sim_Result(const Sim_Param &p, const SBM_Graph &G)
-      : contact_events(p.N_sims, G.N_connections() * 2, (p.Nt)),
-        population_count(p.N_sims, G.N_partitions(), (p.Nt + 1)),
+      : contact_events(p.N_sims, G.N_connections() * 2, p.Nt),
+        population_count(p.N_sims, G.N_partitions(), p.Nt + 1),
         N_partitions(G.N_partitions()), N_connections(G.N_connections()),
         N_sims(p.N_sims), Nt(p.Nt) {}
   void resize(const Sim_Param &p, const SBM_Graph &G) {
     contact_events.resize(p.N_sims, G.N_connections() * 2, p.Nt);
-    population_count.resize(p.N_sims, G.N_partitions(),  (p.Nt + 1));
+    population_count.resize(p.N_sims, G.N_partitions(), p.Nt + 1);
     N_partitions = G.N_partitions();
     N_connections = G.N_connections();
     N_sims = p.N_sims;
     Nt = p.Nt;
   }
-  LinearVector3D<uint32_t> contact_events;
-  LinearVector3D<Population_Count> population_count;
+  Eigen::Tensor<uint32_t, 3> contact_events;
+  Eigen::Tensor<Population_Count, 3> population_count;
+  // Eigen::Tensor<uint32_t, 3> contact_events;
+  // LinearVector3D<Population_Count> population_count;
 
   void write(const std::filesystem::path &dir) {
     write_contact_events(dir);
     write_population_count(dir);
-    
   }
 
   void write_contact_events(const std::filesystem::path &dir) {
@@ -74,21 +75,18 @@ struct Sim_Result {
     std::for_each(sim_vec.begin(), sim_vec.end(),
                   [&](uint32_t sim_idx) { validate_partition_size(sim_idx); });
 
-    std::for_each(sim_vec.begin(), sim_vec.end(),
-                  [&](uint32_t sim_idx) {
-                    std::for_each(
-                        t_vec.begin(), t_vec.end(),
-                        [&](uint32_t t_idx) { validate_step(sim_idx, t_idx); });
-                  });
+    std::for_each(sim_vec.begin(), sim_vec.end(), [&](uint32_t sim_idx) {
+      std::for_each(t_vec.begin(), t_vec.end(),
+                    [&](uint32_t t_idx) { validate_step(sim_idx, t_idx); });
+    });
   }
 
   size_t N_partitions, N_connections, N_sims, Nt;
 
-
 private:
   void validate_partition_size(uint32_t sim_idx) const {
     std::vector<uint32_t> start_pop_size;
-    std::transform(population_count.begin(), population_count.end(),
+    std::transform(population_count.data(), population_count.data() + population_count.size(),
                    std::back_inserter(start_pop_size),
                    [](Population_Count pc) { return pc.S + pc.I + pc.R; });
     for (int t = 0; t < Nt + 1; t++) {
@@ -141,14 +139,13 @@ private:
       auto from = comb[0];
       auto to = comb[1];
 
-      connection_infections[to] += contact_events(sim_idx, 2*con_idx, t_idx);
+      connection_infections[to] += contact_events(sim_idx, 2 * con_idx, t_idx);
       connection_infections[from] +=
-          contact_events(sim_idx, 2*con_idx + 1, t_idx);
+          contact_events(sim_idx, 2 * con_idx + 1, t_idx);
       con_idx++;
     }
     return connection_infections;
   }
-
 };
 
 } // namespace SIR_SBM

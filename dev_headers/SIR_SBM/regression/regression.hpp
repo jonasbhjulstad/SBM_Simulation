@@ -1,7 +1,6 @@
 #pragma once
 #hdr
 #include <SIR_SBM/csv.hpp>
-#include <SIR_SBM/vector3D.hpp>
 #include <casadi/casadi.hpp>
 #include <filesystem>
 #include <fstream>
@@ -51,24 +50,23 @@ std::tuple<casadi::DM, casadi::DM, casadi::DM>
 regression_data_from_simulations(const std::filesystem::path &filenameprefix,
                                  size_t N_communities, size_t N_connections,
                                  size_t N_sims, size_t Nt) {
-  auto read_3D = [](const std::filesystem::path &filenameprefix, size_t N0,
-                    size_t N1, size_t N2) {
-    auto vec = SIR_SBM::read_csv(filenameprefix, N0, N1, N2);
-    return LinearVector3D(vec, N0, N1, N2);
-  };
 
-  auto community_state = read_3D(filenameprefix / "population_count_",
+  auto community_state = read_csv<uint32_t>(filenameprefix / "population_count_",
                                  N_communities, N_sims, Nt + 1);
-  auto infection_count = read_3D(filenameprefix / "infected_count_",
+  auto infection_count = read_csv<uint32_t>(filenameprefix / "infected_count_",
                                  N_connections * 2, N_sims, Nt);
 
   using namespace casadi;
-  auto linvec_to_dm = [](const LinearVector3D<int> &vec, size_t start, size_t end) {
-    DM result(vec.N0 * vec.N1 * (end - start));
-    for (size_t i = 0; i < vec.N0; i++) {
-      for (size_t j = 0; j < vec.N1; j++) {
+  auto linvec_to_dm = [](const Eigen::Tensor<uint32_t, 3> &vec, size_t start, size_t end) {
+    auto shape = vec.dimensions();
+    auto N0 = shape[0];
+    auto N1 = shape[1];
+    auto N2 = shape[2];
+    DM result(N0 * N1 * (end - start));
+    for (size_t i = 0; i < N0; i++) {
+      for (size_t j = 0; j < N1; j++) {
         for (size_t k = start; k < end; k++) {
-          result(i * vec.N1 * vec.N2 + j * vec.N2 + k) = vec(i, j, k);
+          result(i * N1 * N2 + j * N2 + k) = vec(i,j,k);
         }
       }
     }
@@ -76,9 +74,9 @@ regression_data_from_simulations(const std::filesystem::path &filenameprefix,
   };
 
   DM population_counts =
-      linvec_to_dm(community_state, 0, community_state.N2 - 1);
+      linvec_to_dm(community_state, 0, community_state.dimensions()[2] - 1);
 
-  DM infection_counts = linvec_to_dm(infection_count, 0, infection_count.N2);
+  DM infection_counts = linvec_to_dm(infection_count, 0, infection_count.dimensions()[2]);
 
   auto [population_sources, population_targets] = connection_expand_population(
       std::make_tuple(population_counts, infection_counts),

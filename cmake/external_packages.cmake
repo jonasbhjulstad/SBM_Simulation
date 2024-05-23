@@ -18,7 +18,6 @@ ExternalProject_Add(
 
 find_package(casadi HINTS ${CMAKE_BINARY_DIR}/external/casadi/src/casadi-3.6.5/casadi)
 
-
 CPMFindPackage(NAME cppitertools
 GITHUB_REPOSITORY ryanhaining/cppitertools
 OPTIONS

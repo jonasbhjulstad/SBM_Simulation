@@ -2,6 +2,7 @@
 #hdr
 #include <SIR_SBM/epidemiological.hpp>
 #include <SIR_SBM/sycl_routines.hpp>
+#include <SIR_SBM/vector.hpp>
 #end
 namespace SIR_SBM {
 void validate_population(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
@@ -93,10 +94,10 @@ partition_population_count(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
   return count_vec;
 }
 
-uint32_t get_new_infections(const LinearVector2D<Population_Count> &pop_count,
+uint32_t get_new_infections(const Eigen::Matrix<Population_Count, -1, -1> &pop_count,
                             uint32_t p_idx, uint32_t t_idx) {
-  auto dI = pop_count(p_idx, t_idx + 1).I - pop_count(p_idx, t_idx).I;
-  auto dR = pop_count(p_idx, t_idx + 1).R - pop_count(p_idx, t_idx).R;
+  auto dI = pop_count(p_idx, t_idx).I - pop_count(p_idx, t_idx).I;
+  auto dR = pop_count(p_idx, t_idx).R - pop_count(p_idx, t_idx).R;
   return dI + dR;
 }
 

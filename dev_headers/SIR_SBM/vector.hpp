@@ -2,12 +2,9 @@
 #hdr
 #include <SIR_SBM/common.hpp>
 #include <numeric>
-#include <SIR_SBM/vector2D.hpp>
-#include <SIR_SBM/vector3D.hpp>
+#include <SIR_SBM/eigen_tensor.hpp>
 #end
 namespace SIR_SBM {
-
-
 template <typename T>
 std::vector<T> get_at(const std::vector<T> &vec,
                       const std::vector<uint32_t> &indices) {
@@ -23,6 +20,7 @@ void set_at(std::vector<T> &vec, const std::vector<T> &vals,
   std::transform(indices.begin(), indices.end(), vals.begin(), vec.begin(),
                  [](auto idx, auto val) { return val; });
 }
+
 
 
 template <typename T> std::vector<T> vector_merge(const Vec2D<T> &vecs) {
