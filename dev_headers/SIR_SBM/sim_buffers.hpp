@@ -22,7 +22,7 @@ struct Sim_Buffers {
         N_con_largest(G.largest_connection_size()),
         N_part_largest(G.largest_partition_size()),
         // data initialization
-        ecc_vec(subvector_sizes(G.edges)), vpc_vec(subvector_sizes(G.vertices)),
+        ecc_vec(get_vector_sizes(G.edges)), vpc_vec(get_vector_sizes(G.vertices)),
         rng_vec(generate_rngs<oneapi::dpl::ranlux48>(p.seed, p.N_sims)),
         // buffer initialization
         ecc(ecc_vec.data(), G.N_connections()),
@@ -68,8 +68,8 @@ struct Sim_Buffers {
   sycl::buffer<oneapi::dpl::ranlux48, 1> rngs;
 
   // sizes
-  size_t N_vertices, N_sims, Nt, Nt_alloc, N_edges, N_partitions, N_connections;
-  size_t N_con_largest, N_part_largest;
+  uint32_t N_vertices, N_sims, Nt, Nt_alloc, N_edges, N_partitions, N_connections;
+  uint32_t N_con_largest, N_part_largest;
   void validate(sycl::queue &q) {
     validate_vpc(q);
     validate_ecc(q);
@@ -150,4 +150,5 @@ private:
 
   std::vector<sycl::event> events;
 };
+
 } // namespace SIR_SBM

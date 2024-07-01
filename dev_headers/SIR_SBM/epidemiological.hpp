@@ -52,7 +52,7 @@ Population_Count state_to_count(SIR_State s) {
   }
 }
 
-std::tuple<size_t, size_t, size_t>
+std::tuple<uint32_t, uint32_t, uint32_t>
 init_range(sycl::buffer<SIR_State, 3> &state) {
   return std::make_tuple(state.get_range()[0], state.get_range()[1], 1);
 }
@@ -80,7 +80,7 @@ sycl::event initialize(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
 }
 
 sycl::event state_copy(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
-                       size_t t_src, size_t t_dest,
+                       uint32_t t_src, uint32_t t_dest,
                        sycl::event dep_event = {}) {
   throw_if(t_dest >= state.get_range()[2], "Invalid dest time step");
   throw_if(t_src >= state.get_range()[2], "Invalid source time step");
@@ -105,8 +105,8 @@ sycl::event recover(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
   throw_if(t > state.get_range()[2], "Invalid time step");
   return q.submit([&](sycl::handler &h) {
     h.depends_on(dep_event);
-    size_t N_sims = state.get_range()[0];
-    size_t N_vertices = state.get_range()[1];
+    uint32_t N_sims = state.get_range()[0];
+    uint32_t N_vertices = state.get_range()[1];
     auto state_acc =
         sycl::accessor<SIR_State, 3, sycl::access::mode::read_write>(state, h);
     auto rng_acc = rngs.template get_access<sycl::access::mode::read_write>(h);
@@ -131,11 +131,11 @@ sycl::event infect(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
                    sycl::buffer<oneapi::dpl::ranlux48> &rngs, float p_I,
                    uint32_t t, uint32_t t_offset, sycl::event dep_event = {}) {
   throw_if(t_offset > contact_events.get_range()[2], "Invalid time step");
-  size_t N_vertices = state.get_range()[1];
-  size_t N_sims = state.get_range()[0];
-  size_t N_edges = edges.size();
-  size_t N_connections = contact_events.get_range()[1] / 2;
-  size_t t_offset_inf_count = t + t_offset - 1;
+  uint32_t N_vertices = state.get_range()[1];
+  uint32_t N_sims = state.get_range()[0];
+  uint32_t N_edges = edges.size();
+  uint32_t N_connections = contact_events.get_range()[1] / 2;
+  uint32_t t_offset_inf_count = t + t_offset - 1;
   auto zero_evt =
       zero_fill(q, contact_events, sycl::range<3>(N_sims, 2 * N_connections, 1),
                 sycl::range<3>(0, 0, t_offset_inf_count), dep_event);

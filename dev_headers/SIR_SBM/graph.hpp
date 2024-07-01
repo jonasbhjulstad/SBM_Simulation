@@ -11,7 +11,7 @@ typedef std::pair<uint32_t, uint32_t> Edge_t;
 typedef std::vector<Edge_t> Edgelist_t;
 typedef std::vector<uint32_t> Vertexlist_t;
 
-size_t bipartite_max_edges(size_t N0, size_t N1) { return N0 * N1; }
+uint32_t bipartite_max_edges(uint32_t N0, uint32_t N1) { return N0 * N1; }
 
 Edgelist_t complete_bipartite(const Vertexlist_t &N0, const Vertexlist_t &N1) {
   Edgelist_t edges(bipartite_max_edges(N0.size(), N1.size()));
@@ -42,27 +42,27 @@ struct SBM_Graph {
 
   Edgelist_t flat_edges() const { return vector_merge(edges); }
   Vertexlist_t flat_vertices() const { return vector_merge(vertices); }
-  size_t N_edges() const {
+  uint32_t N_edges() const {
     return std::accumulate(
         edges.begin(), edges.end(), 0,
         [](auto sum, auto &elem) { return sum + elem.size(); });
   }
-  size_t N_vertices() const {
+  uint32_t N_vertices() const {
     return std::accumulate(
         vertices.begin(), vertices.end(), 0,
         [](auto sum, auto &elem) { return sum + elem.size(); });
   }
-  size_t N_partitions() const { return vertices.size(); }
-  size_t N_connections() const { return edges.size(); }
+  uint32_t N_partitions() const { return vertices.size(); }
+  uint32_t N_connections() const { return edges.size(); }
 
-  size_t largest_partition_size() const {
+  uint32_t largest_partition_size() const {
     return std::max_element(
                vertices.begin(), vertices.end(),
                [](auto &a, auto &b) { return a.size() < b.size(); })
         ->size();
   }
 
-  size_t largest_connection_size() const {
+  uint32_t largest_connection_size() const {
     return std::max_element(
                edges.begin(), edges.end(),
                [](auto &a, auto &b) { return a.size() < b.size(); })
@@ -70,10 +70,10 @@ struct SBM_Graph {
   }
 };
 
-std::vector<Vertexlist_t> SBM_vertices(size_t N_pop, size_t N_communities) {
+std::vector<Vertexlist_t> SBM_vertices(uint32_t N_pop, uint32_t N_communities) {
   std::vector<Vertexlist_t> Vertexlists(N_communities);
   Vertexlist_t vertices(N_pop);
-  size_t Vertex_offset = 0;
+  uint32_t Vertex_offset = 0;
   for (int i = 0; i < N_communities; i++) {
     std::iota(vertices.begin(), vertices.end(), Vertex_offset);
     Vertexlists[i] = vertices;
@@ -82,7 +82,7 @@ std::vector<Vertexlist_t> SBM_vertices(size_t N_pop, size_t N_communities) {
   return Vertexlists;
 }
 
-SBM_Graph generate_planted_SBM(size_t N_pop, size_t N_communities, float p_in,
+SBM_Graph generate_planted_SBM(uint32_t N_pop, uint32_t N_communities, float p_in,
                                float p_out, uint32_t seed) {
   SBM_Graph graph;
   graph.vertices = SBM_vertices(N_pop, N_communities);

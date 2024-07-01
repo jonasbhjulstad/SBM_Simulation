@@ -29,7 +29,7 @@ void buffer_log(sycl::queue &q, sycl::buffer<T, 3> &buf,
                 const char *fname_prefix, sycl::event dep_event = {}) {
 #ifdef SIR_SBM_BUFFER_LOG
   auto vec = read_buffer<T, 3>(q, buf, dep_event);
-  for (size_t i = 0; i < buf.get_range()[0]; i++) {
+  for (uint32_t i = 0; i < buf.get_range()[0]; i++) {
     write_csv(vec[i],
               std::string(fname_prefix) + std::string("_") + std::to_string(i) +
                   std::string(".csv"),

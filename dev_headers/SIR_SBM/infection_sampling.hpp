@@ -29,12 +29,12 @@ std::vector<int> get_connection_indices(int N_partitions, int p_idx) {
 }
 
 std::vector<uint32_t> get_partition_connection_contacts(
-    const Vec2DView<uint32_t> &contact_events, int N_partitions,
+    const Vec1DView<uint32_t> &contact_events, int N_partitions,
     int p_idx) {
   auto indices = get_connection_indices(N_partitions, p_idx);
   std::vector<uint32_t> result(indices.size());
-  for (int i = 0; i < indices.size(); i++) {
-    result[i] = contact_events(p_idx, indices[i]);
+  for(int c_idx = 0; c_idx < indices.size(); c_idx++) {
+    result[c_idx] = contact_events(indices[c_idx]);
   }
   return result;
 }

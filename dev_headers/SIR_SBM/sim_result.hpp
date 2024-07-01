@@ -54,7 +54,7 @@ struct Sim_Result {
   void write_population_count(const std::filesystem::path &dir) {
     std::ofstream f;
     std::filesystem::create_directories(dir);
-    size_t idx;
+    uint32_t idx;
     Population_Count pc;
     for (int sim_idx = 0; sim_idx < N_sims; sim_idx++) {
       f.open(dir / ("population_count_" + std::to_string(sim_idx) + ".csv"));
@@ -82,7 +82,7 @@ struct Sim_Result {
     });
   }
 
-  size_t N_partitions, N_connections, N_sims, Nt;
+  uint32_t N_partitions, N_connections, N_sims, Nt;
 
 private:
   void validate_partition_size(uint32_t sim_idx) const {

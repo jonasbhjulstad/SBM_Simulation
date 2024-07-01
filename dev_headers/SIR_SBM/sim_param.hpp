@@ -8,10 +8,10 @@ struct Sim_Param {
   float p_I0;
   float p_I;
   float p_R;
-  size_t Nt;
-  size_t Nt_alloc;
-  size_t N_I_terminate;
-  size_t N_sims;
+  uint32_t Nt;
+  uint32_t Nt_alloc;
+  uint32_t N_I_terminate;
+  uint32_t N_sims;
   uint32_t seed;
 };
 

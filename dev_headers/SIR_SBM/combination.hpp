@@ -6,7 +6,7 @@
 
 namespace SIR_SBM {
 
-size_t n_choose_k(size_t n, size_t k) {
+uint32_t n_choose_k(uint32_t n, uint32_t k) {
   if (k > n) {
     return 0;
   }
@@ -17,8 +17,8 @@ size_t n_choose_k(size_t n, size_t k) {
     return 1;
   }
 
-  size_t result = n;
-  for (size_t i = 2; i <= k; ++i) {
+  uint32_t result = n;
+  for (uint32_t i = 2; i <= k; ++i) {
     result *= (n - i + 1);
     result /= i;
   }

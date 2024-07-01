@@ -51,7 +51,7 @@ sycl::buffer<T, N> make_buffer(sycl::queue &q, const std::vector<T> &&data,
 }
 #end
 template <int N> void validate_range(sycl::range<N> r, sycl::range<N> r_buf) {
-  for (size_t i = 0; i < N; i++) {
+  for (uint32_t i = 0; i < N; i++) {
     if (r[i] > r_buf[i]) {
       throw std::runtime_error("Ranges do not match at idx " +
                                std::to_string(i) + " " + std::to_string(r[i]) +
@@ -61,23 +61,23 @@ template <int N> void validate_range(sycl::range<N> r, sycl::range<N> r_buf) {
 }
 
 template <typename T>
-std::tuple<size_t, size_t, size_t> get_range(const sycl::buffer<T, 3> &buf) {
+std::tuple<uint32_t, uint32_t, uint32_t> get_range(const sycl::buffer<T, 3> &buf) {
   return std::make_tuple(buf.get_range()[0], buf.get_range()[1],
                          buf.get_range()[2]);
 }
 
 // GET RANGE FOR 2D BUFFER
 template <typename T>
-std::tuple<size_t, size_t> get_range(const sycl::buffer<T, 2> &buf) {
+std::tuple<uint32_t, uint32_t> get_range(const sycl::buffer<T, 2> &buf) {
   return std::make_tuple(buf.get_range()[0], buf.get_range()[1]);
 }
 
 template <typename T>
-std::tuple<size_t> get_range(const sycl::buffer<T, 1> &buf) {
+std::tuple<uint32_t> get_range(const sycl::buffer<T, 1> &buf) {
   return std::make_tuple(buf.get_range()[0]);
 }
 
-template <typename T, size_t N>
+template <typename T, uint32_t N>
 sycl::event read_buffer(sycl::queue &q, sycl::buffer<T, N> &buf,
                         std::vector<T> &data, sycl::event dep_event) {
 
@@ -99,7 +99,7 @@ sycl::event zero_fill(sycl::queue &q, sycl::buffer<uint32_t, 3> &buf,
     h.parallel_for(acc.get_range(), [=](sycl::id<3> idx) { acc[idx] = 0; });
   });
 }
-template <typename T, size_t N>
+template <typename T, uint32_t N>
 std::vector<T> read_buffer(sycl::queue &q, sycl::buffer<T, N> &buf,
                            sycl::event dep_event) {
   std::vector<T> data;

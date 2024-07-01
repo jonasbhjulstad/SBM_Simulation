@@ -15,7 +15,7 @@
 namespace SIR_SBM {
 
 std::tuple<casadi::DM, casadi::DM>
-connection_expand_population(const std::tuple<casadi::DM, casadi::DM> &data, size_t N_connections) {
+connection_expand_population(const std::tuple<casadi::DM, casadi::DM> &data, uint32_t N_connections) {
   using namespace casadi;
   auto [population_counts, infection_counts] = data;
   // population_counts dim 1 is N_communities
@@ -26,7 +26,7 @@ connection_expand_population(const std::tuple<casadi::DM, casadi::DM> &data, siz
 
   DM sources = DM::zeros(population_counts.size1(), N_directed_connections);
   DM targets = DM::zeros(population_counts.size1(), N_directed_connections);
-  size_t con_idx = 0;
+  uint32_t con_idx = 0;
   auto population_slice = [](int idx) {
     return Slice<int>(idx * 3, idx * 3 + 3);
   };
@@ -48,8 +48,8 @@ connection_expand_population(const std::tuple<casadi::DM, casadi::DM> &data, siz
 // load csv into MX matrix
 std::tuple<casadi::DM, casadi::DM, casadi::DM>
 regression_data_from_simulations(const std::filesystem::path &filenameprefix,
-                                 size_t N_communities, size_t N_connections,
-                                 size_t N_sims, size_t Nt) {
+                                 uint32_t N_communities, uint32_t N_connections,
+                                 uint32_t N_sims, uint32_t Nt) {
 
   auto community_state = read_csv<uint32_t>(filenameprefix / "population_count_",
                                  N_communities, N_sims, Nt + 1);
@@ -57,15 +57,15 @@ regression_data_from_simulations(const std::filesystem::path &filenameprefix,
                                  N_connections * 2, N_sims, Nt);
 
   using namespace casadi;
-  auto linvec_to_dm = [](const Vec3D<uint32_t> &vec, size_t start, size_t end) {
+  auto linvec_to_dm = [](const Vec3D<uint32_t> &vec, uint32_t start, uint32_t end) {
     auto shape = vec.dimensions();
     auto N0 = shape[0];
     auto N1 = shape[1];
     auto N2 = shape[2];
     DM result(N0 * N1 * (end - start));
-    for (size_t i = 0; i < N0; i++) {
-      for (size_t j = 0; j < N1; j++) {
-        for (size_t k = start; k < end; k++) {
+    for (uint32_t i = 0; i < N0; i++) {
+      for (uint32_t j = 0; j < N1; j++) {
+        for (uint32_t k = start; k < end; k++) {
           result(i * N1 * N2 + j * N2 + k) = vec(i,j,k);
         }
       }
