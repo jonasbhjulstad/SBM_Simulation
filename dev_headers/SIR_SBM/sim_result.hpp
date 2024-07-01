@@ -17,16 +17,17 @@ struct Sim_Result {
         N_partitions(G.N_partitions()), N_connections(G.N_connections()),
         N_sims(p.N_sims), Nt(p.Nt) {}
   void resize(const Sim_Param &p, const SBM_Graph &G) {
-    contact_events.resize(p.N_sims, G.N_connections() * 2, p.Nt);
-    population_count.resize(p.N_sims, G.N_partitions(), p.Nt + 1);
+    contact_events = LinVec3D<uint32_t>(p.N_sims, G.N_connections() * 2, p.Nt);
+    population_count =
+        LinVec3D<Population_Count>(p.N_sims, G.N_partitions(), p.Nt + 1);
     N_partitions = G.N_partitions();
     N_connections = G.N_connections();
     N_sims = p.N_sims;
     Nt = p.Nt;
   }
-  Eigen::Tensor<uint32_t, 3> contact_events;
-  Eigen::Tensor<Population_Count, 3> population_count;
-  // Eigen::Tensor<uint32_t, 3> contact_events;
+  LinVec3D<uint32_t> contact_events;
+  LinVec3D<Population_Count> population_count;
+  // Vec3D<uint32_t> contact_events;
   // LinearVector3D<Population_Count> population_count;
 
   void write(const std::filesystem::path &dir) {
@@ -86,7 +87,8 @@ struct Sim_Result {
 private:
   void validate_partition_size(uint32_t sim_idx) const {
     std::vector<uint32_t> start_pop_size;
-    std::transform(population_count.data(), population_count.data() + population_count.size(),
+    std::transform(population_count.data(),
+                   population_count.data() + population_count.size(),
                    std::back_inserter(start_pop_size),
                    [](Population_Count pc) { return pc.S + pc.I + pc.R; });
     for (int t = 0; t < Nt + 1; t++) {

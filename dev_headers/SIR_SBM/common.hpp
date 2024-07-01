@@ -7,6 +7,7 @@
 #include <oneapi/tbb/info.h>
 #include <tuple>
 #include <vector>
+#include <cstddef>
 namespace SIR_SBM {
 const size_t N_DEFAULT_THREADS = oneapi::tbb::info::default_concurrency();
 template <typename T> using Vec3D = std::vector<std::vector<std::vector<T>>>;

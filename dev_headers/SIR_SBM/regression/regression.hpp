@@ -28,7 +28,7 @@ connection_expand_population(const std::tuple<casadi::DM, casadi::DM> &data, siz
   DM targets = DM::zeros(population_counts.size1(), N_directed_connections);
   size_t con_idx = 0;
   auto population_slice = [](int idx) {
-    return Slice(idx * 3, idx * 3 + 3);
+    return Slice<int>(idx * 3, idx * 3 + 3);
   };
   for (auto comb : iter::combinations_with_replacement(make_iota(N_communities), 2)) {
     auto from_idx = comb[0];
@@ -57,7 +57,7 @@ regression_data_from_simulations(const std::filesystem::path &filenameprefix,
                                  N_connections * 2, N_sims, Nt);
 
   using namespace casadi;
-  auto linvec_to_dm = [](const Eigen::Tensor<uint32_t, 3> &vec, size_t start, size_t end) {
+  auto linvec_to_dm = [](const Vec3D<uint32_t> &vec, size_t start, size_t end) {
     auto shape = vec.dimensions();
     auto N0 = shape[0];
     auto N1 = shape[1];

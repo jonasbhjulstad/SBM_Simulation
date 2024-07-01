@@ -20,6 +20,7 @@ find_package(casadi HINTS ${CMAKE_BINARY_DIR}/external/casadi/src/casadi-3.6.5/c
 
 CPMFindPackage(NAME cppitertools
 GITHUB_REPOSITORY ryanhaining/cppitertools
+GIT_TAG master
 OPTIONS
 "cppitertools_INSTALL_CMAKE_DIR \"share/cppitertools/cmake\""
 )

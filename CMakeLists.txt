@@ -29,6 +29,7 @@ include(${PROJECT_SOURCE_DIR}/cmake/lzz_routines.cmake)
 
 #LZZ generation
 add_lzz_library(SIR_SBM "${PROJECT_SOURCE_DIR}/dev_headers/SIR_SBM/")
+target_link_libraries(SIR_SBM PUBLIC ${SIR_SBM_EXTERNAL_LIBRARIES} cppitertools::cppitertools)
 add_lzz_library(SIR_SBM_Regression "${PROJECT_SOURCE_DIR}/dev_headers/SIR_SBM/regression/")
 target_link_libraries(SIR_SBM_Regression PRIVATE SIR_SBM casadi)
 target_include_directories(SIR_SBM PUBLIC ${SIR_SBM_INCLUDE_DIR} ${SIR_SBM_EXTERNAL_INCLUDE_DIRS})

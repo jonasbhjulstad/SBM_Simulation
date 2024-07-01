@@ -12,13 +12,13 @@
 
 namespace SIR_SBM {
 template <typename T = int>
-Eigen::Tensor<T, 2> read_csv(const std::filesystem::path &path, uint32_t N0,
+Vec2D<T> read_csv(const std::filesystem::path &path, uint32_t N0,
                              uint32_t N1) {
   std::ifstream file(path);
   if (!file.is_open()) {
     throw std::runtime_error("Could not open file: " + path.string());
   }
-  Eigen::Tensor<T, 2> result(N0, N1);
+  Vec2D<T> result(N0, std::vector<T>(N1));
   std::string line;
   uint32_t n0 = 0;
   uint32_t n1 = 0;
@@ -27,9 +27,9 @@ Eigen::Tensor<T, 2> read_csv(const std::filesystem::path &path, uint32_t N0,
     std::string cell;
     while (std::getline(ss, cell, ',')) {
       if constexpr (std::is_same_v<T, int> || std::is_same_v<T, uint32_t>)
-        result(n0, n1) = std::stoi(cell);
+        result[n0][n1] = std::stoi(cell);
       else if constexpr (std::is_same_v<T, double>)
-        result(n0, n1) = std::stod(cell);
+        result[n0][n1] = std::stod(cell);
       n1++;
     }
     n0++;
@@ -39,11 +39,11 @@ Eigen::Tensor<T, 2> read_csv(const std::filesystem::path &path, uint32_t N0,
 }
 
 template <typename T = int>
-Eigen::Tensor<T, 3> read_csv(const std::filesystem::path &file_prefix,
+Vec3D<T> read_csv(const std::filesystem::path &file_prefix,
                                     int N0, int N1, int N2) {
   std::ifstream f;
   // std::vector<int> result(N0 * N1 * N2);
-  Eigen::Tensor<T, 3> result(N0, N1, N2);
+  Vec3D<T> result(N0, N1, N2);
 
   for (int i = 0; i < N0; i++) {
     std::string filename = file_prefix.string() + std::to_string(i) + ".csv";

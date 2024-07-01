@@ -1,6 +1,5 @@
 #pragma once
 #hdr
-#include <Eigen/Dense>
 template <typename T>
 using Vec = Eigen::Matrix<T, Eigen::Dynamic, 1>;
 template <typename T>
