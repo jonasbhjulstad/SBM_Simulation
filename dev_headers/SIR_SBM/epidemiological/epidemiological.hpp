@@ -15,11 +15,10 @@ enum class SIR_State : char {
   Recovered = 2,
   Invalid = 3
 };
-#end
 
 struct Population_Count {
   int S, I, R;
-  Population_Count() : S(0), I(0), R(0) {}
+  Population_Count() = default;
   Population_Count(int S, int I, int R) : S(S), I(I), R(R) {}
   Population_Count(const std::array<int, 3> &arr)
       : S(arr[0]), I(arr[1]), R(arr[2]) {}
@@ -40,6 +39,7 @@ struct Population_Count {
     }
   }
 };
+#end
 
 Population_Count state_to_count(SIR_State s) {
   switch (s) {

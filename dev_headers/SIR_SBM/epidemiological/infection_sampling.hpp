@@ -12,6 +12,7 @@
 #end
 
 #src
+#include <SIR_SBM/utils/occurrence.hpp>
 #include <SIR_SBM/vector/routines.hpp>
 #end
 
@@ -41,6 +42,8 @@ std::vector<uint32_t> get_partition_connection_contacts(
   }
   return result;
 }
+
+
 
 std::vector<uint32_t> sample_infections(
     const Vec2DView<uint32_t> &contact_events,
@@ -88,20 +91,20 @@ LinVec2D<uint32_t> simulation_sample_infections(
 }
 
 Vec3D<uint32_t>
-sample_infections(const Vec3D<uint32_t> &contact_events,
-                  const Vec3D<Population_Count> &population_count,
+sample_infections(LinVec3D<uint32_t> &contact_events,
+                  LinVec3D<Population_Count> &population_count,
                   int seed) {
-  auto shape = contact_events.dimensions();
-  auto N_sims = shape[0];
+  // auto [N_sims, N_connections_2, Nt] = get_vector_shape(contact_events);
+  auto N_sims = contact_events.N0;
   auto N_connections = contact_events.N1 / 2;
   auto Nt = contact_events.N2;
   auto N_partitions = population_count.N1;
 
   auto rngs = generate_rngs<std::mt19937_64>(N_sims, seed);
   
-  Vec3D<uint32_t> result(N_sims, 2 * N_connections, Nt);
+  Vec3D<uint32_t> result(N_sims);
   for (auto sim_idx : make_iota(N_sims)) {
-    result(sim_idx) = simulation_sample_infections(
+    result[sim_idx] = simulation_sample_infections(
         contact_events(sim_idx), population_count(sim_idx),
         rngs[sim_idx]);
   }

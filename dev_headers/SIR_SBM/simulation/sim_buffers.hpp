@@ -33,9 +33,9 @@ struct Sim_Buffers {
         vpc(vpc_vec.data(), G.N_partitions()), rngs(rng_vec.data(), p.N_sims),
         state(sycl::range<3>(p.N_sims, G.N_vertices(), p.Nt_alloc)),
         contact_events(
-            result.contact_events.data(),
+            result.contact_events.data.get(),
             sycl::range<3>(p.N_sims, G.N_connections() * 2, p.Nt)),
-        population_count(result.population_count.data(),
+        population_count(result.population_count.data.get(),
                          sycl::range<3>(p.N_sims, G.N_partitions(), p.Nt + 1)),
         edges(make_buffer<Edge_t, 1>(q, G.flat_edges(),
                                      sycl::range<1>(G.N_edges()))) {

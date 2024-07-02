@@ -7,7 +7,6 @@
 namespace SIR_SBM {
 
 void validate_population(sycl::queue &q, sycl::buffer<SIR_State, 3> &state) {
-  validate_population(q, state, state.get_range(), sycl::range<3>(0, 0, 0));
 }
 
 sycl::event partition_population_count(sycl::queue &q,
@@ -19,7 +18,7 @@ sycl::event partition_population_count(sycl::queue &q,
 
   validate_population(q, state);
   auto [N_sims, N_vertices, Nt_alloc] = get_range(state);
-  Nt_alloc = std::min<uint32_t>({Nt_alloc, count.get_range()[2] - t_offset});
+  Nt_alloc = std::min<uint32_t>({Nt_alloc, static_cast<uint32_t>(count.get_range()[2] - t_offset)});
   return Nt_alloc <= 0 ? sycl::event{} : q.submit([&](sycl::handler &h) {
     h.depends_on(dep_event);
     auto pop_inc = [](Population_Count &pc, SIR_State s) {

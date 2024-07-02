@@ -10,11 +10,11 @@ namespace SIR_SBM {
 template <typename T>
 struct Vec1DView
 {
-    std::unique_ptr<T>& data;
+    std::unique_ptr<T[]>& data;
     uint32_t offset;
     uint32_t N;
     uint32_t stride;
-    Vec1DView(std::unique_ptr<T>& data, uint32_t offset, uint32_t N, uint32_t stride = 1) : data(data), offset(offset), N(N), stride(stride) {}
+    Vec1DView(std::unique_ptr<T[]>& data, uint32_t offset, uint32_t N, uint32_t stride = 1) : data(data), offset(offset), N(N), stride(stride) {}
 
     T &operator()(uint32_t i)
     {
@@ -69,10 +69,10 @@ struct Vec1DView
 template <typename T>
 struct Vec2DView
 {
-    std::unique_ptr<T>& data;
+    std::unique_ptr<T[]>& data;
     uint32_t offset;
     uint32_t N0, N1;
-    Vec2DView(std::unique_ptr<T>& data, uint32_t offset, uint32_t N0, uint32_t N1) : data(data), offset(offset), N0(N0), N1(N1) {}
+    Vec2DView(std::unique_ptr<T[]>& data, uint32_t offset, uint32_t N0, uint32_t N1) : data(data), offset(offset), N0(N0), N1(N1) {}
 
     T &operator()(uint32_t i, uint32_t j)
     {
@@ -113,11 +113,11 @@ struct Vec2DView
 template <typename T>
 struct LinVec2D
 {
-    std::unique_ptr<T> data;
+    std::unique_ptr<T[]> data;
     uint32_t N0, N1;
     LinVec2D(uint32_t N0, uint32_t N1) : N0(N0), N1(N1)
     {
-        data = std::make_unique<T>(N0 * N1);
+        data = std::make_unique<T[]>(N0 * N1);
     }
     T &operator()(uint32_t i, uint32_t j)
     {
@@ -151,11 +151,11 @@ struct LinVec2D
 template <typename T>
 struct LinVec3D
 {
-    std::unique_ptr<T> data;
+    std::unique_ptr<T[]> data;
     uint32_t N0, N1, N2;
     LinVec3D(uint32_t N0, uint32_t N1, uint32_t N2) : N0(N0), N1(N1), N2(N2)
     {
-        data = std::make_unique<T>(N0 * N1 * N2);
+        data = std::make_unique<T[]>(N0 * N1 * N2);
     }
     T &operator()(uint32_t i, uint32_t j, uint32_t k)
     {

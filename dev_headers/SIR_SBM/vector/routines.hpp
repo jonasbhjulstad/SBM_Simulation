@@ -1,6 +1,10 @@
 #pragma once
 #hdr
 #include <SIR_SBM/vector/types.hpp>
+#include <tuple>
+#end
+#hdr
+#include <numeric>
 #end
 namespace SIR_SBM
 {
