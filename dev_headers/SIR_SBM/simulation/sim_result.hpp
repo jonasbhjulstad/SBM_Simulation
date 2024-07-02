@@ -91,11 +91,11 @@ struct Sim_Result {
 
 private:
   void validate_partition_size(uint32_t sim_idx) const {
-    std::vector<uint32_t> start_pop_size;
-    std::transform(population_count.data(),
-                   population_count.data() + population_count.size(),
-                   std::back_inserter(start_pop_size),
-                   [](Population_Count pc) { return pc.S + pc.I + pc.R; });
+    std::vector<uint32_t> start_pop_size(population_count.size());
+    for(int i = 0; i < population_count.size(); i++)
+    {
+
+    }
     for (int t = 0; t < Nt + 1; t++) {
       for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
         auto pc = population_count(sim_idx, p_idx, t);

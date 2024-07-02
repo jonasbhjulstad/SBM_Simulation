@@ -9,6 +9,7 @@
 
 #src
 #include <SIR_SBM/vector/vector.hpp>
+#include <SIR_SBM/vector/routines.hpp>
 #include <cppitertools/combinations_with_replacement.hpp>
 #end
 namespace SIR_SBM {
@@ -27,14 +28,14 @@ connection_expand_population(const std::tuple<casadi::DM, casadi::DM> &data, uin
   DM targets = DM::zeros(population_counts.size1(), N_directed_connections);
   uint32_t con_idx = 0;
   auto population_slice = [](int idx) {
-    return Slice((uint32_t)idx * 3, (uint32_t)idx * 3 + 3);
+    return Slice(idx * 3, idx * 3 + 3, 1);
   };
   for (auto comb : iter::combinations_with_replacement(make_iota(N_communities), 2)) {
-    auto from_idx = comb[0];
-    auto to_idx = comb[1];
+    int from_idx = comb[0];
+    int to_idx = comb[1];
     auto con_slice = population_slice(con_idx);
-    auto from_slice = Slice(from_idx * 3, from_idx * 3 + 3);
-    auto to_slice = Slice(to_idx * 3, to_idx * 3 + 3);
+    auto from_slice = Slice(from_idx * 3, from_idx * 3 + 3, 1);
+    auto to_slice = Slice(to_idx * 3, to_idx * 3 + 3, 1);
 
     sources(Slice(), population_slice(con_idx)) =
         population_counts(Slice(), population_slice(from_idx));
@@ -56,18 +57,17 @@ regression_data_from_simulations(const std::filesystem::path &filenameprefix,
                                  N_connections * 2, N_sims, Nt);
 
   using namespace casadi;
-  auto linvec_to_dm = [](const Vec3D<uint32_t> &vec, uint32_t start, uint32_t end) {
-    auto [N0, N1, N2] = get_shape(vec);
-    DM result(N0 * N1 * (end - start));
-    for (uint32_t i = 0; i < N0; i++) {
+  auto linvec_to_dm = [](LinVec3D<uint32_t> &vec, uint32_t start, uint32_t end) {
+    Vec2D<uint32_t> result(vec.N0*vec.N1, std::vector<uint32_t>(vec.N2));
+    for(int i = start; i < end; i++)
+    {
       Vec2DView<uint32_t> row = vec(i);
-      for (uint32_t j = 0; j < N1; j++) {
-        for (uint32_t k = start; k < end; k++) {
-          result(i * N1 * (end - start) + j * (end - start) + k - start) = row(j, k);
-        }
+      for(int j = 0; j < vec.N1; j++)
+      {
+        result[i*vec.N1 + j] = row(j);
       }
     }
-    return result;
+    return DM(result);
   };
 
   DM population_counts =

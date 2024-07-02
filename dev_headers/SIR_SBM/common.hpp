@@ -1,7 +1,6 @@
 #pragma once
 #hdr
 #include <algorithm>
-#include <boost/multi_array.hpp>
 #include <cmath>
 #include <limits>
 #include <oneapi/tbb/info.h>

@@ -11,6 +11,10 @@
 #include <random>
 #end
 
+#src
+#include <SIR_SBM/vector/routines.hpp>
+#end
+
 namespace SIR_SBM {
 
 std::vector<int> get_connection_indices(int N_partitions, int p_idx) {
@@ -89,9 +93,9 @@ sample_infections(const Vec3D<uint32_t> &contact_events,
                   int seed) {
   auto shape = contact_events.dimensions();
   auto N_sims = shape[0];
-  auto N_connections = contact_events.dimensions()[1] / 2;
-  auto Nt = contact_events.dimensions()[2];
-  auto N_partitions = population_count.dimensions()[1];
+  auto N_connections = contact_events.N1 / 2;
+  auto Nt = contact_events.N2;
+  auto N_partitions = population_count.N1;
 
   auto rngs = generate_rngs<std::mt19937_64>(N_sims, seed);
   

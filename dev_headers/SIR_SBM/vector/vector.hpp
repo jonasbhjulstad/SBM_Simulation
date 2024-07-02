@@ -90,7 +90,7 @@ struct Vec2DView
 
     Vec1DView<T> operator()(uint32_t i)
     {
-        return Vec1DView<T>(data, offset + i*N0);
+        return Vec1DView<T>(data, offset + i*N0, N0*N1 - i*N0);
     }
 
     uint32_t size() const
