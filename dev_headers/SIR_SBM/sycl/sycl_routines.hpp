@@ -3,9 +3,6 @@
 #include <SIR_SBM/common.hpp>
 #include <sycl/sycl.hpp>
 #end
-#src
-#include <SIR_SBM/reshape.hpp>
-#end
 namespace SIR_SBM {
 template <typename T, int N = 1>
 sycl::event buffer_copy(sycl::queue &q, sycl::buffer<T, N> &buf,

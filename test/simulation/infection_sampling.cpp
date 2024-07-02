@@ -1,8 +1,8 @@
-#include <SIR_SBM/population_count.hpp>
-#include <SIR_SBM/queue_select.hpp>
-#include <SIR_SBM/simulation.hpp>
-#include <SIR_SBM/ticktock.hpp>
-#include <SIR_SBM/infection_sampling.hpp>
+#include <SIR_SBM/epidemiological/population_count.hpp>
+#include <SIR_SBM/sycl/queue_select.hpp>
+#include <SIR_SBM/simulation/simulation.hpp>
+#include <SIR_SBM/utils/ticktock.hpp>
+#include <SIR_SBM/epidemiological/infection_sampling.hpp>
 #include <filesystem>
 using namespace SIR_SBM;
 

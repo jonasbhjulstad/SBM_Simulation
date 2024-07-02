@@ -1,29 +1,10 @@
 #pragma once
 #hdr
-#include <SIR_SBM/epidemiological.hpp>
-#include <SIR_SBM/sycl_routines.hpp>
-#include <SIR_SBM/vector.hpp>
+#include <SIR_SBM/epidemiological/epidemiological.hpp>
+#include <SIR_SBM/sycl/sycl_routines.hpp>
+#include <SIR_SBM/vector/vector.hpp>
 #end
 namespace SIR_SBM {
-void validate_population(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
-                         sycl::range<3> range, sycl::range<3> offset) {
-#ifdef DEBUG
-  int is_valid = 0;
-  sycl::buffer<int> valid_buf{&is_valid, 1};
-  q.submit([&](sycl::handler &h) {
-    auto any_reduce = sycl::reduction(valid_buf, h, sycl::logical_or<int>());
-    auto state_acc =
-        state.get_access<sycl::access::mode::read>(h, range, offset);
-    h.parallel_for(range, any_reduce, [=](sycl::id<3> idx, auto &reducer) {
-      reducer.combine(state_acc[idx] == SIR_State::Invalid);
-    });
-  });
-  q.wait();
-  if (is_valid) {
-    throw std::runtime_error("Invalid population state");
-  }
-#endif
-}
 
 void validate_population(sycl::queue &q, sycl::buffer<SIR_State, 3> &state) {
   validate_population(q, state, state.get_range(), sycl::range<3>(0, 0, 0));

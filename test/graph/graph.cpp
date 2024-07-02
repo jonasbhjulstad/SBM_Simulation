@@ -1,7 +1,7 @@
-#include <SIR_SBM/graph.hpp>
-#include <SIR_SBM/exceptions.hpp>
-#include <SIR_SBM/ticktock.hpp>
-#include <SIR_SBM/queue_select.hpp>
+#include <SIR_SBM/graph/graph.hpp>
+#include <SIR_SBM/utils/exceptions.hpp>
+#include <SIR_SBM/utils/ticktock.hpp>
+#include <SIR_SBM/sycl/queue_select.hpp>
 
 using namespace SIR_SBM;
 

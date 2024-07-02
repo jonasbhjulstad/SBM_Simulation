@@ -1,14 +1,18 @@
 #pragma once
 #hdr
 #include <SIR_SBM/common.hpp>
-#include <SIR_SBM/epidemiological.hpp>
-#include <SIR_SBM/exceptions.hpp>
-#include <SIR_SBM/graph.hpp>
-#include <SIR_SBM/population_count.hpp>
-#include <SIR_SBM/sim_param.hpp>
-#include <SIR_SBM/sim_result.hpp>
-#include <SIR_SBM/sycl_routines.hpp>
-#include <SIR_SBM/sycl_validate.hpp>
+#include <SIR_SBM/epidemiological/epidemiological.hpp>
+#include <SIR_SBM/utils/exceptions.hpp>
+#include <SIR_SBM/graph/graph.hpp>
+#include <SIR_SBM/epidemiological/population_count.hpp>
+#include <SIR_SBM/simulation/sim_param.hpp>
+#include <SIR_SBM/simulation/sim_result.hpp>
+#include <SIR_SBM/sycl/sycl_routines.hpp>
+#include <SIR_SBM/sycl/sycl_validate.hpp>
+#end
+
+#src
+#include <SIR_SBM/vector/routines.hpp>
 #end
 
 namespace SIR_SBM {

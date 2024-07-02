@@ -1,49 +1,12 @@
 #pragma once
 #hdr
 #include <SIR_SBM/common.hpp>
-#include <SIR_SBM/vector.hpp>
+#include <SIR_SBM/vector/types.hpp>
 #include <memory>
-#include <cstdint>
-#include <type_traits>
-namespace SIR_SBM
-{
-    template <typename T>
-    using Vec2D = std::vector<std::vector<T>>;
-    template <typename T>
-    using Vec3D = std::vector<std::vector<std::vector<T>>>;
-}
 #end
 
 namespace SIR_SBM {
 
-    template <typename T>
-std::vector<uint32_t> get_vector_sizes(const Vec2D<T>& vecs)
-{
-  std::vector<uint32_t> sizes(vecs.size());
-  std::transform(vecs.begin(), vecs.end(), sizes.begin(),
-                 [](const std::vector<T>& vec) { return vec.size(); });
-  return sizes;
-}
-template <typename T>
-std::vector<T> vector_merge(const Vec2D<T> &vecs) {
-  std::vector<T> result;
-  int N = std::accumulate(
-      vecs.begin(), vecs.end(), 0L,
-      [](uint32_t a, const std::vector<T> &b) { return a + b.size(); });
-  result.reserve(N);
-  for (const auto &vec : vecs) {
-    result.insert(result.end(), vec.begin(), vec.end());
-  }
-  return result;
-}
-
-template <typename T = uint32_t>
-std::vector<T> make_iota(uint32_t N)
-{
-    std::vector<T> result(N);
-    std::iota(result.begin(), result.end(), 0);
-    return result;
-}
 template <typename T>
 struct Vec1DView
 {
@@ -218,6 +181,13 @@ struct LinVec3D
         {
             result[i] = Vec2DView<T>(data, i*N1*N2, N1, N2);
         }
+        return result;
+    }
+
+    operator std::vector<T>()
+    {
+        std::vector<T> result(N0*N1*N2);
+        std::copy(data.get(), data.get() + N0*N1*N2, result.begin());
         return result;
     }
 

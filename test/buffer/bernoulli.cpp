@@ -1,6 +1,6 @@
-#include <SIR_SBM/queue_select.hpp>
-#include <SIR_SBM/random.hpp>
-#include <SIR_SBM/sycl_routines.hpp>
+#include <SIR_SBM/sycl/queue_select.hpp>
+#include <SIR_SBM/utils/random.hpp>
+#include <SIR_SBM/sycl/sycl_routines.hpp>
 #include <oneapi/dpl/random>
 
 using namespace SIR_SBM;

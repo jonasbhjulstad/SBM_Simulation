@@ -1,11 +1,10 @@
 #pragma once
 #hdr
 #include <SIR_SBM/common.hpp>
-#include <SIR_SBM/csv.hpp>
-#include <SIR_SBM/eigen.hpp>
-#include <SIR_SBM/population_count.hpp>
-#include <SIR_SBM/sim_result.hpp>
-#include <SIR_SBM/vector.hpp>
+#include <SIR_SBM/utils/csv.hpp>
+#include <SIR_SBM/epidemiological/population_count.hpp>
+#include <SIR_SBM/simulation/sim_result.hpp>
+#include <SIR_SBM/vector/vector.hpp>
 #include <cppitertools/combinations_with_replacement.hpp>
 #include <filesystem>
 #include <fstream>

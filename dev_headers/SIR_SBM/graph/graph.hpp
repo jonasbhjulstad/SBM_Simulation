@@ -1,9 +1,11 @@
 #pragma once
 #hdr
 #include <cppitertools/combinations_with_replacement.hpp>
-#include <SIR_SBM/combination.hpp>
-#include <SIR_SBM/random.hpp>
-#include <SIR_SBM/vector.hpp>
+#include <SIR_SBM/utils/combination.hpp>
+#include <SIR_SBM/utils/random.hpp>
+#include <SIR_SBM/common.hpp>
+#end
+#src
 #include <execution>
 #end
 namespace SIR_SBM {

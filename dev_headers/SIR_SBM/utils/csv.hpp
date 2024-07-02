@@ -1,7 +1,7 @@
 #pragma once
 #hdr
 #include <SIR_SBM/common.hpp>
-#include <SIR_SBM/vector.hpp>
+#include <SIR_SBM/vector/vector.hpp>
 #include <filesystem>
 #include <fstream>
 #end
@@ -39,11 +39,11 @@ Vec2D<T> read_csv(const std::filesystem::path &path, uint32_t N0,
 }
 
 template <typename T = int>
-Vec3D<T> read_csv(const std::filesystem::path &file_prefix,
+LinVec3D<T> read_csv(const std::filesystem::path &file_prefix,
                                     int N0, int N1, int N2) {
   std::ifstream f;
   // std::vector<int> result(N0 * N1 * N2);
-  Vec3D<T> result(N0, N1, N2);
+  LinVec3D<T> result(N0, N1, N2);
 
   for (int i = 0; i < N0; i++) {
     std::string filename = file_prefix.string() + std::to_string(i) + ".csv";

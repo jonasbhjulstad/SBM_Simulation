@@ -1,6 +1,6 @@
 #pragma once
 #hdr
-#include <SIR_SBM/csv.hpp>
+#include <SIR_SBM/utils/csv.hpp>
 #include <casadi/casadi.hpp>
 #include <filesystem>
 #include <fstream>
@@ -8,17 +8,16 @@
 #end
 
 #src
-#include <SIR_SBM/vector.hpp>
+#include <SIR_SBM/vector/vector.hpp>
 #include <cppitertools/combinations_with_replacement.hpp>
 #end
-
 namespace SIR_SBM {
 
 std::tuple<casadi::DM, casadi::DM>
 connection_expand_population(const std::tuple<casadi::DM, casadi::DM> &data, uint32_t N_connections) {
   using namespace casadi;
   auto [population_counts, infection_counts] = data;
-  // population_counts dim 1 is N_communities
+  // population_counts dim 1 is N_communitiesdim
   // infection_counts dim 1 is N_connections
 
   auto N_communities = population_counts.size1();
@@ -28,7 +27,7 @@ connection_expand_population(const std::tuple<casadi::DM, casadi::DM> &data, uin
   DM targets = DM::zeros(population_counts.size1(), N_directed_connections);
   uint32_t con_idx = 0;
   auto population_slice = [](int idx) {
-    return Slice<int>(idx * 3, idx * 3 + 3);
+    return Slice((uint32_t)idx * 3, (uint32_t)idx * 3 + 3);
   };
   for (auto comb : iter::combinations_with_replacement(make_iota(N_communities), 2)) {
     auto from_idx = comb[0];
@@ -58,15 +57,13 @@ regression_data_from_simulations(const std::filesystem::path &filenameprefix,
 
   using namespace casadi;
   auto linvec_to_dm = [](const Vec3D<uint32_t> &vec, uint32_t start, uint32_t end) {
-    auto shape = vec.dimensions();
-    auto N0 = shape[0];
-    auto N1 = shape[1];
-    auto N2 = shape[2];
+    auto [N0, N1, N2] = get_shape(vec);
     DM result(N0 * N1 * (end - start));
     for (uint32_t i = 0; i < N0; i++) {
+      Vec2DView<uint32_t> row = vec(i);
       for (uint32_t j = 0; j < N1; j++) {
         for (uint32_t k = start; k < end; k++) {
-          result(i * N1 * N2 + j * N2 + k) = vec(i,j,k);
+          result(i * N1 * (end - start) + j * (end - start) + k - start) = row(j, k);
         }
       }
     }
@@ -74,9 +71,9 @@ regression_data_from_simulations(const std::filesystem::path &filenameprefix,
   };
 
   DM population_counts =
-      linvec_to_dm(community_state, 0, community_state.dimensions()[2] - 1);
+      linvec_to_dm(community_state, 0, community_state.N2 - 1);
 
-  DM infection_counts = linvec_to_dm(infection_count, 0, infection_count.dimensions()[2]);
+  DM infection_counts = linvec_to_dm(infection_count, 0, infection_count.N2);
 
   auto [population_sources, population_targets] = connection_expand_population(
       std::make_tuple(population_counts, infection_counts),

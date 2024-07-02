@@ -1,7 +1,7 @@
 #pragma once
 #hdr
-#include <SIR_SBM/csv.hpp>
-#include <SIR_SBM/sycl_routines.hpp>
+#include <SIR_SBM/utils/csv.hpp>
+#include <SIR_SBM/sycl/sycl_routines.hpp>
 namespace SIR_SBM {
 template <typename T> using string_f = std::string (*)(T);
 template <typename T, int N, string_f<T> str_f = std::to_string>

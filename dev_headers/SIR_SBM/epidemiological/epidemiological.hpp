@@ -1,9 +1,11 @@
 #pragma once
 #hdr
-#include <SIR_SBM/exceptions.hpp>
-#include <SIR_SBM/graph.hpp>
-#include <SIR_SBM/sycl_routines.hpp>
+#include <SIR_SBM/graph/graph.hpp>
 #include <oneapi/dpl/random>
+#end
+#src
+#include <SIR_SBM/utils/exceptions.hpp>
+#include <SIR_SBM/sycl/sycl_routines.hpp>
 #end
 namespace SIR_SBM {
 #hdr

@@ -1,13 +1,18 @@
 #pragma once
 #hdr
-#include <SIR_SBM/common.hpp>
-#include <SIR_SBM/epidemiological.hpp>
-#include <SIR_SBM/sim_param.hpp>
-#include <SIR_SBM/vector.hpp>
-#include <cppitertools/combinations_with_replacement.hpp>
-#include <execution>
 #include <filesystem>
+#include <cppitertools/combinations_with_replacement.hpp>
+#include <SIR_SBM/common.hpp>
+#include <SIR_SBM/epidemiological/epidemiological.hpp>
+#include <SIR_SBM/simulation/sim_param.hpp>
+#include <SIR_SBM/graph/graph.hpp>
+#include <SIR_SBM/vector/vector.hpp>
+#end
+
+#src
 #include <fstream>
+#include <execution>
+#include <SIR_SBM/vector/routines.hpp>
 #end
 namespace SIR_SBM {
 struct Sim_Result {
@@ -136,7 +141,7 @@ private:
     std::vector<uint32_t> connection_infections(N_connections, 0);
     uint32_t con_idx = 0;
     for (auto comb :
-         iter::combinations_with_replacement(make_iota(N_partitions), 2)) {
+         iter::combinations_with_replacement(make_iota<uint32_t>(N_partitions), 2)) {
       // forward
       auto from = comb[0];
       auto to = comb[1];
