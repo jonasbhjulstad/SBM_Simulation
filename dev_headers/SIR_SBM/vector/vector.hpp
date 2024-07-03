@@ -8,6 +8,51 @@
 namespace SIR_SBM {
 
 template <typename T>
+struct LinVec1D
+{
+    std::unique_ptr<T[]> data;
+    uint32_t N;
+
+    LinVec1D(uint32_t N) : N(N)
+    {
+        data = std::make_unique<T[]>(N);
+    }
+
+    T &operator()(uint32_t i)
+    {
+        return data.get()[i];
+    }
+    T operator()(uint32_t i) const
+    {
+        return data.get()[i];
+    }
+
+    uint32_t size() const
+    {
+        return N;
+    }
+
+    operator Vec1D<T>()
+    {
+        Vec1D<T> result(N);
+        for (uint32_t i = 0; i < N; i++)
+        {
+            result[i] = data.get()[i];
+        }
+        return result;
+    }
+
+    LinVec1D<T> operator+=(const Vec1D<T>& other)
+    {
+        for (uint32_t i = 0; i < N; i++)
+        {
+            data.get()[i] += other(i);
+        }
+        return *this;
+    }
+}
+
+template <typename T>
 struct Vec1DView
 {
     std::unique_ptr<T[]>& data;

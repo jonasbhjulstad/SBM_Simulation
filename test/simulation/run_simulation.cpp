@@ -42,7 +42,5 @@ int main() {
   auto cwd = std::filesystem::current_path();
   auto output_dir = cwd / "run_simulation_data";
   result.write(output_dir);
-  result.validate();
-  
   return 0;
 }

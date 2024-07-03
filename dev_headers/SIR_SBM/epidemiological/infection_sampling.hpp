@@ -58,9 +58,16 @@ std::vector<uint32_t> sample_infections(
       contact_events.column_view(t_idx), N_partitions, p_idx);
 
   auto new_infs = get_new_infections(population_count, p_idx, t_idx);
+  if (new_infs)
+  {
   auto inf_index_samples =
       discrete_finite_sample(rng, connection_contacts, new_infs);
   return count_occurrences(inf_index_samples, 2 * N_connections);
+  }
+  else
+  {
+    return std::vector<uint32_t>(2 * N_connections, 0);
+  }
 }
 
 LinVec2D<uint32_t> simulation_sample_infections(

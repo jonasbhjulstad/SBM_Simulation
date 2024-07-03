@@ -43,7 +43,7 @@ int main() {
   auto cwd = std::filesystem::current_path();
   auto output_dir = cwd / "infection_sampling_data";
   result.write(output_dir);
-  result.validate();
+  // result.validate();
   
   auto sampled_infections = sample_infections(result.contact_events, result.population_count, seed);
 

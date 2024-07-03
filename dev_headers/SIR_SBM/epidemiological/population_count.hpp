@@ -76,9 +76,16 @@ partition_population_count(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
 
 uint32_t get_new_infections(const Vec2DView<Population_Count> &pop_count,
                             uint32_t p_idx, uint32_t t_idx) {
-  auto dI = pop_count(p_idx, t_idx).I - pop_count(p_idx, t_idx).I;
-  auto dR = pop_count(p_idx, t_idx).R - pop_count(p_idx, t_idx).R;
-  return dI + dR;
+  auto dI = pop_count(p_idx, t_idx+1).I - pop_count(p_idx, t_idx).I;
+  auto dR = pop_count(p_idx, t_idx+1).R - pop_count(p_idx, t_idx).R;
+  if (dI > dR)
+  {
+    return dI - dR;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 
