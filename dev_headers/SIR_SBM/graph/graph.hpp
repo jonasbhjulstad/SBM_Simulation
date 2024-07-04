@@ -7,7 +7,7 @@
 #end
 #src
 #include <execution>
-#include <SIR_SBM/vector/routines.hpp>
+#include <SIR_SBM/vector/vector.hpp>
 #end
 namespace SIR_SBM {
 typedef std::pair<uint32_t, uint32_t> Edge_t;

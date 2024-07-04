@@ -39,11 +39,11 @@ Vec2D<T> read_csv(const std::filesystem::path &path, uint32_t N0,
 }
 
 template <typename T = int>
-LinVec3D<T> read_csv(const std::filesystem::path &file_prefix,
+Vec3D<T> read_csv(const std::filesystem::path &file_prefix,
                                     int N0, int N1, int N2) {
   std::ifstream f;
   // std::vector<int> result(N0 * N1 * N2);
-  LinVec3D<T> result(N0, N1, N2);
+  auto result = make_Vec3D<T>(N0, N1, N2);
 
   for (int i = 0; i < N0; i++) {
     std::string filename = file_prefix.string() + std::to_string(i) + ".csv";
@@ -59,9 +59,9 @@ LinVec3D<T> read_csv(const std::filesystem::path &file_prefix,
       int n2 = 0;
       while (std::getline(ss, cell, ',')) {
         if constexpr (std::is_same_v<T, int> || std::is_same_v<T, uint32_t>)
-          result(i, n1, n2) = std::stoi(cell);
+          result[i][n1][n2] = std::stoi(cell);
         else if constexpr (std::is_same_v<T, double>)
-          result(i, n1, n2) = std::stod(cell);
+          result[i][n1][n2] = std::stod(cell);
         n2++;
       }
       n1++;

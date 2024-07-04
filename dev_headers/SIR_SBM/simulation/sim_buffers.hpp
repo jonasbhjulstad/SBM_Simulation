@@ -2,17 +2,17 @@
 #hdr
 #include <SIR_SBM/common.hpp>
 #include <SIR_SBM/epidemiological/epidemiological.hpp>
-#include <SIR_SBM/utils/exceptions.hpp>
-#include <SIR_SBM/graph/graph.hpp>
 #include <SIR_SBM/epidemiological/population_count.hpp>
+#include <SIR_SBM/graph/graph.hpp>
 #include <SIR_SBM/simulation/sim_param.hpp>
 #include <SIR_SBM/simulation/sim_result.hpp>
 #include <SIR_SBM/sycl/sycl_routines.hpp>
 #include <SIR_SBM/sycl/sycl_validate.hpp>
+#include <SIR_SBM/utils/exceptions.hpp>
 #end
 
 #src
-#include <SIR_SBM/vector/routines.hpp>
+#include <SIR_SBM/vector/vector.hpp>
 #end
 
 namespace SIR_SBM {
@@ -26,21 +26,22 @@ struct Sim_Buffers {
         N_con_largest(G.largest_connection_size()),
         N_part_largest(G.largest_partition_size()),
         // data initialization
-        ecc_vec(get_vector_sizes(G.edges)), vpc_vec(get_vector_sizes(G.vertices)),
+        ecc_vec(get_vector_sizes(G.edges)),
+        vpc_vec(get_vector_sizes(G.vertices)),
         rng_vec(generate_rngs<oneapi::dpl::ranlux48>(p.seed, p.N_sims)),
         // buffer initialization
         ecc(ecc_vec.data(), G.N_connections()),
         vpc(vpc_vec.data(), G.N_partitions()), rngs(rng_vec.data(), p.N_sims),
         state(sycl::range<3>(p.N_sims, G.N_vertices(), p.Nt_alloc)),
-        contact_events(
-            result.contact_events.data.get(),
-            sycl::range<3>(p.N_sims, G.N_connections() * 2, p.Nt)),
-        population_count(result.population_count.data.get(),
+        contact_events(result.contact_events.get(),
+                       sycl::range<3>(p.N_sims, G.N_connections() * 2, p.Nt)),
+        population_count(result.population_count.get(),
                          sycl::range<3>(p.N_sims, G.N_partitions(), p.Nt + 1)),
         edges(make_buffer<Edge_t, 1>(q, G.flat_edges(),
                                      sycl::range<1>(G.N_edges()))) {
     events.push_back(buffer_fill(q, state, SIR_State::Susceptible));
-    events.push_back(zero_fill(q, contact_events, contact_events.get_range(), sycl::range<3>(0,0,0)));
+    events.push_back(zero_fill(q, contact_events, contact_events.get_range(),
+                               sycl::range<3>(0, 0, 0)));
   }
   static std::shared_ptr<Sim_Buffers> make(sycl::queue &q, const SBM_Graph &G,
                                            const Sim_Param &p,
@@ -53,7 +54,6 @@ struct Sim_Buffers {
   template <typename... Ts>
   using Shared_Tup = std::tuple<std::shared_ptr<Ts>...>;
 #end
-
 
   void wait() const { sycl::event::wait(events); }
 
@@ -72,7 +72,8 @@ struct Sim_Buffers {
   sycl::buffer<oneapi::dpl::ranlux48, 1> rngs;
 
   // sizes
-  uint32_t N_vertices, N_sims, Nt, Nt_alloc, N_edges, N_partitions, N_connections;
+  uint32_t N_vertices, N_sims, Nt, Nt_alloc, N_edges, N_partitions,
+      N_connections;
   uint32_t N_con_largest, N_part_largest;
   void validate(sycl::queue &q) {
     validate_vpc(q);
@@ -84,7 +85,6 @@ struct Sim_Buffers {
   }
 
 private:
-
   void buffer_copy_init(sycl::queue &q, const SBM_Graph &G,
                         const Sim_Param &p) {}
 

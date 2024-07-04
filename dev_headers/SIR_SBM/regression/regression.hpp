@@ -9,7 +9,7 @@
 
 #src
 #include <SIR_SBM/vector/vector.hpp>
-#include <SIR_SBM/vector/routines.hpp>
+#include <SIR_SBM/vector/vector.hpp>
 #include <cppitertools/combinations_with_replacement.hpp>
 #end
 namespace SIR_SBM {
@@ -58,31 +58,9 @@ regression_data_from_simulations(const std::filesystem::path &filenameprefix,
 
   using namespace casadi;
 
-  auto to_double = [](const std::vector<uint32_t> &vec) {
-    std::vector<double> result(vec.size());
-    for(int i = 0; i < vec.size(); i++)
-    {
-      result[i] = static_cast<double>(vec[i]);
-    }
-    return result;
-  };
-  auto linvec_to_dm = [to_double](LinVec3D<uint32_t> &vec, uint32_t start, uint32_t end) {
-    Vec2D<double> result(vec.N0*vec.N1, std::vector<double>(vec.N2));
-    for(int i = start; i < end; i++)
-    {
-      Vec2DView<uint32_t> row = vec(i);
-      for(int j = 0; j < vec.N1; j++)
-      {
-        result[i*vec.N1 + j] = to_double(row(j));
-      }
-    }
-    return DM(result);
-  };
+  auto population_counts = DM(vstack(dtype_convert<uint32_t, double>(community_state)));
+  auto infection_counts = DM(vstack(dtype_convert<uint32_t, double>(infection_count)));
 
-  DM population_counts =
-      linvec_to_dm(community_state, 0, community_state.N2 - 1);
-
-  DM infection_counts = linvec_to_dm(infection_count, 0, infection_count.N2);
 
   auto [population_sources, population_targets] = connection_expand_population(
       std::make_tuple(population_counts, infection_counts),

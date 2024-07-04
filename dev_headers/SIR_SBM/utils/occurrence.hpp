@@ -5,7 +5,7 @@
 #end
 #src
 #include <unordered_map>
-#include <SIR_SBM/vector/routines.hpp>
+#include <SIR_SBM/vector/vector.hpp>
 #end
 namespace SIR_SBM
 {

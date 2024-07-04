@@ -1,37 +1,45 @@
 #pragma once
 #hdr
-#include <filesystem>
-#include <cppitertools/combinations_with_replacement.hpp>
 #include <SIR_SBM/common.hpp>
 #include <SIR_SBM/epidemiological/epidemiological.hpp>
-#include <SIR_SBM/simulation/sim_param.hpp>
 #include <SIR_SBM/graph/graph.hpp>
+#include <SIR_SBM/simulation/sim_param.hpp>
 #include <SIR_SBM/vector/vector.hpp>
+#include <cppitertools/combinations_with_replacement.hpp>
+#include <filesystem>
 #end
 
 #src
-#include <fstream>
+#include <SIR_SBM/vector/vector.hpp>
 #include <execution>
-#include <SIR_SBM/vector/routines.hpp>
+#include <fstream>
 #end
 namespace SIR_SBM {
 struct Sim_Result {
   explicit Sim_Result(const Sim_Param &p, const SBM_Graph &G)
-      : contact_events(p.N_sims, G.N_connections() * 2, p.Nt),
-        population_count(p.N_sims, G.N_partitions(), p.Nt + 1),
+      : contact_events(make_shared_array<uint32_t>(
+            p.N_sims * G.N_connections() * 2 * p.Nt)),
+        population_count(make_shared_array<Population_Count>(
+            p.N_sims * G.N_partitions() * p.Nt + 1)),
         N_partitions(G.N_partitions()), N_connections(G.N_connections()),
-        N_sims(p.N_sims), Nt(p.Nt) {}
+        N_sims(p.N_sims), Nt(p.Nt), N_pop_count(p.N_sims*G.N_partitions()*(p.Nt+1)), N_contact_events(p.N_sims*G.N_connections()*2*p.Nt) {}
   void resize(const Sim_Param &p, const SBM_Graph &G) {
-    contact_events = LinVec3D<uint32_t>(p.N_sims, G.N_connections() * 2, p.Nt);
-    population_count =
-        LinVec3D<Population_Count>(p.N_sims, G.N_partitions(), p.Nt + 1);
+    contact_events =
+        make_shared_array<uint32_t>(p.N_sims * G.N_connections() * 2 * p.Nt);
+    population_count = make_shared_array<Population_Count>(
+        p.N_sims * G.N_partitions() * p.Nt + 1);
     N_partitions = G.N_partitions();
     N_connections = G.N_connections();
     N_sims = p.N_sims;
+    N_pop_count = p.N_sims * G.N_partitions() * (p.Nt + 1);
+    N_contact_events = p.N_sims * G.N_connections() * 2 * p.Nt;
+
     Nt = p.Nt;
   }
-  LinVec3D<uint32_t> contact_events;
-  LinVec3D<Population_Count> population_count;
+  std::shared_ptr<uint32_t> contact_events;
+  std::shared_ptr<Population_Count> population_count;
+  uint32_t N_pop_count;
+  uint32_t N_contact_events;
   // Vec3D<uint32_t> contact_events;
   // LinearVector3D<Population_Count> population_count;
 
@@ -48,7 +56,9 @@ struct Sim_Result {
       f.open(dir / ("contact_events_" + std::to_string(sim_idx) + ".csv"));
       for (int t_idx = 0; t_idx < Nt; t_idx++) {
         for (int c_idx = 0; c_idx < 2 * N_connections; c_idx++) {
-          f << contact_events(sim_idx, c_idx, t_idx) << ",";
+          f << contact_events.get()[get_linear_idx(
+                   {sim_idx, c_idx, t_idx}, {N_sims, 2 * N_connections, Nt})]
+            << ",";
         }
         f << std::endl;
       }
@@ -65,7 +75,8 @@ struct Sim_Result {
       f.open(dir / ("population_count_" + std::to_string(sim_idx) + ".csv"));
       for (int t_idx = 0; t_idx < Nt; t_idx++) {
         for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
-          pc = population_count(sim_idx, p_idx, t_idx);
+          pc = population_count.get()[get_linear_idx(
+              {sim_idx, p_idx, t_idx}, {N_sims, N_partitions, Nt})];
           f << pc.S << "," << pc.I << "," << pc.R << ",";
         }
         f << std::endl;
@@ -91,14 +102,11 @@ struct Sim_Result {
 
 private:
   void validate_partition_size(uint32_t sim_idx) const {
-    std::vector<uint32_t> start_pop_size(population_count.size());
-    for(int i = 0; i < population_count.size(); i++)
-    {
-
-    }
+    std::vector<uint32_t> start_pop_size(N_pop_count);
     for (int t = 0; t < Nt + 1; t++) {
       for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
-        auto pc = population_count(sim_idx, p_idx, t);
+        auto pc = population_count.get()[get_linear_idx(
+            {sim_idx, p_idx, t}, {N_sims, N_partitions, Nt})];
         if (pc.S + pc.I + pc.R != start_pop_size[p_idx]) {
           std::string msg = "Inconsistent population count for partition " +
                             std::to_string(p_idx) + " at time " +
@@ -112,10 +120,12 @@ private:
   std::vector<int> get_t_dI(uint32_t sim_idx, uint32_t t_idx) const {
     std::vector<int> t_dI(N_partitions, 0);
     for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
-      auto R_diff = population_count(sim_idx, p_idx, t_idx + 1).R -
-                    population_count(sim_idx, p_idx, t_idx).R;
-      auto I_diff = population_count(sim_idx, p_idx, t_idx + 1).I -
-                    population_count(sim_idx, p_idx, t_idx).I;
+      auto idx_t =
+          get_linear_idx({sim_idx, p_idx, t_idx}, {N_sims, N_partitions, Nt});
+      auto idx_t1 = get_linear_idx({sim_idx, p_idx, t_idx + 1},
+                                   {N_sims, N_partitions, Nt});
+      auto R_diff = population_count.get()[idx_t1].R - population_count.get()[idx_t].R;
+      auto I_diff = population_count.get()[idx_t1].I - population_count.get()[idx_t].I;
       t_dI[p_idx] = I_diff + R_diff;
     }
     return t_dI;
@@ -140,15 +150,18 @@ private:
                                                     uint32_t t_idx) const {
     std::vector<uint32_t> connection_infections(N_connections, 0);
     uint32_t con_idx = 0;
-    for (auto comb :
-         iter::combinations_with_replacement(make_iota<uint32_t>(N_partitions), 2)) {
+    for (auto comb : iter::combinations_with_replacement(
+             make_iota<uint32_t>(N_partitions), 2)) {
       // forward
       auto from = comb[0];
       auto to = comb[1];
 
-      connection_infections[to] += contact_events(sim_idx, 2 * con_idx, t_idx);
-      connection_infections[from] +=
-          contact_events(sim_idx, 2 * con_idx + 1, t_idx);
+      auto con_to_idx = get_linear_idx({sim_idx, 2 * con_idx, t_idx},
+                                       {N_sims, 2 * N_connections, Nt});
+      auto con_from_idx = get_linear_idx({sim_idx, 2 * con_idx + 1, t_idx},
+                                         {N_sims, 2 * N_connections, Nt});
+      connection_infections[to] += contact_events.get()[con_to_idx];
+      connection_infections[from] += contact_events.get()[con_from_idx];
       con_idx++;
     }
     return connection_infections;

@@ -1,241 +1,145 @@
 #pragma once
 #hdr
-#include <SIR_SBM/common.hpp>
 #include <SIR_SBM/vector/types.hpp>
+#include <cstdint>
+#include <tuple>
 #include <memory>
+#end
+#hdr
+#include <numeric>
+#end
+#hdr
+namespace SIR_SBM {
+template <typename T> using Vec2D = std::vector<std::vector<T>>;
+template <typename T> using Vec3D = std::vector<std::vector<std::vector<T>>>;
+} // namespace SIR_SBM
 #end
 
 namespace SIR_SBM {
 
 template <typename T>
-struct LinVec1D
-{
-    std::unique_ptr<T[]> data;
-    uint32_t N;
-
-    LinVec1D(uint32_t N) : N(N)
-    {
-        data = std::make_unique<T[]>(N);
-    }
-
-    T &operator()(uint32_t i)
-    {
-        return data.get()[i];
-    }
-    T operator()(uint32_t i) const
-    {
-        return data.get()[i];
-    }
-
-    uint32_t size() const
-    {
-        return N;
-    }
-
-    operator Vec1D<T>()
-    {
-        Vec1D<T> result(N);
-        for (uint32_t i = 0; i < N; i++)
-        {
-            result[i] = data.get()[i];
-        }
-        return result;
-    }
-
-    LinVec1D<T> operator+=(const Vec1D<T>& other)
-    {
-        for (uint32_t i = 0; i < N; i++)
-        {
-            data.get()[i] += other(i);
-        }
-        return *this;
-    }
+Vec3D<T> make_Vec3D(uint32_t N0, uint32_t N1, uint32_t N2) {
+  return Vec3D<T>(N0, Vec2D<T>(N1, std::vector<T>(N2, T{})));
 }
 
 template <typename T>
-struct Vec1DView
-{
-    std::unique_ptr<T[]>& data;
-    uint32_t offset;
-    uint32_t N;
-    uint32_t stride;
-    Vec1DView(std::unique_ptr<T[]>& data, uint32_t offset, uint32_t N, uint32_t stride = 1) : data(data), offset(offset), N(N), stride(stride) {}
-
-    T &operator()(uint32_t i)
-    {
-        return data.get()[stride*i + offset];
-    }
-    T operator()(uint32_t i) const
-    {
-        return data.get()[stride*i + offset];
-    }
-    Vec1DView<T> slice(uint32_t start, uint32_t end)
-    {
-        return Vec1DView<T>(data, end - start);
-    }
-    Vec1DView<T> slice(uint32_t start)
-    {
-        return Vec1DView<T>(data, N - start);
-    }
-    uint32_t size() const
-    {
-        return N;
-    }
-
-    Vec1DView<T> operator+=(const Vec1DView<T>& other)
-    {
-        for (uint32_t i = 0; i < N; i++)
-        {
-            data.get()[i + offset] += other(i);
-        }
-        return *this;
-    }
-
-    Vec1DView<T> operator+=(const std::vector<T>& other)
-    {
-        for (uint32_t i = 0; i < N; i++)
-        {
-            data.get()[i + offset] += other[i];
-        }
-        return *this;
-    }
-
-    operator std::vector<T>()
-    {
-        std::vector<T> result(N);
-        for (uint32_t i = 0; i < N; i++)
-        {
-            result[i] = data.get()[i + offset];
-        }
-        return result;
-    }
-};
+std::tuple<uint32_t, uint32_t, uint32_t> get_vector_shape(const Vec3D<T> &vec) {
+  return std::make_tuple(vec.size(), vec[0].size(), vec[0][0].size());
+}
+// for Vec2D
+template <typename T>
+std::tuple<uint32_t, uint32_t> get_vector_shape(const Vec2D<T> &vec) {
+  return std::make_tuple(vec.size(), vec[0].size());
+}
 
 template <typename T>
-struct Vec2DView
-{
-    std::unique_ptr<T[]>& data;
-    uint32_t offset;
-    uint32_t N0, N1;
-    Vec2DView(std::unique_ptr<T[]>& data, uint32_t offset, uint32_t N0, uint32_t N1) : data(data), offset(offset), N0(N0), N1(N1) {}
+std::vector<uint32_t> get_vector_sizes(const Vec2D<T> &vecs) {
+  std::vector<uint32_t> sizes(vecs.size());
+  std::transform(vecs.begin(), vecs.end(), sizes.begin(),
+                 [](const std::vector<T> &vec) { return vec.size(); });
+  return sizes;
+}
+template <typename T> std::vector<T> vector_merge(const Vec2D<T> &vecs) {
+  std::vector<T> result;
+  int N = std::accumulate(
+      vecs.begin(), vecs.end(), 0L,
+      [](uint32_t a, const std::vector<T> &b) { return a + b.size(); });
+  result.reserve(N);
+  for (const auto &vec : vecs) {
+    result.insert(result.end(), vec.begin(), vec.end());
+  }
+  return result;
+}
 
-    T &operator()(uint32_t i, uint32_t j)
-    {
-        return data.get()[offset + N0*i + j];
-    }
-    T operator()(uint32_t i, uint32_t j) const
-    {
-        return data.get()[offset + N0*i + j];
-    }
+template <typename T = uint32_t> std::vector<T> make_iota(uint32_t N) {
+  std::vector<T> result(N);
+  std::iota(result.begin(), result.end(), 0);
+  return result;
+}
 
-    const Vec1DView<T> column_view(uint32_t j) const
-    {
-        return Vec1DView<T>(data, offset + j, N0, N1);
-    }
+template <typename T> Vec2D<T> vstack(const Vec3D<T> &data) {
+  auto sizes = get_vector_sizes(data);
+  auto N = std::accumulate(sizes.begin(), sizes.end(), 0);
+  Vec2D<T> result(N);
 
-    Vec1DView<T> operator()(uint32_t i)
-    {
-        return Vec1DView<T>(data, offset + i*N0, N0*N1 - i*N0);
+  int idx = 0;
+  for (const auto &vec : data) {
+    for (const auto &val : vec) {
+      result[idx++] = val;
     }
+  }
+  return result;
+}
 
-    uint32_t size() const
-    {
-        return N0 * N1;
+template <typename T0, typename T1>
+Vec3D<T1> dtype_convert(const Vec3D<T0> &data) {
+  Vec3D<T1> result =
+      make_Vec3D<T1>(data.size(), data[0].size(), data[0][0].size());
+  for (int i = 0; i < data.size(); i++) {
+    for (int j = 0; j < data[0].size(); j++) {
+      for (int k = 0; k < data[0][0].size(); k++) {
+        result[i][j][k] = static_cast<T1>(data[i][j][k]);
+      }
     }
-
-    operator Vec2D<T>()
-    {
-        Vec2D<T> result(N0);
-        for (uint32_t i = 0; i < N0; i++)
-        {
-            result[i] = Vec1DView<T>(data, offset + i*N1, N1);
-        }
-        return result;
-    }
-};
-
-
-template <typename T>
-struct LinVec2D
-{
-    std::unique_ptr<T[]> data;
-    uint32_t N0, N1;
-    LinVec2D(uint32_t N0, uint32_t N1) : N0(N0), N1(N1)
-    {
-        data = std::make_unique<T[]>(N0 * N1);
-    }
-    T &operator()(uint32_t i, uint32_t j)
-    {
-        return data.get()[i * N1 + j];
-    }
-    T operator()(uint32_t i, uint32_t j) const
-    {
-        return data.get()[i*N1 + j];
-    }
-    Vec1DView<T> operator()(uint32_t row)
-    {
-        return Vec1DView<T>(data,  N0*row, N1);
-    }
-    uint32_t size() const
-    {
-        return N0 * N1;
-    }
-
-    operator Vec2D<T>()
-    {
-        Vec2D<T> result(N0, std::vector<T>(N1));
-        for (uint32_t i = 0; i < N0; i++)
-        {
-            result[i] = Vec1DView<T>(data, i*N1, N1);
-        }
-        return result;
-    }
-
-};
+  }
+  return result;
+}
 
 template <typename T>
-struct LinVec3D
+void vector_add(std::vector<T> &data, const std::vector<T> &other) {
+  std::transform(data.begin(), data.end(), other.begin(), data.begin(),
+                 std::plus<T>());
+}
+
+template <typename T>
+std::vector<T> get_column(const Vec2D<T> &data, uint32_t col) {
+  std::vector<T> result(data.size());
+  for (int i = 0; i < data.size(); i++) {
+    result[i] = data[i][col];
+  }
+  return result;
+}
+template <typename T>
+std::shared_ptr<T> make_shared_array(std::size_t N)
 {
-    std::unique_ptr<T[]> data;
-    uint32_t N0, N1, N2;
-    LinVec3D(uint32_t N0, uint32_t N1, uint32_t N2) : N0(N0), N1(N1), N2(N2)
-    {
-        data = std::make_unique<T[]>(N0 * N1 * N2);
+  return std::make_shared<T>(N);
+}
+template <typename T> std::vector<T> get_linear_vector(const Vec3D<T> &data) {
+  std::vector<T> result(data.size() * data[0].size() * data[0][0].size());
+  for (int i = 0; i < data.size(); i++) {
+    for (int j = 0; j < data[0].size(); j++) {
+      for (int k = 0; k < data[0][0].size(); k++) {
+        result[i * data[0].size() * data[0][0].size() + j * data[0][0].size() +
+               k] = data[i][j][k];
+      }
     }
-    T &operator()(uint32_t i, uint32_t j, uint32_t k)
-    {
-        return data.get()[i * N1 * N2 + j * N2 + k];
-    }
-    T operator()(uint32_t i, uint32_t j, uint32_t k) const
-    {
-        return data.get()[i * N1 * N2 + j * N2 + k];
-    }
-    Vec2DView<T> operator()(uint32_t row)
-    {
-        return Vec2DView<T>(data,  N0*row, N1, N2);
-    }
-    uint32_t size() const
-    {
-        return N0 * N1 * N2;
-    }
+  }
+  return result;
+}
 
-    operator Vec3D<T>()
-    {
-        Vec3D<T> result(N0);
-        for (uint32_t i = 0; i < N0; i++)
-        {
-            result[i] = Vec2DView<T>(data, i*N1*N2, N1, N2);
-        }
-        return result;
-    }
+uint32_t get_linear_idx(std::tuple<uint32_t, uint32_t> idx,
+                        std::tuple<uint32_t, uint32_t> shape) {
+  auto [N0, N1] = shape;
+  auto [i, j] = idx;
+  return i * N1 + j;
+}
 
-    operator std::vector<T>()
-    {
-        std::vector<T> result(N0*N1*N2);
-        std::copy(data.get(), data.get() + N0*N1*N2, result.begin());
-        return result;
-    }
+uint32_t get_linear_idx(std::tuple<uint32_t, uint32_t, uint32_t> idx,
+                        std::tuple<uint32_t, uint32_t, uint32_t> shape) {
+  auto [N0, N1, N2] = shape;
+  auto [i, j, k] = idx;
+  return i * N1 * N2 + j * N2 + k;
+}
 
-};
+uint32_t get_row_offset(uint32_t row, std::tuple<uint32_t, uint32_t> shape) {
+  auto [N0, N1] = shape;
+  return row * N1;
+}
+
+uint32_t get_row_offset(uint32_t row,
+                        std::tuple<uint32_t, uint32_t, uint32_t> shape) {
+  auto [N0, N1, N2] = shape;
+  return row * N1 * N2;
+}
 
 } // namespace SIR_SBM

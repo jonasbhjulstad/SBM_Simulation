@@ -18,7 +18,7 @@ enum class SIR_State : char {
 
 struct Population_Count {
   int S, I, R;
-  Population_Count() = default;
+  Population_Count(): S{0}, I{0}, R{0}{}
   Population_Count(int S, int I, int R) : S(S), I(I), R(R) {}
   Population_Count(const std::array<int, 3> &arr)
       : S(arr[0]), I(arr[1]), R(arr[2]) {}
