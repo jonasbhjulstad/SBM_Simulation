@@ -37,8 +37,8 @@ file(GLOB_RECURSE subfolder_headers "${PROJECT_SOURCE_DIR}/dev_headers/SIR_SBM/$
 add_library(SIR_SBM_${subfolder_name}_dev_headers ${subfolder_headers})
 set_target_properties(SIR_SBM_${subfolder_name}_dev_headers PROPERTIES LINKER_LANGUAGE CXX)
 endfunction()
-
-
+set(CMAKE_CXX_SCAN_FOR_MODULES ON)
+add_subdirectory(modules)
 
 # function(target_link_sublibrary subfolder_name link_sublibraries)
 # set(libraries "")
