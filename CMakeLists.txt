@@ -3,86 +3,21 @@ cmake_minimum_required(VERSION 3.22)
 
 #c++20
 project(SIR_SBM)
-set(SIR_SBM_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/)
-set(SIR_SBM_LIBRARIES "")
 add_compile_options("-fsycl")
 add_compile_options("-fcolor-diagnostics")
 add_compile_options("-Wfatal-errors")
 option(SIR_SBM_USE_GPU "Use GPU" OFF)
-#set policy CMP0125 to new
 cmake_policy(SET CMP0135 NEW)
 include(cmake/external_packages.cmake)
 include(cmake/default_targets.cmake)
-#export compile commands
+
+#Core Library
+file(GLOB_RECURSE ${PROJECT_NAME}_SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.cpp)
+add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCE_FILES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_EXTERNAL_LIBRARIES})
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-#make dir
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/include/SIR_SBM/)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/src/SIR_SBM/)
-set(SIR_SBM_DEV_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/dev_headers/SIR_SBM/)
-set(SIR_SBM_INCLUDE_DIR ${PROJECT_BINARY_DIR}/include/)
 set(CMAKE_CXX_STANDARD 20)
-set(SIR_SBM_LIBRARY_INCLUDE_DIRS ${SIR_SBM_INCLUDE_DIR} ${SYCL_INCLUDE_DIR} /usr/include/c++/11/)
-file(GLOB DEV_HEADERS ${SIR_SBM_DEV_INCLUDE_DIR}/*.hpp)
-#get ${PROJECT_BINARY_DIR}/include/SIR_SBM/dev_header_name.hpp/.cpp names
-include(${PROJECT_SOURCE_DIR}/cmake/lzz_routines.cmake)
-include_directories(${PROJECT_BINARY_DIR}/include)
-
-
-
-function(add_lzz_sublibrary subfolder_name)
-add_lzz_library(SIR_SBM_${subfolder_name} "${PROJECT_SOURCE_DIR}/dev_headers/SIR_SBM/${subfolder_name}")
-target_link_libraries(SIR_SBM_${subfolder_name} PUBLIC ${external_libraries})
-target_include_directories(SIR_SBM_${subfolder_name} PUBLIC ${SIR_SBM_INCLUDE_DIR} ${SIR_SBM_EXTERNAL_INCLUDE_DIRS})
-file(GLOB_RECURSE subfolder_headers "${PROJECT_SOURCE_DIR}/dev_headers/SIR_SBM/${subfolder_name}/*.hpp")
-add_library(SIR_SBM_${subfolder_name}_dev_headers ${subfolder_headers})
-set_target_properties(SIR_SBM_${subfolder_name}_dev_headers PROPERTIES LINKER_LANGUAGE CXX)
-endfunction()
-
-
-
-# function(target_link_sublibrary subfolder_name link_sublibraries)
-# set(libraries "")
-# foreach(sublibrary ${link_sublibraries})
-#     list(APPEND libraries "SIR_SBM_${sublibrary}")
-# endforeach()
-# target_link_libraries(SIR_SBM_${subfolder_name} PUBLIC ${libraries})
-# target_link_libraries(SIR_SBM_${subfolder_name}_dev_headers PUBLIC ${libraries})
-# endfunction()
-
-# function(external_link_sublibrary subfolder_name external_libraries)
-# target_link_libraries(SIR_SBM_${subfolder_name} PUBLIC ${external_libraries})
-# target_link_libraries(SIR_SBM_${subfolder_name}_dev_headers PUBLIC ${external_libraries})
-# endfunction()
-
-
-# add_lzz_sublibrary(utils)
-# external_link_sublibrary(utils oneDPL TBB)
-# add_lzz_sublibrary(vector)
-# add_lzz_sublibrary(graph)
-# external_link_sublibrary(graph "cppitertools::cppitertools;TBB::tbb")
-# target_link_sublibrary(graph "utils;vector")
-# add_lzz_sublibrary(regression)
-# external_link_sublibrary(regression "casadi;Eigen3::Eigen;cppitertools::cppitertools")
-# target_link_sublibrary(regression "vector")
-# add_lzz_sublibrary(sycl)
-# target_compile_options(SIR_SBM_sycl PUBLIC "-fsycl")
-# add_lzz_sublibrary(simulation)
-# target_link_sublibrary(simulation "graph;vector;sycl;utils")
-# external_link_sublibrary(simulation "cppitertools::cppitertools")
-# add_lzz_sublibrary(epidemiological)
-# target_link_sublibrary(epidemiological "utils;graph;vector;sycl")
-# external_link_sublibrary(epidemiological "cppitertools::cppitertools")
-# target_link_sublibrary(simulation "vector;epidemiological")
-
-
-# add_lzz_library(SIR_SBM "${PROJECT_SOURCE_DIR}/dev_headers/SIR_SBM/")
-# target_link_libraries(SIR_SBM PUBLIC ${SIR_SBM_EXTERNAL_LIBRARIES})
-# target_include_directories(SIR_SBM PUBLIC ${SIR_SBM_INCLUDE_DIR} ${SIR_SBM_EXTERNAL_INCLUDE_DIRS})
-# target_link_libraries(SIR_SBM PUBLIC "SIR_SBM_simulation;SIR_SBM_epidemiological;SIR_SBM_utils;SIR_SBM_graph;SIR_SBM_vector;SIR_SBM_sycl")
-
-# add_lzz_library(SIR_SBM_Regression "${PROJECT_SOURCE_DIR}/dev_headers/SIR_SBM/regression/")
-# target_link_libraries(SIR_SBM_Regression PRIVATE SIR_SBM casadi)
-# target_link_options(SIR_SBM PUBLIC "-fsycl")
-
 add_subdirectory(test)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

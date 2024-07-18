@@ -1,5 +1,3 @@
 function(configure_default_target target_name)
-target_link_libraries(${target_name} PUBLIC ${SIR_SBM_EXTERNAL_LIBRARIES})
-target_link_libraries(${target_name} PUBLIC SIR_SBM)
-target_include_directories(${target_name} PUBLIC ${SIR_SBM_INCLUDE_DIR})
+target_link_libraries(${target_name} PUBLIC ${PROJECT_NAME})
 endfunction()

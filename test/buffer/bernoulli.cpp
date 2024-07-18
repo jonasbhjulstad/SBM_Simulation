@@ -13,7 +13,7 @@ int main() {
   uint32_t seed = 123;
   sycl::buffer<oneapi::dpl::ranlux48> rngs(work_group_size * 10);
   buffer_copy(q, rngs,
-              generate_rngs<oneapi::dpl::ranlux48>(seed, work_group_size * 10));
+              generate_rngs_dpl(seed, work_group_size * 10));
 
   std::vector<float> nums_vec(work_group_size * 10, 0.0f);
   {
