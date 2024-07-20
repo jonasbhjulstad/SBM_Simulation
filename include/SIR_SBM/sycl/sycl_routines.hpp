@@ -1,6 +1,5 @@
 #pragma once
 
-#include <SIR_SBM/common.hpp>
 #include <sycl/sycl.hpp>
 
 namespace SIR_SBM {
@@ -29,8 +28,8 @@ void buffer_copy(sycl::queue &q, sycl::buffer<T, N> &buf,
 }
 
 template <typename T, int N = 1>
-sycl::event buffer_fill(sycl::queue& q, sycl::buffer<T, N>& buf, T val) {
-  return q.submit([&](sycl::handler& h) {
+sycl::event buffer_fill(sycl::queue &q, sycl::buffer<T, N> &buf, T val) {
+  return q.submit([&](sycl::handler &h) {
     auto acc = buf.template get_access<sycl::access::mode::write>(h);
     h.fill(acc, val);
   });
@@ -58,7 +57,8 @@ template <int N> void validate_range(sycl::range<N> r, sycl::range<N> r_buf) {
 }
 
 template <typename T>
-std::tuple<uint32_t, uint32_t, uint32_t> get_range(const sycl::buffer<T, 3> &buf) {
+std::tuple<uint32_t, uint32_t, uint32_t>
+get_range(const sycl::buffer<T, 3> &buf) {
   return std::make_tuple(buf.get_range()[0], buf.get_range()[1],
                          buf.get_range()[2]);
 }
@@ -88,14 +88,7 @@ sycl::event read_buffer(sycl::queue &q, sycl::buffer<T, N> &buf,
 // runs inplace infection on vertices at time t
 sycl::event zero_fill(sycl::queue &q, sycl::buffer<uint32_t, 3> &buf,
                       sycl::range<3> range, sycl::range<3> offset,
-                      sycl::event dep_event = {}) {
-  return q.submit([&](sycl::handler &h) {
-    h.depends_on(dep_event);
-    auto acc = sycl::accessor<uint32_t, 3, sycl::access::mode::read_write>(
-        buf, h, range, offset);
-    h.parallel_for(acc.get_range(), [=](sycl::id<3> idx) { acc[idx] = 0; });
-  });
-}
+                      sycl::event dep_event = {});
 template <typename T, uint32_t N>
 std::vector<T> read_buffer(sycl::queue &q, sycl::buffer<T, N> &buf,
                            sycl::event dep_event) {

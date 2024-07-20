@@ -10,11 +10,11 @@ Population_Count::Population_Count() : S{0}, I{0}, R{0} {}
 Population_Count::Population_Count(int S, int I, int R) : S(S), I(I), R(R) {}
 Population_Count::Population_Count(const std::array<int, 3> &arr)
     : S(arr[0]), I(arr[1]), R(arr[2]) {}
-Population_Count::operator+(const Population_Count &other) const {
+Population_Count Population_Count::operator+(const Population_Count &other) const {
   return Population_Count{S + other.S, I + other.I, R + other.R};
 }
 bool Population_Count::is_zero() const { return S == 0 && I == 0 && R == 0; }
-int &operator[](SIR_State s) {
+int &Population_Count::operator[](SIR_State s) {
   switch (s) {
   case SIR_State::Susceptible:
     return S;
@@ -153,6 +153,8 @@ sycl::event infect(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
       uint32_t e_offset = 0;
       for (int c_idx = 0; c_idx < N_connections; c_idx++) {
         auto N_connection_edges = ecc_acc[c_idx];
+        infected_count_acc[sycl::range<3>(sim_idx[0], 2 * c_idx, 0)] = 0;
+        infected_count_acc[sycl::range<3>(sim_idx[0], 2 * c_idx+1, 0)] = 0;
         for (int e_idx = e_offset; e_idx < e_offset + N_connection_edges;
              e_idx++) {
           auto edge = edges_acc[e_idx];

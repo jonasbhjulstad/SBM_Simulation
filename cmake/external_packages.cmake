@@ -23,4 +23,4 @@ GIT_TAG master
 OPTIONS
 "cppitertools_INSTALL_CMAKE_DIR \"share/cppitertools/cmake\""
 )
-set(${PROJECT_NAME}_EXTERNAL_LIBRARIES oneDPL TBB::tbb Eigen3::Eigen cppitertools::cppitertools casadi)
+set(${PROJECT_NAME}_EXTERNAL_PRIVATE_LIBRARIES TBB::tbb cppitertools::cppitertools)

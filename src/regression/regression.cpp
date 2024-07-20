@@ -1,7 +1,7 @@
 #include <SIR_SBM/regression/regression.hpp>
 #include <SIR_SBM/utils/csv.hpp>
-#include <cppitertools/combinations_with_replacement.hpp>
 #include <SIR_SBM/utils/numeric.hpp>
+#include <cppitertools/combinations_with_replacement.hpp>
 
 #include <fstream>
 
@@ -46,17 +46,15 @@ regression_data_from_simulations(const std::filesystem::path &filenameprefix,
                                  uint32_t N_communities, uint32_t N_connections,
                                  uint32_t N_sims, uint32_t Nt) {
 
-  auto community_state = read_csv(filenameprefix / "population_count_",
-                                  N_communities, N_sims, Nt + 1);
-  auto infection_count = read_csv(filenameprefix / "infected_count_",
-                                  N_connections * 2, N_sims, Nt);
+  auto community_state = read_csv_flat(filenameprefix / "population_count_",
+                                       N_communities, N_sims, Nt + 1);
+  auto infection_count = read_csv_flat(filenameprefix / "infected_count_",
+                                       N_connections * 2, N_sims, Nt);
 
   using namespace casadi;
 
-  auto population_counts =
-      DM(vstack(dtype_convert<uint32_t, double>(community_state)));
-  auto infection_counts =
-      DM(vstack(dtype_convert<uint32_t, double>(infection_count)));
+  auto population_counts = DM(community_state);
+  auto infection_counts = DM(infection_count);
 
   auto [population_sources, population_targets] = connection_expand_population(
       std::make_tuple(population_counts, infection_counts), N_connections);

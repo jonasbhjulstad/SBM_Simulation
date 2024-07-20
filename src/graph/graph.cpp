@@ -1,7 +1,7 @@
 #include <SIR_SBM/graph/graph.hpp>
 
 #include <SIR_SBM/utils/combination.hpp>
-#include <SIR_SBM/utils/random.hpp>
+#include <SIR_SBM/random/random.hpp>
 #include <SIR_SBM/utils/numeric.hpp>
 
 #include <cppitertools/combinations_with_replacement.hpp>
@@ -51,6 +51,13 @@ uint32_t SBM_Graph::N_vertices() const {
   return std::accumulate(
       vertices.begin(), vertices.end(), 0,
       [](auto sum, auto &elem) { return sum + elem.size(); });
+}
+
+std::vector<uint32_t> SBM_Graph::N_partition_vertices() const {
+  std::vector<uint32_t> result(vertices.size());
+  std::transform(vertices.begin(), vertices.end(), result.begin(),
+  [](auto &elem) { return elem.size(); });
+  return result;
 }
 uint32_t SBM_Graph::N_partitions() const { return vertices.size(); }
 uint32_t SBM_Graph::N_connections() const { return edges.size(); }

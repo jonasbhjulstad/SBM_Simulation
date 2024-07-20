@@ -1,44 +1,59 @@
-
-#include <SIR_SBM/common.hpp>
-#include <SIR_SBM/epidemiological/population_count.hpp>
-#include <SIR_SBM/simulation/sim_result.hpp>
-#include <SIR_SBM/utils/csv.hpp>
+#include <SIR_SBM/epidemiological/infection_sampling.hpp>
+#include <SIR_SBM/epidemiological/infection_count.hpp>
+#include <SIR_SBM/graph/indices.hpp>
+#include <SIR_SBM/random/random.hpp>
 #include <SIR_SBM/utils/numeric.hpp>
+#include <SIR_SBM/utils/occurrence.hpp>
 #include <cppitertools/combinations_with_replacement.hpp>
-#include <filesystem>
-#include <fstream>
-
-
 
 namespace SIR_SBM {
-uint32_t get_new_infections(const std::shared_ptr<Population_Count> &pop_count,
-                            uint32_t p_idx, uint32_t t_idx) {
-  auto dI = pop_count[p_idx][t_idx + 1].I - pop_count[p_idx][t_idx].I;
-  auto dR = pop_count[p_idx][t_idx + 1].R - pop_count[p_idx][t_idx].R;
-  if (dI > dR) {
-    return dI - dR;
-  } else {
-    return 0;
-  }
+
+Infection_Sampler::Infection_Sampler(uint32_t N_sims, uint32_t N_partitions,
+                                     uint32_t N_connections, uint32_t Nt)
+    : N_sims(N_sims), N_partitions(N_partitions), N_connections(N_connections),
+      Nt(Nt) {}
+uint32_t Infection_Sampler::partition_idx(uint32_t sim_idx, uint32_t p_idx,
+                                          uint32_t t_idx) const {
+  return get_partition_idx(sim_idx, p_idx, t_idx, N_partitions, Nt + 1);
 }
-std::vector<int> get_connection_indices(int N_partitions, int p_idx) {
+uint32_t Infection_Sampler::from_connection_idx(uint32_t sim_idx,
+                                                uint32_t con_idx,
+                                                uint32_t t_idx) const {
+  return get_from_connection_idx(sim_idx, con_idx, t_idx, N_connections, Nt);
+}
+
+uint32_t Infection_Sampler::to_connection_idx(uint32_t sim_idx,
+                                              uint32_t con_idx,
+                                              uint32_t t_idx) const {
+  return get_to_connection_idx(sim_idx, con_idx, t_idx, N_connections, Nt);
+}
+std::vector<int> Infection_Sampler::get_connection_indices(int p_idx) const {
   std::vector<int> result;
+  uint32_t con_idx = 0;
   for (auto comb :
        iter::combinations_with_replacement(make_iota(N_partitions), 2)) {
     auto from = comb[0];
     auto to = comb[1];
     if (to == p_idx)
-      result.push_back(2 * to);
+      result.push_back(2 * con_idx);
     if (from == p_idx)
-      result.push_back(2 * from + 1);
+      result.push_back(2 * con_idx + 1);
+    con_idx++;
   }
   return result;
 }
-
-std::vector<uint32_t>
-get_partition_connection_contacts(const Vec1D<uint32_t> &contact_events,
-                                  int N_partitions, int p_idx) {
-  auto indices = get_connection_indices(N_partitions, p_idx);
+std::vector<uint32_t> Infection_Sampler::get_t_connections(uint32_t sim_idx,
+                                                           uint32_t t) {
+  std::vector<uint32_t> result(2 * N_connections);
+  for (int c_idx = 0; c_idx < N_connections; c_idx++) {
+    result[2 * c_idx] = to_connection_idx(sim_idx, c_idx, t);
+    result[2 * c_idx + 1] = from_connection_idx(sim_idx, c_idx, t);
+  }
+  return result;
+}
+std::vector<uint32_t> Infection_Sampler::get_partition_connection_contacts(
+    const std::vector<uint32_t> &contact_events, int p_idx) const {
+  auto indices = get_connection_indices(p_idx);
   std::vector<uint32_t> result(indices.size());
   for (int c_idx = 0; c_idx < indices.size(); c_idx++) {
     result[c_idx] = contact_events[indices[c_idx]];
@@ -46,33 +61,17 @@ get_partition_connection_contacts(const Vec1D<uint32_t> &contact_events,
   return result;
 }
 
-std::vector<uint32_t> get_column(const std::shared_ptr<uint32_t>& data, std::tuple<uint32_t, uint32_t> idx, std::tuple<uint32_t, uint32_t, uint32_t> shape)
-{
-  auto [N0, N1, N2] = shape;
-  auto [n0, n2] = idx;
-  std::vector<uint32_t> result(N1);
-  for (int k = 0; k < N1; k++)
-  {
-    result[k] = data.get()[n0 * N1 * N2 + k * N2 + n2];
-  }
-  return result;
-}
+std::vector<uint32_t> Infection_Sampler::sample_infections(
+    const std::vector<uint32_t> &contact_events,
+    const std::vector<Population_Count> &population_count, uint32_t sim_idx,
+    uint32_t p_idx, uint32_t t_idx, std::mt19937 &rng) {
 
-std::vector<uint32_t>
-sample_infections(const std::shared_ptr<uint32_t> &contact_events,
-                  const std::shared_ptr<Population_Count> &population_count,
-                  std::tuple<uint32_t, uint32
-                  _t, uint32_t> idx,
-                  std::tuple<uint32_t, uint32_t, uint32_t, uint32_t> shape,
-                  std::mt19937_64 &rng) {
-
-  auto [sim_idx, p_idx, t_idx] = idx;
-  auto [N_sims, N_connections, N_partitions, Nt] = shape;
-  auto con_indices = get_connection_indices(N_partitions, p_idx);
+  auto con_indices = get_connection_indices(p_idx);
   std::vector<uint32_t> connection_contacts = get_partition_connection_contacts(
-      get_column(contact_events, {sim_idx, t_idx}, {N_sims, N_connections*2, Nt}), N_partitions, p_idx);
+      get_t_connections(sim_idx, t_idx), p_idx);
 
-  auto new_infs = get_new_infections(population_count, p_idx, t_idx);
+  uint32_t new_infs = get_new_infections(population_count, sim_idx, p_idx,
+                                         N_partitions, t_idx, Nt + 1);
   if (new_infs) {
     auto inf_index_samples =
         discrete_finite_sample(rng, connection_contacts, new_infs);
@@ -81,41 +80,36 @@ sample_infections(const std::shared_ptr<uint32_t> &contact_events,
     return std::vector<uint32_t>(2 * N_connections, 0);
   }
 }
-
-void assign_to_column(std::shared_ptr<uint32_t> &infections,
-                      const std::vector<uint32_t> &infections_pt,
-                      std::tuple<uint32_t, uint32_t, uint32_t> idx,
-                      std::tuple<uint32_t, uint32_t, uint32_t> shape) {
-  auto [sim_idx, p_idx, t_idx] = idx;
-  auto [N_sims, N_connections*2, Nt] = shape;
-  for (int i = 0; i < N_connections; i++) {
-    infections[sim_idx * N_connections*2 * Nt + i * Nt + t_idx] =
-        infections_pt[p_idx];
+void Infection_Sampler::assign_t_infections(
+    std::vector<uint32_t> &infections, std::vector<uint32_t> &infections_pt,
+    uint32_t sim_idx, uint32_t t) {
+  for (int con_idx = 0; con_idx < N_connections; con_idx++) {
+    infections[from_connection_idx(sim_idx, con_idx, t)] +=
+        infections_pt[2 * con_idx];
+    infections[to_connection_idx(sim_idx, con_idx, t)] +=
+        infections_pt[2 * con_idx + 1];
   }
 }
 
-std::shared_ptr<uint32_t>
-sample_infections(const std::shared_ptr<uint32_t> &contact_events,
-                  const std::shared_ptr<Population_Count> &population_count,
-                  uint32_t N_sims, uint32_t N_partitions,
-                  uint32_t N_connections, uint32_t Nt, int seed) {
+std::vector<uint32_t> Infection_Sampler::sample_infections(
+    const std::vector<uint32_t> &contact_events,
+    const std::vector<Population_Count> &population_count, int seed) {
 
   auto rngs = generate_rngs(N_sims, seed);
-  auto infections = make_shared_array<uint32_t>(N_sims * N_partitions * Nt);
-  auto infections_pt = std::vector<uint32_t>(N_connections*2, 0);
+  auto infections = std::vector<uint32_t>(N_sims * (2 * N_connections) * Nt, 0);
+  auto infections_pt = std::vector<uint32_t>(N_connections * 2, 0);
   for (int sim_idx = 0; sim_idx < N_sims; sim_idx++) {
     for (int t_idx = 0; t_idx < Nt; t_idx++) {
       for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
         infections_pt = sample_infections(contact_events, population_count,
-                                          {sim_idx, p_idx, t_idx},
-                                          {N_sims, N_connections, N_partitions, Nt},
-                                          rngs[sim_idx]);
-        assign_to_column(infections, infections_pt, {sim_idx, p_idx, t_idx},
-                         {N_sims, N_connections, Nt});
+                                          sim_idx, p_idx, t_idx, rngs[sim_idx]);
+        assign_t_infections(infections, infections_pt, sim_idx, t_idx);
       }
+
       std::fill(infections_pt.begin(), infections_pt.end(), 0);
     }
   }
-  return result;
+
+  return infections;
 }
 } // namespace SIR_SBM

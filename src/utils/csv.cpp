@@ -1,37 +1,16 @@
 #include <SIR_SBM/utils/csv.hpp>
-
+#include <SIR_SBM/graph/indices.hpp>
 #include <fstream>
 
 
 namespace SIR_SBM {
-Vec2D<uint32_t> read_csv(const std::filesystem::path &path, uint32_t N0,
-                         uint32_t N1) {
-  std::ifstream file(path);
-  if (!file.is_open()) {
-    throw std::runtime_error("Could not open file: " + path.string());
-  }
-  Vec2D<uint32_t> result(N0, std::vector<T>(N1));
-  std::string line;
-  uint32_t n0 = 0;
-  uint32_t n1 = 0;
-  while (std::getline(file, line)) {
-    std::stringstream ss(line);
-    std::string cell;
-    while (std::getline(ss, cell, ',')) {
-      result[n0][n1] = std::stoi(cell);
-      n1++;
-    }
-    n0++;
-    n1 = 0;
-  }
-  return result;
-}
 
-Vec3D<uint32_t> read_csv(const std::filesystem::path &file_prefix, int N0,
+
+std::vector<float> read_csv_flat(const std::filesystem::path &file_prefix, int N0,
                          int N1, int N2) {
   std::ifstream f;
   // std::vector<int> result(N0 * N1 * N2);
-  auto result = make_Vec3D<uint32_t>(N0, N1, N2);
+  auto result = std::vector<float>(N0 * N1 * N2);
 
   for (int i = 0; i < N0; i++) {
     std::string filename = file_prefix.string() + std::to_string(i) + ".csv";
@@ -46,7 +25,7 @@ Vec3D<uint32_t> read_csv(const std::filesystem::path &file_prefix, int N0,
       std::string cell;
       int n2 = 0;
       while (std::getline(ss, cell, ',')) {
-        result[i][n1][n2] = std::stoi(cell);
+        result[i*N1*N2 + n1*N2 + n2] = std::stof(cell);
         n2++;
       }
       n1++;
@@ -55,7 +34,6 @@ Vec3D<uint32_t> read_csv(const std::filesystem::path &file_prefix, int N0,
   }
   return result;
 }
-
 void write_csv(const std::vector<uint32_t> &data, const std::filesystem::path &path,
                int N0, int N1) {
   std::ofstream file(path);
@@ -70,4 +48,67 @@ void write_csv(const std::vector<uint32_t> &data, const std::filesystem::path &p
   }
   file.close();
 }
+
+void write_csv(const std::vector<uint32_t> &data, const std::filesystem::path& fname,
+               int N0, int N1, int N2) {
+  std::ofstream file;
+  for(int n0 = 0; n0 < N0; n0++)
+  {
+    std::filesystem::path p = fname;
+    p += "_" + std::to_string(n0) + ".csv";
+    file.open(p);
+    for(int n1 = 0; n1 < N1; n1++)
+    {
+      for(int n2 = 0; n2 < N2; n2++)
+      {
+        file << data[n0*N1*N2 + n1*N2 + n2] << ",";
+      }
+      file << "\n";
+    }
+    file.close();
+  }
+}
+void write_contact_events(const std::vector<uint32_t>& contact_events, const std::filesystem::path &fname,
+uint32_t N_sims, uint32_t N_connections, uint32_t Nt) {
+  std::ofstream f;
+  std::filesystem::create_directories(fname.relative_path());
+  for (int sim_idx = 0; sim_idx < N_sims; sim_idx++) {
+    std::filesystem::path p = fname;
+    p += "_" + std::to_string(sim_idx) + ".csv";
+    f.open(p);
+    for (int t_idx = 0; t_idx < Nt; t_idx++) {
+      for (int c_idx = 0; c_idx < N_connections; c_idx++) {
+        f << contact_events
+                 [get_from_connection_idx(sim_idx, c_idx, t_idx, N_connections, Nt)]
+          << ","
+          << contact_events[get_to_connection_idx(sim_idx, c_idx, t_idx, N_connections, Nt)]
+          << ",";
+      }
+      f << std::endl;
+    }
+    f.close();
+  }
+}
+
+void write_population_count(const std::vector<Population_Count>& population_count, const std::filesystem::path &fname, uint32_t N_sims, uint32_t N_partitions, uint32_t Nt) {
+  std::ofstream f;
+  std::filesystem::create_directories(fname.relative_path());
+  uint32_t idx;
+  Population_Count pc;
+  for (int sim_idx = 0; sim_idx < N_sims; sim_idx++) {
+    
+    std::filesystem::path p = fname;
+    p += "_" + std::to_string(sim_idx) + ".csv";
+    f.open(fname);
+    for (int t_idx = 0; t_idx < Nt; t_idx++) {
+      for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
+        pc = population_count[get_partition_idx(sim_idx, p_idx, t_idx, N_partitions, Nt)];
+        f << pc.S << "," << pc.I << "," << pc.R << ",";
+      }
+      f << std::endl;
+    }
+    f.close();
+  }
+}
+
 } // namespace SIR_SBM

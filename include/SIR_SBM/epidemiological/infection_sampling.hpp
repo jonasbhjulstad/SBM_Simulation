@@ -1,48 +1,44 @@
 #pragma once
 
-#include <SIR_SBM/common.hpp>
 #include <SIR_SBM/epidemiological/population_count.hpp>
 #include <SIR_SBM/simulation/sim_result.hpp>
-#include <SIR_SBM/utils/csv.hpp>
 
-#include <cppitertools/combinations_with_replacement.hpp>
-#include <filesystem>
-#include <fstream>
-#include <random>
-
-#include <SIR_SBM/utils/occurrence.hpp>
-
+#include <SIR_SBM/epidemiological/population_count.hpp>
 
 namespace SIR_SBM {
-uint32_t get_new_infections(const std::shared_ptr<Population_Count> &pop_count,
-                            uint32_t p_idx, uint32_t t_idx)
 
-    std::vector<int> get_connection_indices(int N_partitions, int p_idx);
+struct Infection_Sampler {
+  uint32_t N_sims, N_partitions, N_connections, Nt;
+  std::vector<uint32_t>
+  sample_infections(const std::vector<uint32_t> &contact_events,
+                    const std::vector<Population_Count> &population_count,
+                    int seed);
+  Infection_Sampler(uint32_t N_sims, uint32_t N_partitions,
+                    uint32_t N_connections, uint32_t Nt);
+  uint32_t partition_idx(uint32_t sim_idx, uint32_t p_idx,
+                             uint32_t t_idx) const;
+  uint32_t from_connection_idx(uint32_t sim_idx, uint32_t con_idx,
+                                   uint32_t t_idx) const;
 
-std::vector<uint32_t>
-get_partition_connection_contacts(const Vec1D<uint32_t> &contact_events,
-                                  int N_partitions, int p_idx);
+  uint32_t to_connection_idx(uint32_t sim_idx, uint32_t con_idx,
+                                 uint32_t t_idx) const;
 
-std::vector<uint32_t>
-get_column(const std::shared_ptr<uint32_t> &data,
-           std::tuple<uint32_t, uint32_t> idx,
-           std::tuple<uint32_t, uint32_t, uint32_t> shape);
+private:
+  std::vector<int> get_connection_indices(int p_idx) const;
+  std::vector<uint32_t> get_t_connections(uint32_t sim_idx, uint32_t t);
+  std::vector<uint32_t>
+  get_partition_connection_contacts(const std::vector<uint32_t> &contact_events,
+                                    int p_idx) const;
 
-std::vector<uint32_t> sample_infections(
-    const std::shared_ptr<uint32_t> &contact_events,
-    const std::shared_ptr<Population_Count> &population_count,
-    std::tuple<uint32_t, uint32 _t, uint32_t> idx,
-    std::tuple<uint32_t, uint32_t, uint32_t, uint32_t> shape,
-    std::mt19937_64 &
-        rng) void assign_to_column(std::shared_ptr<uint32_t> &infections,
-                                   const std::vector<uint32_t> &infections_pt,
-                                   std::tuple<uint32_t, uint32_t, uint32_t> idx,
-                                   std::tuple<uint32_t, uint32_t, uint32_t>
-                                       shape);
+  std::vector<uint32_t>
+  sample_infections(const std::vector<uint32_t> &contact_events,
+                    const std::vector<Population_Count> &population_count,
+                    uint32_t sim_idx, uint32_t p_idx, uint32_t t_idx,
+                    std::mt19937 &rng);
+  void assign_t_infections(std::vector<uint32_t> &infections,
+                           std::vector<uint32_t> &infections_pt,
+                           uint32_t sim_idx, uint32_t t);
 
-std::shared_ptr<uint32_t>
-sample_infections(const std::shared_ptr<uint32_t> &contact_events,
-                  const std::shared_ptr<Population_Count> &population_count,
-                  uint32_t N_sims, uint32_t N_partitions,
-                  uint32_t N_connections, uint32_t Nt, int seed);
+};
+
 } // namespace SIR_SBM

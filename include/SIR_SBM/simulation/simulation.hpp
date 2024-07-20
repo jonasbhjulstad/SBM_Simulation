@@ -7,15 +7,15 @@
 
 namespace SIR_SBM {
 
-sycl::event simulation_step(sycl::queue &q, std::shared_ptr<Sim_Buffers> &SB,
+sycl::event simulation_step(sycl::queue &q, Sim_Buffers &SB,
                             float p_I, float p_R, uint32_t t, uint32_t t_offset,
                             sycl::event dep_event = {});
 
 sycl::event simulation_alloc_step(sycl::queue &q,
-                                  std::shared_ptr<Sim_Buffers> &SB, float p_I,
+                                  Sim_Buffers &SB, float p_I,
                                   float p_R, uint32_t t_offset,
                                   sycl::event dep_event = {});
 
-sycl::event run_simulation(sycl::queue &q, std::shared_ptr<Sim_Buffers> &SB,
+sycl::event run_simulation(sycl::queue &q, Sim_Buffers &SB,
                            const Sim_Param &p);
 } // namespace SIR_SBM

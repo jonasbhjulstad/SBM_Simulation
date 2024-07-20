@@ -17,7 +17,7 @@ int main() {
                                                            p_in, p_out, seed);
   t.tock_print();
 
-  sycl::queue q{sycl::cpu_selector_v}; // Create a queue on the default device
+  sycl::queue q{default_queue()}; // Create a queue on the default device
   Sim_Param p;
   p.Nt = 56;
   p.Nt_alloc = 56;
@@ -29,13 +29,12 @@ int main() {
   p.p_R = 0.1;
   Sim_Result result(p, graph);
   {
-    auto SB = Sim_Buffers::make(q, graph, p, result);
-    SB->wait();
-    q.wait();
-    SB->validate(q);
-    initialize(q, SB->state, SB->rngs, 0.1).wait();
+    auto SB = Sim_Buffers(q, graph, p, result);
+    SB.wait();
+    SB.validate(q);
+    initialize(q, SB.state, SB.rngs, 0.1).wait();
 
-    SB->validate(q);
+    SB.validate(q);
 
     run_simulation(q, SB, p).wait();
   }

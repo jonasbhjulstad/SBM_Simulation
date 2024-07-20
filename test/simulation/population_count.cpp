@@ -28,11 +28,11 @@ int main() {
   p.N_sims = 100;
   p.seed = 10;
   Sim_Result result(p, graph);
-  auto SB = Sim_Buffers::make(q, graph, p, result);
-  SB->wait();
+  auto SB = Sim_Buffers(q, graph, p, result);
+  SB.wait();
   // sycl::event initialize(sycl::queue& q, sycl::buffer<SIR_State, 3>& state,
   // sycl::buffer<oneapi::dpl::ranlux48>& rngs, float p_I0)
-  auto event = initialize(q, SB->state, SB->rngs, 0.1);
+  auto event = initialize(q, SB.state, SB.rngs, 0.1);
   event.wait();
 
   std::vector<Population_Count> count(N_communities * p.N_sims * p.Nt,
@@ -40,7 +40,7 @@ int main() {
   {
     auto count_buf = sycl::buffer<Population_Count, 3>{
         count.data(), sycl::range<3>(N_communities, p.N_sims, p.Nt)};
-    partition_population_count(q, SB->state, count_buf, SB->vpc, 0).wait();
+    partition_population_count(q, SB.state, count_buf, SB.vpc, 0).wait();
   }
 
   return 0;

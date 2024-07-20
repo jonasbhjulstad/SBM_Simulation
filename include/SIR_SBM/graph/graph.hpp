@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include <tuple>
 #include <random>
+#include <tuple>
 #include <vector>
 
 namespace SIR_SBM {
@@ -25,6 +25,7 @@ struct SBM_Graph {
   Vertexlist_t flat_vertices() const;
   uint32_t N_edges() const;
   uint32_t N_vertices() const;
+  std::vector<uint32_t> N_partition_vertices() const;
   uint32_t N_partitions() const;
   uint32_t N_connections() const;
 

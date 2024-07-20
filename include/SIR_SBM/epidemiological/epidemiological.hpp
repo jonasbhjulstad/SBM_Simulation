@@ -1,4 +1,5 @@
 #pragma once
+#include <SIR_SBM/epidemiological/types.hpp>
 #include <SIR_SBM/graph/graph.hpp>
 #include <cstdint>
 #include <oneapi/dpl/random>
@@ -6,24 +7,6 @@
 #include <tuple>
 
 namespace SIR_SBM {
-
-enum class SIR_State : char {
-  Susceptible = 0,
-  Infected = 1,
-  Recovered = 2,
-  Invalid = 3
-};
-
-struct Population_Count {
-  int S, I, R;
-  Population_Count();
-  Population_Count(int S, int I, int R);
-  Population_Count(const std::array<int, 3> &arr);
-  Population_Count operator+(const Population_Count &other) const;
-  bool is_zero() const;
-  int &operator[](SIR_State s);
-};
-
 Population_Count state_to_count(SIR_State s);
 
 std::tuple<uint32_t, uint32_t, uint32_t>

@@ -12,7 +12,7 @@ struct Sim_Buffers {
                                            Sim_Result &result);
 
   template <typename... Ts>
-  using Shared_Tup = std::tuple<std::shared_ptr<Ts>...>;
+  using Shared_Tup = std::tuple<std::vector<Ts>...>;
 
   void wait() const;
 

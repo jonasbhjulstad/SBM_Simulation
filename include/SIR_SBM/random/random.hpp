@@ -11,7 +11,7 @@ std::vector<std::mt19937> generate_rngs(uint32_t seed, uint32_t N);
 
 std::vector<uint32_t> repeat_N_indices(const std::vector<uint32_t> weights);
 std::vector<uint32_t>
-discrete_finite_sample(std::mt19937_64 &rng,
+discrete_finite_sample(std::mt19937 &rng,
                        const std::vector<uint32_t> &weights,
                        uint32_t N_samples);
 
