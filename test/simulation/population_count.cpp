@@ -23,7 +23,6 @@ int main() {
       SIR_SBM::default_queue()}; // Create a queue on the default device
   Sim_Param p;
   p.Nt = 100;
-  p.Nt_alloc = 100;
   p.N_I_terminate = 1;
   p.N_sims = 100;
   p.seed = 10;
@@ -40,7 +39,7 @@ int main() {
   {
     auto count_buf = sycl::buffer<Population_Count, 3>{
         count.data(), sycl::range<3>(N_communities, p.N_sims, p.Nt)};
-    partition_population_count(q, SB.state, count_buf, SB.vpc, 0).wait();
+    partition_population_count(q, SB.state, count_buf, SB.vpc).wait();
   }
 
   return 0;

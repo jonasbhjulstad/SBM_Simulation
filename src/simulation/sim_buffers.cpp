@@ -18,8 +18,7 @@ get_vector_sizes(const std::vector<std::vector<T>> vecs) {
 Sim_Buffers::Sim_Buffers(sycl::queue &q, const SBM_Graph &G, const Sim_Param &p,
                          Sim_Result &result)
     : // size initialization
-      N_vertices(G.N_vertices()), N_sims(p.N_sims), Nt(p.Nt),
-      Nt_alloc(p.Nt_alloc), N_edges(G.N_edges()),
+      N_vertices(G.N_vertices()), N_sims(p.N_sims), Nt(p.Nt), N_edges(G.N_edges()),
       N_partitions(G.N_partitions()), N_connections(G.N_connections()),
       N_con_largest(G.largest_connection_size()),
       N_part_largest(G.largest_partition_size()),
@@ -29,7 +28,7 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, const SBM_Graph &G, const Sim_Param &p,
       // buffer initialization
       ecc(ecc_vec.data(), G.N_connections()),
       vpc(vpc_vec.data(), G.N_partitions()), rngs(rng_vec.data(), p.N_sims),
-      state(sycl::range<3>(p.N_sims, G.N_vertices(), p.Nt_alloc)),
+      state(sycl::range<3>(p.N_sims, G.N_vertices(), p.Nt+1)),
       contact_events(result.contact_events.data(),
                      sycl::range<3>(p.N_sims, G.N_connections() * 2, p.Nt)),
       population_count(result.population_count.data(),
@@ -112,7 +111,7 @@ void Sim_Buffers::validate_state(sycl::queue &q) {
         }
       },
       "Invalid state");
-  validate_range(sycl::range<3>(N_sims, N_vertices, Nt_alloc),
+  validate_range(sycl::range<3>(N_sims, N_vertices, Nt + 1),
                  state.get_range());
 }
 

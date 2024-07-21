@@ -1,5 +1,6 @@
 function(custom_configure_sycl target_name)
 target_compile_options(${target_name} PUBLIC "-fsycl")
+target_include_directories(${target_name} PUBLIC ${SYCL_INCLUDE_DIR})
 if(${SIR_SBM_USE_GPU})
 target_compile_definitions(${target_name} PUBLIC SIR_SBM_USE_GPU)
 target_compile_options(${target_name} PUBLIC "-fsycl-targets=nvptx64-nvidia-cuda")

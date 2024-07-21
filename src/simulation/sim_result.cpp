@@ -10,17 +10,14 @@
 
 namespace SIR_SBM {
 Sim_Result::Sim_Result(const Sim_Param &p, const SBM_Graph &G)
-    : contact_events(p.N_sims * G.N_connections() * 2 * p.Nt, 0),
-      population_count(p.N_sims * G.N_partitions() * (p.Nt + 1),
-                       Population_Count()),
+    : contact_events(p.N_sims, G.N_connections(), p.Nt),
+      population_count(p.N_sims, G.N_partitions(), (p.Nt + 1)),
       N_partitions(G.N_partitions()), N_connections(G.N_connections()),
       N_sims(p.N_sims), Nt(p.Nt), N_pops(G.N_partition_vertices()),
       N_contact_events(p.N_sims * G.N_connections() * 2 * p.Nt) {}
 void Sim_Result::resize(const Sim_Param &p, const SBM_Graph &G) {
-  contact_events =
-      std::vector<uint32_t>(p.N_sims * G.N_connections() * 2 * p.Nt, 0);
-  population_count = std::vector<Population_Count>(
-      p.N_sims * G.N_partitions() * (p.Nt + 1), Population_Count());
+  contact_events = Connection_Data(p.N_sims, G.N_connections(), p.Nt);
+  population_count = Population_Data(p.N_sims, G.N_partitions(), (p.Nt + 1));
   N_partitions = G.N_partitions();
   N_connections = G.N_connections();
   N_sims = p.N_sims;
@@ -80,11 +77,12 @@ void Sim_Result::validate_partition_size(uint32_t sim_idx) const {
   }
 }
 
-std::vector<uint32_t> Sim_Result::get_t_infections(uint32_t sim_idx, uint32_t t) const
-{
+std::vector<uint32_t> Sim_Result::get_t_infections(uint32_t sim_idx,
+                                                   uint32_t t) const {
   std::vector<uint32_t> t_infs(N_partitions, 0);
   for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
-    t_infs[p_idx] = get_new_infections(population_count, sim_idx, p_idx, N_partitions, t, Nt + 1);
+    t_infs[p_idx] = get_new_infections(population_count, sim_idx, p_idx,
+                                       N_partitions, t, Nt + 1);
   }
   return t_infs;
 }

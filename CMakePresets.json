@@ -1,0 +1,25 @@
+{
+    "version": 8,
+    "configurePresets": [
+        {
+            "name": "sbm",
+            "displayName": "DPCPP",
+            "description": "Using compilers: C = /home/deb/sycl_workspace/llvm/build/bin/clang, CXX = /home/deb/sycl_workspace/llvm/build/bin/clang++",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_C_COMPILER": "/home/deb/sycl_workspace/llvm/build/bin/clang",
+                "CMAKE_CXX_COMPILER": "/home/deb/sycl_workspace/llvm/build/bin/clang++",
+                "CMAKE_BUILD_TYPE": "Debug"
+            },
+            "environment": {
+                "CCACHE_SLOPPINESS": "clang_index_store"
+            }
+        }
+    ],
+    "buildPresets":[{
+        "name": "infection_sampling",
+        "displayName": "Infection Sampling",
+        "targets": ["infection_sampling"]
+}]
+}

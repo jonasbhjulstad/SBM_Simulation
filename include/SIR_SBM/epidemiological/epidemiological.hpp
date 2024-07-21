@@ -20,7 +20,6 @@ sycl::event state_copy(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
                        sycl::event dep_event = {});
 
 // runs inplace recovery on vertices at time t
-
 sycl::event recover(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
                     sycl::buffer<oneapi::dpl::ranlux48> &rngs, float p_R,
                     uint32_t t, sycl::event dep_event = {});
@@ -29,6 +28,6 @@ sycl::event infect(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
                    sycl::buffer<Edge_t> &edges, sycl::buffer<uint32_t> &ecc,
                    sycl::buffer<uint32_t, 3> &contact_events,
                    sycl::buffer<oneapi::dpl::ranlux48> &rngs, float p_I,
-                   uint32_t t, uint32_t t_offset, sycl::event dep_event = {});
+                   uint32_t t, sycl::event dep_event = {});
 
 } // namespace SIR_SBM

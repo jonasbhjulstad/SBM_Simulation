@@ -71,7 +71,7 @@ void write_csv(const std::vector<uint32_t> &data, const std::filesystem::path& f
 void write_contact_events(const std::vector<uint32_t>& contact_events, const std::filesystem::path &fname,
 uint32_t N_sims, uint32_t N_connections, uint32_t Nt) {
   std::ofstream f;
-  std::filesystem::create_directories(fname.relative_path());
+  std::filesystem::create_directories(fname.parent_path());
   for (int sim_idx = 0; sim_idx < N_sims; sim_idx++) {
     std::filesystem::path p = fname;
     p += "_" + std::to_string(sim_idx) + ".csv";
@@ -92,14 +92,14 @@ uint32_t N_sims, uint32_t N_connections, uint32_t Nt) {
 
 void write_population_count(const std::vector<Population_Count>& population_count, const std::filesystem::path &fname, uint32_t N_sims, uint32_t N_partitions, uint32_t Nt) {
   std::ofstream f;
-  std::filesystem::create_directories(fname.relative_path());
+  std::filesystem::create_directories(fname.parent_path());
   uint32_t idx;
   Population_Count pc;
   for (int sim_idx = 0; sim_idx < N_sims; sim_idx++) {
     
     std::filesystem::path p = fname;
     p += "_" + std::to_string(sim_idx) + ".csv";
-    f.open(fname);
+    f.open(p);
     for (int t_idx = 0; t_idx < Nt; t_idx++) {
       for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
         pc = population_count[get_partition_idx(sim_idx, p_idx, t_idx, N_partitions, Nt)];

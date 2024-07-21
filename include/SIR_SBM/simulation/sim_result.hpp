@@ -1,16 +1,17 @@
 #pragma once
 #include <SIR_SBM/epidemiological/epidemiological.hpp>
 #include <SIR_SBM/graph/graph.hpp>
+#include <SIR_SBM/simulation/connection_data.hpp>
+#include <SIR_SBM/simulation/population_data.hpp>
 #include <SIR_SBM/simulation/sim_param.hpp>
 #include <cstdint>
 #include <filesystem>
-
 namespace SIR_SBM {
 struct Sim_Result {
   explicit Sim_Result(const Sim_Param &p, const SBM_Graph &G);
   void resize(const Sim_Param &p, const SBM_Graph &G);
-  std::vector<uint32_t> contact_events;
-  std::vector<Population_Count> population_count;
+  Connection_Data contact_events;
+  Population_Data population_count;
   std::vector<uint32_t> N_pops;
   uint32_t N_contact_events;
 

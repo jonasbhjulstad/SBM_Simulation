@@ -1,5 +1,5 @@
-#include <SIR_SBM/epidemiological/infection_sampling.hpp>
 #include <SIR_SBM/epidemiological/infection_count.hpp>
+#include <SIR_SBM/epidemiological/infection_sampling.hpp>
 #include <SIR_SBM/graph/indices.hpp>
 #include <SIR_SBM/random/random.hpp>
 #include <SIR_SBM/utils/numeric.hpp>
@@ -27,6 +27,9 @@ uint32_t Infection_Sampler::to_connection_idx(uint32_t sim_idx,
                                               uint32_t t_idx) const {
   return get_to_connection_idx(sim_idx, con_idx, t_idx, N_connections, Nt);
 }
+
+// get indices of connections which points towards partition p_idx
+//
 std::vector<int> Infection_Sampler::get_connection_indices(int p_idx) const {
   std::vector<int> result;
   uint32_t con_idx = 0;
@@ -42,12 +45,14 @@ std::vector<int> Infection_Sampler::get_connection_indices(int p_idx) const {
   }
   return result;
 }
-std::vector<uint32_t> Infection_Sampler::get_t_connections(uint32_t sim_idx,
-                                                           uint32_t t) {
+std::vector<uint32_t>
+Infection_Sampler::get_t_connections(const Connection_Data &contact_events,
+                                     uint32_t sim_idx, uint32_t t) {
   std::vector<uint32_t> result(2 * N_connections);
   for (int c_idx = 0; c_idx < N_connections; c_idx++) {
-    result[2 * c_idx] = to_connection_idx(sim_idx, c_idx, t);
-    result[2 * c_idx + 1] = from_connection_idx(sim_idx, c_idx, t);
+    Connection c = contact_events(sim_idx, c_idx, t);
+    result[2 * c_idx] = c.to;
+    result[2 * c_idx + 1] = c.from;
   }
   return result;
 }
@@ -61,14 +66,15 @@ std::vector<uint32_t> Infection_Sampler::get_partition_connection_contacts(
   return result;
 }
 
-std::vector<uint32_t> Infection_Sampler::sample_infections(
-    const std::vector<uint32_t> &contact_events,
-    const std::vector<Population_Count> &population_count, uint32_t sim_idx,
-    uint32_t p_idx, uint32_t t_idx, std::mt19937 &rng) {
+std::vector<uint32_t>
+Infection_Sampler::sample_infections(const Connection_Data &contact_events,
+                                     const Population_Data &population_count,
+                                     uint32_t sim_idx, uint32_t p_idx,
+                                     uint32_t t_idx, std::mt19937 &rng) {
 
   auto con_indices = get_connection_indices(p_idx);
   std::vector<uint32_t> connection_contacts = get_partition_connection_contacts(
-      get_t_connections(sim_idx, t_idx), p_idx);
+      get_t_connections(contact_events, sim_idx, t_idx), p_idx);
 
   uint32_t new_infs = get_new_infections(population_count, sim_idx, p_idx,
                                          N_partitions, t_idx, Nt + 1);
@@ -81,22 +87,23 @@ std::vector<uint32_t> Infection_Sampler::sample_infections(
   }
 }
 void Infection_Sampler::assign_t_infections(
-    std::vector<uint32_t> &infections, std::vector<uint32_t> &infections_pt,
+    Connection_Data &infections, std::vector<uint32_t> &infections_pt,
     uint32_t sim_idx, uint32_t t) {
   for (int con_idx = 0; con_idx < N_connections; con_idx++) {
-    infections[from_connection_idx(sim_idx, con_idx, t)] +=
-        infections_pt[2 * con_idx];
-    infections[to_connection_idx(sim_idx, con_idx, t)] +=
-        infections_pt[2 * con_idx + 1];
+    auto& [to, from] =
+        infections.ref_connection(sim_idx, con_idx, t);
+    to += infections_pt[2 * con_idx];
+    from += infections_pt[2 * con_idx + 1];
   }
 }
 
-std::vector<uint32_t> Infection_Sampler::sample_infections(
-    const std::vector<uint32_t> &contact_events,
-    const std::vector<Population_Count> &population_count, int seed) {
+std::vector<uint32_t>
+Infection_Sampler::sample_infections(const Connection_Data &contact_events,
+                                     const Population_Data &population_count,
+                                     int seed) {
 
   auto rngs = generate_rngs(N_sims, seed);
-  auto infections = std::vector<uint32_t>(N_sims * (2 * N_connections) * Nt, 0);
+  auto infections = Connection_Data(N_sims, N_connections, Nt);
   auto infections_pt = std::vector<uint32_t>(N_connections * 2, 0);
   for (int sim_idx = 0; sim_idx < N_sims; sim_idx++) {
     for (int t_idx = 0; t_idx < Nt; t_idx++) {

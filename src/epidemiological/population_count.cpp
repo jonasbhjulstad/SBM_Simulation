@@ -11,13 +11,11 @@ sycl::event partition_population_count(sycl::queue &q,
                                        sycl::buffer<SIR_State, 3> &state,
                                        sycl::buffer<Population_Count, 3> &count,
                                        sycl::buffer<uint32_t> &vpc,
-                                       uint32_t t_offset,
                                        sycl::event dep_event ) {
 
   validate_population(q, state);
-  auto [N_sims, N_vertices, Nt_alloc] = get_range(state);
-  Nt_alloc = std::min<uint32_t>({Nt_alloc, static_cast<uint32_t>(count.get_range()[2] - t_offset)});
-  return Nt_alloc <= 0 ? sycl::event{} : q.submit([&](sycl::handler &h) {
+  auto [N_sims, N_vertices, Nt] = get_range(state);
+  return Nt <= 0 ? sycl::event{} : q.submit([&](sycl::handler &h) {
     h.depends_on(dep_event);
     auto pop_inc = [](Population_Count &pc, SIR_State s) {
       switch (s) {
@@ -36,14 +34,14 @@ sycl::event partition_population_count(sycl::queue &q,
     };
     auto N_partitions = count.get_range()[0];
     auto state_acc = sycl::accessor<SIR_State, 3, sycl::access::mode::read>(
-        state, h, sycl::range<3>(N_sims, N_vertices, Nt_alloc),
+        state, h, sycl::range<3>(N_sims, N_vertices, Nt),
         sycl::id<3>(0, 0, 0));
     auto count_acc =
         sycl::accessor<Population_Count, 3, sycl::access::mode::read_write>(
-            count, h, sycl::range<3>(N_sims, N_partitions, Nt_alloc),
-            sycl::id<3>(0, 0, t_offset));
+            count, h, sycl::range<3>(N_sims, N_partitions, Nt),
+            sycl::id<3>(0, 0, 0));
     auto vpc_acc = vpc.get_access<sycl::access::mode::read>(h);
-    h.parallel_for(sycl::range<2>(N_sims, Nt_alloc), [=](sycl::id<2> idx) {
+    h.parallel_for(sycl::range<2>(N_sims, Nt), [=](sycl::id<2> idx) {
       uint32_t v_offset = 0;
       auto sim_idx = idx[0];
       auto t_idx = idx[1];
@@ -62,12 +60,12 @@ sycl::event partition_population_count(sycl::queue &q,
 
 std::vector<Population_Count>
 partition_population_count(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
-                           sycl::buffer<uint32_t> &vpc, uint32_t t_offset) {
+                           sycl::buffer<uint32_t> &vpc) {
   std::vector<Population_Count> count_vec(state.size());
   {
     sycl::buffer<Population_Count, 3> count{count_vec.data(),
                                             state.get_range()};
-    partition_population_count(q, state, count, vpc, t_offset).wait();
+    partition_population_count(q, state, count, vpc).wait();
   }
   return count_vec;
 }

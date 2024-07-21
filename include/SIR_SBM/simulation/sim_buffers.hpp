@@ -31,7 +31,7 @@ struct Sim_Buffers {
   sycl::buffer<oneapi::dpl::ranlux48, 1> rngs;
 
   // sizes
-  uint32_t N_vertices, N_sims, Nt, Nt_alloc, N_edges, N_partitions,
+  uint32_t N_vertices, N_sims, Nt, N_edges, N_partitions,
       N_connections;
   uint32_t N_con_largest, N_part_largest;
   void validate(sycl::queue &q);

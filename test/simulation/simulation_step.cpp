@@ -20,7 +20,6 @@ int main() {
   sycl::queue q{default_queue()}; // Create a queue on the default device
   Sim_Param p;
   p.Nt = 100;
-  p.Nt_alloc = 100;
   p.N_I_terminate = 1;
   p.N_sims = 2;
   p.seed = 10;
@@ -36,8 +35,8 @@ int main() {
 
     SB.validate(q);
 
-    simulation_step(q, SB, .01, 0.1, 0, 0).wait();
-    partition_population_count(q, SB.state, SB.population_count, SB.vpc, 0)
+    simulation_step(q, SB, .01, 0.1, 0).wait();
+    partition_population_count(q, SB.state, SB.population_count, SB.vpc)
         .wait();
   }
   auto cwd = std::filesystem::current_path();
