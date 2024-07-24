@@ -47,6 +47,11 @@ void Sim_Result::write(const std::filesystem::path &dir) {
   write_contact_events(contact_events, c_name, N_sims, N_connections, Nt);
   write_population_count(population_count, p_name, N_sims, N_partitions,
                          Nt + 1);
+  std::filesystem::path i_name = dir;
+  i_name += "/partition_infections";
+  write_partition_infections(population_count, i_name, N_sims, N_partitions, Nt);
+
+
 }
 
 void Sim_Result::validate() const {

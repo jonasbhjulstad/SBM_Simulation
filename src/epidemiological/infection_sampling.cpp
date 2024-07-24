@@ -30,41 +30,6 @@ uint32_t Infection_Sampler::to_connection_idx(uint32_t sim_idx,
 
 // get indices of connections which points towards partition p_idx
 //
-std::vector<int> Infection_Sampler::get_connection_indices(int p_idx) const {
-  std::vector<int> result;
-  uint32_t con_idx = 0;
-  for (auto comb :
-       iter::combinations_with_replacement(make_iota(N_partitions), 2)) {
-    auto from = comb[0];
-    auto to = comb[1];
-    if (to == p_idx)
-      result.push_back(2 * con_idx);
-    if (from == p_idx)
-      result.push_back(2 * con_idx + 1);
-    con_idx++;
-  }
-  return result;
-}
-std::vector<uint32_t>
-Infection_Sampler::get_t_connections(const Connection_Data &contact_events,
-                                     uint32_t sim_idx, uint32_t t) {
-  std::vector<uint32_t> result(2 * N_connections);
-  for (int c_idx = 0; c_idx < N_connections; c_idx++) {
-    Connection c = contact_events(sim_idx, c_idx, t);
-    result[2 * c_idx] = c.to;
-    result[2 * c_idx + 1] = c.from;
-  }
-  return result;
-}
-std::vector<uint32_t> Infection_Sampler::get_partition_connection_contacts(
-    const std::vector<uint32_t> &contact_events, int p_idx) const {
-  auto indices = get_connection_indices(p_idx);
-  std::vector<uint32_t> result(indices.size());
-  for (int c_idx = 0; c_idx < indices.size(); c_idx++) {
-    result[c_idx] = contact_events[indices[c_idx]];
-  }
-  return result;
-}
 
 std::vector<uint32_t>
 Infection_Sampler::sample_infections(const Connection_Data &contact_events,
@@ -74,7 +39,7 @@ Infection_Sampler::sample_infections(const Connection_Data &contact_events,
 
   auto con_indices = get_connection_indices(p_idx);
   std::vector<uint32_t> connection_contacts = get_partition_connection_contacts(
-      get_t_connections(contact_events, sim_idx, t_idx), p_idx);
+      contact_events.get_connections_t(sim_idx, t_idx), p_idx);
 
   uint32_t new_infs = get_new_infections(population_count, sim_idx, p_idx,
                                          N_partitions, t_idx, Nt + 1);
@@ -90,10 +55,9 @@ void Infection_Sampler::assign_t_infections(
     Connection_Data &infections, std::vector<uint32_t> &infections_pt,
     uint32_t sim_idx, uint32_t t) {
   for (int con_idx = 0; con_idx < N_connections; con_idx++) {
-    auto& [to, from] =
-        infections.ref_connection(sim_idx, con_idx, t);
-    to += infections_pt[2 * con_idx];
-    from += infections_pt[2 * con_idx + 1];
+    infections.plus(
+        sim_idx, con_idx, t,
+        {infections_pt[2 * con_idx], infections_pt[2 * con_idx + 1]});
   }
 }
 

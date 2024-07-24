@@ -1,9 +1,9 @@
 #pragma once
 
+#include <SIR_SBM/epidemiological/types.hpp>
 #include <filesystem>
 #include <fstream>
 #include <vector>
-#include <SIR_SBM/epidemiological/types.hpp>
 namespace SIR_SBM {
 
 std::vector<float> read_csv_flat(const std::filesystem::path &file_prefix,
@@ -20,5 +20,8 @@ void write_population_count(
     const std::vector<Population_Count> &population_count,
     const std::filesystem::path &dir, uint32_t N_sims, uint32_t N_partitions,
     uint32_t Nt);
+void write_partition_infections(const std::vector<Population_Count> &population_count,
+                          const std::filesystem::path &fname, uint32_t N_sims,
+                          uint32_t N_partitions, uint32_t Nt);
 
 } // namespace SIR_SBM

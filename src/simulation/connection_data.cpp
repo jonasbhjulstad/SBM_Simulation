@@ -20,11 +20,11 @@ uint32_t Connection_Data::get_connection_idx(uint32_t sim_idx,
   else
     return sim_idx * N_connections * Nt + 2 * connection_idx * Nt + t;
 }
-std::tuple<uint32_t &, uint32_t &>
-Connection_Data::ref_connection(uint32_t sim_idx, uint32_t connection_idx, uint32_t t) const {
-  return std::tie(
-      this->operator[](get_connection_idx(sim_idx, connection_idx, t)),
-      this->operator[](get_connection_idx(sim_idx, connection_idx, t, true)));
+void Connection_Data::plus(uint32_t sim_idx, uint32_t connection_idx,
+                           uint32_t t,
+                           const std::pair<uint32_t, uint32_t> elem) {
+  (*this)[get_connection_idx(sim_idx, connection_idx, t)] += elem.first;
+  (*this)[get_connection_idx(sim_idx, connection_idx, t, true)] += elem.second;
 }
 Connection Connection_Data::operator()(uint32_t sim_idx,
                                        uint32_t connection_idx,
@@ -49,5 +49,16 @@ void Connection_Data::write(const std::filesystem::path &fname) const {
     }
     f.close();
   }
+}
+
+std::vector<uint32_t> Connection_Data::get_connections_t(uint32_t sim_idx,
+                                                         uint32_t t) const {
+  std::vector<uint32_t> result(2 * N_connections);
+  for (int c_idx = 0; c_idx < N_connections; c_idx++) {
+    Connection c = contact_events(sim_idx, c_idx, t);
+    result[2 * c_idx] = c.to;
+    result[2 * c_idx + 1] = c.from;
+  }
+  return result;
 }
 } // namespace SIR_SBM
