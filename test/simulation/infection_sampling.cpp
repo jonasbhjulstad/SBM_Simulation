@@ -2,33 +2,20 @@
 #include <SIR_SBM/epidemiological/population_count.hpp>
 #include <SIR_SBM/simulation/simulation.hpp>
 #include <SIR_SBM/sycl/queue_select.hpp>
-#include <SIR_SBM/utils/ticktock.hpp>
 #include <SIR_SBM/utils/csv.hpp>
+#include <SIR_SBM/utils/parameters.hpp>
+#include <SIR_SBM/utils/ticktock.hpp>
 #include <filesystem>
 using namespace SIR_SBM;
 
 int main() {
-  int N_pop = 100;
-  int N_communities = 2;
-  int seed = 10;
-  float p_in = 1.0;
-  float p_out = 1.0;
   TickTock t;
   t.tick();
-  auto graph = generate_planted_SBM(N_pop, N_communities, p_in, p_out, seed);
-
+  auto p = parse_simulation_parameters("simulation.yaml");
+  auto graph = generate_planted_SBM(p);
   uint32_t N_connections = graph.N_connections();
   t.tock_print();
 
-  sycl::queue q{default_queue()}; // Create a queue on the default device
-  Sim_Param p;
-  p.Nt = 56;
-  p.N_I_terminate = 1;
-  p.N_sims = 2;
-  p.seed = 10;
-  p.p_I0 = 0.1;
-  p.p_I = 0.001;
-  p.p_R = 0.1;
   Sim_Result result(p, graph);
   {
     auto SB = Sim_Buffers(q, graph, p, result);
@@ -49,6 +36,7 @@ int main() {
   Infection_Sampler sampler(p.N_sims, N_communities, N_connections, p.Nt);
   auto infections = sampler.sample_infections(result.contact_events,
                                               result.population_count, p.seed);
-  write_contact_events(infections, output_dir / "infections", p.N_sims, N_connections, p.Nt);
+  write_contact_events(infections, output_dir / "infections", p.N_sims,
+                       N_connections, p.Nt);
   return 0;
 }

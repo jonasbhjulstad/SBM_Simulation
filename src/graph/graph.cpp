@@ -1,8 +1,9 @@
 #include <SIR_SBM/graph/graph.hpp>
 
-#include <SIR_SBM/utils/combination.hpp>
+#include <SIR_SBM/math/combination.hpp>
+#include <SIR_SBM/math/numeric.hpp>
 #include <SIR_SBM/random/random.hpp>
-#include <SIR_SBM/utils/numeric.hpp>
+#include <yaml-cpp/yaml.h>
 
 #include <cppitertools/combinations_with_replacement.hpp>
 #include <execution>
@@ -10,8 +11,7 @@
 namespace SIR_SBM {
 uint32_t bipartite_max_edges(uint32_t N0, uint32_t N1) { return N0 * N1; }
 
-template <typename T>
-static T vector_merge(const std::vector<T> &v) {
+template <typename T> static T vector_merge(const std::vector<T> &v) {
   T result;
   for (auto &edges : v) {
     result.insert(result.end(), edges.begin(), edges.end());
@@ -40,6 +40,17 @@ Edgelist_t generate_bipartite(const Vertexlist_t &N0, const Vertexlist_t &N1,
   return edges;
 }
 
+SBM_Param SBM_Param::parse(const char *fname) {
+  YAML::Node config = YAML::LoadFile(fname);
+  SBM_Param p;
+  p.N_pop = config["SBM"]["N_pop"].as<int>();
+  p.N_communities = config["SBM"]["N_communities"].as<int>();
+  p.seed = config["seed"].as<int>();
+  p.p_in = config["SBM"]["p_in"].as<float>();
+  p.p_out = config["SBM"]["p_out"].as<float>();
+  return p;
+}
+
 Edgelist_t SBM_Graph::flat_edges() const { return vector_merge(edges); }
 Vertexlist_t SBM_Graph::flat_vertices() const { return vector_merge(vertices); }
 uint32_t SBM_Graph::N_edges() const {
@@ -56,7 +67,7 @@ uint32_t SBM_Graph::N_vertices() const {
 std::vector<uint32_t> SBM_Graph::N_partition_vertices() const {
   std::vector<uint32_t> result(vertices.size());
   std::transform(vertices.begin(), vertices.end(), result.begin(),
-  [](auto &elem) { return elem.size(); });
+                 [](auto &elem) { return elem.size(); });
   return result;
 }
 uint32_t SBM_Graph::N_partitions() const { return vertices.size(); }
@@ -86,25 +97,24 @@ std::vector<Vertexlist_t> SBM_vertices(uint32_t N_pop, uint32_t N_communities) {
   return Vertexlists;
 }
 
-SBM_Graph generate_planted_SBM(uint32_t N_pop, uint32_t N_communities,
-                               float p_in, float p_out, uint32_t seed) {
+SBM_Graph generate_planted_SBM(const SBM_Param &p) {
   SBM_Graph graph;
-  graph.vertices = SBM_vertices(N_pop, N_communities);
-  auto combs = iter::combinations_with_replacement(make_iota(N_communities), 2);
+  graph.vertices = SBM_vertices(p.N_pop, p.N_communities);
+  auto combs =
+      iter::combinations_with_replacement(make_iota(p.N_communities), 2);
 
-  auto rngs =
-      generate_rngs(seed, n_choose_k(N_communities, 2));
+  auto rngs = generate_rngs(p.seed, n_choose_k(p.N_communities, 2));
 
   std::transform(combs.begin(), combs.end(), rngs.begin(),
-                 std::back_inserter(graph.edges),
-                 [N_pop, p_in, p_out](auto comb, auto &rng) {
+                 std::back_inserter(graph.edges), [p](auto comb, auto &rng) {
                    Vertexlist_t N0(N_pop);
                    Vertexlist_t N1(N_pop);
-                   std::iota(N0.begin(), N0.end(), N_pop * comb[0]);
-                   std::iota(N1.begin(), N1.end(), N_pop * comb[1]);
-                   float p = comb[0] == comb[1] ? p_in : p_out;
+                   std::iota(N0.begin(), N0.end(), p.N_pop * comb[0]);
+                   std::iota(N1.begin(), N1.end(), p.N_pop * comb[1]);
+                   float p = comb[0] == comb[1] ? p.p_in : p.p_out;
                    return generate_bipartite(N0, N1, p, rng);
                  });
   return graph;
 }
+
 } // namespace SIR_SBM

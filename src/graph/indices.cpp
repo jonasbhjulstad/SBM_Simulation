@@ -1,5 +1,6 @@
 #include <SIR_SBM/graph/indices.hpp>
-
+#include <SIR_SBM/math/numeric.hpp>
+#include <cppitertools/combinations_with_replacement.hpp>
 namespace SIR_SBM {
 uint32_t get_from_connection_idx(uint32_t sim_idx, uint32_t con_idx,
                                  uint32_t t_idx, uint32_t N_connections,
@@ -36,8 +37,7 @@ std::vector<int> get_connection_indices(int p_idx, uint32_t N_partitions) {
 
 std::vector<uint32_t>
 get_partition_connection_contacts(const std::vector<uint32_t> &contact_events,
-                                  int p_idx, uint32_t N_connections,
-                                  uint32_t N_partitions) {
+                                  int p_idx, uint32_t N_partitions) {
   auto indices = get_connection_indices(p_idx, N_partitions);
   uint32_t N_connections = contact_events.size() / 2;
   std::vector<uint32_t> result(2 * N_connections, 0);

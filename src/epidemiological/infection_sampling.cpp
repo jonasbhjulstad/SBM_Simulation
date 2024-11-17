@@ -1,9 +1,9 @@
 #include <SIR_SBM/epidemiological/infection_count.hpp>
 #include <SIR_SBM/epidemiological/infection_sampling.hpp>
 #include <SIR_SBM/graph/indices.hpp>
+#include <SIR_SBM/math/numeric.hpp>
+#include <SIR_SBM/math/occurrence.hpp>
 #include <SIR_SBM/random/random.hpp>
-#include <SIR_SBM/utils/numeric.hpp>
-#include <SIR_SBM/utils/occurrence.hpp>
 #include <cppitertools/combinations_with_replacement.hpp>
 
 namespace SIR_SBM {
@@ -28,18 +28,14 @@ uint32_t Infection_Sampler::to_connection_idx(uint32_t sim_idx,
   return get_to_connection_idx(sim_idx, con_idx, t_idx, N_connections, Nt);
 }
 
-// get indices of connections which points towards partition p_idx
-//
-
 std::vector<uint32_t>
 Infection_Sampler::sample_infections(const Connection_Data &contact_events,
                                      const Population_Data &population_count,
                                      uint32_t sim_idx, uint32_t p_idx,
                                      uint32_t t_idx, std::mt19937 &rng) {
 
-  auto con_indices = get_connection_indices(p_idx);
   std::vector<uint32_t> connection_contacts = get_partition_connection_contacts(
-      contact_events.get_connections_t(sim_idx, t_idx), p_idx);
+      contact_events.get_connections_t(sim_idx, t_idx), p_idx, N_partitions);
 
   uint32_t new_infs = get_new_infections(population_count, sim_idx, p_idx,
                                          N_partitions, t_idx, Nt + 1);

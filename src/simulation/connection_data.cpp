@@ -55,7 +55,7 @@ std::vector<uint32_t> Connection_Data::get_connections_t(uint32_t sim_idx,
                                                          uint32_t t) const {
   std::vector<uint32_t> result(2 * N_connections);
   for (int c_idx = 0; c_idx < N_connections; c_idx++) {
-    Connection c = contact_events(sim_idx, c_idx, t);
+    Connection c = this->operator()(sim_idx, c_idx, t);
     result[2 * c_idx] = c.to;
     result[2 * c_idx + 1] = c.from;
   }

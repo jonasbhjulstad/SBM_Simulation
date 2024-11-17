@@ -1,9 +1,9 @@
 #include <SIR_SBM/epidemiological/epidemiological.hpp>
 #include <SIR_SBM/epidemiological/infection_count.hpp>
 #include <SIR_SBM/graph/indices.hpp>
+#include <SIR_SBM/math/numeric.hpp>
 #include <SIR_SBM/simulation/sim_result.hpp>
 #include <SIR_SBM/utils/csv.hpp>
-#include <SIR_SBM/utils/numeric.hpp>
 #include <cppitertools/combinations_with_replacement.hpp>
 #include <execution>
 #include <fstream>
@@ -49,9 +49,12 @@ void Sim_Result::write(const std::filesystem::path &dir) {
                          Nt + 1);
   std::filesystem::path i_name = dir;
   i_name += "/partition_infections";
-  write_partition_infections(population_count, i_name, N_sims, N_partitions, Nt);
+  write_partition_infections(population_count, i_name, N_sims, N_partitions,
+                             Nt);
 
-
+  std::filesystem::path pc_name = dir;
+  i_name += "/partition_contacts";
+  write_partition_contacts(contact_events, pc_name, N_sims, N_partitions, Nt);
 }
 
 void Sim_Result::validate() const {

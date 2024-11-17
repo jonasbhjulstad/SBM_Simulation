@@ -1,6 +1,6 @@
+#include <SIR_SBM/math/numeric.hpp>
 #include <SIR_SBM/regression/regression.hpp>
 #include <SIR_SBM/utils/csv.hpp>
-#include <SIR_SBM/utils/numeric.hpp>
 #include <cppitertools/combinations_with_replacement.hpp>
 
 #include <fstream>

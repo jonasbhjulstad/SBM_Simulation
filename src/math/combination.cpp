@@ -1,6 +1,4 @@
-#include <SIR_SBM/utils/combination.hpp>
-
-
+#include <SIR_SBM/math/combination.hpp>
 
 namespace SIR_SBM {
 
@@ -22,7 +20,5 @@ uint32_t n_choose_k(uint32_t n, uint32_t k) {
   }
   return result;
 }
-
-
 
 } // namespace SIR_SBM

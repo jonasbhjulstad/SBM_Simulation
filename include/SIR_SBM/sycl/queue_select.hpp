@@ -4,6 +4,6 @@
 
 namespace SIR_SBM {
 
-sycl::queue default_queue();
+sycl::queue parse_queue(const char *fname);
 
 } // namespace SIR_SBM

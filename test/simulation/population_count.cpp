@@ -23,7 +23,6 @@ int main() {
       SIR_SBM::default_queue()}; // Create a queue on the default device
   Sim_Param p;
   p.Nt = 100;
-  p.N_I_terminate = 1;
   p.N_sims = 100;
   p.seed = 10;
   Sim_Result result(p, graph);

@@ -2,7 +2,7 @@
 #include <SIR_SBM/graph/indices.hpp>
 #include <SIR_SBM/utils/csv.hpp>
 #include <fstream>
-
+#include <numeric>
 namespace SIR_SBM {
 
 std::vector<float> read_csv_flat(const std::filesystem::path &file_prefix,
@@ -138,7 +138,7 @@ void write_partition_infections(const std::vector<Population_Count> &population_
 
 void write_partition_contacts(const std::vector<uint32_t> &contact_events,
                           const std::filesystem::path &fname, uint32_t N_sims,
-                          uint32_t N_connections, uint32_t Nt) {
+                          uint32_t N_partitions, uint32_t Nt) {
   std::ofstream f;
   std::filesystem::create_directories(fname.parent_path());
   uint32_t idx;
@@ -148,7 +148,9 @@ void write_partition_contacts(const std::vector<uint32_t> &contact_events,
     p += "_" + std::to_string(sim_idx) + ".csv";
     f.open(p);
     for (int t_idx = 0; t_idx < Nt; t_idx++) {
-      for (int c_idx = 0; c_idx < N_connections; c_idx++) {
+      for (int p_idx = 0; p_idx < N_partitions; p_idx++) {
+        auto pcc = get_partition_connection_contacts(contact_events, p_idx, N_partitions);
+        f << std::accumulate(pcc.begin(), pcc.end(), 0);
         f << ",";
       }
       f << std::endl;

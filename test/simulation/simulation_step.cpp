@@ -1,26 +1,19 @@
 #include <SIR_SBM/epidemiological/population_count.hpp>
-#include <SIR_SBM/sycl/queue_select.hpp>
 #include <SIR_SBM/simulation/simulation.hpp>
+#include <SIR_SBM/sycl/queue_select.hpp>
 #include <SIR_SBM/utils/ticktock.hpp>
 
 using namespace SIR_SBM;
 
 int main() {
-  int N_pop = 100;
-  int N_communities = 2;
-  int seed = 10;
-  float p_in = 1.0;
-  float p_out = 1.0;
   TickTock t;
   t.tick();
-  auto graph = generate_planted_SBM(N_pop, N_communities,
-                                                           p_in, p_out, seed);
+  auto graph = generate_planted_SBM(N_pop, N_communities, p_in, p_out, seed);
   t.tock_print();
 
   sycl::queue q{default_queue()}; // Create a queue on the default device
   Sim_Param p;
   p.Nt = 100;
-  p.N_I_terminate = 1;
   p.N_sims = 2;
   p.seed = 10;
 
@@ -36,8 +29,7 @@ int main() {
     SB.validate(q);
 
     simulation_step(q, SB, .01, 0.1, 0).wait();
-    partition_population_count(q, SB.state, SB.population_count, SB.vpc)
-        .wait();
+    partition_population_count(q, SB.state, SB.population_count, SB.vpc).wait();
   }
   auto cwd = std::filesystem::current_path();
   auto output_dir = cwd / "simulation_step_data";

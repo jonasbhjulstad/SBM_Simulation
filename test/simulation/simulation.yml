@@ -1,0 +1,12 @@
+seed: 10
+simulation:
+  Nt : 100
+SBM:  
+  N_pop: 100
+  N_communities: 2
+  p_in: 1.0 
+  p_out: 1.0
+epidemiological:
+  p_I0: 0.1
+  p_I: 0.001
+  p_R: 0.1

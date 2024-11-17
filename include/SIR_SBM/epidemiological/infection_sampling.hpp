@@ -29,9 +29,7 @@ private:
   std::vector<uint32_t>
   get_t_connections(const Connection_Data &contact_events,
                     uint32_t sim_idx, uint32_t t);
-  std::vector<uint32_t>
-  get_partition_connection_contacts(const std::vector<uint32_t> &contact_events,
-                                    int p_idx) const;
+
 
   std::vector<uint32_t>
   sample_infections(const Connection_Data &contact_events,

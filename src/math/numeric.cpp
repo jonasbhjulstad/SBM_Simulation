@@ -1,4 +1,4 @@
-#include <SIR_SBM/utils/numeric.hpp>
+#include <SIR_SBM/math/numeric.hpp>
 #include <numeric>
 namespace SIR_SBM {
 std::vector<uint32_t> make_iota(uint32_t N) {

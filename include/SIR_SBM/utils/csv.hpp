@@ -24,4 +24,7 @@ void write_partition_infections(const std::vector<Population_Count> &population_
                           const std::filesystem::path &fname, uint32_t N_sims,
                           uint32_t N_partitions, uint32_t Nt);
 
+void write_partition_contacts(const std::vector<uint32_t> &contact_events,
+                          const std::filesystem::path &fname, uint32_t N_sims,
+                          uint32_t N_partitions, uint32_t Nt);
 } // namespace SIR_SBM
