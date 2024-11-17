@@ -107,12 +107,12 @@ SBM_Graph generate_planted_SBM(const SBM_Param &p) {
 
   std::transform(combs.begin(), combs.end(), rngs.begin(),
                  std::back_inserter(graph.edges), [p](auto comb, auto &rng) {
-                   Vertexlist_t N0(N_pop);
-                   Vertexlist_t N1(N_pop);
+                   Vertexlist_t N0(p.N_pop);
+                   Vertexlist_t N1(p.N_pop);
                    std::iota(N0.begin(), N0.end(), p.N_pop * comb[0]);
                    std::iota(N1.begin(), N1.end(), p.N_pop * comb[1]);
-                   float p = comb[0] == comb[1] ? p.p_in : p.p_out;
-                   return generate_bipartite(N0, N1, p, rng);
+                   float prob = comb[0] == comb[1] ? p.p_in : p.p_out;
+                   return generate_bipartite(N0, N1, prob, rng);
                  });
   return graph;
 }

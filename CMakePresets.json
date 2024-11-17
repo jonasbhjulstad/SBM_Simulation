@@ -18,7 +18,8 @@
                 "CMAKE_BUILD_RPATH": "/home/deb/sycl_workspace/llvm/llvm/install/base/lib/",
                 "CUDA_TOOLKIT_ROOT_DIR": "/usr/local/cuda/",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "SIR_SBM_USE_GPU": "ON"
+                "SIR_SBM_USE_GPU": "ON",
+                "SIR_SBM_USE_CPU": "ON"
             },
             "environment": {
                 "CCACHE_DIR": "${sourceDir}/build/ccache/",

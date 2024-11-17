@@ -2,8 +2,7 @@
 
 #include <cstdint>
 
-namespace SIR_SBM
-{
+namespace SIR_SBM {
 struct Sim_Param {
   float p_I0;
   float p_I;
@@ -11,7 +10,7 @@ struct Sim_Param {
   uint32_t Nt;
   uint32_t N_sims;
   uint32_t seed;
+  static Sim_Param parse(const char *fname);
 };
-
 
 } // namespace SIR_SBM
