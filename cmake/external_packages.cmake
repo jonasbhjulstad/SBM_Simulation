@@ -1,10 +1,7 @@
 
 include(${PROJECT_SOURCE_DIR}/cmake/CPM.cmake)
-# set(SYCL_INCLUDE_DIR /opt/intel/oneapi/compiler/2024.0/include/)
-# set(SYCL_LIBRARY_DIR /opt/intel/oneapi/compiler/2024.0/lib/)
-# include_directories(${SYCL_INCLUDE_DIR})
-find_package(oneDPL REQUIRED HINTS "/opt/intel/oneapi/dpl/latest/lib/cmake/oneDPL/")
 find_package(TBB REQUIRED HINTS "/opt/intel/oneapi/tbb/latest/lib/cmake/tbb/")
+find_package(oneDPL REQUIRED HINTS "/opt/intel/oneapi/dpl/latest/lib/cmake/oneDPL/")
 find_package(Eigen3 REQUIRED)
 include(FindOpenMP)
 include(ExternalProject)
@@ -28,3 +25,7 @@ OPTIONS
 )
 set(${PROJECT_NAME}_EXTERNAL_PRIVATE_LIBRARIES TBB::tbb cppitertools::cppitertools yaml-cpp::yaml-cpp)
 set(${PROJECT_NAME}_EXTERNAL_TEST_LIBRARIES yaml-cpp::yaml-cpp)
+
+include(FindPkgConfig)
+#graph tool
+pkg_check_modules(GRAPH_TOOL REQUIRED graph-tool-py3.12)

@@ -1,0 +1,65 @@
+from pathlib import Path
+import os
+import sys
+
+
+def add_subdirs(subdirs, pwd):
+    with open(pwd / "CMakeLists.txt", "w") as f:
+        for subdir in subdirs:
+            # make cmakelists.txt
+            f.write("add_subdirectory({})".format(subdir.name))
+            f.write("\n")
+
+
+def link_library(cwd, target, libname, type="PRIVATE"):
+    with open(cwd / target / "CMakeLists.txt", "a") as f:
+        f.write("target_link_libraries(" + target + " PRIVATE " + libname + ")")
+        f.write("\n")
+
+
+if __name__ == '__main__':
+    cwd = Path(__file__).parent
+    # set cwd
+    os.chdir(cwd)
+    # get subdirs
+    subdirs = [d for d in cwd.iterdir() if d.is_dir()]
+    add_subdirs(subdirs, cwd)
+    for subdir in subdirs:
+        with open(subdir / 'CMakeLists.txt', 'w') as f:
+            cpp_files = [
+                sub.name for sub in subdir.iterdir() if sub.suffix == '.cpp']
+            subdirname = subdir.name
+            f.write("add_library(" + subdirname + " " +
+                    "\n\t".join([str(cpp) for cpp in cpp_files]) + ")")
+            f.write("\n")
+            f.write("target_include_directories(" +
+                    subdirname + " PUBLIC ${PROJECT_SOURCE_DIR}/include)")
+            f.write("\n")
+
+    # append to subdirs
+    sycl_targets = ["sycl", "simulation", "epidemiological"]
+    for sycl_target in sycl_targets:
+        # open cmakelists
+        with open(cwd / "CMakeLists.txt", "a") as f:
+            f.write("custom_configure_sycl(" + sycl_target + ")")
+            f.write("\n")
+    cppiter_targets = ["epidemiological", "graph", "simulation"]
+    yaml_targets = ["graph", "simulation", "sycl", "epidemiological"]
+    casadi_targets = ["regression"]
+    onedpl_targets = ["epidemiological", "random", "simulation", "graph"]
+    _ = [link_library(cwd, target, "cppitertools::cppitertools")
+         for target in cppiter_targets]
+    _ = [link_library(cwd, target, "yaml-cpp::yaml-cpp")
+         for target in yaml_targets]
+    _ = [link_library(cwd, target, "casadi", type="PUBLIC")
+         for target in casadi_targets]
+    _ = [link_library(cwd, target, "oneDPL TBB::tbb", type="PUBLIC")
+         for target in onedpl_targets]
+
+    # main library
+    with open(cwd / "CMakeLists.txt", "a") as f:
+        f.write("add_library(SIR_SBM STATIC sir_sbm.cpp)\n")
+        f.write(
+            "target_include_directories(SIR_SBM PUBLIC ${PROJECT_SOURCE_DIR}/include)\n")
+        f.write("target_link_libraries(SIR_SBM PRIVATE " +
+                "\n\t\t\t\t".join([sub.name for sub in subdirs]) + ")\n")

@@ -1,0 +1,9 @@
+build/
+build/**
+build/
+.vscode/
+.cache/
+.cache
+**.so
+**/__pycache__/**
+

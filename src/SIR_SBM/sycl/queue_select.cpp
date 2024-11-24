@@ -6,9 +6,9 @@ sycl::queue parse_queue(const char *fname) {
   YAML::Node config = YAML::LoadFile(fname);
   auto queue_type = config["queue_type"].as<std::string>();
   if (queue_type == "gpu") {
-    return sycl::gpu_selector_v{};
+    return sycl::queue(sycl::gpu_selector_v);
   } else if (queue_type == "cpu") {
-    return sycl::cpu_selector_v{};
+    return sycl::queue(sycl::cpu_selector_v);
   } else {
     throw std::runtime_error("Unknown queue type: " + queue_type);
   }

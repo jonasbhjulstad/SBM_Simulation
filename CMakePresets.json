@@ -16,7 +16,6 @@
                 "CMAKE_EXE_LINKER_FLAGS": "-L/home/deb/sycl_workspace/llvm/llvm/install/base/lib/",
                 "CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES": "/home/deb/sycl_workspace/llvm/llvm/install/base/include/",
                 "CMAKE_BUILD_RPATH": "/home/deb/sycl_workspace/llvm/llvm/install/base/lib/",
-                "CUDA_TOOLKIT_ROOT_DIR": "/usr/local/cuda/",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "SIR_SBM_USE_GPU": "ON",
                 "SIR_SBM_USE_CPU": "ON"
@@ -34,11 +33,31 @@
             "description": "Using compilers: C = /home/deb/sycl_workspace/llvm/llvm/install/base/bin/clang, CXX = /home/deb/sycl_workspace/llvm/llvm/install/base/bin/clang++",
             "cacheVariables":{
                 "OpenMP_C_LIB_NAMES": "libomp",
-                "OpenMP_libomp_LIBRARY": "/home/deb/sycl_workspace/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so",
-                "OpenMP_CXX_FLAGS": "-Xpreprocessor -fopenmp /home/deb/sycl_workspace/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so",
+                "OpenMP_libomp_LIBRARY": "/home/deb/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so",
+                "OpenMP_CXX_FLAGS": "-Xpreprocessor -fopenmp /home/deb/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so",
                 "OpenMP_CXX_LIB_NAMES": "libomp",
-                "OpenMP_C_FLAGS": "-Xpreprocessor -fopenmp /home/deb/sycl_workspace/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so"
+                "OpenMP_C_FLAGS": "-Xpreprocessor -fopenmp /home/deb/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so"
             }
+        },
+        {
+            "name": "graph-tool-base",
+            "hidden": true,
+            "inherits": "OpenMP_variables",
+            "displayName": "graph-tool-base",
+            "description": "Graph-tool configuration parameters",
+            "cacheVariables": {
+                "Python3_ROOT_DIR": "/home/deb/mambaforge/envs/gt/"            
+            },
+            "environment":
+            {
+                "PKG_CONFIG_PATH": "/home/deb/mambaforge/envs/gt/lib/pkgconfig"
+            }
+        },
+        {
+            "name": "full-dpcpp",
+            "displayName": "full-dpcpp",
+            "description": "DPCPP with all cache variables",
+            "inherits": ["dpcpp", "graph-tool-base"]
         }
     ],
     "buildPresets": [
@@ -48,9 +67,9 @@
 
         },
         {
-            "name": "simulation",
-            "configurePreset": "dpcpp",
-            "targets": ["infection_sampling", "population_count", "run_simulation", "simulation_step", "sycl_ls"]
+            "name": "all",
+            "configurePreset": "full-dpcpp",
+            "targets": ["all"]
         }
     ]
 

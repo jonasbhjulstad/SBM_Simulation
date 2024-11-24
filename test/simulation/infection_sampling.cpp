@@ -1,5 +1,6 @@
 #include <SIR_SBM/epidemiological/infection_sampling.hpp>
 #include <SIR_SBM/epidemiological/population_count.hpp>
+#include <SIR_SBM/graph/graph.hpp>
 #include <SIR_SBM/simulation/simulation.hpp>
 #include <SIR_SBM/sycl/queue_select.hpp>
 #include <SIR_SBM/utils/csv.hpp>
@@ -35,11 +36,11 @@ int main() {
   auto output_dir = cwd / "infection_sampling_data";
   result.write(output_dir);
   // result.validate();
-  Infection_Sampler sampler(p.N_sims, p_SBM.N_communities, p.SBM.N_connections,
-                            p.Nt);
-  auto infections = sampler.sample_infections(result.contact_events,
-                                              result.population_count, p.seed);
-  write_contact_events(infections, output_dir / "infections", p.N_sims,
-                       p_SBM.N_connections, p.Nt);
+  Infection_Sampler sampler(p_Sim.N_sims, p_SBM.N_communities, N_connections,
+                            p_Sim.Nt);
+  auto infections = sampler.sample_infections(
+      result.contact_events, result.population_count, p_Sim.seed);
+  write_contact_events(infections, output_dir / "infections", p_Sim.N_sims,
+                       N_connections, p_Sim.Nt);
   return 0;
 }
