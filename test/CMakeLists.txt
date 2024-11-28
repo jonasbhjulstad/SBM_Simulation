@@ -1,7 +1,7 @@
 function(add_custom_test target_name)
 add_executable(${target_name}_test ${target_name}.cpp)
 custom_configure_sycl(${target_name}_test)
-target_link_libraries(${target_name}_test PRIVATE ${PROJECT_NAME})
+target_link_libraries(${target_name}_test PRIVATE ${PROJECT_NAME} oneDPL)
 endfunction()
 add_subdirectory(buffer)
 add_subdirectory(epidemiological)

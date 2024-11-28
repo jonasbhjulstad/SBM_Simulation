@@ -45,6 +45,6 @@ struct SBM_Graph {
 
 std::vector<Vertexlist_t> SBM_vertices(uint32_t N_pop, uint32_t N_communities);
 
-SBM_Graph generate_planted_SBM(struct SBM_Param &p);
+SBM_Graph generate_planted_SBM(const SBM_Param &p);
 
 } // namespace SIR_SBM

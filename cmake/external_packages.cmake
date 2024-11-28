@@ -14,7 +14,7 @@ ExternalProject_Add(
         PREFIX ${CMAKE_BINARY_DIR}/external/casadi)
 
 find_package(casadi HINTS ${CMAKE_BINARY_DIR}/external/casadi/src/casadi-3.6.5/casadi)
-CPMAddPackage(NAME yaml-cpp
+CPMFindPackage(NAME yaml-cpp
 GITHUB_REPOSITORY jbeder/yaml-cpp
 GIT_TAG master)
 CPMFindPackage(NAME cppitertools

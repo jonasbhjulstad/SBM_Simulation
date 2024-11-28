@@ -1,50 +1,45 @@
 #include <SIR_SBM/epidemiological/population_count.hpp>
-#include <SIR_SBM/sycl/queue_select.hpp>
 #include <SIR_SBM/simulation/simulation.hpp>
+#include <SIR_SBM/sycl/queue_select.hpp>
 #include <SIR_SBM/utils/ticktock.hpp>
 
 using namespace SIR_SBM;
 
 int main() {
-  int N_pop = 100;
-  int N_communities = 2;
-  int seed = 10;
-  float p_in = 0.5;
-  float p_out = 1.0;
+  auto p_SBM = SBM_Param::parse("simulation.yaml");
+  auto p_Sim = Sim_Param::parse("simulation.yaml");
   TickTock t;
   t.tick();
-  auto graph = generate_planted_SBM(N_pop, N_communities, p_in, p_out, seed);
+  auto graph = generate_planted_SBM(p_SBM);
   t.tock_print();
 
-  sycl::queue q{
-      SIR_SBM::default_queue()}; // Create a queue on the default device
-  Sim_Param p;
-  p.Nt = 100;
-  p.N_sims = 100;
-  p.seed = 10;
-  Sim_Result result(p, graph);
-  auto SB = Sim_Buffers::make(q, graph, p, result);
+  auto q = parse_queue("simulation.yaml");
+
+  Sim_Result result(p_Sim, graph);
+  auto SB = Sim_Buffers::make(q, graph, p_Sim, result);
   SB->wait();
 
   initialize(q, SB->state, SB->rngs, 0.1).wait();
 
-  std::vector<Population_Count> count(N_communities * p.N_sims * p.Nt,
-                                      {0, 0, 0});
+  std::vector<Population_Count> count(
+      p_SBM.N_communities * p_Sim.N_sims * p_Sim.Nt, {0, 0, 0});
   {
     auto count_buf = sycl::buffer<Population_Count, 3>{
-        count.data(), sycl::range<3>(N_communities, p.N_sims, p.Nt)};
-    partition_population_count(q, SB->state, count_buf, SB->vpc, 0).wait();
+        count.data(),
+        sycl::range<3>(p_SBM.N_communities, p_Sim.N_sims, p_Sim.Nt)};
+    partition_population_count(q, SB->state, count_buf, SB->vpc).wait();
   }
 
   state_copy(q, SB->state, 0, 1).wait();
 
-  count =
-      std::vector<Population_Count>(N_communities * p.N_sims * p.Nt, {0, 0, 0});
+  count = std::vector<Population_Count>(
+      p_SBM.N_communities * p_Sim.N_sims * p_Sim.Nt, {0, 0, 0});
 
   {
     auto count_buf = sycl::buffer<Population_Count, 3>{
-        count.data(), sycl::range<3>(N_communities, p.N_sims, p.Nt)};
-    partition_population_count(q, SB->state, count_buf, SB->vpc, 0).wait();
+        count.data(),
+        sycl::range<3>(p_SBM.N_communities, p_Sim.N_sims, p_Sim.Nt)};
+    partition_population_count(q, SB->state, count_buf, SB->vpc).wait();
   }
 
   return 0;

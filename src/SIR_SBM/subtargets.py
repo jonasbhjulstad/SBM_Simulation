@@ -47,14 +47,22 @@ if __name__ == '__main__':
     yaml_targets = ["graph", "simulation", "sycl", "epidemiological"]
     casadi_targets = ["regression"]
     onedpl_targets = ["epidemiological", "random", "simulation", "graph"]
+    epidemiological_targets = ["utils"]
+    utils_targets = ["simulation", "epidemiological"]
+
     _ = [link_library(cwd, target, "cppitertools::cppitertools")
          for target in cppiter_targets]
+
     _ = [link_library(cwd, target, "yaml-cpp::yaml-cpp")
          for target in yaml_targets]
-    _ = [link_library(cwd, target, "casadi", type="PUBLIC")
+    _ = [link_library(cwd, target, "casadi", type="PRIVATE")
          for target in casadi_targets]
     _ = [link_library(cwd, target, "oneDPL TBB::tbb", type="PUBLIC")
          for target in onedpl_targets]
+    _ = [link_library(cwd, target, "utils", type="PRIVATE")
+         for target in utils_targets]
+    _ = [link_library(cwd, target, "epidemiological", type="PRIVATE")
+         for target in epidemiological_targets]
 
     # main library
     with open(cwd / "CMakeLists.txt", "a") as f:

@@ -1,19 +1,19 @@
-#include <SIR_SBM/sycl/queue_select.hpp>
 #include <SIR_SBM/random/random.hpp>
+#include <SIR_SBM/sycl/queue_select.hpp>
 #include <SIR_SBM/sycl/sycl_routines.hpp>
 #include <oneapi/dpl/random>
 
 using namespace SIR_SBM;
 int main() {
   // sycl queue
-  sycl::queue q{SIR_SBM::default_queue()};
+  auto q = parse_queue("simulation.yaml");
+
   // get work group size
   auto work_group_size =
       q.get_device().get_info<sycl::info::device::max_work_group_size>();
   uint32_t seed = 123;
   sycl::buffer<oneapi::dpl::ranlux48> rngs(work_group_size * 10);
-  buffer_copy(q, rngs,
-              generate_rngs_dpl(seed, work_group_size * 10));
+  buffer_copy(q, rngs, generate_rngs_dpl(seed, work_group_size * 10));
 
   std::vector<float> nums_vec(work_group_size * 10, 0.0f);
   {

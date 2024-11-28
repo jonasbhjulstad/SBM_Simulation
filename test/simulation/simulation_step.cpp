@@ -6,18 +6,21 @@
 using namespace SIR_SBM;
 
 int main() {
+  auto p_SBM = SBM_Param::parse("simulation.yaml");
+  auto p_Sim = Sim_Param::parse("simulation.yaml");
   TickTock t;
   t.tick();
-  auto graph = generate_planted_SBM(N_pop, N_communities, p_in, p_out, seed);
+  auto graph = generate_planted_SBM(p_SBM);
   t.tock_print();
 
-  sycl::queue q{default_queue()}; // Create a queue on the default device
-  Sim_Param p;
-  p.Nt = 100;
-  p.N_sims = 2;
-  p.seed = 10;
+  auto q = parse_queue("simulation.yaml");
 
-  Sim_Result result(p, graph);
+  Sim_Param p;
+  p_Sim.Nt = 100;
+  p_Sim.N_sims = 2;
+  p_Sim.seed = 10;
+
+  Sim_Result result(p_Sim, graph);
   {
     auto SB = Sim_Buffers(q, graph, p, result);
     SB.wait();

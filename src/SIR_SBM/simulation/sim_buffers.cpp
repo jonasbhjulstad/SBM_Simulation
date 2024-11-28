@@ -18,8 +18,9 @@ get_vector_sizes(const std::vector<std::vector<T>> vecs) {
 Sim_Buffers::Sim_Buffers(sycl::queue &q, const SBM_Graph &G, const Sim_Param &p,
                          Sim_Result &result)
     : // size initialization
-      N_vertices(G.N_vertices()), N_sims(p.N_sims), Nt(p.Nt), N_edges(G.N_edges()),
-      N_partitions(G.N_partitions()), N_connections(G.N_connections()),
+      N_vertices(G.N_vertices()), N_sims(p.N_sims), Nt(p.Nt),
+      N_edges(G.N_edges()), N_partitions(G.N_partitions()),
+      N_connections(G.N_connections()),
       N_con_largest(G.largest_connection_size()),
       N_part_largest(G.largest_partition_size()),
       // data initialization
@@ -28,7 +29,7 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, const SBM_Graph &G, const Sim_Param &p,
       // buffer initialization
       ecc(ecc_vec.data(), G.N_connections()),
       vpc(vpc_vec.data(), G.N_partitions()), rngs(rng_vec.data(), p.N_sims),
-      state(sycl::range<3>(p.N_sims, G.N_vertices(), p.Nt+1)),
+      state(sycl::range<3>(p.N_sims, G.N_vertices(), p.Nt + 1)),
       contact_events(result.contact_events.data(),
                      sycl::range<3>(p.N_sims, G.N_connections() * 2, p.Nt)),
       population_count(result.population_count.data(),
@@ -39,9 +40,17 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, const SBM_Graph &G, const Sim_Param &p,
   events.push_back(zero_fill(q, contact_events, contact_events.get_range(),
                              sycl::range<3>(0, 0, 0)));
   events.push_back(buffer_fill(q, population_count, Population_Count()));
-  assert(result.population_count.size() == p.N_sims*G.N_partitions()*(p.Nt+1) && "Inconsistent population count buffer size");
-  assert(result.contact_events.size() == p.N_sims*G.N_connections()*2*p.Nt && "Inconsistent contact events buffer size");
+  assert(result.population_count.size() ==
+             p.N_sims * G.N_partitions() * (p.Nt + 1) &&
+         "Inconsistent population count buffer size");
+  assert(result.contact_events.size() ==
+             p.N_sims * G.N_connections() * 2 * p.Nt &&
+         "Inconsistent contact events buffer size");
 }
+
+static std::shared_ptr<Sim_Buffers> make(sycl::queue &q, const SBM_Graph &G,
+                                         const Sim_Param &p,
+                                         Sim_Result &result) {}
 
 void Sim_Buffers::wait() const { sycl::event::wait(events); }
 
@@ -111,8 +120,7 @@ void Sim_Buffers::validate_state(sycl::queue &q) {
         }
       },
       "Invalid state");
-  validate_range(sycl::range<3>(N_sims, N_vertices, Nt + 1),
-                 state.get_range());
+  validate_range(sycl::range<3>(N_sims, N_vertices, Nt + 1), state.get_range());
 }
 
 void Sim_Buffers::validate_infected_count(sycl::queue &q) {

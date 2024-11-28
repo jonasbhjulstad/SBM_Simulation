@@ -1,31 +1,28 @@
 #include <SIR_SBM/epidemiological/population_count.hpp>
-#include <SIR_SBM/sycl/queue_select.hpp>
 #include <SIR_SBM/simulation/simulation.hpp>
+#include <SIR_SBM/sycl/queue_select.hpp>
 #include <SIR_SBM/utils/ticktock.hpp>
 #include <filesystem>
 using namespace SIR_SBM;
 
 int main() {
-  int N_pop = 100;
-  int N_communities = 2;
-  int seed = 10;
-  float p_in = 1.0;
-  float p_out = 1.0;
+  auto p_SBM = SBM_Param::parse("simulation.yaml");
+  auto p_Sim = Sim_Param::parse("simulation.yaml");
   TickTock t;
   t.tick();
-  auto graph = generate_planted_SBM(N_pop, N_communities,
-                                                           p_in, p_out, seed);
+  auto graph = generate_planted_SBM(p_SBM);
   t.tock_print();
 
-  sycl::queue q{default_queue()}; // Create a queue on the default device
+  auto q = parse_queue("simulation.yaml");
+
   Sim_Param p;
-  p.Nt = 56;
-  p.N_sims = 2;
-  p.seed = 10;
-  p.p_I0 = 0.1;
-  p.p_I = 0.001;
-  p.p_R = 0.1;
-  Sim_Result result(p, graph);
+  p_Sim.Nt = 56;
+  p_Sim.N_sims = 2;
+  p_Sim.seed = 10;
+  p_Sim.p_I0 = 0.1;
+  p_Sim.p_I = 0.001;
+  p_Sim.p_R = 0.1;
+  Sim_Result result(p_Sim, graph);
   {
     auto SB = Sim_Buffers(q, graph, p, result);
     SB.wait();

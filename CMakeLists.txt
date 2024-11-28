@@ -17,6 +17,5 @@ include(cmake/ccache.cmake)
 include(cmake/external_packages.cmake)
 include(cmake/default_targets.cmake)
 include(cmake/configure_sycl.cmake)
-
 add_subdirectory(src)
 add_subdirectory(test)

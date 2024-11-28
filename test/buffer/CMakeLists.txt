@@ -1,1 +1,2 @@
 add_custom_test(bernoulli)
+target_link_libraries(bernoulli_test PUBLIC oneDPL)
