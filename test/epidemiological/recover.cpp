@@ -7,9 +7,9 @@
 using namespace SIR_SBM;
 
 int main() {
-  auto p_SBM = SBM_Param::parse(SOURCE_TEST_DIR / "simulation.yaml");
-  auto p_Sim = Sim_Param::parse(SOURCE_TEST_DIR / "simulation.yaml");
-  auto q = parse_queue(SOURCE_TEST_DIR / "simulation.yaml");
+  auto p_SBM = SBM_Param::parse(SOURCE_TEST_DIR / "simulation.yml");
+  auto p_Sim = Sim_Param::parse(SOURCE_TEST_DIR / "simulation.yml");
+  auto q = parse_queue(SOURCE_TEST_DIR / "simulation.yml");
   TickTock t;
   t.tick();
   auto graph = generate_planted_SBM(p_SBM);

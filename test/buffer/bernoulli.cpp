@@ -7,7 +7,7 @@
 using namespace SIR_SBM;
 int main() {
   // sycl queue
-  auto q = parse_queue(SOURCE_TEST_DIR / "simulation.yaml");
+  auto q = parse_queue(SOURCE_TEST_DIR / "simulation.yml");
 
   // get work group size
   auto work_group_size =

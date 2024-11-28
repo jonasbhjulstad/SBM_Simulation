@@ -19,7 +19,8 @@
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_CXX_FLAGS": "-Wno-error=unused-command-line-argument",
                 "CMAKE_LINKER": "/usr/bin/mold",
-                "CMAKE_BUILD_RPATH": "${userHome}/sycl_workspace/llvm/llvm/build/base/lib/"
+                "CMAKE_BUILD_RPATH": "${userHome}/sycl_workspace/llvm/llvm/build/base/lib/",
+                "SYCL_INCLUDE_DIR": "${userHome}/sycl_workspace/llvm/build/include/sycl/"
             }
         },
         {

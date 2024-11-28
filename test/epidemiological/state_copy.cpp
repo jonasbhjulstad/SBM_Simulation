@@ -14,7 +14,7 @@ int main() {
   auto graph = generate_planted_SBM(p_SBM);
   t.tock_print();
 
-  auto q = parse_queue(SOURCE_TEST_DIR / "simulation.yaml");
+  auto q = parse_queue(SOURCE_TEST_DIR / "simulation.yml");
 
   Sim_Result result(p_Sim, graph);
   auto SB = Sim_Buffers(q, graph, p_Sim, result);

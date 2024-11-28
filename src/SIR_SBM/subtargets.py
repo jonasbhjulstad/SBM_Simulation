@@ -21,13 +21,15 @@ if __name__ == '__main__':
     cwd = Path(__file__).parent
     # set cwd
     os.chdir(cwd)
-    # get subdirs
+
     subdirs = [d for d in cwd.iterdir() if d.is_dir()]
     add_subdirs(subdirs, cwd)
     for subdir in subdirs:
         with open(subdir / 'CMakeLists.txt', 'w') as f:
             cpp_files = [
                 sub.name for sub in subdir.iterdir() if sub.suffix == '.cpp']
+            if subdir.name == "utils":
+                cpp_files.append("${CMAKE_CURRENT_BINARY_DIR}/filepaths.cpp")
             subdirname = subdir.name
             f.write("add_library(" + subdirname + " " +
                     "\n\t".join([str(cpp) for cpp in cpp_files]) + ")")
@@ -36,35 +38,48 @@ if __name__ == '__main__':
                     subdirname + " PUBLIC ${PROJECT_SOURCE_DIR}/include)")
             f.write("\n")
 
-    # configure filepaths.hpp.in
+    with open(cwd / "utils/CMakeLists.txt", "a") as f:
+        f.write(
+            "configure_file(${CMAKE_CURRENT_LIST_DIR}/filepaths.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/filepaths.cpp @ONLY)\n")
 
-    # append to subdirs
-    sycl_targets = ["sycl", "simulation", "epidemiological"]
+    sycl_targets = ["simulation", "epidemiological", "utils"]
     for sycl_target in sycl_targets:
-        # open cmakelists
         with open(cwd / "CMakeLists.txt", "a") as f:
             f.write("custom_configure_sycl(" + sycl_target + ")")
             f.write("\n")
+    graph_targets = ["epidemiological", "simulation"]
     cppiter_targets = ["epidemiological", "graph", "simulation"]
     yaml_targets = ["graph", "simulation", "sycl", "epidemiological"]
     casadi_targets = ["regression"]
     onedpl_targets = ["epidemiological", "random", "simulation", "graph"]
     epidemiological_targets = ["utils"]
     utils_targets = ["simulation", "epidemiological"]
+    dependencies = {"sycl": sycl_targets,
+                    "graph": graph_targets,
+                    "cppitertools::cppitertools": cppiter_targets,
+                    "yaml-cpp::yaml-cpp": yaml_targets,
+                    "casadi": casadi_targets,
+                    "oneDPL": onedpl_targets,
+                    "epidemiological": epidemiological_targets,
+                    "utils": utils_targets}
 
-    _ = [link_library(cwd, target, "cppitertools::cppitertools")
-         for target in cppiter_targets]
+    # _ = [link_library(cwd, target, "cppitertools::cppitertools")
+    #      for target in cppiter_targets]
+    # _ = [link_library(cwd, target, "yaml-cpp::yaml-cpp")
+    #      for target in yaml_targets]
+    # _ = [link_library(cwd, target, "casadi", type="PRIVATE")
+    #      for target in casadi_targets]
+    # _ = [link_library(cwd, target, "oneDPL TBB::tbb", type="PUBLIC")
+    #      for target in onedpl_targets]
+    # _ = [link_library(cwd, target, "utils", type="PRIVATE")
+    #      for target in utils_targets]
+    # _ = [link_library(cwd, target, "epidemiological", type="PRIVATE")
+    #      for target in epidemiological_targets]
 
-    _ = [link_library(cwd, target, "yaml-cpp::yaml-cpp")
-         for target in yaml_targets]
-    _ = [link_library(cwd, target, "casadi", type="PRIVATE")
-         for target in casadi_targets]
-    _ = [link_library(cwd, target, "oneDPL TBB::tbb", type="PUBLIC")
-         for target in onedpl_targets]
-    _ = [link_library(cwd, target, "utils", type="PRIVATE")
-         for target in utils_targets]
-    _ = [link_library(cwd, target, "epidemiological", type="PRIVATE")
-         for target in epidemiological_targets]
+    # iterate over dependencies
+    for target in dependencies:
+        _ = [link_library(cwd, sub, target, type="PUBLIC")
+             for sub in dependencies[target]]
 
     # main library
     with open(cwd / "CMakeLists.txt", "a") as f:
