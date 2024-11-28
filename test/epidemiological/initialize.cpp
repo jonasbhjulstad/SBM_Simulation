@@ -21,9 +21,9 @@ int main() {
   p_Sim.N_sims = 100;
   p_Sim.seed = 10;
   Sim_Result result(p_Sim, graph);
-  auto SB = Sim_Buffers::make(q, graph, p_Sim, result);
-  SB->wait();
-  auto event = initialize(q, SB->state, SB->rngs, 0.1);
+  auto SB = Sim_Buffers(q, graph, p_Sim, result);
+  SB.wait();
+  auto event = initialize(q, SB.state, SB.rngs, 0.1);
   event.wait();
 
   return 0;

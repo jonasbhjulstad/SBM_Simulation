@@ -20,6 +20,7 @@
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_CXX_FLAGS": "-Wno-error=unused-command-line-argument",
                 "CMAKE_LINKER": "/home/deb/sycl_workspace/llvm/llvm/install/base/bin/lld",
+                "CMAKE_BUILD_RPATH": "${userHome}/sycl_workspace//llvm/llvm/build/base/lib/",
                 "SIR_SBM_USE_GPU": "ON",
                 "SIR_SBM_USE_CPU": "ON"
             },

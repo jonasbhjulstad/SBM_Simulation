@@ -14,10 +14,11 @@ int main() {
   auto graph = generate_planted_SBM(p_SBM);
   t.tock_print();
   Sim_Result result(p_Sim, graph);
-  auto SB = Sim_Buffers::make(q, graph, p_Sim, result);
-  SB->wait();
+  auto SB = Sim_Buffers(q, graph, p_Sim, result);
 
-  initialize(q, SB->state, SB->rngs, 0.1).wait();
+  SB.wait();
+
+  initialize(q, SB.state, SB.rngs, 0.1).wait();
 
   std::vector<Population_Count> count(
       p_SBM.N_communities * p_Sim.N_sims * p_Sim.Nt, {0, 0, 0});
@@ -25,10 +26,10 @@ int main() {
     auto count_buf = sycl::buffer<Population_Count, 3>{
         count.data(),
         sycl::range<3>(p_SBM.N_communities, p_Sim.N_sims, p_Sim.Nt)};
-    partition_population_count(q, SB->state, count_buf, SB->vpc).wait();
+    partition_population_count(q, SB.state, count_buf, SB.vpc).wait();
   }
 
-  auto rec_evt = recover(q, SB->state, SB->rngs, 0.1, 0);
+  auto rec_evt = recover(q, SB.state, SB.rngs, 0.1, 0);
 
   rec_evt.wait();
 
@@ -39,7 +40,7 @@ int main() {
     auto count_buf = sycl::buffer<Population_Count, 3>{
         count.data(),
         sycl::range<3>(p_SBM.N_communities, p_Sim.N_sims, p_Sim.Nt)};
-    partition_population_count(q, SB->state, count_buf, SB->vpc).wait();
+    partition_population_count(q, SB.state, count_buf, SB.vpc).wait();
   }
 
   return 0;

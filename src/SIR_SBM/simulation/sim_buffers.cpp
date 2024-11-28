@@ -48,10 +48,6 @@ Sim_Buffers::Sim_Buffers(sycl::queue &q, const SBM_Graph &G, const Sim_Param &p,
          "Inconsistent contact events buffer size");
 }
 
-static std::shared_ptr<Sim_Buffers> make(sycl::queue &q, const SBM_Graph &G,
-                                         const Sim_Param &p,
-                                         Sim_Result &result) {}
-
 void Sim_Buffers::wait() const { sycl::event::wait(events); }
 
 void Sim_Buffers::validate(sycl::queue &q) {

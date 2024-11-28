@@ -7,12 +7,7 @@ namespace SIR_SBM {
 struct Sim_Buffers {
   Sim_Buffers(sycl::queue &q, const SBM_Graph &G, const Sim_Param &p,
               Sim_Result &result);
-  static std::shared_ptr<Sim_Buffers> make(sycl::queue &q, const SBM_Graph &G,
-                                           const Sim_Param &p,
-                                           Sim_Result &result);
-
-  template <typename... Ts>
-  using Shared_Tup = std::tuple<std::vector<Ts>...>;
+  template <typename... Ts> using Shared_Tup = std::tuple<std::vector<Ts>...>;
 
   void wait() const;
 
@@ -31,8 +26,7 @@ struct Sim_Buffers {
   sycl::buffer<oneapi::dpl::ranlux48, 1> rngs;
 
   // sizes
-  uint32_t N_vertices, N_sims, Nt, N_edges, N_partitions,
-      N_connections;
+  uint32_t N_vertices, N_sims, Nt, N_edges, N_partitions, N_connections;
   uint32_t N_con_largest, N_part_largest;
   void validate(sycl::queue &q);
 
