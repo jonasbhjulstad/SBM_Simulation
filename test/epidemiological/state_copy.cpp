@@ -1,19 +1,20 @@
 #include <SIR_SBM/epidemiological/population_count.hpp>
 #include <SIR_SBM/simulation/simulation.hpp>
 #include <SIR_SBM/sycl/queue_select.hpp>
+#include <SIR_SBM/utils/filepaths.hpp>
 #include <SIR_SBM/utils/ticktock.hpp>
 
 using namespace SIR_SBM;
 
 int main() {
-  auto p_SBM = SBM_Param::parse("simulation.yaml");
-  auto p_Sim = Sim_Param::parse("simulation.yaml");
+  auto p_SBM = SBM_Param::parse("state_copy.yaml");
+  auto p_Sim = Sim_Param::parse("state_copy.yaml");
   TickTock t;
   t.tick();
   auto graph = generate_planted_SBM(p_SBM);
   t.tock_print();
 
-  auto q = parse_queue("simulation.yaml");
+  auto q = parse_queue(SOURCE_TEST_DIR / "simulation.yaml");
 
   Sim_Result result(p_Sim, graph);
   auto SB = Sim_Buffers(q, graph, p_Sim, result);

@@ -4,9 +4,10 @@
 #include <SIR_SBM/utils/exceptions.hpp>
 #include <SIR_SBM/utils/ticktock.hpp>
 using namespace SIR_SBM;
+#include <SIR_SBM/utils/filepaths.hpp>
 
 int main() {
-  auto p_SBM = SBM_Param::parse("simulation.yaml");
+  auto p_SBM = SBM_Param::parse(SOURCE_TEST_DIR / "simulation.yaml");
   TickTock t;
   t.tick();
   auto graph = generate_planted_SBM(p_SBM);

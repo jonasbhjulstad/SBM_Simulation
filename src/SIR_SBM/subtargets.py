@@ -36,6 +36,8 @@ if __name__ == '__main__':
                     subdirname + " PUBLIC ${PROJECT_SOURCE_DIR}/include)")
             f.write("\n")
 
+    # configure filepaths.hpp.in
+
     # append to subdirs
     sycl_targets = ["sycl", "simulation", "epidemiological"]
     for sycl_target in sycl_targets:

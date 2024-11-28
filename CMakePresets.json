@@ -4,77 +4,94 @@
         {
             "name": "dpcpp",
             "displayName": "DPCPP",
-            "description": "Using compilers: C = /home/deb/sycl_workspace/llvm/llvm/install/base/bin/clang, CXX = /home/deb/sycl_workspace/llvm/llvm/install/base/bin/clang++",
+            "description": "Using compilers: C = ${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang, CXX = ${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang++",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/${presetName}",
-                "CMAKE_C_COMPILER": "/home/deb/sycl_workspace/llvm/llvm/install/base/bin/clang",
-                "CMAKE_CXX_COMPILER": "/home/deb/sycl_workspace/llvm/llvm/install/base/bin/clang++",
+                "CMAKE_C_COMPILER": "${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang",
+                "CMAKE_CXX_COMPILER": "${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang++",
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_LINKER": "/usr/bin/mold",
-                "CMAKE_EXE_LINKER_FLAGS": "-L/home/deb/sycl_workspace/llvm/llvm/install/base/lib/",
-                "CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES": "/home/deb/sycl_workspace/llvm/llvm/install/base/include/",
-                "CMAKE_BUILD_RPATH": "/home/deb/sycl_workspace/llvm/llvm/install/base/lib/",
-                "CMAKE_PREFIX_PATH": "/home/deb/sycl_workspace/llvm/llvm/install/base/lib/cmake/llvm/",
+                "CMAKE_EXE_LINKER_FLAGS": "-L${userHome}/sycl_workspace/llvm/llvm/install/base/lib/",
+                "CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES": "${userHome}/sycl_workspace/llvm/llvm/install/base/include/",
+                "CMAKE_BUILD_RPATH": "${userHome}/sycl_workspace/llvm/llvm/install/base/lib/",
+                "CMAKE_PREFIX_PATH": "${userHome}/sycl_workspace/llvm/llvm/install/base/lib/cmake/llvm/",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "CMAKE_CXX_FLAGS": "-Wno-error=unused-command-line-argument",
-                "CMAKE_LINKER": "/home/deb/sycl_workspace/llvm/llvm/install/base/bin/lld",
-                "CMAKE_BUILD_RPATH": "${userHome}/sycl_workspace//llvm/llvm/build/base/lib/",
-                "SIR_SBM_USE_GPU": "ON",
-                "SIR_SBM_USE_CPU": "ON"
+                "CMAKE_LINKER": "/usr/bin/mold",
+                "CMAKE_BUILD_RPATH": "${userHome}/sycl_workspace/llvm/llvm/build/base/lib/"
+            }
+        },
+        {
+            "name": "ccache",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER_LAUNCHER": "/usr/bin/ccache"
             },
             "environment": {
                 "CCACHE_DIR": "${sourceDir}/build/ccache/",
-                "CCACHE_SLOPPINESS": "clang_index_store",
-                "PKG_CONFIG_PATH": "/home/deb/mambaforge/envs/gt/lib/pkgconfig"
+                "CCACHE_SLOPPINESS": "clang_index_store"
             }
         },
         {
-            "name": "OpenMP_variables",
-            "displayName": "OpenMP-variables",
+            "name": "SIR_SBM",
             "hidden": true,
-            "description": "Using compilers: C = /home/deb/sycl_workspace/llvm/llvm/install/base/bin/clang, CXX = /home/deb/sycl_workspace/llvm/llvm/install/base/bin/clang++",
-            "cacheVariables":{
+            "cacheVariables": {
+                "SIR_SBM_USE_GPU": "ON",
+                "SIR_SBM_USE_CPU": "ON"
+            }
+        },
+        {
+            "name": "OpenMP",
+            "displayName": "OpenMP",
+            "hidden": true,
+            "description": "Using compilers: C = ${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang, CXX = ${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang++",
+            "cacheVariables": {
                 "OpenMP_C_LIB_NAMES": "libomp",
-                "OpenMP_libomp_LIBRARY": "/home/deb/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so",
-                "OpenMP_CXX_FLAGS": "-Xpreprocessor -fopenmp /home/deb/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so",
+                "OpenMP_libomp_LIBRARY": "${userHome}/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so",
+                "OpenMP_CXX_FLAGS": "-Xpreprocessor -fopenmp ${userHome}/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so",
                 "OpenMP_CXX_LIB_NAMES": "libomp",
-                "OpenMP_C_FLAGS": "-Xpreprocessor -fopenmp /home/deb/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so"
+                "OpenMP_C_FLAGS": "-Xpreprocessor -fopenmp ${userHome}/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so"
             }
         },
         {
-            "name": "graph-tool-base",
+            "name": "graph-tool",
             "hidden": true,
-            "inherits": "OpenMP_variables",
-            "displayName": "graph-tool-base",
+            "inherits": "OpenMP",
+            "displayName": "graph-tool",
             "description": "Graph-tool configuration parameters",
             "cacheVariables": {
-                "Python3_ROOT_DIR": "/home/deb/mambaforge/envs/gt/"            
+                "Python3_ROOT_DIR": "${userHome}/mambaforge/envs/gt/"
             },
-            "environment":
-            {
-                "PKG_CONFIG_PATH": "/home/deb/mambaforge/envs/gt/lib/pkgconfig"
+            "environment": {
+                "PKG_CONFIG_PATH": "${userHome}/mambaforge/envs/gt/lib/pkgconfig"
             }
         },
         {
             "name": "full-dpcpp",
             "displayName": "full-dpcpp",
             "description": "DPCPP with all cache variables",
-            "inherits": ["dpcpp", "graph-tool-base"]
+            "inherits": [
+                "dpcpp",
+                "graph-tool",
+                "ccache",
+                "SIR_SBM"
+            ]
         }
     ],
     "buildPresets": [
         {
             "name": "graph-tool-tests",
-            "targets": ["kcore"]
-
+            "targets": [
+                "kcore"
+            ]
         },
         {
             "name": "all",
             "configurePreset": "full-dpcpp",
-            "targets": ["all"]
+            "targets": [
+                "all"
+            ]
         }
     ]
-
 }

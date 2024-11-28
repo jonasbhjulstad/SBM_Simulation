@@ -1,12 +1,13 @@
 #include <SIR_SBM/random/random.hpp>
 #include <SIR_SBM/sycl/queue_select.hpp>
 #include <SIR_SBM/sycl/sycl_routines.hpp>
+#include <SIR_SBM/utils/filepaths.hpp>
 #include <oneapi/dpl/random>
 
 using namespace SIR_SBM;
 int main() {
   // sycl queue
-  auto q = parse_queue("simulation.yaml");
+  auto q = parse_queue(SOURCE_TEST_DIR / "simulation.yaml");
 
   // get work group size
   auto work_group_size =

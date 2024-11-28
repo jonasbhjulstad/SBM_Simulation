@@ -3,7 +3,6 @@
 #include <SIR_SBM/math/combination.hpp>
 #include <SIR_SBM/math/numeric.hpp>
 #include <SIR_SBM/random/random.hpp>
-#include <yaml-cpp/yaml.h>
 
 #include <cppitertools/combinations_with_replacement.hpp>
 #include <execution>
@@ -38,17 +37,6 @@ Edgelist_t generate_bipartite(const Vertexlist_t &N0, const Vertexlist_t &N1,
     std::remove_if(edges.begin(), edges.end(),
                    [&dist, &rng](auto elem) { return !dist(rng); });
   return edges;
-}
-
-SBM_Param SBM_Param::parse(const char *fname) {
-  YAML::Node config = YAML::LoadFile(fname);
-  SBM_Param p;
-  p.N_pop = config["SBM"]["N_pop"].as<int>();
-  p.N_communities = config["SBM"]["N_communities"].as<int>();
-  p.seed = config["seed"].as<int>();
-  p.p_in = config["SBM"]["p_in"].as<float>();
-  p.p_out = config["SBM"]["p_out"].as<float>();
-  return p;
 }
 
 Edgelist_t SBM_Graph::flat_edges() const { return vector_merge(edges); }

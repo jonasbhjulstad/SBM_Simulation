@@ -1,7 +1,7 @@
 #include <SIR_SBM/simulation/sim_param.hpp>
 #include <yaml-cpp/yaml.h>
 namespace SIR_SBM {
-Sim_Param Sim_Param::parse(const char *fname) {
+Sim_Param Sim_Param::parse(const std::filesystem::path &fname) {
   YAML::Node config = YAML::LoadFile(fname);
   Sim_Param p;
   p.p_I0 = config["p_I0"].as<float>();

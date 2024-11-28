@@ -4,6 +4,7 @@
 #include <SIR_SBM/simulation/simulation.hpp>
 #include <SIR_SBM/sycl/queue_select.hpp>
 #include <SIR_SBM/utils/csv.hpp>
+#include <SIR_SBM/utils/filepaths.hpp>
 #include <SIR_SBM/utils/ticktock.hpp>
 #include <filesystem>
 using namespace SIR_SBM;
@@ -11,9 +12,9 @@ using namespace SIR_SBM;
 int main() {
   TickTock t;
   t.tick();
-  auto p_SBM = SBM_Param::parse("simulation.yaml");
-  auto p_Sim = Sim_Param::parse("simulation.yaml");
-  auto q = parse_queue("simulation.yaml");
+  auto p_SBM = SBM_Param::parse(SOURCE_TEST_DIR / "simulation.yaml");
+  auto p_Sim = Sim_Param::parse(SOURCE_TEST_DIR / "simulation.yaml");
+  auto q = parse_queue(SOURCE_TEST_DIR / "simulation.yaml");
   auto graph = generate_planted_SBM(p_SBM);
   uint32_t N_connections = graph.N_connections();
 

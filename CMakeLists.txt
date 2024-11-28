@@ -17,5 +17,12 @@ include(cmake/ccache.cmake)
 include(cmake/external_packages.cmake)
 include(cmake/default_targets.cmake)
 include(cmake/configure_sycl.cmake)
+
 add_subdirectory(src)
+
+#Configuration of project-relative filepaths
+configure_file(${PROJECT_SOURCE_DIR}/include/SIR_SBM/utils/filepaths.hpp.in
+${PROJECT_BINARY_DIR}/include/SIR_SBM/utils/filepaths.hpp @ONLY)
+target_include_directories(utils PUBLIC ${PROJECT_BINARY_DIR}/include)
+
 add_subdirectory(test)

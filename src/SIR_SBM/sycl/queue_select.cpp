@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <yaml-cpp/yaml.h>
 namespace SIR_SBM {
-sycl::queue parse_queue(const char *fname) {
+sycl::queue parse_queue(const std::filesystem::path &fname) {
   YAML::Node config = YAML::LoadFile(fname);
   auto queue_type = config["queue_type"].as<std::string>();
   if (queue_type == "gpu") {
