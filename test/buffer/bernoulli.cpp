@@ -1,10 +1,10 @@
-#include <SIR_SBM/random/random.hpp>
-#include <SIR_SBM/sycl/queue_select.hpp>
-#include <SIR_SBM/sycl/sycl_routines.hpp>
-#include <SIR_SBM/utils/filepaths.hpp>
+#include <SBM/random/random.hpp>
+#include <SBM/sycl/queue_select.hpp>
+#include <SBM/sycl/sycl_routines.hpp>
+#include <SBM/utils/filepaths.hpp>
 #include <oneapi/dpl/random>
 
-using namespace SIR_SBM;
+using namespace SBM;
 int main() {
   // sycl queue
   auto q = parse_queue(SOURCE_TEST_DIR / "simulation.yml");

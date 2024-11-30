@@ -1,1 +1,1 @@
-add_subdirectory(SIR_SBM)
+add_subdirectory(SBM)

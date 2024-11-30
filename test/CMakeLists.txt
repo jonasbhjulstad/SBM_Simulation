@@ -5,4 +5,6 @@ target_link_libraries(${target_name}_test PRIVATE ${PROJECT_NAME} oneDPL utils s
 endfunction()
 add_subdirectory(buffer)
 add_subdirectory(graph)
+if(${PROJECT_NAME}_ENABLE_GRAPH_TOOL)
 add_subdirectory(gt)
+endif()

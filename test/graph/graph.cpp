@@ -1,10 +1,10 @@
-#include <SIR_SBM/graph/graph.hpp>
-#include <SIR_SBM/math/combination.hpp>
-#include <SIR_SBM/sycl/queue_select.hpp>
-#include <SIR_SBM/utils/exceptions.hpp>
-#include <SIR_SBM/utils/ticktock.hpp>
-using namespace SIR_SBM;
-#include <SIR_SBM/utils/filepaths.hpp>
+#include <SBM/graph/graph.hpp>
+#include <SBM/math/combination.hpp>
+#include <SBM/sycl/queue_select.hpp>
+#include <SBM/utils/exceptions.hpp>
+#include <SBM/utils/ticktock.hpp>
+using namespace SBM;
+#include <SBM/utils/filepaths.hpp>
 
 int main() {
   auto p_SBM = SBM_Param::parse(SOURCE_TEST_DIR / "simulation.yml");

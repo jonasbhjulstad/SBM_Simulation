@@ -1,7 +1,0 @@
-#include <SIR_SBM/utils/filepaths.hpp>
-namespace SIR_SBM {
-const std::filesystem::path PROJECT_BINARY_DIR = "@PROJECT_BINARY_DIR@";
-const std::filesystem::path PROJECT_SOURCE_DIR = "@PROJECT_SOURCE_DIR@";
-const std::filesystem::path SOURCE_TEST_DIR = PROJECT_SOURCE_DIR / "test/";
-const std::filesystem::path BINARY_TEST_DIR = PROJECT_BINARY_DIR / "test/";
-} // namespace SIR_SBM
