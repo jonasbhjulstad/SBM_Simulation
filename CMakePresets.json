@@ -2,25 +2,13 @@
     "version": 8,
     "configurePresets": [
         {
-            "name": "dpcpp",
-            "displayName": "DPCPP",
-            "description": "Using compilers: C = ${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang, CXX = ${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang++",
+            "name": "dpcpp-base",
+            "hidden": true,
             "binaryDir": "${sourceDir}/build/${presetName}",
             "generator": "Ninja",
             "cacheVariables": {
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/${presetName}",
-                "CMAKE_C_COMPILER": "${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang",
-                "CMAKE_CXX_COMPILER": "${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang++",
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_EXE_LINKER_FLAGS": "-L${userHome}/sycl_workspace/llvm/llvm/install/base/lib/",
-                "CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES": "${userHome}/sycl_workspace/llvm/llvm/install/base/include/",
-                "CMAKE_BUILD_RPATH": "${userHome}/sycl_workspace/llvm/llvm/install/base/lib/",
-                "CMAKE_PREFIX_PATH": "${userHome}/sycl_workspace/llvm/llvm/install/base/lib/cmake/llvm/",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_CXX_FLAGS": "-Wno-error=unused-command-line-argument",
-                "CMAKE_LINKER": "/usr/bin/mold",
-                "CMAKE_BUILD_RPATH": "${userHome}/sycl_workspace/llvm/llvm/build/base/lib/",
-                "SYCL_INCLUDE_DIR": "${userHome}/sycl_workspace/llvm/build/include/sycl/"
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/dpcpp.cmake"
             }
         },
         {
@@ -42,66 +30,53 @@
             }
         },
         {
-            "name": "SIR_SBM",
+            "name": "SBM",
             "hidden": true,
             "cacheVariables": {
-                "SIR_SBM_USE_GPU": "ON",
-                "SIR_SBM_USE_CPU": "ON"
+                "SBM_USE_GPU": "ON",
+                "SBM_USE_CPU": "ON"
             }
         },
         {
-            "name": "OpenMP",
-            "displayName": "OpenMP",
+            "name": "dpcpp-openMP",
             "hidden": true,
-            "description": "Using compilers: C = ${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang, CXX = ${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang++",
-            "cacheVariables": {
-                "OpenMP_C_LIB_NAMES": "libomp",
-                "OpenMP_libomp_LIBRARY": "${userHome}/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so",
-                "OpenMP_CXX_FLAGS": "-Xpreprocessor -fopenmp ${userHome}/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so",
-                "OpenMP_CXX_LIB_NAMES": "libomp",
-                "OpenMP_C_FLAGS": "-Xpreprocessor -fopenmp ${userHome}/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so"
-            }
+            "cacheVariables": {}
         },
         {
             "name": "IWYU",
             "hidden": true,
             "cacheVariables": {
-                "CMAKE_CXX_INCLUDE_WHAT_YOU_USE": "/usr/bin/iwyu"
+                "CMAKE_CXX_INCLUDE_WHAT_YOU_USE": "/home/deb/sycl_workspace/llvm/llvm/install/base/bin/include-what-you-use;-Xiwyu;--error_always"
             }
         },
         {
             "name": "graph-tool",
             "hidden": true,
-            "inherits": "OpenMP",
-            "displayName": "graph-tool",
-            "description": "Graph-tool configuration parameters",
+            "inherits": "dpcpp-openMP",
             "cacheVariables": {
-                "Python3_ROOT_DIR": "${userHome}/mambaforge/envs/gt/"
+                "Python3_ROOT_DIR": "${userHome}/mambaforge/envs/gt/",
+                "SBM_ENABLE_GRAPH_TOOL": "ON"
             },
             "environment": {
                 "PKG_CONFIG_PATH": "${userHome}/mambaforge/envs/gt/lib/pkgconfig"
             }
         },
         {
-            "name": "full-dpcpp",
-            "displayName": "full-dpcpp",
-            "description": "DPCPP with all cache variables",
+            "name": "dpcpp",
+            "displayName": "dpcpp",
             "inherits": [
-                "dpcpp",
-                "graph-tool",
+                "dpcpp-base",
                 "ccache",
-                "SIR_SBM"
+                "SBM"
             ]
         },
         {
-            "name": "clang-tidy-full-dpcpp",
-            "displayName": "full-dpcpp",
-            "description": "clang-tidy full",
+            "name": "dpcpp-static-analysis",
+            "displayName": "dpcpp static analysis",
+            "description": "+clang-tidy +IWYU",
             "inherits": [
                 "dpcpp",
-                "graph-tool",
-                "ccache",
-                "SIR_SBM",
+                "SBM",
                 "clang-tidy",
                 "IWYU"
             ]
@@ -109,14 +84,8 @@
     ],
     "buildPresets": [
         {
-            "name": "graph-tool-tests",
-            "targets": [
-                "kcore"
-            ]
-        },
-        {
-            "name": "all",
-            "configurePreset": "full-dpcpp",
+            "name": "tests",
+            "configurePreset": "dpcpp",
             "targets": [
                 "all"
             ]

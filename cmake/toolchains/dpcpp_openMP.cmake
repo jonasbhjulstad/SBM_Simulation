@@ -1,0 +1,6 @@
+include(${CMAKE_CURRENT_LIST_DIR}/dpcpp.cmake)
+set(OpenMP_C_LIB_NAMES "libomp")
+set(OpenMP_libomp_LIBRARY "${userHome}/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so")
+set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp ${userHome}/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so")
+set(OpenMP_CXX_LIB_NAMES "libomp")
+set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp ${userHome}/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so")

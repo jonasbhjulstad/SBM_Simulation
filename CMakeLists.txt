@@ -1,16 +1,8 @@
 #default cmakelists
 cmake_minimum_required(VERSION 3.22)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-#c++20
-project(SIR_SBM)
-set(CMAKE_CXX_STANDARD 20)
-add_compile_options("-fcolor-diagnostics")
-add_compile_options("-Wfatal-errors")
-set(SYCL_INCLUDE_DIR "~/sycl_workspace/llvm/build/include/sycl/")
-include_directories(${SYCL_INCLUDE_DIR})
-set(SIR_SBM_USE_GPU ON)
+project(SBM)
 cmake_policy(SET CMP0135 NEW)
-set(Python3_ROOT_DIR "/home/deb/mambaforge/envs/gt/")
 include(FindPython3)
 include(cmake/FindGraphTool.cmake)
 include(cmake/ccache.cmake)

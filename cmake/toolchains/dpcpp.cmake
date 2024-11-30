@@ -1,0 +1,13 @@
+enable_language(CXX)
+enable_language(C)
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_C_COMPILER: "$ENV{HOME}/sycl_workspace/llvm/llvm/install/base/bin/clang")
+set(CMAKE_CXX_COMPILER: "$ENV{HOME}/sycl_workspace/llvm/llvm/install/base/bin/clang++")
+set(CMAKE_EXE_LINKER_FLAGS: "-L$ENV{HOME}/sycl_workspace/llvm/llvm/install/base/lib/")
+set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES: "$ENV{HOME}/sycl_workspace/llvm/llvm/install/base/include/")
+set(CMAKE_BUILD_RPATH: "$ENV{HOME}/sycl_workspace/llvm/llvm/install/base/lib/")
+set(CMAKE_PREFIX_PATH: "$ENV{HOME}/sycl_workspace/llvm/llvm/install/base/lib/cmake/llvm/")
+set(CMAKE_LINKER: "/usr/bin/mold")
+set(CMAKE_BUILD_RPATH: "$ENV{HOME}/sycl_workspace/llvm/llvm/build/base/lib/")
+set(SYCL_INCLUDE_DIR: "$ENV{HOME}/sycl_workspace/llvm/build/include/sycl/")
+

@@ -31,6 +31,7 @@ GIT_TAG 3.3.0
 set(${PROJECT_NAME}_EXTERNAL_PRIVATE_LIBRARIES TBB::tbb cppitertools::cppitertools yaml-cpp::yaml-cpp DataFrame::DataFrame)
 set(${PROJECT_NAME}_EXTERNAL_TEST_LIBRARIES yaml-cpp::yaml-cpp)
 
+if(${${PROJECT_NAME}_ENABLE_GRAPH_TOOL})
 include(FindPkgConfig)
-#graph tool
 pkg_check_modules(GRAPH_TOOL REQUIRED graph-tool-py3.12)
+endif()
