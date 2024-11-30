@@ -35,6 +35,13 @@
             }
         },
         {
+            "name": "clang-tidy",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_CLANG_TIDY": "${userHome}/sycl_workspace/llvm/llvm/install/base/bin/clang-tidy"
+            }
+        },
+        {
             "name": "SIR_SBM",
             "hidden": true,
             "cacheVariables": {
@@ -53,6 +60,13 @@
                 "OpenMP_CXX_FLAGS": "-Xpreprocessor -fopenmp ${userHome}/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so",
                 "OpenMP_CXX_LIB_NAMES": "libomp",
                 "OpenMP_C_FLAGS": "-Xpreprocessor -fopenmp ${userHome}/sycl_workspace/llvm/llvm/install/base/lib/x86_64-unknown-linux-gnu/libomp.so"
+            }
+        },
+        {
+            "name": "IWYU",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_INCLUDE_WHAT_YOU_USE": "/usr/bin/iwyu"
             }
         },
         {
@@ -77,6 +91,19 @@
                 "graph-tool",
                 "ccache",
                 "SIR_SBM"
+            ]
+        },
+        {
+            "name": "clang-tidy-full-dpcpp",
+            "displayName": "full-dpcpp",
+            "description": "clang-tidy full",
+            "inherits": [
+                "dpcpp",
+                "graph-tool",
+                "ccache",
+                "SIR_SBM",
+                "clang-tidy",
+                "IWYU"
             ]
         }
     ],
