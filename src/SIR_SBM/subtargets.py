@@ -42,46 +42,31 @@ if __name__ == '__main__':
         f.write(
             "configure_file(${CMAKE_CURRENT_LIST_DIR}/filepaths.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/filepaths.cpp @ONLY)\n")
 
-    sycl_targets = ["simulation", "epidemiological", "utils"]
+    sycl_targets = ["utils"]
     for sycl_target in sycl_targets:
         with open(cwd / "CMakeLists.txt", "a") as f:
             f.write("custom_configure_sycl(" + sycl_target + ")")
             f.write("\n")
-    graph_targets = ["epidemiological", "simulation"]
-    cppiter_targets = ["epidemiological", "graph", "simulation"]
-    yaml_targets = ["graph", "simulation", "sycl", "epidemiological"]
-    casadi_targets = ["regression"]
-    onedpl_targets = ["epidemiological", "random", "simulation", "graph"]
-    epidemiological_targets = ["utils"]
-    utils_targets = ["simulation", "epidemiological"]
+    graph_targets = []
+    cppiter_targets = ["graph"]
+    yaml_targets = ["graph", "sycl"]
+    casadi_targets = []
+    onedpl_targets = ["random", "graph"]
+    utils_targets = []
     dependencies = {"sycl": sycl_targets,
                     "graph": graph_targets,
                     "cppitertools::cppitertools": cppiter_targets,
                     "yaml-cpp::yaml-cpp": yaml_targets,
                     "casadi": casadi_targets,
                     "oneDPL": onedpl_targets,
-                    "epidemiological": epidemiological_targets,
                     "utils": utils_targets}
-
-    # _ = [link_library(cwd, target, "cppitertools::cppitertools")
-    #      for target in cppiter_targets]
-    # _ = [link_library(cwd, target, "yaml-cpp::yaml-cpp")
-    #      for target in yaml_targets]
-    # _ = [link_library(cwd, target, "casadi", type="PRIVATE")
-    #      for target in casadi_targets]
-    # _ = [link_library(cwd, target, "oneDPL TBB::tbb", type="PUBLIC")
-    #      for target in onedpl_targets]
-    # _ = [link_library(cwd, target, "utils", type="PRIVATE")
-    #      for target in utils_targets]
-    # _ = [link_library(cwd, target, "epidemiological", type="PRIVATE")
-    #      for target in epidemiological_targets]
 
     # iterate over dependencies
     for target in dependencies:
         _ = [link_library(cwd, sub, target, type="PUBLIC")
              for sub in dependencies[target]]
 
-    # main library
+        # main library
     with open(cwd / "CMakeLists.txt", "a") as f:
         f.write("add_library(SIR_SBM STATIC sir_sbm.cpp)\n")
         f.write(

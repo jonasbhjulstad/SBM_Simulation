@@ -1,4 +1,0 @@
-add_custom_test(population_count)
-add_custom_test(simulation_step)
-add_custom_test(run_simulation)
-add_custom_test(infection_sampling)

@@ -23,7 +23,12 @@ GIT_TAG master
 OPTIONS
 "cppitertools_INSTALL_CMAKE_DIR \"share/cppitertools/cmake\""
 )
-set(${PROJECT_NAME}_EXTERNAL_PRIVATE_LIBRARIES TBB::tbb cppitertools::cppitertools yaml-cpp::yaml-cpp)
+CPMFindPackage(NAME DataFrame
+GITHUB_REPOSITORY hosseinmoein/DataFrame
+GIT_TAG 3.3.0
+)
+
+set(${PROJECT_NAME}_EXTERNAL_PRIVATE_LIBRARIES TBB::tbb cppitertools::cppitertools yaml-cpp::yaml-cpp DataFrame::DataFrame)
 set(${PROJECT_NAME}_EXTERNAL_TEST_LIBRARIES yaml-cpp::yaml-cpp)
 
 include(FindPkgConfig)
