@@ -72,15 +72,8 @@ sycl::event state_copy(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
                        uint32_t t_src, uint32_t t_dest, sycl::event dep_event) {
   throw_if(t_dest >= state.get_range()[2], "Invalid dest time step");
   throw_if(t_src >= state.get_range()[2], "Invalid source time step");
-  auto N_sims = state.get_range()[0];
-  auto N_vertices = state.get_range()[1];
   return q.submit([&](sycl::handler &h) {
     h.depends_on(dep_event);
-    // auto acc = state.template get_access<sycl::access::mode::read_write>(h);
-    // h.parallel_for(sycl::range<2>(N_sims, N_vertices), [=](sycl::item<2> it)
-    // {
-    //   acc[it[0]][it[1]][t_dest] = acc[it[0]][it[1]][t_src];
-    // });
     auto timestep_range =
         sycl::range<3>(state.get_range()[0], state.get_range()[1], 1);
     auto src_acc = sycl::accessor<SIR_State, 3, sycl::access::mode::read>(
@@ -90,8 +83,6 @@ sycl::event state_copy(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
     h.copy(src_acc, dest_acc);
   });
 }
-
-// runs inplace recovery on vertices at time t
 
 sycl::event recover(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
                     sycl::buffer<oneapi::dpl::ranlux48> &rngs, float p_R,
@@ -108,8 +99,7 @@ sycl::event recover(sycl::queue &q, sycl::buffer<SIR_State, 3> &state,
       auto rng = rng_acc[sim_idx];
       for (int i = 0; i < N_vertices; i++) {
         SIR_State &s = state_acc[sycl::range<3>(sim_idx[0], i, t)];
-        if (s == SIR_State::Infected && dist(rng))
-        {
+        if (s == SIR_State::Infected && dist(rng)) {
           s = SIR_State::Recovered;
         }
       }

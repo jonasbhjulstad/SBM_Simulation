@@ -28,7 +28,6 @@ connection_expand_population(const std::tuple<casadi::DM, casadi::DM> &data,
        iter::combinations_with_replacement(make_iota(N_communities), 2)) {
     int from_idx = comb[0];
     int to_idx = comb[1];
-    auto con_slice = population_slice(con_idx);
     auto from_slice = Slice(from_idx * 3, from_idx * 3 + 3, 1);
     auto to_slice = Slice(to_idx * 3, to_idx * 3 + 3, 1);
 
