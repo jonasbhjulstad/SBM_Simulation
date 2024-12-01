@@ -1,5 +1,5 @@
 
-include(${PROJECT_SOURCE_DIR}/cmake/CPM.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/CPM.cmake)
 find_package(TBB REQUIRED HINTS "/opt/intel/oneapi/tbb/latest/lib/cmake/tbb/")
 find_package(oneDPL REQUIRED HINTS "/opt/intel/oneapi/dpl/latest/lib/cmake/oneDPL/")
 find_package(Eigen3 REQUIRED)
@@ -14,18 +14,32 @@ ExternalProject_Add(
         PREFIX ${CMAKE_BINARY_DIR}/external/casadi)
 
 find_package(casadi HINTS ${CMAKE_BINARY_DIR}/external/casadi/src/casadi-3.6.5/casadi)
-CPMFindPackage(NAME yaml-cpp
-GITHUB_REPOSITORY jbeder/yaml-cpp
-GIT_TAG master)
-CPMFindPackage(NAME cppitertools
-GITHUB_REPOSITORY ryanhaining/cppitertools
-GIT_TAG master
-OPTIONS
-"cppitertools_INSTALL_CMAKE_DIR \"share/cppitertools/cmake\""
+
+function(Custom_ExternalProject_Add name git_url)
+    ExternalProject_Add(
+            ${name}_repo
+            GIT_REPOSITORY ${git_url}
+            PREFIX ${CMAKE_BINARY_DIR}/external/${name}
+            LOG_INSTALL "false"
+            INSTALL_COMMAND ""
+            CMAKE_ARGS "-DCMAKE_TOOLCHAIN_FILE=${PROJECT_SOURCE_DIR}/cmake/toolchains/dpcpp.cmake"
+    )
+    set(${name}_BINARY_DIR ${CMAKE_BINARY_DIR}/external/${name}_repo/src/${name})
+    find_package(${name} HINTS ${${name}_BINARY_DIR})
+endfunction()
+
+Custom_ExternalProject_Add(
+        yaml-cpp
+        https://github.com/jbeder/yaml-cpp.git
 )
-CPMFindPackage(NAME DataFrame
-GITHUB_REPOSITORY hosseinmoein/DataFrame
-GIT_TAG 3.3.0
+
+Custom_ExternalProject_Add(
+        DataFrame
+        https://github.com/jbeder/yaml-cpp.git
+)
+Custom_ExternalProject_Add(
+        cppitertools
+        https://github.com/ryanhaining/cppitertools.git
 )
 
 set(${PROJECT_NAME}_EXTERNAL_PRIVATE_LIBRARIES TBB::tbb cppitertools::cppitertools yaml-cpp::yaml-cpp DataFrame::DataFrame)

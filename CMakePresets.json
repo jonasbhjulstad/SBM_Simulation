@@ -81,14 +81,5 @@
                 "IWYU"
             ]
         }
-    ],
-    "buildPresets": [
-        {
-            "name": "tests",
-            "configurePreset": "dpcpp",
-            "targets": [
-                "all"
-            ]
-        }
     ]
 }
