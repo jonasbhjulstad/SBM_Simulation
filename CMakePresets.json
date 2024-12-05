@@ -81,5 +81,14 @@
                 "IWYU"
             ]
         }
+    ],
+    "buildPresets": [
+        {
+            "name": "tests",
+            "configurePreset": "dpcpp",
+            "targets": [
+                "SBM_tests"
+            ]
+        }
     ]
 }
