@@ -8,6 +8,7 @@ include(cmake/FindGraphTool.cmake)
 include(cmake/ccache.cmake)
 include(cmake/external_packages.cmake)
 include(cmake/default_targets.cmake)
+include(cmake/custom_tests.cmake)
 include(cmake/configure_sycl.cmake)
 
 add_subdirectory(src)
