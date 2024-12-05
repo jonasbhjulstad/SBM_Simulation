@@ -68,8 +68,8 @@ if __name__ == '__main__':
 
         # main library
     with open(cwd / "CMakeLists.txt", "a") as f:
-        f.write("add_library(SBM STATIC SBM.cpp)\n")
+        f.write("add_library(SBM STATIC sbm.cpp)\n")
         f.write(
             "target_include_directories(SBM PUBLIC ${PROJECT_SOURCE_DIR}/include)\n")
-        f.write("target_link_libraries(SBM PRIVATE " +
+        f.write("target_link_libraries(SBM PUBLIC " +
                 "\n\t\t\t\t".join([sub.name for sub in subdirs]) + ")\n")

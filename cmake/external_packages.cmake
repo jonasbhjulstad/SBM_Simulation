@@ -43,7 +43,7 @@ Custom_ExternalProject_Add(
 )
 
 set(${PROJECT_NAME}_EXTERNAL_PRIVATE_LIBRARIES TBB::tbb cppitertools::cppitertools yaml-cpp::yaml-cpp DataFrame::DataFrame)
-set(${PROJECT_NAME}_EXTERNAL_TEST_LIBRARIES yaml-cpp::yaml-cpp)
+set(${PROJECT_NAME}_EXTERNAL_TEST_LIBRARIES yaml-cpp::yaml-cpp DataFrame::DataFrame)
 
 if(${${PROJECT_NAME}_ENABLE_GRAPH_TOOL})
 include(FindPkgConfig)
