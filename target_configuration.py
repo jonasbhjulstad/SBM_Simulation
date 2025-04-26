@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import sys
+import networkx as nx
 
 
 def add_subdirs(subdirs, pwd):
@@ -21,6 +22,10 @@ if __name__ == '__main__':
     cwd = Path(__file__).parent
     # set cwd
     os.chdir(cwd)
+    include_dir = cwd / "include"
+    source_dir = cwd / "src"
+    header_files = list(include_dir.rglob("*.hpp"))
+    source_files = list(source_dir.rglob("*.cpp"))
 
     subdirs = [d for d in cwd.iterdir() if d.is_dir()]
     add_subdirs(subdirs, cwd)

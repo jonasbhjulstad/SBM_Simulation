@@ -1,45 +1,37 @@
 
-include(${CMAKE_CURRENT_LIST_DIR}/CPM.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/configure_external.cmake)
 find_package(TBB REQUIRED HINTS "/opt/intel/oneapi/tbb/latest/lib/cmake/tbb/")
 find_package(oneDPL REQUIRED HINTS "/opt/intel/oneapi/dpl/latest/lib/cmake/oneDPL/")
 find_package(Eigen3 REQUIRED)
 include(FindOpenMP)
-include(ExternalProject)
-ExternalProject_Add(
-        casadi-3.6.5
-        URL https://github.com/casadi/casadi/releases/download/3.6.5/casadi-3.6.5-linux64-py39.zip
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        INSTALL_COMMAND ""
-        PREFIX ${CMAKE_BINARY_DIR}/external/casadi)
+ExternalProject_MakeAvailable(
+        NAME casadi
+        LIB_NAME casadi
+        URL https://github.com/casadi/casadi/releases/download/3.6.5/casadi-3.6.5-linux64-py39.zip)
 
-find_package(casadi HINTS ${CMAKE_BINARY_DIR}/external/casadi/src/casadi-3.6.5/casadi)
-
-function(Custom_ExternalProject_Add name git_url)
-    ExternalProject_Add(
-            ${name}_repo
-            GIT_REPOSITORY ${git_url}
-            PREFIX ${CMAKE_BINARY_DIR}/external/${name}
-            LOG_INSTALL "false"
-            INSTALL_COMMAND ""
-            CMAKE_ARGS "-DCMAKE_TOOLCHAIN_FILE=${PROJECT_SOURCE_DIR}/cmake/toolchains/dpcpp.cmake"
-    )
-    set(${name}_BINARY_DIR ${CMAKE_BINARY_DIR}/external/${name}_repo/src/${name})
-    find_package(${name} HINTS ${${name}_BINARY_DIR})
-endfunction()
-
-Custom_ExternalProject_Add(
-        yaml-cpp
-        https://github.com/jbeder/yaml-cpp.git
+ExternalProject_MakeAvailable(
+        NAME yaml-cpp
+        LIB_NAME yaml-cpp::yaml-cpp
+        GIT_REPO https://github.com/jbeder/yaml-cpp.git
+        TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/cmake/dpcpp.cmake
+        CMAKE_EXTRA_ARGS
+        -DYAML_CPP_BUILD_TESTS=OFF
+        BUILD_TYPE Release
 )
 
-Custom_ExternalProject_Add(
-        DataFrame
-        https://github.com/jbeder/yaml-cpp.git
+ExternalProject_MakeAvailable(
+        NAME DataFrame
+        LIB_NAME DataFrame::DataFrame
+        GIT_REPO https://github.com/hosseinmoein/DataFrame.git
+        TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/cmake/dpcpp.cmake
+        BUILD_TYPE Release
 )
-Custom_ExternalProject_Add(
-        cppitertools
-        https://github.com/ryanhaining/cppitertools.git
+ExternalProject_MakeAvailable(
+        NAME cppitertools
+        LIB_NAME cppitertools::cppitertools
+        GIT_REPO https://github.com/ryanhaining/cppitertools.git
+        TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/cmake/dpcpp.cmake
+        BUILD_TYPE Release
 )
 
 set(${PROJECT_NAME}_EXTERNAL_PRIVATE_LIBRARIES TBB::tbb cppitertools::cppitertools yaml-cpp::yaml-cpp DataFrame::DataFrame)
